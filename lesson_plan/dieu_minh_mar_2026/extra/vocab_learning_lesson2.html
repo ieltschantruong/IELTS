@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Speaking Part 2 Vocabulary</title>
+    <style>
+        :root {
+            --primary: #4338ca;
+            --primary-light: #e0e7ff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-body: #f3f4f6;
+            --card-bg: #ffffff;
+            --accent: #6366f1;
+            --border: #e5e7eb;
+            --badge-bg: #c7d2fe;
+            --badge-text: #312e81;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding: 2rem 1rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem; }
+        p.subtitle { color: var(--text-muted); font-size: 1.1rem; max-width: 800px; margin: 0 auto; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--primary-light); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); border-color: var(--primary); }
+        .vocab-card.hidden { display: none; } /* Used for filtering */
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        .phonetic { font-size: 0.95rem; color: var(--text-muted); font-style: italic; }
+        .word-form { background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        .definition { font-size: 1rem; margin-bottom: 1rem; flex-grow: 1; }
+        .definition strong { color: var(--text-main); }
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 600px; height: 380px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid var(--border); background: var(--card-bg); padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 3rem; margin-bottom: 1rem; }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .phonetic { font-size: 1.2rem; }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.2rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .flashcard-back .definition { font-size: 1.15rem; margin-bottom: 1rem; }
+        .flashcard-back .example-box { width: 100%; font-size: 1.05rem; }
+        .flashcard-hint { position: absolute; bottom: 1.5rem; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { h1 { font-size: 2rem; } #grid-view { grid-template-columns: 1fr; } .flashcard-scene { height: 420px; } .flashcard-front .word { font-size: 2.2rem; } .flashcard-back .definition { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>IELTS Speaking Part 2 Vocabulary</h1>
+        <p class="subtitle">Target Band 6.5 | 30 Essential Words & Phrases</p>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Topics</button>
+        <button class="filter-btn" onclick="filterTopic('A Creative Person')">A Creative Person</button>
+        <button class="filter-btn" onclick="filterTopic('An Exciting Activity')">An Exciting Activity</button>
+        <button class="filter-btn" onclick="filterTopic('A Science Subject')">A Science Subject</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="word-form" id="fc-form">Verb</span>
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Definition</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <div class="example-box">
+                        <span>Example</span>
+                        <div id="fc-example">"Example sentence goes here."</div>
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 30</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: var(--border); margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- ============================================== -->
+        <!-- Topic 1: Creative Person (10 items)            -->
+        <!-- ============================================== -->
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Innovative</span>
+                    <button class="audio-btn" onclick="playAudio('Innovative')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Adjective</span>
+                    <span class="phonetic">/ˈɪnəveɪtɪv/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> Introducing new ideas; original and creative in thinking.</p>
+            <div class="example-box"><span>Example</span>"I admire him because his approach to architecture is incredibly innovative."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Visionary</span>
+                    <button class="audio-btn" onclick="playAudio('Visionary')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun/Adj</span>
+                    <span class="phonetic">/ˈvɪʒənri/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> Thinking about or planning the future with imagination or wisdom.</p>
+            <div class="example-box"><span>Example</span>"She is a true visionary in the tech industry, always anticipating trends."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Masterpiece</span>
+                    <button class="audio-btn" onclick="playAudio('Masterpiece')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun</span>
+                    <span class="phonetic">/ˈmɑːstəpiːs/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> A work of outstanding artistry, skill, or workmanship.</p>
+            <div class="example-box"><span>Example</span>"Her greatest achievement was composing a symphony that critics called a masterpiece."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Unconventional</span>
+                    <button class="audio-btn" onclick="playAudio('Unconventional')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Adjective</span>
+                    <span class="phonetic">/ˌʌnkənˈvɛnʃənl/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> Not based on or conforming to what is generally done or believed.</p>
+            <div class="example-box"><span>Example</span>"What makes him so creative is his unconventional use of everyday materials."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Dedication</span>
+                    <button class="audio-btn" onclick="playAudio('Dedication')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun</span>
+                    <span class="phonetic">/ˌdɛdɪˈkeɪʃn/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> The quality of being committed to a task or purpose.</p>
+            <div class="example-box"><span>Example</span>"Besides his talent, his absolute dedication to his craft sets him apart."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Inspiration</span>
+                    <button class="audio-btn" onclick="playAudio('Inspiration')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun</span>
+                    <span class="phonetic">/ˌɪnspəˈreɪʃn/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> The process of being mentally stimulated to do or feel something.</p>
+            <div class="example-box"><span>Example</span>"He draws inspiration from nature for his vibrant landscape paintings."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Avant-garde</span>
+                    <button class="audio-btn" onclick="playAudio('Avant-garde')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Adjective</span>
+                    <span class="phonetic">/ˌævɒ̃ˈɡɑːd/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> New and unusual or experimental ideas, especially in the arts.</p>
+            <div class="example-box"><span>Example</span>"Her avant-garde fashion designs constantly challenge traditional aesthetics."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Think outside the box</span>
+                    <button class="audio-btn" onclick="playAudio('Think outside the box')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Phrase</span>
+                    <span class="phonetic">/tə θɪŋk ˌaʊtˈsaɪd ðə bɒks/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> To think creatively, freely, and off the beaten path.</p>
+            <div class="example-box"><span>Example</span>"His ability to think outside the box allows him to solve problems uniquely."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Profound</span>
+                    <button class="audio-btn" onclick="playAudio('Profound')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Adjective</span>
+                    <span class="phonetic">/prəˈfaʊnd/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> Very great or intense; having or showing great knowledge or insight.</p>
+            <div class="example-box"><span>Example</span>"Her poetry has a profound impact on anyone who reads it."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Creative Person">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Perseverance</span>
+                    <button class="audio-btn" onclick="playAudio('Perseverance')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun</span>
+                    <span class="phonetic">/ˌpɜːsɪˈvɪərəns/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: A Creative Person</span>
+            <p class="definition"><strong>Definition:</strong> Persistence in doing something despite difficulty or delay in achieving success.</p>
+            <div class="example-box"><span>Example</span>"His perseverance in the face of numerous rejections eventually led to his breakthrough."</div>
+        </article>
+
+        <!-- ============================================== -->
+        <!-- Topic 2: Exciting Activity (10 items)          -->
+        <!-- ============================================== -->
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Exhilarating</span>
+                    <button class="audio-btn" onclick="playAudio('Exhilarating')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Adjective</span>
+                    <span class="phonetic">/ɪɡˈzɪləreɪtɪŋ/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> Making one feel very happy, animated, or elated; thrilling.</p>
+            <div class="example-box"><span>Example</span>"Skydiving for the first time was an absolutely exhilarating experience."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Adrenaline rush</span>
+                    <button class="audio-btn" onclick="playAudio('Adrenaline rush')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun Phrase</span>
+                    <span class="phonetic">/əˈdrɛnəlɪn rʌʃ/</span>
+                </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> A physical feeling of intense excitement caused by the release of adrenaline.</p>
+            <div class="example-box"><span>Example</span>"As I stood at the edge of the platform, I felt a massive adrenaline rush."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Overcome</span>
+                    <button class="audio-btn" onclick="playAudio('Overcome')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Verb</span>
+                    <span class="phonetic">/ˌoʊvərˈkʌm/</span>
+                 </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> To succeed in dealing with a problem or difficulty (often a fear).</p>
+            <div class="example-box"><span>Example</span>"I was terrified, but I managed to overcome my fear to try scuba diving."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Anticipation</span>
+                    <button class="audio-btn" onclick="playAudio('Anticipation')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Noun</span>
+                    <span class="phonetic">/ænˌtɪsɪˈpeɪʃn/</span>
+                 </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> A feeling of excitement about something that is going to happen.</p>
+            <div class="example-box"><span>Example</span>"The anticipation built up during the boat ride out to the reef."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Push my boundaries</span>
+                    <button class="audio-btn" onclick="playAudio('Push my boundaries')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Phrase</span>
+                    <span class="phonetic">/pʊʃ maɪ ˈbaʊndəriz/</span>
+                 </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> To step outside of one's comfort zone and do something challenging.</p>
+            <div class="example-box"><span>Example</span>"I’m usually cautious, so rock climbing really pushed my boundaries."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                    <span class="word">Nerve-wracking</span>
+                    <button class="audio-btn" onclick="playAudio('Nerve-wracking')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                    <span class="word-form">Adjective</span>
+                    <span class="phonetic">/ˈnɜːvˌrækɪŋ/</span>
+                 </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> Causing stress or anxiety.</p>
+            <div class="example-box"><span>Example</span>"The moments just before the bungee jump were incredibly nerve-wracking."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                <div class="word-main">
+                     <span class="word">Thrilled</span>
+                     <button class="audio-btn" onclick="playAudio('Thrilled')" title="Listen to pronunciation">🔊</button>
+                </div>
+                <div class="meta-info">
+                     <span class="word-form">Adjective</span>
+                     <span class="phonetic">/θrɪld/</span>
+                 </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> Extremely pleased and excited.</p>
+            <div class="example-box"><span>Example</span>"I was absolutely thrilled when I finally managed to stand up on the surfboard."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+            <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Once-in-a-lifetime</span>
+                     <button class="audio-btn" onclick="playAudio('Once-in-a-lifetime')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Adjective</span>
+                     <span class="phonetic">/ˌwʌns ɪn ə ˈlaɪftaɪm/</span>
+                 </div>
+            </div>
+            <span class="topic-tag">Topic: An Exciting Activity</span>
+            <p class="definition"><strong>Definition:</strong> Very rare; unlikely to happen again.</p>
+            <div class="example-box"><span>Example</span>"Seeing the Northern Lights from a dog sled was a once-in-a-lifetime experience."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Take the plunge</span>
+                     <button class="audio-btn" onclick="playAudio('Take the plunge')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Phrase</span>
+                     <span class="phonetic">/teɪk ðə plʌndʒ/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: An Exciting Activity</span>
+             <p class="definition"><strong>Definition:</strong> To commit to doing something difficult or risky, especially after hesitation.</p>
+             <div class="example-box"><span>Example</span>"After weeks of indecision, I finally decided to take the plunge and book the skydiving lesson."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="An Exciting Activity">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Sense of achievement</span>
+                     <button class="audio-btn" onclick="playAudio('Sense of achievement')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Noun Phrase</span>
+                     <span class="phonetic">/sɛns əv əˈtʃiːvmənt/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: An Exciting Activity</span>
+             <p class="definition"><strong>Definition:</strong> A feeling of pride after having done something difficult successfully.</p>
+             <div class="example-box"><span>Example</span>"Reaching the summit gave me an immense sense of achievement."</div>
+        </article>
+
+        <!-- ============================================== -->
+        <!-- Topic 3: Science Subject (10 items)            -->
+        <!-- ============================================== -->
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Fascinated</span>
+                     <button class="audio-btn" onclick="playAudio('Fascinated')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Adjective</span>
+                     <span class="phonetic">/ˈfæsɪneɪtɪd/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> Strongly attracted and interested.</p>
+             <div class="example-box"><span>Example</span>"I have always been fascinated by marine biology and the ocean's ecosystems."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Breakthrough</span>
+                     <button class="audio-btn" onclick="playAudio('Breakthrough')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Noun</span>
+                     <span class="phonetic">/ˈbreɪkθruː/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> A sudden, dramatic, and important discovery or development.</p>
+             <div class="example-box"><span>Example</span>"I read journals to keep up with the latest technological breakthroughs."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Complex</span>
+                     <button class="audio-btn" onclick="playAudio('Complex')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Adjective</span>
+                     <span class="phonetic">/ˈkɒmplɛks/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> Consisting of many different and connected parts; not easy to understand.</p>
+             <div class="example-box"><span>Example</span>"Genetics is a highly complex subject, which is why I find it stimulating."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Application</span>
+                     <button class="audio-btn" onclick="playAudio('Application')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Noun</span>
+                     <span class="phonetic">/ˌæplɪˈkeɪʃn/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> The practical use or relevance of something (such as a theory or discovery).</p>
+             <div class="example-box"><span>Example</span>"I’m interested in AI because of its practical applications in medicine."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Curiosity</span>
+                     <button class="audio-btn" onclick="playAudio('Curiosity')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Noun</span>
+                     <span class="phonetic">/ˌkjʊəriˈɒsɪti/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> A strong desire to know or learn something.</p>
+             <div class="example-box"><span>Example</span>"Watching a documentary sparked my lifelong curiosity about astronomy."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Hypothesis</span>
+                     <button class="audio-btn" onclick="playAudio('Hypothesis')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Noun</span>
+                     <span class="phonetic">/haɪˈpɒθɪsɪs/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> A proposed explanation made on the basis of limited evidence as a starting point for further investigation.</p>
+             <div class="example-box"><span>Example</span>"The scientists set up an experiment to test their new hypothesis about climate change."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Phenomenon</span>
+                     <button class="audio-btn" onclick="playAudio('Phenomenon')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Noun</span>
+                     <span class="phonetic">/fɪˈnɒmɪnən/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> A fact or situation that is observed to exist or happen, especially one whose cause is in question.</p>
+             <div class="example-box"><span>Example</span>"Gravity is a fundamental physical phenomenon that dictates how planets orbit."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Delve into</span>
+                     <button class="audio-btn" onclick="playAudio('Delve into')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Phrasal Verb</span>
+                     <span class="phonetic">/dɛlv ˈɪntuː/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> To examine something carefully in order to discover more information about it.</p>
+             <div class="example-box"><span>Example</span>"If I had the chance, I would love to delve deeply into the subject of quantum mechanics."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Intricate</span>
+                     <button class="audio-btn" onclick="playAudio('Intricate')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Adjective</span>
+                     <span class="phonetic">/ˈɪntrɪkət/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> Very complicated or detailed.</p>
+             <div class="example-box"><span>Example</span>"The human immune system is an intricate network of cells and proteins."</div>
+        </article>
+
+        <article class="vocab-card" data-topic="A Science Subject">
+             <div class="word-header">
+                 <div class="word-main">
+                     <span class="word">Groundbreaking</span>
+                     <button class="audio-btn" onclick="playAudio('Groundbreaking')" title="Listen to pronunciation">🔊</button>
+                 </div>
+                 <div class="meta-info">
+                     <span class="word-form">Adjective</span>
+                     <span class="phonetic">/ˈɡraʊndˌbreɪkɪŋ/</span>
+                 </div>
+             </div>
+             <span class="topic-tag">Topic: A Science Subject</span>
+             <p class="definition"><strong>Definition:</strong> Innovative; pioneering.</p>
+             <div class="example-box"><span>Example</span>"The recent mapping of the human genome was a truly groundbreaking achievement in biology."</div>
+        </article>
+    </main>
+</div>
+
+<script>
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        // Re-initialize flashcards based on the new filter if we are in flashcard mode
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            // Extract data based on currently active filter
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            const topicName = activeFilter === 'All Topics' ? 'all' : activeFilter;
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        const cards = document.querySelectorAll('.vocab-card');
+        cards.forEach(card => {
+            // Only add card if it matches the current topic filter
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                // Safeguard against missing elements to fix "Cannot read properties of undefined" error
+                const definitionElement = card.querySelector('.definition');
+                const exampleBoxElement = card.querySelector('.example-box');
+
+                if (definitionElement && exampleBoxElement) {
+                    // Use a safer way to get the text, removing "Definition:" and "Example" text
+                    let defText = definitionElement.textContent.replace('Definition:', '').trim();
+                    let exText = exampleBoxElement.textContent.replace('Example', '').trim();
+                    
+                    flashcardData.push({
+                        word: card.querySelector('.word').textContent.trim(),
+                        form: card.querySelector('.word-form').textContent.trim(),
+                        phonetic: card.querySelector('.phonetic').textContent.trim(),
+                        topic: card.getAttribute('data-topic'),
+                        definition: defText, 
+                        example: exText
+                    });
+                }
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-form').textContent = data.form;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = "Topic: " + data.topic;
+            document.getElementById('fc-definition').textContent = data.definition;
+            document.getElementById('fc-example').textContent = data.example;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
