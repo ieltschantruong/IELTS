@@ -48,47 +48,48 @@
             min-height: 100vh;
         }
 
-        /* Top Bar - IELTS Test Style */
+        /* Top Bar - IELTS Test Style (Sticky) */
         .top-bar {
             background-color: var(--header-bg);
             color: var(--header-text);
-            padding: 12px 24px;
+            padding: 0 24px;
+            height: 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
             border-bottom: 4px solid var(--pink-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .top-bar-left, .top-bar-right {
+        .top-bar-left {
             display: flex;
             align-items: center;
             gap: 16px;
-        }
-
-        .top-bar-right span {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 12px;
-            border-radius: var(--radius-sm);
         }
 
         /* Layout Container */
         .app-container {
             display: flex;
             flex: 1;
-            overflow: hidden;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
+            align-items: flex-start; /* Critical for sticky sidebar */
         }
 
-        /* Sidebar Navigation */
+        /* Sidebar Navigation (Sticky) */
         .sidebar {
             width: 280px;
             background-color: var(--bg-white);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            position: sticky;
+            top: 60px; /* Height of the top-bar */
+            height: calc(100vh - 60px);
             overflow-y: auto;
         }
 
@@ -135,7 +136,6 @@
         .main-content {
             flex: 1;
             padding: 32px 48px;
-            overflow-y: auto;
             background-color: var(--bg-main);
             scroll-behavior: smooth;
         }
@@ -449,17 +449,38 @@
             }
             .sidebar {
                 width: 100%;
+                height: auto;
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
-                max-height: 250px;
+                position: sticky;
+                top: 60px; /* Right below the top-bar */
+                z-index: 90;
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none; /* Firefox */
+            }
+            .sidebar::-webkit-scrollbar {
+                display: none; /* Chrome/Safari */
+            }
+            .sidebar-header {
+                display: none; /* Hide section headers for horizontal space */
+            }
+            .nav-btn {
+                border-bottom: 3px solid transparent;
+                border-left: none;
+                padding: 14px 20px;
+                white-space: nowrap;
+                font-size: 14px;
+            }
+            .nav-btn.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--pink-500);
+                background-color: var(--pink-50);
             }
             .main-content {
-                padding: 20px;
-            }
-            .top-bar {
-                flex-direction: column;
-                gap: 12px;
-                text-align: center;
+                padding: 24px 20px;
             }
             .vocab-grid {
                 grid-template-columns: 1fr;
@@ -474,11 +495,7 @@
         <div class="top-bar-left">
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
             <strong>IELTS Writing Task 2</strong>
-            <span>Academic & General Training</span>
-        </div>
-        <div class="top-bar-right">
-            <span>Candidate: <strong>Chan Truong</strong></span>
-            <span>Standard View</span>
+            <span>Academic Training</span>
         </div>
     </header>
 
@@ -1363,9 +1380,12 @@
             document.getElementById(tabName).classList.add('active');
             buttonElement.classList.add('active');
             
-            // On mobile, scroll back to top of main content on tab switch
+            // Scroll to the top of the page smoothly when switching tabs
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // On mobile, ensure the active tab button scrolls into the center of the sticky navigation bar
             if (window.innerWidth <= 768) {
-                document.querySelector('.main-content').scrollTop = 0;
+                buttonElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
         }
 
