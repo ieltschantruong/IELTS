@@ -137,12 +137,13 @@
             padding: 32px 48px;
             overflow-y: auto;
             background-color: var(--bg-main);
+            scroll-behavior: smooth;
         }
 
         .tab-panel {
             display: none;
             animation: fadeIn 0.3s ease-in-out;
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
         }
 
@@ -249,11 +250,22 @@
             margin-top: 8px;
         }
 
-        /* Accordions for Phrases */
+        .question-list li {
+            padding: 12px 16px;
+            background: var(--bg-main);
+            border-left: 3px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        /* Accordions */
         .accordion-item {
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             margin-bottom: 8px;
+            overflow: hidden;
         }
 
         .accordion-btn {
@@ -263,7 +275,7 @@
             border: none;
             padding: 14px 20px;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-main);
             cursor: pointer;
             display: flex;
@@ -304,6 +316,7 @@
             padding: 16px 20px;
         }
 
+        /* Phrases styling */
         .phrase-list {
             display: grid;
             grid-template-columns: 1fr;
@@ -312,21 +325,95 @@
 
         .phrase-list li {
             background: var(--bg-main);
-            padding: 10px 14px;
+            padding: 12px 16px;
             border-radius: var(--radius-sm);
             border-left: 3px solid var(--border-color);
             font-size: 14px;
+            line-height: 1.5;
         }
 
         .phrase-list li strong {
             color: var(--text-main);
+            display: block;
+            margin-bottom: 4px;
         }
 
         .phrase-list li span {
             color: var(--text-muted);
-            display: block;
-            margin-top: 4px;
             font-size: 13px;
+        }
+
+        /* Vocab Cards */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .vocab-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+        
+        .vocab-card h3 {
+            color: var(--pink-accent);
+            border-bottom: 1px solid var(--pink-100);
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .vocab-card ul li {
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .vocab-card ul li strong {
+            color: var(--text-main);
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+        
+        .vocab-card ul li span {
+            color: var(--text-muted);
+            display: block;
+            font-style: italic;
+        }
+
+        /* Sample Essay Styling */
+        .essay-container {
+            background-color: #fdfbf7;
+            padding: 24px;
+            border: 1px solid #e5e5e5;
+            border-radius: var(--radius-sm);
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+        }
+        
+        .essay-prompt {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--pink-50);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 24px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-main);
+            border-left: 4px solid var(--pink-accent);
+        }
+
+        .essay-container p {
+            margin-bottom: 16px;
+            text-indent: 20px;
+        }
+
+        .essay-container p:last-child {
+            margin-bottom: 0;
         }
 
         /* Footer */
@@ -364,7 +451,7 @@
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
-                max-height: 200px;
+                max-height: 250px;
             }
             .main-content {
                 padding: 20px;
@@ -373,6 +460,9 @@
                 flex-direction: column;
                 gap: 12px;
                 text-align: center;
+            }
+            .vocab-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -416,6 +506,11 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 Direct Questions (Two-part)
             </button>
+            <div class="sidebar-header" style="margin-top: 10px;">Language Bank</div>
+            <button class="nav-btn" onclick="openTab('vocab', this)">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                Vocab & Paraphrasing
+            </button>
         </nav>
 
         <!-- Main Content -->
@@ -445,10 +540,25 @@
 
                 <div class="section-card">
                     <div class="section-card-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Sample Test Questions
+                    </div>
+                    <div class="section-card-body">
+                        <ul class="question-list">
+                            <li><strong>Education:</strong> "University education should be free for everyone, regardless of their background. To what extent do you agree or disagree?"</li>
+                            <li><strong>Technology:</strong> "Some people believe that the widespread use of the internet has a mostly negative effect on social interaction. Do you agree or disagree?"</li>
+                            <li><strong>Environment:</strong> "It is the responsibility of individuals, rather than governments, to reduce their carbon footprint. What is your opinion?"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                         Paragraph Structure (Strong Opinion Approach)
                     </div>
                     <div class="section-card-body">
+                        <p style="margin-bottom:16px; color:var(--text-muted); font-size: 14px;">Use this structure if you 100% agree or 100% disagree. It is often the easiest structure to follow.</p>
                         <ul class="structure-list">
                             <li>
                                 <strong>1. Introduction</strong>
@@ -466,8 +576,7 @@
                                 <strong>3. Body Paragraph 2 (Second Reason)</strong>
                                 <span>Sentence 1: Topic sentence stating your second main reason.<br>
                                 Sentence 2-3: Explanation and expansion.<br>
-                                Sentence 4: Specific example.<br>
-                                Sentence 5: Concluding sentence.</span>
+                                Sentence 4: Specific example.</span>
                             </li>
                             <li>
                                 <strong>4. Conclusion</strong>
@@ -480,8 +589,41 @@
 
                 <div class="section-card">
                     <div class="section-card-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        Alternative Structure (Partly Agree / Balanced Approach)
+                    </div>
+                    <div class="section-card-body">
+                        <p style="margin-bottom:16px; color:var(--text-muted); font-size: 14px;">Use this structure when you can see the validity of both sides, but still lean towards one side. This often leads to a more nuanced, higher-band essay.</p>
+                        <ul class="structure-list">
+                            <li>
+                                <strong>1. Introduction</strong>
+                                <span>Sentence 1: Paraphrase the prompt statement.<br>
+                                Sentence 2: Thesis statement acknowledging both sides (e.g., "While I agree that [concession], I firmly believe that [main argument]").</span>
+                            </li>
+                            <li>
+                                <strong>2. Body Paragraph 1 (The side you agree with LESS - Concession)</strong>
+                                <span>Sentence 1: Topic sentence stating the merit of the opposing view.<br>
+                                Sentence 2-3: Explain why this side is valid in some situations.<br>
+                                Sentence 4: Give a brief example.</span>
+                            </li>
+                            <li>
+                                <strong>3. Body Paragraph 2 (The side you agree with MORE - Main stance)</strong>
+                                <span>Sentence 1: Pivot sentence showing why your main stance is stronger (e.g., "However, the aforementioned benefits are overshadowed by...").<br>
+                                Sentence 2-3: Explain your primary argument deeply.<br>
+                                Sentence 4: Specific, strong example.</span>
+                            </li>
+                            <li>
+                                <strong>4. Conclusion</strong>
+                                <span>Sentence 1: Restate that while [Side A] has merit, [Side B] is ultimately more important/correct.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Phrase Bank
+                        Enriched Phrase Bank
                     </div>
                     <div class="section-card-body" style="padding: 10px;">
                         
@@ -493,9 +635,12 @@
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>I completely agree/disagree with this perspective because...</strong><span>Use for a strong, one-sided essay (recommended).</span></li>
-                                        <li><strong>It is my firm belief that...</strong><span>A formal way to state your thesis.</span></li>
-                                        <li><strong>I partly agree with this assertion; however...</strong><span>Use only if you are writing a balanced (partial agreement) essay.</span></li>
+                                        <li><strong>I completely agree / fundamentally disagree with this perspective because...</strong><span>Use for a strong, one-sided essay. Expresses absolute certainty.</span></li>
+                                        <li><strong>It is my firm conviction that...</strong><span>A formal, high-band alternative to "I think".</span></li>
+                                        <li><strong>From my perspective, there is little doubt that...</strong><span>A confident thesis statement opener.</span></li>
+                                        <li><strong>I am staunchly of the opinion that...</strong><span>Indicates a very strong, unmoving belief in your stance.</span></li>
+                                        <li><strong>While I concede that [Opposing View], I would argue that [Your View] is far more significant.</strong><span>Perfect thesis for the Partly Agree/Balanced approach.</span></li>
+                                        <li><strong>To a certain extent, I agree that [Topic], but I cannot wholly endorse this view.</strong><span>Another excellent thesis for a balanced opinion.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -503,15 +648,37 @@
 
                         <div class="accordion-item">
                             <button class="accordion-btn" onclick="toggleAccordion(this)">
-                                Introducing Arguments (Body Paragraphs)
+                                Introducing Arguments & Concessions
                                 <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </button>
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>The primary reason I support this view is that...</strong><span>Excellent for Body Paragraph 1 topic sentence.</span></li>
-                                        <li><strong>Another significant factor to consider is...</strong><span>Excellent for Body Paragraph 2 topic sentence.</span></li>
-                                        <li><strong>To illustrate this point, consider...</strong><span>To introduce an example.</span></li>
+                                        <li><strong>The principal justification for this stance is that...</strong><span>Excellent for Body Paragraph 1 topic sentence.</span></li>
+                                        <li><strong>The paramount reason for supporting this view is...</strong><span>Strong variation for opening your main argument.</span></li>
+                                        <li><strong>Another compelling argument in favor of this is...</strong><span>Excellent for Body Paragraph 2 topic sentence.</span></li>
+                                        <li><strong>Admittedly, there is some validity to the argument that...</strong><span>Used to open a concession paragraph (Partly Agree structure).</span></li>
+                                        <li><strong>It is undeniable that some people might reasonably argue...</strong><span>Acknowledges the opposing side objectively.</span></li>
+                                        <li><strong>Despite the merits of the aforementioned point, it is crucial to recognize that...</strong><span>Transitioning from your concession paragraph back to your main argument.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <button class="accordion-btn" onclick="toggleAccordion(this)">
+                                Providing Examples & Hedging
+                                <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="accordion-inner">
+                                    <ul class="phrase-list">
+                                        <li><strong>A prime example of this phenomenon is...</strong><span>High-level way to introduce examples instead of "For example".</span></li>
+                                        <li><strong>To epitomize this point... / A clear manifestation of this trend can be seen in...</strong><span>Advanced phrases for introducing a specific, undeniable case study.</span></li>
+                                        <li><strong>This is perfectly illustrated by the case of...</strong><span>Great when you are using a real-world country or company as an example.</span></li>
+                                        <li><strong>In the vast majority of cases...</strong><span>Hedging language. Avoids generalizations (like saying "all people do this").</span></li>
+                                        <li><strong>It is highly likely that... / It tends to be the case that...</strong><span>Hedging language to soften claims. Examiners look for this.</span></li>
+                                        <li><strong>Generally speaking, it is widely accepted that...</strong><span>Introduces a broad societal trend before narrowing down to specifics.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -519,6 +686,30 @@
 
                     </div>
                 </div>
+
+                <div class="accordion-item" style="border-color: var(--pink-200); box-shadow: 0 4px 6px rgba(225, 29, 72, 0.05);">
+                    <button class="accordion-btn" onclick="toggleAccordion(this)" style="background-color: var(--pink-50); color: var(--pink-accent);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            View Sample Essay (Band 8.5) - Partly Agree Approach
+                        </div>
+                        <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="essay-prompt">
+                                <strong>Prompt:</strong> University education should be free for everyone, regardless of their background. To what extent do you agree or disagree?
+                            </div>
+                            <div class="essay-container">
+                                <p>The question of whether tertiary education should be provided free of charge to all citizens remains a highly debated issue. While I concede that abolishing tuition fees could democratize access to education, I firmly believe that making universities completely free is economically unsustainable and could compromise the quality of higher education.</p>
+                                <p>Admittedly, there is a compelling moral argument for universal free university education. Proponents argue that financial constraints should never prevent a capable student from pursuing higher studies. By removing tuition fees, governments could ensure equal opportunities, allowing talented individuals from socio-economically disadvantaged backgrounds to access prestigious professions. A prime example of this is seen in Nordic countries, where free tuition has led to high levels of social mobility and a highly educated workforce. Therefore, the societal benefit of creating a more egalitarian society cannot be dismissed.</p>
+                                <p>Despite the merits of this egalitarian approach, the financial repercussions of completely free higher education are simply too severe for most nations to bear. Universities require massive funding to maintain state-of-the-art facilities, conduct cutting-edge research, and employ top-tier faculty. If tuition is eliminated, this financial burden falls entirely on taxpayers. Consequently, governments may be forced to either drastically raise taxes or cut funding in other critical sectors such as healthcare and infrastructure. Furthermore, without the revenue generated from tuition, universities might experience overcrowded lecture halls and a decline in educational standards, ultimately devaluing the degree itself.</p>
+                                <p>In conclusion, while eliminating university fees would undoubtedly promote social equality and equal opportunity, I am convinced that the economic strain on both the government and educational institutions makes this an impractical policy. A more balanced approach, such as providing targeted scholarships or income-contingent loans, would be a far superior alternative to a blanket policy of free education for all.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Module 2: Discussion -->
@@ -544,6 +735,20 @@
 
                 <div class="section-card">
                     <div class="section-card-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Sample Test Questions
+                    </div>
+                    <div class="section-card-body">
+                        <ul class="question-list">
+                            <li><strong>Crime:</strong> "Some people think that the best way to reduce crime is to give longer prison sentences. Others, however, believe there are better alternative ways of reducing crime. Discuss both views and give your opinion."</li>
+                            <li><strong>Work:</strong> "Some people think that individuals should change jobs frequently to gain experience, while others think it is better to stay in one job for the rest of their career. Discuss both views and give your opinion."</li>
+                            <li><strong>Media:</strong> "Some argue that reading newspapers is the best way to get news, while others believe that the internet is a better source. Discuss both sides and give your opinion."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                         Paragraph Structure
                     </div>
@@ -556,13 +761,13 @@
                             </li>
                             <li>
                                 <strong>2. Body Paragraph 1 (The view you disagree with)</strong>
-                                <span>Sentence 1: State the first view objectively.<br>
+                                <span>Sentence 1: State the first view objectively using distancing language.<br>
                                 Sentence 2-3: Explain <i>why</i> some people hold this view.<br>
                                 Sentence 4: Give an example supporting their perspective.</span>
                             </li>
                             <li>
-                                <strong>3. Body Paragraph 2 (The view you agree with)</strong>
-                                <span>Sentence 1: State the second view and indicate your support for it.<br>
+                                <strong>3. Body Paragraph 2 (The view you agree with + Your Opinion)</strong>
+                                <span>Sentence 1: State the second view and indicate your strong support for it.<br>
                                 Sentence 2-3: Explain your reasoning.<br>
                                 Sentence 4: Give a specific example.</span>
                             </li>
@@ -578,7 +783,7 @@
                 <div class="section-card">
                     <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Phrase Bank
+                        Enriched Phrase Bank
                     </div>
                     <div class="section-card-body" style="padding: 10px;">
                         
@@ -590,9 +795,12 @@
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>Opinions are divided on whether... or...</strong><span>Good opening for the introduction.</span></li>
-                                        <li><strong>On the one hand, there are those who argue that...</strong><span>Start of Body Paragraph 1 (the side you disagree with).</span></li>
-                                        <li><strong>On the other hand, a growing number of people, myself included, believe that...</strong><span>Start of Body Paragraph 2 (your side).</span></li>
+                                        <li><strong>Opinions are fiercely divided on whether [A] or [B].</strong><span>Good, strong opening for the introduction.</span></li>
+                                        <li><strong>The public discourse regarding [Topic] often centers around the idea that...</strong><span>A sophisticated way to introduce the general topic.</span></li>
+                                        <li><strong>On the one hand, a significant segment of society argues that...</strong><span>Start of Body Paragraph 1 (the side you disagree with).</span></li>
+                                        <li><strong>There is a widely held belief among certain groups that...</strong><span>Another excellent opener for Body Paragraph 1.</span></li>
+                                        <li><strong>It is frequently asserted by some individuals that...</strong><span>Highlights that this is *someone else's* opinion, not yours.</span></li>
+                                        <li><strong>Conversely, opponents of this view, myself included, maintain that...</strong><span>Start of Body Paragraph 2 (your side). Shows contrast beautifully.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -606,8 +814,12 @@
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>Proponents of this view suggest that...</strong><span>Shows you are discussing others' opinions, not yours.</span></li>
-                                        <li><strong>They base this argument on the premise that...</strong><span>Explaining the rationale of the opposing side.</span></li>
+                                        <li><strong>Proponents of this view suggest that... / Advocates assert that...</strong><span>Shows you are discussing others' opinions, not yours.</span></li>
+                                        <li><strong>Those who subscribe to this viewpoint argue that...</strong><span>A high-level variation of "Some people think".</span></li>
+                                        <li><strong>From the perspective of its advocates, the primary benefit is...</strong><span>Explains the logic of the opposing side respectfully.</span></li>
+                                        <li><strong>They base this argument on the underlying premise that...</strong><span>Explaining the rationale of the opposing side.</span></li>
+                                        <li><strong>Their central thesis revolves around the notion that...</strong><span>Academic phrasing for summarizing someone's argument.</span></li>
+                                        <li><strong>While this perspective is understandable, it overlooks the crucial fact that...</strong><span>A great way to subtly critique the first view before moving to your preferred view.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -615,6 +827,30 @@
 
                     </div>
                 </div>
+
+                <div class="accordion-item" style="border-color: var(--pink-200); box-shadow: 0 4px 6px rgba(225, 29, 72, 0.05);">
+                    <button class="accordion-btn" onclick="toggleAccordion(this)" style="background-color: var(--pink-50); color: var(--pink-accent);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            View Sample Essay (Band 8.0)
+                        </div>
+                        <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="essay-prompt">
+                                <strong>Prompt:</strong> Some people think that the best way to reduce crime is to give longer prison sentences. Others, however, believe there are better alternative ways of reducing crime. Discuss both views and give your opinion.
+                            </div>
+                            <div class="essay-container">
+                                <p>The issue of how to effectively combat crime is a topic of constant debate. While some individuals argue that imposing lengthier prison sentences is the most potent deterrent, others contend that alternative methods of rehabilitation and social intervention yield better results. In my opinion, while strict punishment is necessary for severe offenses, attacking the root causes of crime through education and rehabilitation is ultimately a more effective strategy.</p>
+                                <p>On the one hand, advocates of extended incarcerations argue that harsh penalties serve as a powerful deterrent. They base this argument on the premise that if potential offenders know they will forfeit a significant portion of their lives in prison, they will be far less likely to commit unlawful acts. Furthermore, keeping dangerous individuals behind bars for longer periods undeniably protects society from immediate harm. For example, for violent crimes such as murder or armed robbery, lengthy sentences ensure public safety while providing a sense of justice and retribution for the victims.</p>
+                                <p>Conversely, opponents of this view, myself included, maintain that relying solely on punitive measures is fundamentally flawed because it fails to address why crimes occur in the first place. Statistics frequently show that ex-convicts have high rates of reoffending because prisons often act as 'universities of crime' rather than correctional facilities. A far superior alternative involves investing in preventative measures, such as improving educational opportunities and creating jobs in impoverished areas, thereby removing the financial desperation that drives many to theft. Additionally, providing psychological counseling and vocational training to existing inmates ensures they can reintegrate into society as productive citizens.</p>
+                                <p>In conclusion, while longer prison sentences play a vital role in punishing severe crimes and keeping the public safe, they are a reactionary measure rather than a cure. I firmly believe that the most effective way to reduce crime rates long-term is to invest heavily in educational alternatives and rehabilitation programs that dismantle the underlying socio-economic triggers of criminal behavior.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Module 3: Problem & Solution -->
@@ -640,6 +876,20 @@
 
                 <div class="section-card">
                     <div class="section-card-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Sample Test Questions
+                    </div>
+                    <div class="section-card-body">
+                        <ul class="question-list">
+                            <li><strong>Urbanization:</strong> "In many cities, traffic congestion is a growing problem. What are the causes of this, and what solutions can you suggest?"</li>
+                            <li><strong>Health:</strong> "Rates of obesity are increasing in many developed countries. Why is this happening? What measures can be taken to resolve this?"</li>
+                            <li><strong>Society:</strong> "People today are spending less time with their families. What are the reasons for this? What effects does this have on individuals and society?" (Note: Cause & Effect variation)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                         Paragraph Structure
                     </div>
@@ -654,13 +904,13 @@
                                 <strong>2. Body Paragraph 1 (Causes/Problems)</strong>
                                 <span>Sentence 1: Topic sentence identifying 1 or 2 main causes.<br>
                                 Sentence 2-3: Explain the first cause in detail.<br>
-                                Sentence 4: (Optional) Mention the second cause or give an example.</span>
+                                Sentence 4: Mention the second cause or give an example.</span>
                             </li>
                             <li>
                                 <strong>3. Body Paragraph 2 (Solutions)</strong>
                                 <span>Sentence 1: Topic sentence stating that the problem can be solved.<br>
                                 Sentence 2-3: Explain Solution 1 (linking it directly to Cause 1).<br>
-                                Sentence 4: Explain Solution 2 (if applicable) or expand on how Solution 1 works.</span>
+                                Sentence 4: Explain Solution 2 (linking to Cause 2).</span>
                             </li>
                             <li>
                                 <strong>4. Conclusion</strong>
@@ -674,21 +924,24 @@
                 <div class="section-card">
                     <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Phrase Bank
+                        Enriched Phrase Bank
                     </div>
                     <div class="section-card-body" style="padding: 10px;">
                         
                         <div class="accordion-item">
                             <button class="accordion-btn" onclick="toggleAccordion(this)">
-                                Discussing Causes
+                                Discussing Causes & Effects
                                 <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </button>
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>One of the principal causes of this phenomenon is...</strong><span>Strong topic sentence opener.</span></li>
-                                        <li><strong>This issue is largely attributed to...</strong><span>Good for explaining the root of a problem.</span></li>
-                                        <li><strong>Consequently, / As a direct result...</strong><span>For explaining the effect of the cause.</span></li>
+                                        <li><strong>One of the primary catalysts for this phenomenon is... / This issue is largely rooted in...</strong><span>Strong topic sentence openers for causes.</span></li>
+                                        <li><strong>The crux of the problem primarily lies in...</strong><span>Identifies the absolute core reason for an issue.</span></li>
+                                        <li><strong>A major contributing factor to this escalating dilemma is...</strong><span>A formal way to introduce a reason.</span></li>
+                                        <li><strong>This is further exacerbated by...</strong><span>Great way to introduce a second, compounding cause that makes the first one worse.</span></li>
+                                        <li><strong>This inevitably culminates in a situation where...</strong><span>Shows the final, negative end-result of a cause.</span></li>
+                                        <li><strong>The repercussions of this trend are profound. Consequently, ...</strong><span>Excellent for transitioning into the effects/impacts of a problem.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -702,9 +955,12 @@
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>To tackle this problem, several measures could be implemented.</strong><span>Topic sentence for the Solutions paragraph.</span></li>
-                                        <li><strong>A viable solution would be for governments/individuals to...</strong><span>Introducing a specific, practical fix.</span></li>
-                                        <li><strong>If such measures were taken, it would significantly mitigate the issue of...</strong><span>Explaining the result of the solution.</span></li>
+                                        <li><strong>To tackle this mounting crisis, several robust measures must be implemented.</strong><span>Topic sentence for the Solutions paragraph.</span></li>
+                                        <li><strong>To rectify this situation, it is imperative that policymakers...</strong><span>Shows urgency and targets the government/authority.</span></li>
+                                        <li><strong>A pragmatic approach to this issue would entail...</strong><span>Introduces a logical, step-by-step solution.</span></li>
+                                        <li><strong>A highly effective remedy would be for governments to...</strong><span>Introducing a specific, practical fix involving authorities.</span></li>
+                                        <li><strong>The onus is on the authorities to implement strict regulations regarding...</strong><span>Places the responsibility clearly on the government.</span></li>
+                                        <li><strong>By embracing these strategies, society could significantly mitigate the adverse impacts of...</strong><span>Concluding the solutions paragraph by showing the expected positive result.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -712,6 +968,30 @@
 
                     </div>
                 </div>
+
+                <div class="accordion-item" style="border-color: var(--pink-200); box-shadow: 0 4px 6px rgba(225, 29, 72, 0.05);">
+                    <button class="accordion-btn" onclick="toggleAccordion(this)" style="background-color: var(--pink-50); color: var(--pink-accent);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            View Sample Essay (Band 8.5)
+                        </div>
+                        <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="essay-prompt">
+                                <strong>Prompt:</strong> In many cities, traffic congestion is a growing problem. What are the causes of this, and what solutions can you suggest?
+                            </div>
+                            <div class="essay-container">
+                                <p>In recent years, severe traffic congestion has become a ubiquitous issue plaguing major metropolitan areas globally. This essay will examine the primary drivers behind this urban dilemma—namely, overreliance on private vehicles and inadequate infrastructure—before proposing viable government-led solutions to alleviate the crisis.</p>
+                                <p>The escalating problem of traffic jams is largely rooted in two main causes. Foremost among these is the exponential rise in private vehicle ownership. As the middle class expands in developing nations and car ownership remains a status symbol, the sheer volume of cars on the road has vastly outpaced the capacity of existing road networks. This is further exacerbated by chronic underinvestment in urban infrastructure. Many historical cities were simply not designed to accommodate modern traffic volumes, and local governments often lack the funding or spatial planning required to expand highways or modernize outdated public transit systems. Consequently, commuting times have skyrocketed, leading to economic losses and increased pollution.</p>
+                                <p>To tackle this mounting crisis, several robust measures must be implemented. The most effective remedy involves a simultaneous upgrade of public transportation and the introduction of deterrents for private car use. Governments must invest heavily in expanding and subsidizing reliable transit networks, such as subterranean railways or dedicated bus rapid transit (BRT) lanes, making public transport a cheaper and more convenient alternative to driving. Concurrently, authorities should introduce 'congestion pricing' mechanisms, whereby drivers are heavily taxed for entering city centers during peak hours. Cities like London and Singapore have already adopted this model with remarkable success, significantly reducing daily vehicular traffic.</p>
+                                <p>In conclusion, while urban traffic congestion is a severe issue driven by surging car ownership and structural inadequacies, it is not insurmountable. By funneling resources into high-quality public transportation and imposing financial deterrents on private driving, municipalities can effectively unsnarl their roads and improve the quality of urban life.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Module 4: Advantages & Disadvantages -->
@@ -737,6 +1017,20 @@
 
                 <div class="section-card">
                     <div class="section-card-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Sample Test Questions
+                    </div>
+                    <div class="section-card-body">
+                        <ul class="question-list">
+                            <li><strong>Education:</strong> "In some countries, young people are encouraged to work or travel for a year between finishing high school and starting university studies. Do the advantages of this outweigh the disadvantages?"</li>
+                            <li><strong>Tourism:</strong> "International tourism has brought enormous benefit to many places. At the same time, there is concern about its impact on local inhabitants and the environment. Do the disadvantages of international tourism outweigh the advantages?"</li>
+                            <li><strong>Business:</strong> "Many companies now allow their employees to work from home. What are the advantages and disadvantages of this trend?" (No opinion needed)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                         Paragraph Structure (For "Outweigh" prompts)
                     </div>
@@ -750,7 +1044,7 @@
                             <li>
                                 <strong>2. Body Paragraph 1 (The weaker side)</strong>
                                 <span>Sentence 1: Acknowledge the side you don't support (e.g., the disadvantages).<br>
-                                Sentence 2-4: Explain 1-2 points for this side, but keep the language restrained.</span>
+                                Sentence 2-4: Explain 1-2 points for this side, but keep the language restrained to show you don't fully agree.</span>
                             </li>
                             <li>
                                 <strong>3. Body Paragraph 2 (The stronger side)</strong>
@@ -769,7 +1063,7 @@
                 <div class="section-card">
                     <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Phrase Bank
+                        Enriched Phrase Bank
                     </div>
                     <div class="section-card-body" style="padding: 10px;">
                         
@@ -781,9 +1075,12 @@
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>The primary benefit of this development is...</strong><span>Clear topic sentence for advantages.</span></li>
-                                        <li><strong>Furthermore, it provides individuals with the opportunity to...</strong><span>Adding a second advantage.</span></li>
-                                        <li><strong>From an economic/social standpoint, the positive impacts are undeniable.</strong><span>Concluding thought on advantages.</span></li>
+                                        <li><strong>The most salient advantage of this development is...</strong><span>A sophisticated alternative to "The main advantage".</span></li>
+                                        <li><strong>One of the most compelling justifications for this trend is...</strong><span>A strong opener for your main body paragraph of benefits.</span></li>
+                                        <li><strong>A distinct merit of embracing this approach is...</strong><span>A clear, academic way to list an advantage.</span></li>
+                                        <li><strong>Furthermore, this practice yields considerable dividends in terms of...</strong><span>Adding a second advantage with advanced vocabulary (yields dividends = brings benefits).</span></li>
+                                        <li><strong>Beyond the immediate practical benefits, it also fosters...</strong><span>Great for showing a secondary, deeper advantage.</span></li>
+                                        <li><strong>From a societal standpoint, the positive impacts are undeniable.</strong><span>Concluding thought on advantages.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -797,9 +1094,12 @@
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>Despite these advantages, there are significant drawbacks that must be acknowledged.</strong><span>Transition to disadvantages.</span></li>
-                                        <li><strong>However, I firmly believe that these negative aspects are eclipsed by the benefits.</strong><span>Stating that pros outweigh cons.</span></li>
-                                        <li><strong>The disadvantages, while valid, are easily mitigated by...</strong><span>Showing why the cons are weak.</span></li>
+                                        <li><strong>Despite these profound advantages, there are tangible drawbacks that must be acknowledged.</strong><span>Excellent transition to disadvantages.</span></li>
+                                        <li><strong>On the flip side, one cannot ignore the detrimental impacts such as...</strong><span>A natural, native-sounding transition to the negative side.</span></li>
+                                        <li><strong>While the downsides are undeniable, they pale in comparison to the massive benefits...</strong><span>A fantastic phrase to explicitly state your "outweigh" opinion.</span></li>
+                                        <li><strong>However, I firmly believe that these negative aspects are completely eclipsed by the benefits.</strong><span>Stating that pros heavily outweigh cons.</span></li>
+                                        <li><strong>The gravitas of the advantages heavily overshadows any minor inconveniences.</strong><span>Advanced vocabulary (gravitas = weight/seriousness).</span></li>
+                                        <li><strong>The disadvantages, while valid in isolation, are easily mitigated by...</strong><span>Showing why the cons are weak compared to the pros.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -807,6 +1107,30 @@
 
                     </div>
                 </div>
+
+                <div class="accordion-item" style="border-color: var(--pink-200); box-shadow: 0 4px 6px rgba(225, 29, 72, 0.05);">
+                    <button class="accordion-btn" onclick="toggleAccordion(this)" style="background-color: var(--pink-50); color: var(--pink-accent);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            View Sample Essay (Band 8.0)
+                        </div>
+                        <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="essay-prompt">
+                                <strong>Prompt:</strong> In some countries, young people are encouraged to work or travel for a year between finishing high school and starting university studies. Do the advantages of this outweigh the disadvantages?
+                            </div>
+                            <div class="essay-container">
+                                <p>The concept of taking a 'gap year' prior to commencing tertiary education has gained immense popularity among high school graduates worldwide. While pausing formal education entails certain risks, such as losing academic momentum, I firmly believe that the advantages of gaining real-world experience and maturity far outweigh the potential drawbacks.</p>
+                                <p>It is important to acknowledge the potential disadvantages of delaying university enrollment. The most salient concern is the loss of academic discipline. Students who step away from the rigors of studying, test-taking, and scheduled learning for an extended period may find it exceptionally difficult to readjust to an academic environment a year later. Furthermore, embarking on a year of travel can be prohibitively expensive, potentially placing a severe financial burden on young adults or their parents before the costly endeavor of university even begins.</p>
+                                <p>However, I am convinced that these drawbacks are eclipsed by the profound personal and professional benefits a gap year offers. Firstly, working or traveling independently fosters a level of maturity, resilience, and worldly understanding that cannot be acquired in a classroom. Young adults who navigate foreign cultures or manage their own finances in a workplace develop crucial life skills and independence. Secondly, taking a year to explore different interests often helps students crystallize their career aspirations. Rather than rushing into a degree program they are unsure of, a gap year provides the breathing room to discover true passions, thereby reducing the likelihood of changing majors or dropping out of university later on.</p>
+                                <p>In conclusion, although taking a year off between high school and university presents minor challenges regarding academic continuity and finances, the benefits are vastly superior. The unparalleled opportunity to cultivate independence, gain practical life experience, and solidify future goals makes a gap year a highly advantageous pursuit.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Module 5: Direct Questions -->
@@ -832,6 +1156,20 @@
 
                 <div class="section-card">
                     <div class="section-card-header">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Sample Test Questions
+                    </div>
+                    <div class="section-card-body">
+                        <ul class="question-list">
+                            <li><strong>Sports & Society:</strong> "Success in sports is often highly correlated with wealth. Why is this the case? Is this a positive or negative development?"</li>
+                            <li><strong>Lifestyle:</strong> "In many countries today, people in cities either live alone or in small family units, rather than in large, extended family groups. Is this a positive or negative trend? What are the reasons for this?"</li>
+                            <li><strong>Technology:</strong> "Nowadays, people use social media to keep in touch with others and be aware of news. Do the advantages of this outweigh the disadvantages? How is this affecting society?"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                         Paragraph Structure
                     </div>
@@ -840,7 +1178,7 @@
                             <li>
                                 <strong>1. Introduction</strong>
                                 <span>Sentence 1: Paraphrase the background statement.<br>
-                                Sentence 2: Directly but briefly answer Question 1 and Question 2.</span>
+                                Sentence 2: Directly but briefly answer Question 1 and Question 2. (This is your thesis).</span>
                             </li>
                             <li>
                                 <strong>2. Body Paragraph 1 (Answers Question 1)</strong>
@@ -864,26 +1202,136 @@
                 <div class="section-card">
                     <div class="section-card-header">
                         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Phrase Bank
+                        Enriched Phrase Bank
                     </div>
                     <div class="section-card-body" style="padding: 10px;">
                         
                         <div class="accordion-item">
                             <button class="accordion-btn" onclick="toggleAccordion(this)">
-                                Structuring the Essay
+                                Structuring the Essay & Sequencing
                                 <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </button>
                             <div class="accordion-content">
                                 <div class="accordion-inner">
                                     <ul class="phrase-list">
-                                        <li><strong>In response to the first question, the primary reason for this is...</strong><span>Very clear opening for Body Paragraph 1.</span></li>
-                                        <li><strong>Regarding the second issue, I consider this to be a largely negative development.</strong><span>Clear transition to answering the second question.</span></li>
-                                        <li><strong>In conclusion, this trend is primarily driven by [Answer 1], and its impact on society is [Answer 2].</strong><span>A perfect, concise conclusion formula.</span></li>
+                                        <li><strong>In response to the first question, the primary reason for this is...</strong><span>Very clear, mechanical opening for Body Paragraph 1 ensuring the examiner knows exactly what you are doing.</span></li>
+                                        <li><strong>Addressing the initial query, it is abundantly clear that...</strong><span>A more advanced variation for opening the first body paragraph.</span></li>
+                                        <li><strong>To delve into the first aspect of the prompt,...</strong><span>A highly academic transition to begin your first paragraph.</span></li>
+                                        <li><strong>Turning to the second issue, I consider this to be a largely detrimental trend.</strong><span>Perfect transitional phrasing to move from Question 1 to Question 2.</span></li>
+                                        <li><strong>With respect to the subsequent question, my stance is that...</strong><span>Another smooth transition to shift focus to the second part of the prompt.</span></li>
+                                        <li><strong>With regard to whether this is a positive or negative development, I firmly believe...</strong><span>An alternative, highly cohesive way to start the second body paragraph.</span></li>
+                                        <li><strong>In conclusion, this trend is primarily driven by [Answer 1], and its impact on society is overwhelmingly [Answer 2].</strong><span>A perfect, concise conclusion formula that scores high for coherence.</span></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <div class="accordion-item" style="border-color: var(--pink-200); box-shadow: 0 4px 6px rgba(225, 29, 72, 0.05);">
+                    <button class="accordion-btn" onclick="toggleAccordion(this)" style="background-color: var(--pink-50); color: var(--pink-accent);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            View Sample Essay (Band 8.5)
+                        </div>
+                        <svg class="accordion-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            <div class="essay-prompt">
+                                <strong>Prompt:</strong> Success in sports is often highly correlated with wealth. Why is this the case? Is this a positive or negative development?
+                            </div>
+                            <div class="essay-container">
+                                <p>In contemporary society, athletic triumph is frequently linked to financial affluence, whether at an individual or national level. This correlation primarily stems from the exorbitant costs associated with professional training and facilities. In my view, this is an overwhelmingly negative development as it undermines the fundamental principle of fair play in sports.</p>
+                                <p>To address the first question, the primary reason wealth dictates sporting success is the capital-intensive nature of modern athletics. Achieving elite status today requires far more than mere natural talent; it demands state-of-the-art equipment, advanced nutritional science, and world-class coaching. For instance, sports like tennis, equestrianism, or Formula One require massive financial backing from childhood just to participate. Furthermore, on a macro level, affluent nations can afford to build superior Olympic training facilities and fund national sports programs, giving their athletes a statistically significant advantage over competitors from developing countries who lack basic infrastructure.</p>
+                                <p>Turning to whether this is a positive or negative trend, I firmly believe it is deeply detrimental to the spirit of sport. Historically, sports were viewed as the ultimate meritocracy—a leveled playing field where hard work and genetic gifts were the sole determinants of victory. However, when wealth becomes the prerequisite for success, this meritocracy is destroyed. It creates an elitist environment that disenfranchises millions of talented, lower-income youths who are priced out of participation. Consequently, the sporting world loses out on vast pools of potential talent simply due to socio-economic barriers, diminishing the integrity and universal appeal of global competitions.</p>
+                                <p>In conclusion, the intertwining of wealth and sporting success is driven by the modern necessity for expensive, specialized training and facilities. I consider this a highly negative phenomenon, as it transforms sports from a pure test of human ability into a reflection of financial privilege, thereby shutting out less affluent but equally talented individuals.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Module 6: Vocabulary & Paraphrasing -->
+            <div id="vocab" class="tab-panel">
+                <div class="module-header">
+                    <h1>Vocabulary & Paraphrasing</h1>
+                    <p>Essential topic-neutral synonyms and advanced vocabulary to boost your Lexical Resource score (Band 7+).</p>
+                </div>
+
+                <div class="vocab-grid">
+                    <!-- Card 1 -->
+                    <div class="vocab-card">
+                        <h3><svg class="svg-icon" style="display:inline; margin-right:4px; margin-bottom:-4px;" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> People & Society</h3>
+                        <ul>
+                            <li><strong>Individuals / Citizens</strong> <span>Instead of "people"</span></li>
+                            <li><strong>The general public / The populace</strong> <span>Instead of "everyone"</span></li>
+                            <li><strong>Demographics</strong> <span>Refers to a specific sector of society (e.g., younger demographics)</span></li>
+                            <li><strong>Contemporary society</strong> <span>Instead of "modern society"</span></li>
+                            <li><strong>The workforce / Labor pool</strong> <span>Instead of "workers" or "employees"</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="vocab-card">
+                        <h3><svg class="svg-icon" style="display:inline; margin-right:4px; margin-bottom:-4px;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Importance & Necessity</h3>
+                        <ul>
+                            <li><strong>Crucial / Imperative</strong> <span>Instead of "very important"</span></li>
+                            <li><strong>Paramount</strong> <span>Of the greatest importance (e.g., "It is of paramount importance")</span></li>
+                            <li><strong>Indispensable</strong> <span>Absolutely necessary (e.g., "Technology is an indispensable tool")</span></li>
+                            <li><strong>Pivotal</strong> <span>Crucial in determining an outcome (e.g., "A pivotal role")</span></li>
+                            <li><strong>Significant / Substantial</strong> <span>Instead of "big" or "large" (when referring to impact)</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="vocab-card">
+                        <h3><svg class="svg-icon" style="display:inline; margin-right:4px; margin-bottom:-4px;" viewBox="0 0 24 24"><path d="M2 12h4l3-9 5 18 3-9h5"></path></svg> Effects & Impacts</h3>
+                        <ul>
+                            <li><strong>Repercussions / Ramifications</strong> <span>Instead of "negative effects"</span></li>
+                            <li><strong>Profound consequences</strong> <span>Instead of "deep effects"</span></li>
+                            <li><strong>Adverse impacts / Detrimental effects</strong> <span>Instead of "bad effects"</span></li>
+                            <li><strong>Yield positive dividends</strong> <span>Instead of "give good results"</span></li>
+                            <li><strong>Implications</strong> <span>Possible future effects or results</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="vocab-card">
+                        <h3><svg class="svg-icon" style="display:inline; margin-right:4px; margin-bottom:-4px;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg> Problems & Issues</h3>
+                        <ul>
+                            <li><strong>Dilemma / Predicament</strong> <span>Instead of "problem" or "difficult situation"</span></li>
+                            <li><strong>Mounting crisis</strong> <span>A problem that is growing worse</span></li>
+                            <li><strong>A pressing issue</strong> <span>An urgent problem that needs immediate attention</span></li>
+                            <li><strong>Societal hurdle / Obstacle</strong> <span>Instead of "challenge"</span></li>
+                            <li><strong>Phenomenon</strong> <span>An observable fact or event (often used for trends)</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="vocab-card">
+                        <h3><svg class="svg-icon" style="display:inline; margin-right:4px; margin-bottom:-4px;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Solutions & Actions</h3>
+                        <ul>
+                            <li><strong>Mitigate / Alleviate</strong> <span>To make something less severe (e.g., "mitigate the damage")</span></li>
+                            <li><strong>Rectify</strong> <span>To put right; correct (e.g., "rectify the situation")</span></li>
+                            <li><strong>Combat / Tackle</strong> <span>Instead of "solve" or "fight"</span></li>
+                            <li><strong>Implement / Execute</strong> <span>Instead of "put into action" or "do"</span></li>
+                            <li><strong>Foster / Cultivate</strong> <span>To encourage the development of something (e.g., "foster creativity")</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="vocab-card">
+                        <h3><svg class="svg-icon" style="display:inline; margin-right:4px; margin-bottom:-4px;" viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg> Governments & Control</h3>
+                        <ul>
+                            <li><strong>Policymakers / Legislators</strong> <span>Instead of "the government"</span></li>
+                            <li><strong>Governing bodies / Authorities</strong> <span>Instead of "leaders"</span></li>
+                            <li><strong>Allocate funds/resources</strong> <span>Instead of "spend money"</span></li>
+                            <li><strong>Impose strict regulations</strong> <span>Instead of "make strict rules"</span></li>
+                            <li><strong>Incentivize</strong> <span>To provide encouragement/reward for an action (e.g., "incentivize green energy")</span></li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -927,11 +1375,27 @@
             const content = buttonElement.nextElementSibling;
             
             if (buttonElement.classList.contains('active')) {
-                content.style.maxHeight = content.scrollHeight + "px";
+                // Set to scrollHeight to allow expanding
+                content.style.maxHeight = content.scrollHeight + 100 + "px"; // added buffer for safety
+                
+                // If it's the essay, ensure smooth scrolling into view
+                if (content.querySelector('.essay-container')) {
+                    setTimeout(() => {
+                        buttonElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
+                }
             } else {
                 content.style.maxHeight = "0";
             }
         }
+
+        // Handle window resize for open accordions to prevent text cut-off
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.accordion-btn.active').forEach(btn => {
+                const content = btn.nextElementSibling;
+                content.style.maxHeight = content.scrollHeight + 100 + "px";
+            });
+        });
     </script>
 </body>
 </html>
