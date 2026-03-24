@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading | The Rise and Fall of the British Textile Industry</title>
+    <style>
+        :root {
+            --primary-color: #00b06b; /* Green from the screenshot */
+            --primary-light: #e6f7f0;
+            --primary-hover: #009359;
+            --bg-color: #f4f6f8;
+            --text-main: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --wrong-color: #ff4d4f;
+            --wrong-light: #fff1f0;
+            --highlight-vocab: #ffeb3b; /* Yellow highlight for vocab */
+            --highlight-sentence: rgba(0, 176, 107, 0.25); /* Green highlight for sentence */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: #fff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .nav-timer {
+            background-color: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Split Container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        /* Left Pane - Reading Passage */
+        .passage-pane {
+            background-color: #fff;
+            border-right: 2px solid var(--border-color);
+            padding-bottom: 250px; /* Space for dictionary popup */
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .passage-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #000;
+        }
+
+        .passage-pane p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* Interactive Text Elements */
+        .vocab {
+            background-color: var(--highlight-vocab);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: opacity 0.2s;
+        }
+
+        .vocab:hover {
+            opacity: 0.8;
+        }
+
+        .sentence {
+            transition: background-color 0.4s ease;
+            border-radius: 4px;
+        }
+
+        .sentence.active {
+            background-color: var(--highlight-sentence);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* Right Pane - Questions */
+        .questions-pane {
+            background-color: #fff;
+        }
+
+        .question-block {
+            margin-bottom: 40px;
+        }
+
+        .instruction {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            background-color: var(--primary-light);
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Notes Completion Specifics */
+        .notes-container {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .notes-container ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .notes-container li {
+            margin-bottom: 15px;
+            line-height: 2;
+        }
+
+        /* General Question Item */
+        .q-item {
+            margin-bottom: 20px;
+        }
+
+        .q-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 26px;
+            height: 26px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        /* Inputs */
+        .text-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 1rem;
+            outline: none;
+            width: 200px;
+            transition: border-color 0.2s;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 176, 107, 0.2);
+        }
+
+        .mcq-options {
+            margin-top: 10px;
+            margin-left: 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: var(--bg-color);
+        }
+
+        .option-label input[type="radio"] {
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+        }
+
+        .check-btn {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Explanation Box */
+        .explanation {
+            display: none;
+            margin-top: 15px;
+            margin-left: 36px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .explanation.correct {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .explanation.incorrect {
+            background-color: var(--wrong-light);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .exp-status {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .correct .exp-status { background-color: var(--primary-color); color: white; }
+        .incorrect .exp-status { background-color: var(--wrong-color); color: white; }
+
+        /* Dictionary Panel */
+        .dict-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            background-color: white;
+            border-top: 3px solid var(--primary-color);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .dict-panel.show {
+            transform: translateY(0);
+        }
+
+        .dict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .dict-word {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .dict-phonetic {
+            color: var(--text-light);
+            font-family: monospace;
+            margin-left: 10px;
+            font-size: 1.1rem;
+        }
+
+        .dict-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .dict-content strong {
+            display: block;
+            margin-top: 10px;
+            color: #111;
+        }
+
+        .dict-example {
+            margin-top: 5px;
+            font-style: italic;
+            color: var(--text-light);
+            background-color: var(--bg-color);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="navbar">
+        <div class="nav-title">📖 Reading Passage 1</div>
+        <div class="nav-timer">⏱️ 20:00</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- LEFT PANE: PASSAGE -->
+        <div class="pane passage-pane" id="passage-pane">
+            <div class="passage-title">The Rise and Fall of the British Textile Industry</div>
+            
+            <p>Textile production in Britain can be said to have its roots as an industry at the beginning of the 18th century, when Thomas Crotchet and George Sorocold established what is thought to be the first factory built in Britain. It was a textile mill with a waterwheel as its source of power, the latest machinery, and even accommodation for the workers. As well as possibly being the first <span class="vocab" data-word="sweatshop">sweatshop</span> in the modern sense, it was the beginning of the end for traditional textile production.</p>
+
+            <p>For hundreds of years the spinning and weaving of cloth had been done <span class="vocab" data-word="manually">manually</span> by men, women and children in their own homes. The yarn would be combed and spun using a <span class="vocab" data-word="spindle">spindle</span>, then woven on a hand <span class="vocab" data-word="loom">loom</span>, and <span class="sentence" id="s-q1">what they produced would be mainly for local consumption</span>. Technology far more sophisticated than the spindle and hand-loom would change all that.</p>
+
+            <p>The demand for cotton textiles had been growing since the Middle Ages, <span class="vocab" data-word="fostered">fostered</span> by the <span class="sentence" id="s-q10">importation of high quality cotton fabrics</span> from the Middle East and India. <span class="sentence" id="s-q2">So how were local producers able to fight off the competition?</span> The imported fabrics were of course expensive, so textile makers (not just in Britain but throughout Europe) produced mixed fabrics and cotton substitutes. <span class="sentence" id="s-q3">They also had foreign textiles banned.</span> But the key to the <span class="sentence" id="s-q4">increased productivity needed to meet the demand</span> was machine production. It would be faster, cheaper and the finished products would be consistent in quality. Not least of the advantages was that it would allow manufacturers to market their goods on a large, if not yet global, scale.</p>
+
+            <p>The story of the growth of the British textile industry from about 1733 and for the next two hundred years is one of constant technological <span class="vocab" data-word="innovation">innovation</span> and expansion. In 1733 John Kay invented the fly-shuttle, which <span class="sentence" id="s-q5">made the hand-loom more efficient</span>, and in 1764 James Hargreaves came up with the spinning jenny, which among other things had the effect of <span class="sentence" id="s-q7">raising productivity eightfold</span>. The next great innovator was Richard Arkwright, who in 1768 employed John Kay (of the fly-shuttle) to help him build more efficient machinery. He was a man with a vision – to mechanise textile production – and by 1782 he had a network of mills across Britain. As the water-powered machinery, <span class="sentence" id="s-q11">though not yet fully mechanised</span>, became more complex, <span class="sentence" id="s-q6">Kay began to use steam engines for power.</span> The first power-loom, however, which was invented in 1785 by Dr Edmund Cartwright, really did mechanise the weaving stage of textile manufacture.</p>
+
+            <p>The pace of growth quickened with the expansion of Britain’s influence in the world and the acquisition of colonies from which cheap raw materials could be imported. For example, in a single decade, from 1781 to 1791, imports of cotton into Britain <span class="vocab" data-word="quadrupled">quadrupled</span>, going on to reach 100 million pounds in weight in 1815 and 263 million in 1830. The increase in exports is equally impressive; in 1751 £46,000 worth of cloth was exported and by the end of the century this had risen to £5.4 million. <span class="sentence" id="s-q8">By the end of the 19th century the figure had soared to close to £50 million.</span> Britain was now supplying cheaper and better quality clothing to a global market. Yet during the course of the 20th century Britain lost its position as a major textile manufacturer.</p>
+
+            <p>So what happened? There are a number of views on this question, not all of them conflicting, and where there is disagreement it is usually about when the decline began. Whether it began before the First World War (1914-18), or during the inter-war years (1919-1939), or after 1945, most economists would give roughly the same reasons. To start with, there was <span class="sentence" id="s-q9">competition from abroad, especially from developing countries in the Far East</span>, notably Japan. It was thought by manufacturers that the best way to combat this increased competition was to modernise. However, management and the labour unions were unable to agree on how to handle this situation.</p>
+
+            <p>Modernisation would mean people losing their jobs and possibly a change in labour practices. Such changes as were made served only to slow down the industry’s decline rather than help regain its <span class="vocab" data-word="predominant">predominant</span> position. <span class="sentence" id="s-q12">Economically less developed countries, on the other hand, had the advantage of being able to provide low wage competition</span>, without the problem of powerful labour unions.</p>
+
+            <p>There are, of course, many other reasons for the textile industry’s decline, two of which became particularly noticeable in the late twentieth century and are related. The first is <span class="vocab" data-word="outsourcing">outsourcing</span>, when manufacturers establish factories in countries where there is cheap labour. This obviously leads to less demand for locally-produced goods. Related to this, the textile and clothing industries have acquired a bad reputation for exploiting workers, often illegal immigrants, in sweatshops where they are forced to work long hours and are paid far less than the minimum wage.</p>
+
+            <p>We seem to be back with Crotchet and Sorocold and their first live-in factory. <span class="sentence" id="s-q13">The globalising trend of out-sourcing, however, was a rational response to the growing competition from overseas</span>, which, it goes without saying, does not excuse the <span class="vocab" data-word="exploitation">exploitation</span> of workers. The British industry itself, while no longer holding a key place in the global textile market, has adapted itself and now concentrates more on the world of fashion and design, where it seems to be doing quite well.</p>
+        </div>
+
+        <!-- RIGHT PANE: QUESTIONS -->
+        <div class="pane questions-pane">
+            
+            <!-- Questions 1-6 -->
+            <div class="question-block">
+                <div class="instruction">Questions 1-6</div>
+                <p style="margin-bottom: 15px;">Complete the notes below. Write <strong>NO MORE THAN THREE WORDS</strong> for each answer.</p>
+                
+                <div class="notes-container">
+                    <h3 style="text-align: center; margin-bottom: 10px;">Textile Manufacture</h3>
+                    
+                    <strong>Early history</strong>
+                    <ul>
+                        <li>Begins as a cottage industry</li>
+                        <li>
+                            Products hand-woven and made for 
+                            <span class="q-number">1</span>
+                            <input type="text" id="input-q1" class="text-input" placeholder="...">
+                            <button class="check-btn" onclick="checkAnswer('q1')">Check</button>
+                            <div id="exp-q1" class="explanation"></div>
+                        </li>
+                        <li>
+                            Local producers face 
+                            <span class="q-number">2</span>
+                            <input type="text" id="input-q2" class="text-input" placeholder="...">
+                            <button class="check-btn" onclick="checkAnswer('q2')">Check</button>
+                            <div id="exp-q2" class="explanation"></div>
+                            from overseas
+                        </li>
+                    </ul>
+
+                    <strong>Ways found to deal with situation</strong>
+                    <ul>
+                        <li>
+                            Imported fabrics 
+                            <span class="q-number">3</span>
+                            <input type="text" id="input-q3" class="text-input" placeholder="...">
+                            <button class="check-btn" onclick="checkAnswer('q3')">Check</button>
+                            <div id="exp-q3" class="explanation"></div>
+                            , mixed cottons produced
+                        </li>
+                    </ul>
+
+                    <strong>Early technology</strong>
+                    <ul>
+                        <li>
+                            Machine production needed to 
+                            <span class="q-number">4</span>
+                            <input type="text" id="input-q4" class="text-input" placeholder="...">
+                            <button class="check-btn" onclick="checkAnswer('q4')">Check</button>
+                            <div id="exp-q4" class="explanation"></div>
+                            for cotton fabrics
+                        </li>
+                        <li>
+                            Improved technology (such as the fly-shuttle) more 
+                            <span class="q-number">5</span>
+                            <input type="text" id="input-q5" class="text-input" placeholder="...">
+                            <button class="check-btn" onclick="checkAnswer('q5')">Check</button>
+                            <div id="exp-q5" class="explanation"></div>
+                            and productive
+                        </li>
+                        <li>
+                            Machinery begins to be powered by 
+                            <span class="q-number">6</span>
+                            <input type="text" id="input-q6" class="text-input" placeholder="...">
+                            <button class="check-btn" onclick="checkAnswer('q6')">Check</button>
+                            <div id="exp-q6" class="explanation"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Questions 7-9 -->
+            <div class="question-block">
+                <div class="instruction">Questions 7-9</div>
+                <p style="margin-bottom: 15px;">Choose the correct letter, A, B, C or D.</p>
+
+                <div class="q-item">
+                    <div><span class="q-number">7</span> Which of the following innovations increased productivity by 800%?</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q7" value="A"> A. the power-loom</label>
+                        <label class="option-label"><input type="radio" name="q7" value="B"> B. the steam engine</label>
+                        <label class="option-label"><input type="radio" name="q7" value="C"> C. the spinning jenny</label>
+                        <label class="option-label"><input type="radio" name="q7" value="D"> D. the fly-shuttle</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q7')">Check</button>
+                    <div id="exp-q7" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">8</span> During which period was the British textile industry at its peak?</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q8" value="A"> A. 1733-1785</label>
+                        <label class="option-label"><input type="radio" name="q8" value="B"> B. 1781-1791</label>
+                        <label class="option-label"><input type="radio" name="q8" value="C"> C. 1791-1830</label>
+                        <label class="option-label"><input type="radio" name="q8" value="D"> D. 1830-1900</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q8')">Check</button>
+                    <div id="exp-q8" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">9</span> Which of the following was a major cause of the British textile industry’s decline?</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q9" value="A"> A. the expansion of foreign textile industries</label>
+                        <label class="option-label"><input type="radio" name="q9" value="B"> B. the loss of overseas markets</label>
+                        <label class="option-label"><input type="radio" name="q9" value="C"> C. there being no demand for products</label>
+                        <label class="option-label"><input type="radio" name="q9" value="D"> D. labour becoming too expensive</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q9')">Check</button>
+                    <div id="exp-q9" class="explanation"></div>
+                </div>
+            </div>
+
+            <!-- Questions 10-13 -->
+            <div class="question-block">
+                <div class="instruction">Questions 10-13</div>
+                <p style="margin-bottom: 15px;">Do the following statements agree with the information given in the Reading Passage?</p>
+                <div style="background-color: #fafafa; padding: 15px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 20px;">
+                    <strong>TRUE</strong> if the statement agrees with the information<br>
+                    <strong>FALSE</strong> if the statement contradicts the information<br>
+                    <strong>NOT GIVEN</strong> if there is no information on this
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">10</span> Foreign textiles were banned because of their inferior quality.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q10" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q10" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q10" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q10')">Check</button>
+                    <div id="exp-q10" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">11</span> Richard Arkwright built the first fully-mechanised textile mill.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q11" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q11" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q11" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q11')">Check</button>
+                    <div id="exp-q11" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">12</span> In less developed countries, the industry could rely on cheap labour.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q12" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q12" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q12" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q12')">Check</button>
+                    <div id="exp-q12" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">13</span> Out-sourcing was one method used to compete with foreign manufacturers.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q13" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q13" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q13" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q13')">Check</button>
+                    <div id="exp-q13" class="explanation"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Dictionary Panel -->
+    <div class="dict-panel" id="dict-panel">
+        <div class="dict-header">
+            <div>
+                <span class="dict-word" id="dict-word">word</span>
+                <span class="dict-phonetic" id="dict-phonetic">/wɜːd/</span>
+            </div>
+            <button class="dict-close" onclick="closeDict()">✖</button>
+        </div>
+        <div class="dict-content">
+            <div style="color: var(--primary-color); font-weight: bold; margin-bottom: 10px;" id="dict-vi">Ý nghĩa tiếng Việt</div>
+            <strong>Giải thích ngữ cảnh:</strong>
+            <div id="dict-context" style="margin-top: 5px;">Giải thích</div>
+            <strong>Ví dụ trong bài:</strong>
+            <div class="dict-example" id="dict-example">"Ví dụ"</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. VOCABULARY DATA ---
+        const dictionary = {
+            "sweatshop": {
+                phonetic: "/ˈswet.ʃɒp/",
+                vi: "Xưởng bóc lột sức lao động",
+                context: "Trong bài dùng để chỉ nhà máy dệt đầu tiên, nơi công nhân (có thể) phải làm việc vất vả với điều kiện kém.",
+                example: "As well as possibly being the first sweatshop in the modern sense..."
+            },
+            "manually": {
+                phonetic: "/ˈmæn.ju.ə.li/",
+                vi: "Thủ công, bằng tay",
+                context: "Trước khi có máy móc, việc dệt vải được con người thực hiện hoàn toàn bằng tay tại nhà.",
+                example: "The spinning and weaving of cloth had been done manually by men, women and children."
+            },
+            "spindle": {
+                phonetic: "/ˈspɪn.dəl/",
+                vi: "Con suốt (công cụ kéo sợi)",
+                context: "Một công cụ truyền thống nhỏ gọn dùng để se và kéo sợi bông/len.",
+                example: "The yarn would be combed and spun using a spindle..."
+            },
+            "loom": {
+                phonetic: "/luːm/",
+                vi: "Khung cửi (dệt vải)",
+                context: "Thiết bị thủ công dùng để đan các sợi lại với nhau thành tấm vải.",
+                example: "...then woven on a hand loom..."
+            },
+            "fostered": {
+                phonetic: "/ˈfɒs.tərd/",
+                vi: "Được thúc đẩy, nuôi dưỡng",
+                context: "Nhu cầu vải cotton được thúc đẩy/làm tăng lên do sự xuất hiện của vải nhập khẩu chất lượng cao.",
+                example: "The demand... had been growing, fostered by the importation of high quality cotton fabrics..."
+            },
+            "innovation": {
+                phonetic: "/ˌɪn.əˈveɪ.ʃən/",
+                vi: "Sự đổi mới, sáng chế",
+                context: "Đề cập đến những phát minh công nghệ liên tục giúp ngành dệt may phát triển mạnh mẽ.",
+                example: "...is one of constant technological innovation and expansion."
+            },
+            "quadrupled": {
+                phonetic: "/kwɒdˈruː.pəld/",
+                vi: "Tăng gấp 4 lần",
+                context: "Lượng bông nhập khẩu vào Anh đã tăng lên gấp 4 lần chỉ trong vòng một thập kỷ (10 năm).",
+                example: "imports of cotton into Britain quadrupled, going on to reach 100 million pounds..."
+            },
+            "predominant": {
+                phonetic: "/prɪˈdɒm.ɪ.nənt/",
+                vi: "Chiếm ưu thế, vị trí dẫn đầu",
+                context: "Ngành công nghiệp Anh cố gắng hiện đại hóa để giành lại vị trí thống trị thế giới nhưng không thành.",
+                example: "...rather than help regain its predominant position."
+            },
+            "outsourcing": {
+                phonetic: "/ˈaʊtˌsɔː.sɪŋ/",
+                vi: "Thuê ngoài (sản xuất ở nước khác)",
+                context: "Chiến lược các công ty đem nhà máy sang các nước có nhân công rẻ để tiết kiệm chi phí.",
+                example: "The first is outsourcing, when manufacturers establish factories in countries where there is cheap labour."
+            },
+            "exploitation": {
+                phonetic: "/ˌek.splɔɪˈteɪ.ʃən/",
+                vi: "Sự bóc lột",
+                context: "Dù thuê ngoài là cách để cạnh tranh, điều đó không thể bào chữa cho việc bóc lột công nhân.",
+                example: "...which, it goes without saying, does not excuse the exploitation of workers."
+            }
+        };
+
+        // --- 2. ANSWER KEY & EXPLANATIONS ---
+        const answers = {
+            "q1": { 
+                type: "text", answer: "local consumption", targetId: "s-q1", 
+                exp: "<b>Bước 1:</b> Tìm keywords <i>'hand-woven'</i>, <i>'made for'</i> trong câu hỏi.<br><b>Bước 2:</b> Đoạn 2 viết: <i>'woven on a hand loom, and what they produced would be mainly for <b>local consumption</b>'</i>.<br>=> Đáp án: <b>local consumption</b>." 
+            },
+            "q2": { 
+                type: "text", answer: "competition", targetId: "s-q2", 
+                exp: "<b>Bước 1:</b> Tìm keywords <i>'Local producers face'</i>, <i>'from overseas'</i>.<br><b>Bước 2:</b> Đoạn 3 viết: <i>'So how were local producers able to fight off the <b>competition</b>?'</i> (cạnh tranh từ nước ngoài).<br>=> Đáp án: <b>competition</b>." 
+            },
+            "q3": { 
+                type: "text", answer: "banned", targetId: "s-q3", 
+                exp: "<b>Bước 1:</b> Tìm keywords <i>'Imported fabrics'</i>, cách đối phó (deal with).<br><b>Bước 2:</b> Đoạn 3 viết: <i>'They also had foreign textiles <b>banned</b>.'</i><br>=> Đáp án: <b>banned</b>." 
+            },
+            "q4": { 
+                type: "text", answer: "meet the demand", targetId: "s-q4", 
+                exp: "<b>Bước 1:</b> Tìm keywords <i>'Machine production needed to'</i>.<br><b>Bước 2:</b> Đoạn 3 viết: <i>'But the key to the increased productivity needed to <b>meet the demand</b> was machine production.'</i><br>=> Đáp án: <b>meet the demand</b>." 
+            },
+            "q5": { 
+                type: "text", answer: "efficient", targetId: "s-q5", 
+                exp: "<b>Bước 1:</b> Tìm keywords <i>'fly-shuttle'</i>, <i>'more'</i>.<br><b>Bước 2:</b> Đoạn 4 viết: <i>'invented the fly-shuttle, which made the hand-loom more <b>efficient</b>'</i>.<br>=> Đáp án: <b>efficient</b>." 
+            },
+            "q6": { 
+                type: "text", answer: "steam engines", targetId: "s-q6", 
+                exp: "<b>Bước 1:</b> Tìm keywords <i>'Machinery'</i>, <i>'powered by'</i>.<br><b>Bước 2:</b> Đoạn 4 viết: <i>'Kay began to use <b>steam engines</b> for power.'</i><br>=> Đáp án: <b>steam engines</b>." 
+            },
+            "q7": { 
+                type: "mcq", answer: "C", targetId: "s-q7", 
+                exp: "<b>Bước 1:</b> Tìm keyword <i>'increased productivity by 800%'</i>.<br><b>Bước 2:</b> Đoạn 4 nêu: <i>'...spinning jenny, which among other things had the effect of raising productivity eightfold'</i> (eightfold = 800%).<br>=> Đáp án: <b>C</b>." 
+            },
+            "q8": { 
+                type: "mcq", answer: "D", targetId: "s-q8", 
+                exp: "<b>Bước 1:</b> Tìm giai đoạn đỉnh cao (peak).<br><b>Bước 2:</b> Đoạn 5 mô tả sự tăng vọt cuối thế kỷ 19: <i>'By the end of the 19th century the figure had soared to close to £50 million.'</i> (Cuối thế kỷ 19 là những năm 1800s muộn).<br>=> Đáp án: <b>D (1830-1900)</b>." 
+            },
+            "q9": { 
+                type: "mcq", answer: "A", targetId: "s-q9", 
+                exp: "<b>Bước 1:</b> Tìm nguyên nhân suy thoái (decline).<br><b>Bước 2:</b> Đoạn 6 nêu: <i>'To start with, there was competition from abroad, especially from developing countries in the Far East...'</i>.<br>=> Sự mở rộng của ngành dệt nước ngoài => Đáp án: <b>A</b>." 
+            },
+            "q10": { 
+                type: "mcq", answer: "FALSE", targetId: "s-q10", 
+                exp: "<b>Câu hỏi:</b> Vải ngoại bị cấm vì chất lượng kém (inferior quality).<br><b>Trong bài:</b> Đoạn 3 ghi: <i>'...importation of <b>high quality</b> cotton fabrics'</i>. Việc cấm là do cạnh tranh chứ không phải vì chất lượng kém.<br>=> Thông tin bị ngược => <b>FALSE</b>." 
+            },
+            "q11": { 
+                type: "mcq", answer: "FALSE", targetId: "s-q11", 
+                exp: "<b>Câu hỏi:</b> Richard Arkwright xây nhà máy cơ giới hóa hoàn toàn đầu tiên.<br><b>Trong bài:</b> Đoạn 4 nói về máy của Arkwright: <i>'...though <b>not yet fully mechanised</b>...'</i>.<br>=> Chưa được cơ giới hóa hoàn toàn => <b>FALSE</b>." 
+            },
+            "q12": { 
+                type: "mcq", answer: "TRUE", targetId: "s-q12", 
+                exp: "<b>Câu hỏi:</b> Ở nước kém phát triển, ngành công nghiệp dựa vào nhân công rẻ.<br><b>Trong bài:</b> Đoạn 7 ghi: <i>'Economically less developed countries... had the advantage of being able to provide <b>low wage competition</b>'</i>.<br>=> Khớp thông tin => <b>TRUE</b>." 
+            },
+            "q13": { 
+                type: "mcq", answer: "TRUE", targetId: "s-q13", 
+                exp: "<b>Câu hỏi:</b> Thuê ngoài (out-sourcing) là cách cạnh tranh với nhà sản xuất ngoại.<br><b>Trong bài:</b> Đoạn 9: <i>'The globalising trend of out-sourcing... was a rational response to the <b>growing competition from overseas</b>'</i>.<br>=> Khớp thông tin => <b>TRUE</b>." 
+            }
+        };
+
+        // --- 3. INTERACTIVITY LOGIC ---
+
+        // Dictionary Click Logic
+        const dictPanel = document.getElementById('dict-panel');
+        document.querySelectorAll('.vocab').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const word = this.getAttribute('data-word');
+                const data = dictionary[word];
+                
+                if (data) {
+                    document.getElementById('dict-word').innerText = word;
+                    document.getElementById('dict-phonetic').innerText = data.phonetic;
+                    document.getElementById('dict-vi').innerText = data.vi;
+                    document.getElementById('dict-context').innerText = data.context;
+                    document.getElementById('dict-example').innerText = `"${data.example}"`;
+                    
+                    dictPanel.classList.add('show');
+                }
+            });
+        });
+
+        function closeDict() {
+            dictPanel.classList.remove('show');
+        }
+
+        // Close dictionary when clicking outside
+        document.getElementById('passage-pane').addEventListener('click', closeDict);
+
+        // Answer Checking Logic
+        let activeSentenceId = null;
+
+        function checkAnswer(qId) {
+            const data = answers[qId];
+            let userAns = "";
+            let isCorrect = false;
+
+            // Get User Answer
+            if (data.type === "text") {
+                const input = document.getElementById(`input-${qId}`);
+                userAns = input.value.trim().toLowerCase();
+                isCorrect = (userAns === data.answer.toLowerCase());
+            } else if (data.type === "mcq") {
+                const checked = document.querySelector(`input[name="${qId}"]:checked`);
+                if (!checked) {
+                    alert("Vui lòng chọn một đáp án!");
+                    return;
+                }
+                userAns = checked.value;
+                isCorrect = (userAns === data.answer);
+            }
+
+            // Build Explanation Box
+            const expBox = document.getElementById(`exp-${qId}`);
+            const statusLabel = isCorrect ? "CHÍNH XÁC" : "SAI";
+            const correctText = data.answer.toUpperCase();
+            
+            expBox.innerHTML = `
+                <div class="exp-status">${statusLabel}</div>
+                <div style="margin-bottom: 8px;">Đáp án đúng: <b style="color:var(--primary-color)">${correctText}</b></div>
+                <div>${data.exp}</div>
+            `;
+            
+            expBox.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
+            expBox.style.display = 'block';
+
+            // Highlight Sentence in Passage
+            highlightPassage(data.targetId);
+        }
+
+        function highlightPassage(sentenceId) {
+            if (!sentenceId) return;
+
+            // Remove old highlight
+            if (activeSentenceId) {
+                const oldEl = document.getElementById(activeSentenceId);
+                if (oldEl) oldEl.classList.remove('active');
+            }
+
+            // Add new highlight
+            const newEl = document.getElementById(sentenceId);
+            if (newEl) {
+                newEl.classList.add('active');
+                activeSentenceId = sentenceId;
+                
+                // Scroll passage pane to the element
+                newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Allow 'Enter' key to trigger check for text inputs
+        document.querySelectorAll('.text-input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const qId = this.id.replace('input-', '');
+                    checkAnswer(qId);
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

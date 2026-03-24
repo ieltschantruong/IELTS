@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading | The Development of Travel Under the Ocean</title>
+    <style>
+        :root {
+            --primary-color: #00b06b;
+            --primary-light: #e6f7f0;
+            --primary-hover: #009359;
+            --bg-color: #f4f6f8;
+            --text-main: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --wrong-color: #ff4d4f;
+            --wrong-light: #fff1f0;
+            --highlight-vocab: #ffeb3b;
+            --highlight-sentence: rgba(0, 176, 107, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: #fff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .nav-timer {
+            background-color: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Split Container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        /* Left Pane - Reading Passage */
+        .passage-pane {
+            background-color: #fff;
+            border-right: 2px solid var(--border-color);
+            padding-bottom: 250px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .passage-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #000;
+        }
+
+        .passage-pane p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* Interactive Text Elements */
+        .vocab {
+            background-color: var(--highlight-vocab);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: opacity 0.2s;
+        }
+
+        .vocab:hover {
+            opacity: 0.8;
+        }
+
+        .sentence {
+            transition: background-color 0.4s ease;
+            border-radius: 4px;
+        }
+
+        .sentence.active {
+            background-color: var(--highlight-sentence);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* Right Pane - Questions */
+        .questions-pane {
+            background-color: #fff;
+        }
+
+        .question-block {
+            margin-bottom: 40px;
+        }
+
+        .instruction {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            background-color: var(--primary-light);
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* General Question Item */
+        .q-item {
+            margin-bottom: 20px;
+        }
+
+        .q-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 26px;
+            height: 26px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        /* Inputs */
+        .text-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            outline: none;
+            width: 250px;
+            transition: border-color 0.2s;
+            margin-bottom: 10px;
+            margin-left: 36px;
+            display: block;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 176, 107, 0.2);
+        }
+
+        /* Diagram Specific Styling */
+        .diagram-container {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .diagram-image {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            display: block;
+        }
+
+        .diagram-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .diagram-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .diagram-item .text-input {
+            margin: 0;
+            width: 100%;
+        }
+
+        .check-btn {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 36px;
+            transition: all 0.2s;
+        }
+        
+        .diagram-item .check-btn {
+            margin-left: 0;
+            padding: 8px 12px;
+        }
+
+        .check-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Explanation Box */
+        .explanation {
+            display: none;
+            margin-top: 15px;
+            margin-left: 36px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .diagram-item ~ .explanation {
+            margin-left: 0;
+            grid-column: span 2;
+        }
+
+        .explanation.correct {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .explanation.incorrect {
+            background-color: var(--wrong-light);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .exp-status {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .correct .exp-status { background-color: var(--primary-color); color: white; }
+        .incorrect .exp-status { background-color: var(--wrong-color); color: white; }
+
+        /* Dictionary Panel */
+        .dict-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            background-color: white;
+            border-top: 3px solid var(--primary-color);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .dict-panel.show {
+            transform: translateY(0);
+        }
+
+        .dict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .dict-word {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .dict-phonetic {
+            color: var(--text-light);
+            font-family: monospace;
+            margin-left: 10px;
+            font-size: 1.1rem;
+        }
+
+        .dict-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .dict-content strong {
+            display: block;
+            margin-top: 10px;
+            color: #111;
+        }
+
+        .dict-example {
+            margin-top: 5px;
+            font-style: italic;
+            color: var(--text-light);
+            background-color: var(--bg-color);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .dict-panel { width: 100%; }
+            .passage-pane { padding-bottom: 30px; border-right: none; border-bottom: 2px solid var(--border-color); }
+            .diagram-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="navbar">
+        <div class="nav-title">📖 Reading Passage 2</div>
+        <div class="nav-timer">⏱️ 20:00</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- LEFT PANE: PASSAGE -->
+        <div class="pane passage-pane" id="passage-pane">
+            <div class="passage-title">The development of travel under the ocean</div>
+            
+            <p>For millennia, humans have been <span class="vocab" data-word="intrigued">intrigued</span> by what lies beneath the sea and although submarine travel was attempted from time to time, it did not become commonplace until the middle of last century. Several clever and innovative people had experimented with designs for <span class="vocab" data-word="submersible">submersible</span> boats before then, but there was much loss of life and little success.</p>
+
+            <p><span class="sentence" id="s-q1">There had long been use of a primitive diving bell for exploratory purposes</span>, but it was as a war machine that the submarine came into its own. The first development in the history of American submarines was a small submersible with a hand-cranked screw-like oar and a crew of one. It was built before the American Revolutionary War (1775—1783) but was adapted for use against the British during this war. Although its <span class="sentence" id="s-q2">pilot twice failed to fasten explosive devices</span> to British ships before losing control of his vessel, he escaped harm.</p>
+
+            <p>In 1800, an American inventor, Robert Fulton, designed an underwater machine that he called the Nautilus. This version brought in features that can still be found in some modern submarines, notably adjustable diving planes for better underwater manoeuvring, dual systems of propulsion, and <span class="sentence" id="s-q3">a compressed air system that allowed it to stay down for about four hours without surfacing.</span></p>
+
+            <p>Development of submersible vessels lagged a long way behind the continued progress in the design of surface ships until the American Civil War (1861-1865) when both sides tried out various designs. One of those, called the Hunley — named after its financier rather than its inventor, sank twice during training missions with 11 crew members losing their lives including Hunley himself. Notwithstanding these failures, <span class="sentence" id="s-q4">it was commissioned again in 1864 to attack a ship in Charleston Harbor. A torpedo was used to strike and scuttle the ship – a first in naval history</span>, but the submarine never reappeared, and once again the whole crew perished. Its potential had been recognised, but there still remained the challenge of operating safely under the water.</p>
+
+            <p>The US Navy could appreciate the strategic benefits of having submarines in its fleet and held a competition to encourage design and construction of these underwater craft. The inventor, John Holland, won the competition and it was his sixth prototype, the Holland, that the navy bought and added to its fleet in 1900. This submarine was quite different from previous designs. <span class="sentence" id="s-q5">It was propelled by a gasoline engine that turned a propeller while the vessel was on the surface.</span> When it submerged, the engine ran a generator to charge batteries to operate an electric motor. The improved propulsion methods were, unfortunately, highly dangerous. Not only is gasoline <span class="vocab" data-word="flammable">flammable</span> and unstable, using it in the restricted environment of a submarine posed quite a hazard for the crewmen. There was another problem, too: the batteries were not only heavy, cumbersome and inefficient, but they were also extremely <span class="vocab" data-word="volatile">volatile</span>.</p>
+
+            <p>During the same period as Holland’s efforts were being trialled, a German scientist by the name of Rudolf Diesel <span class="sentence" id="s-q6">created an engine which used a fuel less explosive than gasoline and which would consequently be stored safely.</span> Another advantage was that there was no necessity for an electric spark to ignite the fuel. These safety improvements combined with better fuel economy allowed Diesel engines to power a submarine for longer on the surface; however, batteries were still needed to supply energy for underwater operation.</p>
+
+            <p>Although diesel-powered submarines were successful and used by the US Navy for almost 50 years, the search for a single power source carried on. It wasn’t long before the concept of nuclear power was realised in Germany and taken up by an American physicist, Ross Gunn, who could envisage its potential in submersibles. A research team was put together to adapt the concept of nuclear power for use in submarines. In effect, modern nuclear submarines have on board a small nuclear power plant which produces a great amount of energy. This is used to heat water and create steam which drives a huge turbine which turns the propeller.</p>
+
+            <p>There have been many adaptations and technological improvements made to submarines over the years, but the shape is basically the same. Obviously, it is a totally enclosed craft, cigar shaped with narrowed ends. <span class="sentence" id="s-q13">The outer hull is the largest part of the boat and forms the body.</span> The inner hull is designed to resist the considerable water pressure and insulates the crew from the cold. This is where the crew works, eats and sleeps. It also contains the engine room and the apparatus that makes clean air and clean water. Between the hulls are the <span class="vocab" data-word="ballast">ballast</span> tanks for controlling buoyancy. There is a tall fin-shaped sail that comes up out of the hull. Inside the sail is the conning tower and extending from this, to the fore, <span class="sentence" id="s-q8">there is a periscope</span> (through which the captain can see the sea and sky when the submarine is near the surface of the water). Sonar is used for navigation deep below the surface. <span class="sentence" id="s-q9">The other projection from the conning tower is the radio antenna.</span></p>
+
+            <p>Underwater, there are two controls for steering the submarine. <span class="sentence" id="s-q10">The rudder (like a tail fin) controls side-to-side movement</span>, and diving planes influence rise and descent. There are two sets of diving planes: <span class="sentence" id="s-q7">the forward sailplanes</span> and <span class="sentence" id="s-q12">the stem planes</span>, which are located at the back with the <span class="sentence" id="s-q11">rudder and propeller.</span></p>
+
+            <p>Advancing technology will undoubtedly result in different shapes and modes of operation, and it is quite possible that, in the future, submarines will be manned by robots or computer technology that communicates information to land bases via satellite.</p>
+        </div>
+
+        <!-- RIGHT PANE: QUESTIONS -->
+        <div class="pane questions-pane">
+            
+            <!-- Questions 1-6 -->
+            <div class="question-block">
+                <div class="instruction">Questions 1-6</div>
+                <p style="margin-bottom: 15px;">Answer the questions below. Choose <strong>NO MORE THAN THREE WORDS</strong> from the text for each answer.</p>
+
+                <div class="q-item">
+                    <div><span class="q-number">1</span> What kind of underwater device was used to investigate the ocean before submersible boats were invented?</div>
+                    <input type="text" id="input-q1" class="text-input" placeholder="Your answer...">
+                    <button class="check-btn" onclick="checkAnswer('q1')">Check</button>
+                    <div id="exp-q1" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">2</span> What was the crewman of the first American-built submarine trying to do before his mission failed?</div>
+                    <input type="text" id="input-q2" class="text-input" placeholder="Your answer...">
+                    <button class="check-btn" onclick="checkAnswer('q2')">Check</button>
+                    <div id="exp-q2" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">3</span> What gave the Nautilus the ability to remain submerged for a long time?</div>
+                    <input type="text" id="input-q3" class="text-input" placeholder="Your answer...">
+                    <button class="check-btn" onclick="checkAnswer('q3')">Check</button>
+                    <div id="exp-q3" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">4</span> When was a submarine first used successfully to sink an enemy boat?</div>
+                    <input type="text" id="input-q4" class="text-input" placeholder="Your answer...">
+                    <button class="check-btn" onclick="checkAnswer('q4')">Check</button>
+                    <div id="exp-q4" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">5</span> What new type of propulsion did the Holland use on top of the water?</div>
+                    <input type="text" id="input-q5" class="text-input" placeholder="Your answer...">
+                    <button class="check-btn" onclick="checkAnswer('q5')">Check</button>
+                    <div id="exp-q5" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">6</span> For what reason was Diesel’s fuel considered safer than Holland’s?</div>
+                    <input type="text" id="input-q6" class="text-input" placeholder="Your answer...">
+                    <button class="check-btn" onclick="checkAnswer('q6')">Check</button>
+                    <div id="exp-q6" class="explanation"></div>
+                </div>
+            </div>
+
+            <!-- Questions 7-13 -->
+            <div class="question-block">
+                <div class="instruction">Questions 7-13</div>
+                <p style="margin-bottom: 15px;">Label the diagram below. Choose <strong>NO MORE THAN TWO WORDS</strong> from the text for each answer.</p>
+                
+                <div class="diagram-container">
+                    <img src="src/reading_diagrams/the_development_of_travel_under_the_ocean.png" alt="Submarine Diagram" class="diagram-image">
+
+                    <div class="diagram-grid">
+                        <!-- Q7 -->
+                        <div class="diagram-item">
+                            <span class="q-number">7</span>
+                            <input type="text" id="input-q7" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q7')">Check</button>
+                        </div>
+                        <div id="exp-q7" class="explanation"></div>
+
+                        <!-- Q8 -->
+                        <div class="diagram-item">
+                            <span class="q-number">8</span>
+                            <input type="text" id="input-q8" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q8')">Check</button>
+                        </div>
+                        <div id="exp-q8" class="explanation"></div>
+
+                        <!-- Q9 -->
+                        <div class="diagram-item">
+                            <span class="q-number">9</span>
+                            <input type="text" id="input-q9" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q9')">Check</button>
+                        </div>
+                        <div id="exp-q9" class="explanation"></div>
+
+                        <!-- Q10 -->
+                        <div class="diagram-item">
+                            <span class="q-number">10</span>
+                            <input type="text" id="input-q10" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q10')">Check</button>
+                        </div>
+                        <div id="exp-q10" class="explanation"></div>
+
+                        <!-- Q11 -->
+                        <div class="diagram-item">
+                            <span class="q-number">11</span>
+                            <input type="text" id="input-q11" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q11')">Check</button>
+                        </div>
+                        <div id="exp-q11" class="explanation"></div>
+
+                        <!-- Q12 -->
+                        <div class="diagram-item">
+                            <span class="q-number">12</span>
+                            <input type="text" id="input-q12" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q12')">Check</button>
+                        </div>
+                        <div id="exp-q12" class="explanation"></div>
+
+                        <!-- Q13 -->
+                        <div class="diagram-item">
+                            <span class="q-number">13</span>
+                            <input type="text" id="input-q13" class="text-input">
+                            <button class="check-btn" onclick="checkAnswer('q13')">Check</button>
+                        </div>
+                        <div id="exp-q13" class="explanation"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Dictionary Panel -->
+    <div class="dict-panel" id="dict-panel">
+        <div class="dict-header">
+            <div>
+                <span class="dict-word" id="dict-word">word</span>
+                <span class="dict-phonetic" id="dict-phonetic">/wɜːd/</span>
+            </div>
+            <button class="dict-close" onclick="closeDict()">✖</button>
+        </div>
+        <div class="dict-content">
+            <div style="color: var(--primary-color); font-weight: bold; margin-bottom: 10px;" id="dict-vi">Ý nghĩa tiếng Việt</div>
+            <strong>Giải thích ngữ cảnh:</strong>
+            <div id="dict-context" style="margin-top: 5px;">Giải thích</div>
+            <strong>Ví dụ trong bài:</strong>
+            <div class="dict-example" id="dict-example">"Ví dụ"</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. VOCABULARY DATA ---
+        const dictionary = {
+            "intrigued": {
+                phonetic: "/ɪnˈtriːɡd/",
+                vi: "Bị hấp dẫn, tò mò",
+                context: "Con người luôn có sự tò mò, bị thu hút mạnh mẽ bởi những gì nằm dưới đáy biển.",
+                example: "For millennia, humans have been intrigued by what lies beneath the sea..."
+            },
+            "submersible": {
+                phonetic: "/səbˈmɜː.sə.bəl/",
+                vi: "Có thể lặn dưới nước / Tàu lặn",
+                context: "Dùng để mô tả những loại tàu hay thiết kế có khả năng lặn và hoạt động dưới nước.",
+                example: "...innovative people had experimented with designs for submersible boats before then..."
+            },
+            "flammable": {
+                phonetic: "/ˈflæm.ə.bəl/",
+                vi: "Dễ cháy",
+                context: "Nhiên liệu xăng (gasoline) cực kỳ dễ cháy, gây nguy hiểm cao khi dùng trong không gian hẹp của tàu ngầm.",
+                example: "Not only is gasoline flammable and unstable..."
+            },
+            "volatile": {
+                phonetic: "/ˈvɒl.ə.taɪl/",
+                vi: "Dễ bay hơi, không ổn định, dễ nổ",
+                context: "Pin dùng trong thiết kế cũ không những nặng nề mà còn rất dễ phát nổ/gây nguy hiểm.",
+                example: "...but they were also extremely volatile."
+            },
+            "ballast": {
+                phonetic: "/ˈbæl.əst/",
+                vi: "Hệ thống dằn (chứa nước để kiểm soát sức nổi)",
+                context: "Các khoang chứa nằm giữa vỏ trong và vỏ ngoài để điều khiển việc tàu nổi hay chìm.",
+                example: "Between the hulls are the ballast tanks for controlling buoyancy."
+            }
+        };
+
+        // --- 2. ANSWER KEY & EXPLANATIONS ---
+        const answers = {
+            "q1": { 
+                valid: ["primitive diving bell", "diving bell"], 
+                targetId: "s-q1", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>'investigate the ocean'</i> (exploratory purposes), <i>'before submersible boats'</i>.<br><b>Bước 2:</b> Đoạn 2 viết: <i>'There had long been use of a <b>primitive diving bell</b> for exploratory purposes'</i>.<br>=> Đáp án: <b>(primitive) diving bell</b>." 
+            },
+            "q2": { 
+                valid: ["fasten explosive devices"], 
+                targetId: "s-q2", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>'crewman of the first American-built submarine'</i>, <i>'failed'</i>.<br><b>Bước 2:</b> Đoạn 2 viết: <i>'...pilot twice failed to <b>fasten explosive devices</b> to British ships...'</i>.<br>=> Đáp án: <b>fasten explosive devices</b>." 
+            },
+            "q3": { 
+                valid: ["compressed air system"], 
+                targetId: "s-q3", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>'Nautilus'</i>, <i>'submerged for a long time'</i>.<br><b>Bước 2:</b> Đoạn 3 viết: <i>'...and a <b>compressed air system</b> that allowed it to stay down for about four hours without surfacing.'</i><br>=> Đáp án: <b>compressed air system</b>." 
+            },
+            "q4": { 
+                valid: ["1864"], 
+                targetId: "s-q4", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>'first used successfully to sink an enemy boat'</i>.<br><b>Bước 2:</b> Đoạn 4 viết về tàu Hunley: <i>'...it was commissioned again in <b>1864</b> to attack a ship... A torpedo was used to strike and scuttle the ship - a first in naval history'</i>.<br>=> Đáp án: <b>1864</b>." 
+            },
+            "q5": { 
+                valid: ["gasoline engine"], 
+                targetId: "s-q5", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>'Holland'</i>, <i>'on top of the water'</i> (on the surface).<br><b>Bước 2:</b> Đoạn 5 viết: <i>'It was propelled by a <b>gasoline engine</b> that turned a propeller while the vessel was on the surface.'</i><br>=> Đáp án: <b>gasoline engine</b>." 
+            },
+            "q6": { 
+                valid: ["less explosive", "less explosive fuel"], 
+                targetId: "s-q6", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>'Diesel’s fuel'</i>, <i>'safer'</i>.<br><b>Bước 2:</b> Đoạn 6 viết: <i>'...created an engine which used a fuel <b>less explosive</b> than gasoline and which would consequently be stored safely.'</i><br>=> Đáp án: <b>less explosive</b>." 
+            },
+            "q7": { 
+                valid: ["forward sailplanes"], 
+                targetId: "s-q7", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Phần cánh mũi ở phía trước tháp chỉ huy.<br><b>Trong bài:</b> Đoạn cuối mô tả hai bộ cánh lặn: <i>'...<b>the forward sailplanes</b> and the stem planes...'</i>.<br>=> Đáp án: <b>forward sailplanes</b>." 
+            },
+            "q8": { 
+                valid: ["periscope"], 
+                targetId: "s-q8", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Cột nhô lên cao nhất ở tháp chỉ huy dùng để nhìn.<br><b>Trong bài:</b> Đoạn 8: <i>'...extending from this, to the fore, there is a <b>periscope</b>...'</i>.<br>=> Đáp án: <b>periscope</b>." 
+            },
+            "q9": { 
+                valid: ["radio antenna"], 
+                targetId: "s-q9", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Cột nhô lên phía sau kính tiềm vọng.<br><b>Trong bài:</b> Đoạn 8: <i>'The other projection from the conning tower is the <b>radio antenna</b>.'</i><br>=> Đáp án: <b>radio antenna</b>." 
+            },
+            "q10": { 
+                valid: ["rudder"], 
+                targetId: "s-q10", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Vây đuôi điều khiển hướng trái phải.<br><b>Trong bài:</b> Đoạn 9: <i>'The <b>rudder</b> (like a tail fin) controls side-to-side movement...'</i><br>=> Đáp án: <b>rudder</b>." 
+            },
+            "q11": { 
+                valid: ["propeller"], 
+                targetId: "s-q11", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Chân vịt tạo lực đẩy ở đuôi tàu.<br><b>Trong bài:</b> Đoạn 9: <i>'...located at the back with the rudder and <b>propeller</b>.'</i><br>=> Đáp án: <b>propeller</b>." 
+            },
+            "q12": { 
+                valid: ["stem planes"], 
+                targetId: "s-q12", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Cánh lặn ở phần đuôi tàu (sau bánh lái).<br><b>Trong bài:</b> Đoạn 9: <i>'...and the <b>stem planes</b>, which are located at the back...'</i>.<br>=> Đáp án: <b>stem planes</b>." 
+            },
+            "q13": { 
+                valid: ["outer hull"], 
+                targetId: "s-q13", 
+                exp: "<b>Chỉ dẫn Sơ đồ:</b> Lớp vỏ bọc bên ngoài toàn bộ thân tàu.<br><b>Trong bài:</b> Đoạn 8: <i>'The <b>outer hull</b> is the largest part of the boat and forms the body.'</i><br>=> Đáp án: <b>outer hull</b>." 
+            }
+        };
+
+        // --- 3. INTERACTIVITY LOGIC ---
+
+        // Dictionary Click Logic
+        const dictPanel = document.getElementById('dict-panel');
+        document.querySelectorAll('.vocab').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const word = this.getAttribute('data-word');
+                const data = dictionary[word];
+                
+                if (data) {
+                    document.getElementById('dict-word').innerText = word;
+                    document.getElementById('dict-phonetic').innerText = data.phonetic;
+                    document.getElementById('dict-vi').innerText = data.vi;
+                    document.getElementById('dict-context').innerText = data.context;
+                    document.getElementById('dict-example').innerText = `"${data.example}"`;
+                    
+                    dictPanel.classList.add('show');
+                }
+            });
+        });
+
+        function closeDict() {
+            dictPanel.classList.remove('show');
+        }
+
+        // Close dictionary when clicking outside
+        document.getElementById('passage-pane').addEventListener('click', closeDict);
+
+        // Answer Checking Logic
+        let activeSentenceId = null;
+
+        function checkAnswer(qId) {
+            const data = answers[qId];
+            const input = document.getElementById(`input-${qId}`);
+            const userAns = input.value.trim().toLowerCase();
+            
+            // Check if user answer matches any of the valid variations
+            let isCorrect = false;
+            for(let validAns of data.valid) {
+                if(userAns === validAns.toLowerCase()) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+
+            // Build Explanation Box
+            const expBox = document.getElementById(`exp-${qId}`);
+            const statusLabel = isCorrect ? "CHÍNH XÁC" : "SAI";
+            const correctText = data.valid[0].toUpperCase(); // Display primary valid answer
+            
+            expBox.innerHTML = `
+                <div class="exp-status">${statusLabel}</div>
+                <div style="margin-bottom: 8px;">Đáp án đúng: <b style="color:var(--primary-color)">${correctText}</b></div>
+                <div>${data.exp}</div>
+            `;
+            
+            expBox.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
+            expBox.style.display = 'block';
+
+            // Highlight Sentence in Passage
+            highlightPassage(data.targetId);
+        }
+
+        function highlightPassage(sentenceId) {
+            if (!sentenceId) return;
+
+            // Remove old highlight
+            if (activeSentenceId) {
+                const oldEl = document.getElementById(activeSentenceId);
+                if (oldEl) oldEl.classList.remove('active');
+            }
+
+            // Add new highlight
+            const newEl = document.getElementById(sentenceId);
+            if (newEl) {
+                newEl.classList.add('active');
+                activeSentenceId = sentenceId;
+                
+                // Scroll passage pane to the element
+                newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Allow 'Enter' key to trigger check for text inputs
+        document.querySelectorAll('.text-input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const qId = this.id.replace('input-', '');
+                    checkAnswer(qId);
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

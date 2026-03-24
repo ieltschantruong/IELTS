@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading | Robert Louis Stevenson</title>
+    <style>
+        :root {
+            --primary-color: #00b06b;
+            --primary-light: #e6f7f0;
+            --primary-hover: #009359;
+            --bg-color: #f4f6f8;
+            --text-main: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --wrong-color: #ff4d4f;
+            --wrong-light: #fff1f0;
+            --highlight-vocab: #ffeb3b;
+            --highlight-sentence: rgba(0, 176, 107, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: #fff;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .nav-timer {
+            background-color: var(--bg-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Split Container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        /* Left Pane - Reading Passage */
+        .passage-pane {
+            background-color: #fff;
+            border-right: 2px solid var(--border-color);
+            padding-bottom: 250px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .passage-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #000;
+        }
+
+        .passage-pane p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* Interactive Text Elements */
+        .vocab {
+            background-color: var(--highlight-vocab);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: opacity 0.2s;
+        }
+
+        .vocab:hover {
+            opacity: 0.8;
+        }
+
+        .sentence {
+            transition: background-color 0.4s ease;
+            border-radius: 4px;
+        }
+
+        .sentence.active {
+            background-color: var(--highlight-sentence);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* Right Pane - Questions */
+        .questions-pane {
+            background-color: #fff;
+        }
+
+        .question-block {
+            margin-bottom: 40px;
+        }
+
+        .instruction {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            background-color: var(--primary-light);
+            padding: 10px 15px;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* General Question Item */
+        .q-item {
+            margin-bottom: 20px;
+        }
+
+        .q-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 26px;
+            height: 26px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .mcq-options {
+            margin-top: 10px;
+            margin-left: 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: var(--bg-color);
+        }
+
+        .option-label input[type="radio"] {
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Inputs */
+        .text-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            outline: none;
+            width: 200px;
+            transition: border-color 0.2s;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 176, 107, 0.2);
+        }
+
+        .check-btn {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Explanation Box */
+        .explanation {
+            display: none;
+            margin-top: 15px;
+            margin-left: 36px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .explanation.correct {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .explanation.incorrect {
+            background-color: var(--wrong-light);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .exp-status {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .correct .exp-status { background-color: var(--primary-color); color: white; }
+        .incorrect .exp-status { background-color: var(--wrong-color); color: white; }
+
+        /* Summary Box */
+        .summary-box {
+            background-color: #fafafa;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 2;
+        }
+
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        /* Dictionary Panel */
+        .dict-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            background-color: white;
+            border-top: 3px solid var(--primary-color);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .dict-panel.show {
+            transform: translateY(0);
+        }
+
+        .dict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .dict-word {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .dict-phonetic {
+            color: var(--text-light);
+            font-family: monospace;
+            margin-left: 10px;
+            font-size: 1.1rem;
+        }
+
+        .pronounce-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-left: 10px;
+            transition: transform 0.2s;
+            border-radius: 50%;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pronounce-btn:hover {
+            transform: scale(1.15);
+            background-color: var(--primary-light);
+        }
+
+        .dict-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .dict-content strong {
+            display: block;
+            margin-top: 10px;
+            color: #111;
+        }
+
+        .dict-example {
+            margin-top: 5px;
+            font-style: italic;
+            color: var(--text-light);
+            background-color: var(--bg-color);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .dict-panel { width: 100%; }
+            .passage-pane { padding-bottom: 30px; border-right: none; border-bottom: 2px solid var(--border-color); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="navbar">
+        <div class="nav-title">📖 Reading Passage 3</div>
+        <div class="nav-timer">⏱️ 20:00</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- LEFT PANE: PASSAGE -->
+        <div class="pane passage-pane" id="passage-pane">
+            <div class="passage-title">Robert Louis Stevenson</div>
+            
+            <p>Scottish novelist, poet, essayist, and travel writer, Robert Louis Stevenson was born at 8 Howard Place, Edinburgh, Scotland, on 13 November 1850. It has been more than 100 years since his death. Stevenson was a writer who caused <span class="vocab" data-word="conflicting">conflicting</span> opinions about his works. On one hand, he was often highly praised for his expert <span class="vocab" data-word="prose">prose</span> and style by many English-language critics. On the other hand, others criticised the religious themes in his works, often misunderstanding Stevenson’s own religious beliefs. Since his death a century before, critics and <span class="vocab" data-word="biographers">biographers</span> have disagreed on the <span class="vocab" data-word="legacy">legacy</span> of Stevenson’s writing. Two biographers, KF and CP, wrote a biography about Stevenson with a clear focus. <span class="sentence" id="s-q27">They chose not to criticise aspects of Stevenson’s personal life. Instead, they focused on his writing, and gave high praise to his writing style and skill.</span></p>
+
+            <p>The literary <span class="vocab" data-word="pendulum">pendulum</span> has swung these days. Different critics have different opinions towards Robert Louis Stevenson’s works. Though today, Stevenson is one of the most translated authors in the world, his works have <span class="vocab" data-word="sustained">sustained</span> a wide variety of negative criticism throughout his life. It was like a complete reversal of <span class="vocab" data-word="polarity">polarity</span>—from highly positive to slightly less positive to clearly negative; after being highly praised as a great writer, he became an example of an author with <span class="vocab" data-word="corrupt">corrupt</span> ethics and lack of morals. Many literary critics passed his works off as children’s stories or horror stories, and thought to have little social value in an educational setting. Stevenson’s works were often excluded from the literature <span class="vocab" data-word="curriculum">curriculum</span> because of its <span class="vocab" data-word="controversial">controversial</span> nature. These debates remain, and <span class="sentence" id="s-q28">many critics still assert that despite his skill, his literary works still lack moral value.</span></p>
+
+            <p>One of the main reasons why Stevenson’s literary works attracted so much criticism was due to the genre of his writing. Stevenson mainly wrote adventure stories, which was part of a popular and entertaining writing <span class="vocab" data-word="fad">fad</span> at the time. <span class="sentence" id="s-q29">Many of us believe adventure stories are exciting, offer engaging characters, action, and mystery but ultimately can’t teach moral principles.</span> The plot points are <span class="vocab" data-word="one-dimensional">one-dimensional</span> and rarely offer a deeper moral meaning, instead focusing on exciting and shocking plot twists and thrilling events. His works were even criticised by fellow authors. <span class="sentence" id="s-q32">Though Stevenson’s works have deeply influenced Oscar Wilde, Wilde often joked that Stevenson would have written better works if he wasn’t born in Scotland.</span> Other authors came to Stevenson’s defence, <span class="sentence" id="s-q34">including Galsworthy who claimed that Stevenson is a greater writer than Thomas Hardy.</span></p>
+
+            <p>Despite Wilde’s criticism, Stevenson’s Scottish identity was an <span class="vocab" data-word="integral">integral</span> part of his written works. Although Stevenson’s works were not popular in Scotland when he was alive, many modern Scottish literary critics claim that Sir Walter Scott and Robert Louis Stevenson are the most influential writers in the history of Scotland. <span class="sentence" id="s-q36">While many critics <span class="vocab" data-word="exalt">exalt</span> Sir Walter Scott as a literary genius because of his technical ability</span>, <span class="sentence" id="s-q37">others argue that Stevenson deserves the same recognition for his natural ability to capture stories and characters in words.</span> <span class="sentence" id="s-q38">Many of Scott’s works were taken more seriously as literature for their depth due to their tragic themes</span>, but <span class="sentence" id="s-q39">fans of Stevenson praise his unique style of story-telling</span> and <span class="sentence" id="s-q40">capture of human nature.</span> <span class="sentence" id="s-q30">Stevenson’s works, unlike other British authors, captured the unique day to day life of average Scottish people.</span> Many literary critics point to this as a <span class="vocab" data-word="flaw">flaw</span> of his works. According to the critics, truly important literature should <span class="vocab" data-word="transcend">transcend</span> local culture and stories. However, many critics praise the local taste of his literature. To this day, Stevenson’s works provide valuable insight to life in Scotland during the 19th century.</p>
+
+            <p><span class="sentence" id="s-q35">Despite much debate of Stevenson’s writing topics, his writing was not the only source of attention for critics. Stevenson’s personal life often attracted a lot of attention</span> from his fans and critics alike. Some even argue that his personal life eventually <span class="vocab" data-word="outshone">outshone</span> his writing. Stevenson had been <span class="vocab" data-word="plagued">plagued</span> with health problems his whole life, and often had to live in much warmer climates than the cold, <span class="vocab" data-word="dreary">dreary</span> weather of Scotland in order to recover. So he took his family to a south pacific island Samoa, which was a controversial decision at that time. However, Stevenson did not regret the decision. The sea air and thrill of adventure complimented the themes of his writing, and for a time restored his health. From there, Stevenson gained a love of travelling, and for nearly three years he wandered the eastern and central Pacific. Much of his works reflected this love of travel and adventure that Stevenson experienced in the Pacific islands. <span class="sentence" id="s-q31">It was as a result of this biographical attention that the feeling grew that interest in Stevenson’s life had taken the place of interest in his works.</span> Whether critics focus on his writing subjects, his religious beliefs, or his <span class="vocab" data-word="eccentric">eccentric</span> lifestyle of travel and adventure, people from the past and present have different opinions about Stevenson as an author. Today, he remains a controversial yet widely popular figure in Western literature.</p>
+        </div>
+
+        <!-- RIGHT PANE: QUESTIONS -->
+        <div class="pane questions-pane">
+            
+            <!-- Questions 27-31 -->
+            <div class="question-block">
+                <div class="instruction">Questions 27-31</div>
+                <p style="margin-bottom: 15px;">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+
+                <div class="q-item">
+                    <div><span class="q-number">27</span> Stevenson’s biographers KF and CP</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q27" value="A"> A. Underestimated the role of family played in Stevenson’s life.</label>
+                        <label class="option-label"><input type="radio" name="q27" value="B"> B. Overestimated the writer’s works in literature history.</label>
+                        <label class="option-label"><input type="radio" name="q27" value="C"> C. Exaggerated Stevenson’s religious belief in his works.</label>
+                        <label class="option-label"><input type="radio" name="q27" value="D"> D. Elevated Stevenson’s role as a writer.</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q27')">Check</button>
+                    <div id="exp-q27" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">28</span> The main point of the second paragraph is</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q28" value="A"> A. The public gives a more fair criticism to Stevenson’s works.</label>
+                        <label class="option-label"><input type="radio" name="q28" value="B"> B. Recent criticism has been justified.</label>
+                        <label class="option-label"><input type="radio" name="q28" value="C"> C. The style of Stevenson’s works overweigh his faults in his life.</label>
+                        <label class="option-label"><input type="radio" name="q28" value="D"> D. Stevenson’s works’ drawback is lack of ethical nature.</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q28')">Check</button>
+                    <div id="exp-q28" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">29</span> According to the author, adventure stories</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q29" value="A"> A. Do not provide plot twists well.</label>
+                        <label class="option-label"><input type="radio" name="q29" value="B"> B. Cannot be used by writers to show moral values.</label>
+                        <label class="option-label"><input type="radio" name="q29" value="C"> C. Are more fashionable art forms.</label>
+                        <label class="option-label"><input type="radio" name="q29" value="D"> D. Can be found in other’s works but not in Stevenson’s</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q29')">Check</button>
+                    <div id="exp-q29" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">30</span> What does the author say about Stevenson’s works?</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q30" value="A"> A. They describe the life of people in Scotland.</label>
+                        <label class="option-label"><input type="radio" name="q30" value="B"> B. They are commonly regarded as real literature.</label>
+                        <label class="option-label"><input type="radio" name="q30" value="C"> C. They were popular during Stevenson’s life.</label>
+                        <label class="option-label"><input type="radio" name="q30" value="D"> D. They transcend the local culture and stories.</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q30')">Check</button>
+                    <div id="exp-q30" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">31</span> The lifestyle of Stevenson</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q31" value="A"> A. Made his family envy him so much.</label>
+                        <label class="option-label"><input type="radio" name="q31" value="B"> B. Should be responsible for his death.</label>
+                        <label class="option-label"><input type="radio" name="q31" value="C"> C. Gained more attention from the public than his works.</label>
+                        <label class="option-label"><input type="radio" name="q31" value="D"> D. Didn’t prepare well for his life in Samoa.</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q31')">Check</button>
+                    <div id="exp-q31" class="explanation"></div>
+                </div>
+            </div>
+
+            <!-- Questions 32-35 -->
+            <div class="question-block">
+                <div class="instruction">Questions 32-35</div>
+                <p style="margin-bottom: 15px;">Do the following statements agree with the information given in the Reading Passage?</p>
+                <div style="background-color: #fafafa; padding: 15px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 20px;">
+                    <strong>TRUE</strong> if the statement agrees with the information<br>
+                    <strong>FALSE</strong> if the statement contradicts the information<br>
+                    <strong>NOT GIVEN</strong> if there is no information on this
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">32</span> Although Oscar Wilde admired Robert Louis Stevenson very much, he believed Stevenson could have written greater works.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q32" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q32" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q32" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q32')">Check</button>
+                    <div id="exp-q32" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">33</span> Robert Louis Stevenson encouraged Oscar Wilde to start writing at first.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q33" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q33" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q33" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q33')">Check</button>
+                    <div id="exp-q33" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">34</span> Galsworthy thought Hardy is a greater writer than Stevenson is.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q34" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q34" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q34" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q34')">Check</button>
+                    <div id="exp-q34" class="explanation"></div>
+                </div>
+
+                <div class="q-item">
+                    <div><span class="q-number">35</span> Critics only paid attention to Robert Louis Stevenson’s writing topics.</div>
+                    <div class="mcq-options">
+                        <label class="option-label"><input type="radio" name="q35" value="TRUE"> TRUE</label>
+                        <label class="option-label"><input type="radio" name="q35" value="FALSE"> FALSE</label>
+                        <label class="option-label"><input type="radio" name="q35" value="NOT GIVEN"> NOT GIVEN</label>
+                    </div>
+                    <button class="check-btn" style="margin-top: 10px; margin-left: 36px;" onclick="checkAnswer('q35')">Check</button>
+                    <div id="exp-q35" class="explanation"></div>
+                </div>
+            </div>
+
+            <!-- Questions 36-40 -->
+            <div class="question-block">
+                <div class="instruction">Questions 36-40</div>
+                <p style="margin-bottom: 15px;">Complete the notes using the list of words, A-I, below.</p>
+                
+                <div class="summary-box">
+                    <strong>Sir Walter Scott and Robert Louis Stevenson</strong><br><br>
+                    A lot of people believe that Sir Walter Scott and Robert Louis Stevenson are the most influential writers in the history of Scotland, but Sir Walter Scott is more proficient in <strong>[ 36 ]</strong>, while Stevenson has better <strong>[ 37 ]</strong>. Scott’s books illustrate <strong>[ 38 ]</strong>, especially in terms of tragedy, but a lot of readers prefer Stevenson’s <strong>[ 39 ]</strong>. What’s more, Stevenson’s understanding of <strong>[ 40 ]</strong> made his works have the most unique expression of Scottish people.
+                </div>
+
+                <div class="word-list">
+                    <span><strong>A.</strong> Natural ability</span>
+                    <span><strong>B.</strong> Romance</span>
+                    <span><strong>C.</strong> Colorful language</span>
+                    <span><strong>D.</strong> Critical acclaim</span>
+                    <span><strong>E.</strong> Humor</span>
+                    <span><strong>F.</strong> Technical control</span>
+                    <span><strong>G.</strong> Storytelling</span>
+                    <span><strong>H.</strong> Depth</span>
+                    <span><strong>I.</strong> Human nature</span>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <div class="q-item" style="display:flex; align-items:center;">
+                        <span class="q-number">36</span>
+                        <input type="text" id="input-q36" class="text-input" placeholder="Enter letter A-I" style="width: 150px; margin-bottom: 0; margin-left: 0;">
+                        <button class="check-btn" onclick="checkAnswer('q36')">Check</button>
+                    </div>
+                    <div id="exp-q36" class="explanation"></div>
+
+                    <div class="q-item" style="display:flex; align-items:center;">
+                        <span class="q-number">37</span>
+                        <input type="text" id="input-q37" class="text-input" placeholder="Enter letter A-I" style="width: 150px; margin-bottom: 0; margin-left: 0;">
+                        <button class="check-btn" onclick="checkAnswer('q37')">Check</button>
+                    </div>
+                    <div id="exp-q37" class="explanation"></div>
+
+                    <div class="q-item" style="display:flex; align-items:center;">
+                        <span class="q-number">38</span>
+                        <input type="text" id="input-q38" class="text-input" placeholder="Enter letter A-I" style="width: 150px; margin-bottom: 0; margin-left: 0;">
+                        <button class="check-btn" onclick="checkAnswer('q38')">Check</button>
+                    </div>
+                    <div id="exp-q38" class="explanation"></div>
+
+                    <div class="q-item" style="display:flex; align-items:center;">
+                        <span class="q-number">39</span>
+                        <input type="text" id="input-q39" class="text-input" placeholder="Enter letter A-I" style="width: 150px; margin-bottom: 0; margin-left: 0;">
+                        <button class="check-btn" onclick="checkAnswer('q39')">Check</button>
+                    </div>
+                    <div id="exp-q39" class="explanation"></div>
+
+                    <div class="q-item" style="display:flex; align-items:center;">
+                        <span class="q-number">40</span>
+                        <input type="text" id="input-q40" class="text-input" placeholder="Enter letter A-I" style="width: 150px; margin-bottom: 0; margin-left: 0;">
+                        <button class="check-btn" onclick="checkAnswer('q40')">Check</button>
+                    </div>
+                    <div id="exp-q40" class="explanation"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Dictionary Panel -->
+    <div class="dict-panel" id="dict-panel">
+        <div class="dict-header">
+            <div style="display: flex; align-items: center;">
+                <span class="dict-word" id="dict-word">word</span>
+                <span class="dict-phonetic" id="dict-phonetic">/wɜːd/</span>
+                <button id="pronounce-btn" class="pronounce-btn" title="Listen to pronunciation">🔊</button>
+            </div>
+            <button class="dict-close" onclick="closeDict()">✖</button>
+        </div>
+        <div class="dict-content">
+            <div style="color: var(--primary-color); font-weight: bold; margin-bottom: 10px;" id="dict-vi">Ý nghĩa tiếng Việt</div>
+            <strong>Giải thích ngữ cảnh:</strong>
+            <div id="dict-context" style="margin-top: 5px;">Giải thích</div>
+            <strong>Ví dụ trong bài:</strong>
+            <div class="dict-example" id="dict-example">"Ví dụ"</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. VOCABULARY DATA (20 Words) ---
+        const dictionary = {
+            "prose": {
+                phonetic: "/prəʊz/",
+                vi: "Văn xuôi",
+                context: "Chỉ phong cách viết văn xuôi xuất sắc của Stevenson, được nhiều nhà phê bình đánh giá cao.",
+                example: "He was often highly praised for his expert prose and style by many English-language critics."
+            },
+            "polarity": {
+                phonetic: "/pəˈlær.ə.ti/",
+                vi: "Sự phân cực, đối lập",
+                context: "Dùng để diễn tả sự thay đổi hoàn toàn thái độ của giới phê bình, từ khen ngợi hết lời sang chỉ trích nặng nề.",
+                example: "It was like a complete reversal of polarity—from highly positive to slightly less positive to clearly negative..."
+            },
+            "curriculum": {
+                phonetic: "/kəˈrɪk.jə.ləm/",
+                vi: "Chương trình giảng dạy",
+                context: "Các tác phẩm của ông thường bị loại khỏi chương trình dạy văn học vì bản chất gây tranh cãi.",
+                example: "Stevenson’s works were often excluded from the literature curriculum..."
+            },
+            "one-dimensional": {
+                phonetic: "/ˌwʌn.daɪˈmen.ʃən.əl/",
+                vi: "Một chiều, phiến diện",
+                context: "Nhận xét rằng cốt truyện phiêu lưu của ông thiếu chiều sâu, chỉ tập trung vào sự hấp dẫn bề nổi.",
+                example: "The plot points are one-dimensional and rarely offer a deeper moral meaning..."
+            },
+            "exalt": {
+                phonetic: "/ɪɡˈzɒlt/",
+                vi: "Tôn vinh, đề cao",
+                context: "Nhiều nhà phê bình tôn vinh Sir Walter Scott như một thiên tài văn học.",
+                example: "While many critics exalt Sir Walter Scott as a literary genius because of his technical ability..."
+            },
+            "transcend": {
+                phonetic: "/trænˈsend/",
+                vi: "Vượt qua, vượt lên trên",
+                context: "Ý kiến của giới phê bình cho rằng văn học thực sự quan trọng phải vượt ra khỏi khuôn khổ văn hóa địa phương.",
+                example: "According to the critics, truly important literature should transcend local culture and stories."
+            },
+            "dreary": {
+                phonetic: "/ˈdrɪə.ri/",
+                vi: "Tẻ nhạt, ảm đạm",
+                context: "Mô tả thời tiết lạnh lẽo và buồn tẻ ở Scotland, khiến ông phải chuyển đến nơi ấm áp hơn.",
+                example: "...often had to live in much warmer climates than the cold, dreary weather of Scotland in order to recover."
+            },
+            "eccentric": {
+                phonetic: "/ɪkˈsen.trɪk/",
+                vi: "Kỳ dị, lập dị, khác thường",
+                context: "Nhắc đến phong cách sống thích du lịch và phiêu lưu có phần khác người của ông.",
+                example: "Whether critics focus on his writing subjects, his religious beliefs, or his eccentric lifestyle of travel and adventure..."
+            },
+            "conflicting": {
+                phonetic: "/kənˈflɪk.tɪŋ/",
+                vi: "Mâu thuẫn, trái ngược",
+                context: "Dùng để chỉ những luồng ý kiến trái chiều từ giới phê bình đối với tác phẩm của Stevenson.",
+                example: "Stevenson was a writer who caused conflicting opinions about his works."
+            },
+            "legacy": {
+                phonetic: "/ˈleɡ.ə.si/",
+                vi: "Di sản",
+                context: "Những giá trị văn học mà ông để lại sau khi qua đời vẫn là chủ đề gây tranh luận.",
+                example: "Since his death a century before, critics and biographers have disagreed on the legacy of Stevenson’s writing."
+            },
+            "biographers": {
+                phonetic: "/baɪˈɒɡ.rə.fərz/",
+                vi: "Người viết tiểu sử",
+                context: "Những nhà văn/nhà nghiên cứu ghi chép lại cuộc đời và sự nghiệp của Stevenson.",
+                example: "Since his death a century before, critics and biographers have disagreed..."
+            },
+            "pendulum": {
+                phonetic: "/ˈpen.dʒəl.əm/",
+                vi: "Quả lắc (đồng hồ)",
+                context: "Nghĩa bóng chỉ sự thay đổi qua lại của quan điểm văn học theo thời gian.",
+                example: "The literary pendulum has swung these days."
+            },
+            "sustained": {
+                phonetic: "/səˈsteɪnd/",
+                vi: "Chịu đựng, hứng chịu",
+                context: "Tác phẩm của ông đã phải hứng chịu nhiều lời chỉ trích tiêu cực trong suốt cuộc đời.",
+                example: "...his works have sustained a wide variety of negative criticism throughout his life."
+            },
+            "corrupt": {
+                phonetic: "/kəˈrʌpt/",
+                vi: "Suy đồi, đồi bại",
+                context: "Một số người từng coi ông là tấm gương xấu với đạo đức suy đồi.",
+                example: "...he became an example of an author with corrupt ethics and lack of morals."
+            },
+            "controversial": {
+                phonetic: "/ˌkɒn.trəˈvɜː.ʃəl/",
+                vi: "Gây tranh cãi",
+                context: "Bản chất các tác phẩm cũng như quyết định cá nhân của ông thường gây ra nhiều cuộc tranh luận.",
+                example: "...because of its controversial nature."
+            },
+            "fad": {
+                phonetic: "/fæd/",
+                vi: "Mốt nhất thời, trào lưu",
+                context: "Truyện phiêu lưu từng là một trào lưu viết văn phổ biến và mang tính giải trí thời bấy giờ.",
+                example: "...which was part of a popular and entertaining writing fad at the time."
+            },
+            "integral": {
+                phonetic: "/ˈɪn.tɪ.ɡrəl/",
+                vi: "Thiết yếu, không thể thiếu",
+                context: "Bản sắc Scotland là một phần cốt lõi và không thể tách rời trong các tác phẩm của ông.",
+                example: "Despite Wilde’s criticism, Stevenson’s Scottish identity was an integral part of his written works."
+            },
+            "flaw": {
+                phonetic: "/flɔː/",
+                vi: "Điểm yếu, thiếu sót",
+                context: "Một số nhà phê bình coi việc ông chỉ tập trung vào đời sống người dân Scotland là một điểm yếu.",
+                example: "Many literary critics point to this as a flaw of his works."
+            },
+            "plagued": {
+                phonetic: "/pleɪɡd/",
+                vi: "Bị hành hạ, quấy rầy",
+                context: "Sức khỏe của ông liên tục bị ảnh hưởng xấu do các căn bệnh mãn tính trong suốt cuộc đời.",
+                example: "Stevenson had been plagued with health problems his whole life..."
+            },
+            "outshone": {
+                phonetic: "/ˌaʊtˈʃɒn/",
+                vi: "Vượt trội, làm lu mờ",
+                context: "Có ý kiến cho rằng đời tư thú vị của ông đã thu hút nhiều sự chú ý hơn và làm lu mờ cả các tác phẩm văn học.",
+                example: "Some even argue that his personal life eventually outshone his writing."
+            }
+        };
+
+        // --- 2. ANSWER KEY & EXPLANATIONS ---
+        const answers = {
+            "q27": { 
+                type: "mcq", answer: "D", targetId: "s-q27", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>KF and CP</i> trong đoạn 1.<br><b>Bước 2:</b> Câu cuối đoạn 1: <i>'They chose not to criticise... Instead, they focused on his writing, and gave high praise to his writing style and skill.'</i> (Tập trung khen ngợi kỹ năng viết).<br>=> Hành động này đã đề cao vai trò nhà văn của ông. Đáp án <b>D (Elevated Stevenson’s role as a writer)</b>." 
+            },
+            "q28": { 
+                type: "mcq", answer: "D", targetId: "s-q28", 
+                exp: "<b>Bước 1:</b> Đọc hiểu ý chính đoạn 2.<br><b>Bước 2:</b> Đoạn 2 nói về sự thay đổi thái độ (từ khen sang chê) và chốt lại ở câu: <i>'...many critics still assert that despite his skill, his literary works still lack moral value'</i> (nhiều nhà phê bình cho rằng tác phẩm của ông thiếu giá trị đạo đức).<br>=> Đáp án <b>D (Stevenson’s works’ drawback is lack of ethical nature)</b>." 
+            },
+            "q29": { 
+                type: "mcq", answer: "B", targetId: "s-q29", 
+                exp: "<b>Bước 1:</b> Tìm từ khóa <i>adventure stories</i> trong đoạn 3.<br><b>Bước 2:</b> Đoạn 3 ghi: <i>'...adventure stories are exciting... but ultimately can’t teach moral principles'</i> (không thể dạy các nguyên tắc đạo đức).<br>=> Đáp án <b>B (Cannot be used by writers to show moral values)</b>." 
+            },
+            "q30": { 
+                type: "mcq", answer: "A", targetId: "s-q30", 
+                exp: "<b>Bước 1:</b> Tìm ý kiến của tác giả về tác phẩm của Stevenson (đoạn 4).<br><b>Bước 2:</b> Đoạn 4 ghi rõ: <i>'Stevenson’s works... captured the unique day to day life of average Scottish people'</i> (ghi lại cuộc sống thường nhật độc đáo của người Scotland).<br>=> Đáp án <b>A (They describe the life of people in Scotland)</b>." 
+            },
+            "q31": { 
+                type: "mcq", answer: "C", targetId: "s-q31", 
+                exp: "<b>Bước 1:</b> Tìm thông tin về <i>lifestyle</i> ở cuối bài (đoạn 5).<br><b>Bước 2:</b> Đoạn 5: <i>'It was as a result of this biographical attention that the feeling grew that interest in Stevenson’s life had taken the place of interest in his works.'</i> (Sự quan tâm đến đời tư/lối sống đã chiếm chỗ sự quan tâm đến tác phẩm).<br>=> Đáp án <b>C (Gained more attention from the public than his works)</b>." 
+            },
+            "q32": { 
+                type: "mcq", answer: "TRUE", targetId: "s-q32", 
+                exp: "<b>Câu hỏi:</b> Mặc dù Wilde ngưỡng mộ Stevenson, ông tin rằng Stevenson có thể viết ra những tác phẩm vĩ đại hơn.<br><b>Trong bài:</b> Đoạn 3: <i>'...Wilde often joked that Stevenson would have written better works if he wasn’t born in Scotland.'</i> (Viết tốt hơn nếu không sinh ra ở Scotland).<br>=> Ý nghĩa tương đồng => <b>TRUE</b>." 
+            },
+            "q33": { 
+                type: "mcq", answer: "NOT GIVEN", targetId: null, 
+                exp: "<b>Câu hỏi:</b> Stevenson đã khuyến khích Oscar Wilde bắt đầu viết văn.<br><b>Trong bài:</b> Bài đọc có nhắc đến việc hai tác giả ảnh hưởng và nhận xét nhau, nhưng KHÔNG CÓ thông tin nào nói Stevenson khuyến khích Wilde viết văn lúc ban đầu.<br>=> <b>NOT GIVEN</b>." 
+            },
+            "q34": { 
+                type: "mcq", answer: "FALSE", targetId: "s-q34", 
+                exp: "<b>Câu hỏi:</b> Galsworthy nghĩ Hardy là nhà văn vĩ đại hơn Stevenson.<br><b>Trong bài:</b> Đoạn 3 ghi: <i>'...including Galsworthy who claimed that Stevenson is a greater writer than Thomas Hardy.'</i> (Galsworthy khẳng định Stevenson vĩ đại HƠN Hardy).<br>=> Thông tin bị ngược => <b>FALSE</b>." 
+            },
+            "q35": { 
+                type: "mcq", answer: "FALSE", targetId: "s-q35", 
+                exp: "<b>Câu hỏi:</b> Các nhà phê bình <u>chỉ</u> (only) chú ý đến các chủ đề viết của Stevenson.<br><b>Trong bài:</b> Đầu đoạn 5: <i>'Despite much debate of Stevenson’s writing topics, his writing was not the only source of attention for critics. Stevenson’s personal life often attracted a lot of attention...'</i> (Văn chương không phải là thứ duy nhất thu hút sự chú ý, mà còn đời tư).<br>=> Sự xuất hiện của từ 'only' làm câu sai => <b>FALSE</b>." 
+            },
+            "q36": { 
+                type: "text", valid: ["f", "technical control"], targetId: "s-q36", 
+                exp: "<b>Trong bài:</b> Đoạn 4 so sánh hai nhà văn: <i>'While many critics exalt Sir Walter Scott as a literary genius because of his <b>technical ability</b>...'</i>.<br>=> Khớp với lựa chọn <b>F. Technical control</b>." 
+            },
+            "q37": { 
+                type: "text", valid: ["a", "natural ability"], targetId: "s-q37", 
+                exp: "<b>Trong bài:</b> Đoạn 4: <i>'...others argue that Stevenson deserves the same recognition for his <b>natural ability</b> to capture stories...'</i>.<br>=> Khớp với lựa chọn <b>A. Natural ability</b>." 
+            },
+            "q38": { 
+                type: "text", valid: ["h", "depth"], targetId: "s-q38", 
+                exp: "<b>Trong bài:</b> Đoạn 4: <i>'Many of Scott’s works were taken more seriously as literature for their <b>depth</b> due to their tragic themes...'</i>.<br>=> Khớp với lựa chọn <b>H. Depth</b>." 
+            },
+            "q39": { 
+                type: "text", valid: ["g", "storytelling", "story-telling"], targetId: "s-q39", 
+                exp: "<b>Trong bài:</b> Đoạn 4: <i>'...but fans of Stevenson praise his unique style of <b>story-telling</b>...'</i>.<br>=> Khớp với lựa chọn <b>G. Storytelling</b>." 
+            },
+            "q40": { 
+                type: "text", valid: ["i", "human nature"], targetId: "s-q40", 
+                exp: "<b>Trong bài:</b> Đoạn 4: <i>'...and capture of <b>human nature</b>.'</i> Điều này giúp tác phẩm phản ánh độc đáo con người Scotland.<br>=> Khớp với lựa chọn <b>I. Human nature</b>." 
+            }
+        };
+
+        // --- 3. INTERACTIVITY LOGIC ---
+
+        // Speech Synthesis Setup
+        function pronounceWord(word) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US'; // You can change to 'en-GB' for British accent
+                utterance.rate = 0.9; // Slightly slower for clarity
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log("Text-to-speech not supported in this browser.");
+            }
+        }
+
+        // Speaker Button Click
+        document.getElementById('pronounce-btn').addEventListener('click', function() {
+            const currentWord = document.getElementById('dict-word').innerText;
+            if (currentWord) {
+                pronounceWord(currentWord);
+            }
+        });
+
+        // Dictionary Click Logic
+        const dictPanel = document.getElementById('dict-panel');
+        document.querySelectorAll('.vocab').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const word = this.getAttribute('data-word');
+                const data = dictionary[word];
+                
+                if (data) {
+                    document.getElementById('dict-word').innerText = word;
+                    document.getElementById('dict-phonetic').innerText = data.phonetic;
+                    document.getElementById('dict-vi').innerText = data.vi;
+                    document.getElementById('dict-context').innerText = data.context;
+                    document.getElementById('dict-example').innerText = `"${data.example}"`;
+                    
+                    dictPanel.classList.add('show');
+
+                    // Automatically pronounce the word when clicked
+                    pronounceWord(word);
+                }
+            });
+        });
+
+        function closeDict() {
+            dictPanel.classList.remove('show');
+        }
+
+        // Close dictionary when clicking outside
+        document.getElementById('passage-pane').addEventListener('click', closeDict);
+
+        // Answer Checking Logic
+        let activeSentenceId = null;
+
+        function checkAnswer(qId) {
+            const data = answers[qId];
+            let userAns = "";
+            let isCorrect = false;
+
+            if (data.type === "text") {
+                const input = document.getElementById(`input-${qId}`);
+                userAns = input.value.trim().toLowerCase();
+                
+                // Check if user answer matches any of the valid variations
+                for(let validAns of data.valid) {
+                    if(userAns === validAns.toLowerCase()) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+            } else if (data.type === "mcq") {
+                const checked = document.querySelector(`input[name="${qId}"]:checked`);
+                if (!checked) {
+                    alert("Vui lòng chọn một đáp án!");
+                    return;
+                }
+                userAns = checked.value;
+                isCorrect = (userAns === data.answer);
+            }
+
+            // Build Explanation Box
+            const expBox = document.getElementById(`exp-${qId}`);
+            const statusLabel = isCorrect ? "CHÍNH XÁC" : "SAI";
+            
+            // Format the correct text display
+            let correctText = "";
+            if (data.type === "mcq") {
+                correctText = data.answer.toUpperCase();
+            } else {
+                correctText = data.valid[0].toUpperCase();
+            }
+            
+            expBox.innerHTML = `
+                <div class="exp-status">${statusLabel}</div>
+                <div style="margin-bottom: 8px;">Đáp án đúng: <b style="color:var(--primary-color)">${correctText}</b></div>
+                <div>${data.exp}</div>
+            `;
+            
+            expBox.className = `explanation ${isCorrect ? 'correct' : 'incorrect'}`;
+            expBox.style.display = 'block';
+
+            // Highlight Sentence in Passage
+            highlightPassage(data.targetId);
+        }
+
+        function highlightPassage(sentenceId) {
+            if (!sentenceId) return;
+
+            // Remove old highlight
+            if (activeSentenceId) {
+                const oldEl = document.getElementById(activeSentenceId);
+                if (oldEl) oldEl.classList.remove('active');
+            }
+
+            // Add new highlight
+            const newEl = document.getElementById(sentenceId);
+            if (newEl) {
+                newEl.classList.add('active');
+                activeSentenceId = sentenceId;
+                
+                // Scroll passage pane to the element
+                newEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Allow 'Enter' key to trigger check for text inputs
+        document.querySelectorAll('.text-input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const qId = this.id.replace('input-', '');
+                    checkAnswer(qId);
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
