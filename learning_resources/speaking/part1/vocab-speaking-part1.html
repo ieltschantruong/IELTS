@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>IELTS Speaking Part 1 - Interactive Master</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap');
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #F8F7F4;
+    }
+
+    h1, h2, h3, .serif {
+        font-family: 'Playfair Display', serif;
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        height: 250px;
+        max-height: 300px;
+    }
+
+    /* Custom Scrollbar for the sidebar */
+    .custom-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-active {
+        border-bottom: 2px solid #E11D48;
+        color: #E11D48;
+        font-weight: 600;
+    }
+    
+    .tab-inactive {
+        color: #64748b;
+    }
+    .tab-inactive:hover {
+        color: #334155;
+    }
+
+    /* Vocab Card Styling */
+    .vocab-card {
+        border-left: 4px solid #E11D48;
+    }
+    .expression-card {
+        border-left: 4px solid #4F46E5;
+    }
+
+    .ipa-text {
+        font-family: 'Arial', sans-serif; /* Fallback for special chars */
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin-left: 0.5rem;
+        font-weight: 400;
+    }
+</style>
+</head> <body class="text-slate-700 h-screen flex overflow-hidden">
+
+<aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col z-20 shadow-sm hidden md:flex">
+    <div class="p-6 border-b border-slate-100">
+        <h1 class="text-2xl font-bold text-slate-800">IELTS<span class="text-rose-600">ChanTruong</span></h1>
+        <p class="text-xs text-slate-500 mt-1 uppercase tracking-wider">Speaking Part 1</p>
+    </div>
+    
+    <nav class="flex-1 overflow-y-auto custom-scroll p-4 space-y-2" id="topicList">
+        </nav>
+
+    <div class="p-4 border-t border-slate-100 bg-slate-50">
+        <div class="text-xs text-slate-500 text-center">
+            Band 7.5+ Target Vocabulary
+        </div>
+    </div>
+</aside>
+
+<div class="md:hidden fixed top-0 left-0 right-0 bg-white z-50 border-b border-slate-200 p-4 flex justify-between items-center h-16">
+    <h1 class="text-xl font-bold">IELTS<span class="text-rose-600">ChanTruong</span></h1>
+    <button id="mobileMenuBtn" class="text-slate-600 focus:outline-none">
+        <span class="text-2xl">☰</span>
+    </button>
+</div>
+
+<div id="mobileSidebar" class="fixed inset-0 bg-gray-800 bg-opacity-75 z-40 hidden">
+    <div class="bg-white w-64 h-full flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="font-bold">Topics</h2>
+            <button id="closeMobileSidebar" class="text-2xl">&times;</button>
+        </div>
+        <nav class="flex-1 overflow-y-auto p-4 space-y-2" id="mobileTopicList">
+            </nav>
+    </div>
+</div>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden relative pt-16 md:pt-0 bg-[#F8F7F4]">
+    
+    <header class="bg-white border-b border-slate-200 px-8 py-6 flex justify-between items-center shadow-sm">
+        <div>
+            <h2 id="currentTopicTitle" class="text-3xl font-bold text-slate-800 serif">Topic Name</h2>
+            <p id="currentTopicIntro" class="text-slate-500 mt-2 max-w-2xl">Brief introduction to the topic and why it is common in IELTS.</p>
+        </div>
+        <div class="hidden lg:block text-right">
+            <div class="text-sm font-semibold text-slate-600">Target Band</div>
+            <div class="text-3xl font-bold text-rose-600">7.5+</div>
+        </div>
+    </header>
+
+    <div class="bg-white px-8 border-b border-slate-200">
+        <div class="flex space-x-8">
+            <button onclick="switchTab('vocab')" id="tab-vocab" class="tab-active py-4 px-2 transition-colors">Lexical Toolkit</button>
+            <button onclick="switchTab('questions')" id="tab-questions" class="tab-inactive py-4 px-2 transition-colors">Questions Matrix</button>
+            <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-inactive py-4 px-2 transition-colors">Topic Analytics</button>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto custom-scroll p-8">
+        
+        <div id="view-vocab" class="space-y-8 animate-fade-in">
+            
+            <div>
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold mr-4">V</div>
+                    <h3 class="text-xl font-bold text-slate-800">Top 10 Advanced Vocabulary <span class="text-sm font-normal text-slate-400 ml-2">(with IPA)</span></h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6" id="vocabGrid">
+                    </div>
+            </div>
+
+            <div>
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold mr-4">E</div>
+                    <h3 class="text-xl font-bold text-slate-800">Top 10 Natural Expressions</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6" id="expressionGrid">
+                    </div>
+            </div>
+        </div>
+
+        <div id="view-questions" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm p-8 border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-4">Practice Interview Questions</h3>
+                <p class="text-slate-500 mb-8 italic">Read these aloud and try to incorporate the vocabulary from the Lexical Toolkit.</p>
+                <ul class="space-y-4" id="questionsList">
+                    </ul>
+            </div>
+        </div>
+
+        <div id="view-analytics" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Lexical Composition</h3>
+                    <p class="text-xs text-center text-slate-500 mb-4">Breakdown of the provided toolkit by linguistic function.</p>
+                    <div class="chart-container">
+                        <canvas id="compositionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Usage Complexity</h3>
+                    <p class="text-xs text-center text-slate-500 mb-4">How difficult these terms are to use naturally.</p>
+                    <div class="chart-container">
+                        <canvas id="difficultyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Examiner's Note</h3>
+                    <p class="text-slate-600 leading-relaxed" id="examinerNote">
+                        </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // --- DATA STORE ---
+    // Includes IPA fields for all vocabulary words
+    const ieltsData = {
+        weather: {
+            title: "Weather",
+            intro: "Weather is a classic 'ice-breaker' topic in IELTS. Examiners often ask about the climate in your country or your favorite season.",
+            questions: [
+                "What kind of weather do you like most?",
+                "What’s the weather like in your hometown?",
+                "Do you like snow?",
+                "Do you prefer hot or cold weather?",
+                "Do you check the weather forecast before you go out?"
+            ],
+            vocab: [
+                { word: "Scorching", ipa: "/ˈskɔː.tʃɪŋ/", type: "adj", def: "Extremely hot", example: "It was a scorching day, so we decided to stay indoors with the AC on." },
+                { word: "Overcast", ipa: "/ˈəʊ.və.kɑːst/", type: "adj", def: "Covered with clouds; dull", example: "I actually prefer overcast days because the sun isn't beating down on me." },
+                { word: "Humidity", ipa: "/hjjuːˈmɪd.ə.ti/", type: "noun", def: "The amount of water vapor in the air", example: "The high humidity in Singapore makes 30 degrees feel like 40." },
+                { word: "Drizzle", ipa: "/ˈdrɪz.əl/", type: "noun/verb", def: "Light rain", example: "There was a constant drizzle all morning, but it wasn't heavy enough for an umbrella." },
+                { word: "Breeze", ipa: "/briːz/", type: "noun", def: "A gentle wind", example: "A cool sea breeze made the walk along the beach very pleasant." },
+                { word: "Climate", ipa: "/ˈklaɪ.mət/", type: "noun", def: "General weather conditions in an area over a long period", example: "My country has a tropical climate, so it's warm year-round." },
+                { word: "Forecast", ipa: "/ˈfɔː.kɑːst/", type: "noun", def: "A prediction of future weather", example: "The forecast predicts scattered showers for the weekend." },
+                { word: "Mild", ipa: "/maɪld/", type: "adj", def: "Not severe or extreme (weather)", example: "We usually have very mild winters, it rarely freezes." },
+                { word: "Torrential", ipa: "/təˈren.ʃəl/", type: "adj", def: "(of rain) Falling rapidly and in copious quantities", example: "We got caught in a torrential downpour without coats." },
+                { word: "Unpredictable", ipa: "/ˌʌn.prɪˈdɪk.tə.bəl/", type: "adj", def: "Not able to be foreseen or known beforehand", example: "The weather here is notoriously unpredictable; you need sunglasses and an umbrella!" }
+            ],
+            expressions: [
+                { phrase: "Soaked to the bone", def: "Completely wet", example: "I forgot my umbrella and got soaked to the bone." },
+                { phrase: "Raining cats and dogs", def: "Raining very heavily", example: "We had to cancel the picnic because it was raining cats and dogs." },
+                { phrase: "Come rain or shine", def: "Whatever happens", example: "I go for a jog every morning, come rain or shine." },
+                { phrase: "A fair-weather friend", def: "Someone who is only a friend when things are going well", example: "When I lost my job, I realized who my fair-weather friends were." },
+                { phrase: "Under the weather", def: "Feeling slightly sick", example: "I'm feeling a bit under the weather today, maybe I'm catching a cold." },
+                { phrase: "Weather the storm", def: "To endure a difficult situation", example: "The company managed to weather the storm during the economic crisis." },
+                { phrase: "A spell of good weather", def: "A short period of nice weather", example: "We've had a spell of good weather recently, which is great for gardening." },
+                { phrase: "The heavens opened", def: "It started raining suddenly and heavily", example: "Just as we left the cinema, the heavens opened." },
+                { phrase: "To catch some rays", def: "To sunbathe", example: "I'm hoping to catch some rays on the beach this weekend." },
+                { phrase: "Changeable weather", def: "Weather that changes quickly", example: "Pack layers because we're expecting changeable weather." }
+            ],
+            analytics: {
+                composition: [4, 4, 2], // Nouns, Adjectives, Verbs
+                difficulty: [20, 50, 30] // Basic, Intermediate, Advanced usage
+            }
+        },
+        hometown: {
+            title: "Hometown",
+            intro: "One of the most frequent starting topics. You need to be able to describe your town vividly, discussing its facilities, atmosphere, and history.",
+            questions: [
+                "Where is your hometown?",
+                "What do you like most about your hometown?",
+                "Is your hometown a popular place for tourists?",
+                "Has your hometown changed much since you were a child?",
+                "Do you think your hometown is a good place to bring up children?"
+            ],
+            vocab: [
+                { word: "Bustling", ipa: "/ˈbʌs.lɪŋ/", type: "adj", def: "Full of activity; busy", example: "I live in a bustling city center that never sleeps." },
+                { word: "Picturesque", ipa: "/ˌpɪk.tʃərˈesk/", type: "adj", def: "Visually attractive, especially in a quaint way", example: "My village is quite picturesque, with old stone cottages and a river." },
+                { word: "Amenities", ipa: "/əˈmiː.nə.tiz/", type: "noun", def: "Useful features/facilities", example: "The town lacks basic amenities like a cinema or a large shopping mall." },
+                { word: "Cosmopolitan", ipa: "/ˌkɒz.məˈpɒl.ɪ.tən/", type: "adj", def: "Including people from many different countries", example: "London is a truly cosmopolitan city with a diverse culture." },
+                { word: "Industrial", ipa: "/ɪnˈdʌs.tri.əl/", type: "adj", def: "Relating to industry/factories", example: "It's an industrial town, so the air quality isn't always great." },
+                { word: "Coastal", ipa: "/ˈkəʊ.stəl/", type: "adj", def: "Located on or near the sea", example: "Living in a coastal town means I can go swimming whenever I want." },
+                { word: "Infrastructure", ipa: "/ˈɪn.frəˌstrʌk.tʃər/", type: "noun", def: "Basic physical structures (roads, etc.)", example: "The government is investing heavily in the city's transport infrastructure." },
+                { word: "Suburbs", ipa: "/ˈsʌb.ɜːbz/", type: "noun", def: "Outlying district of a city", example: "I prefer living in the suburbs because it's quieter than the city center." },
+                { word: "Congested", ipa: "/kənˈdʒes.tɪd/", type: "adj", def: "Blocked up with traffic", example: "The roads are terribly congested during rush hour." },
+                { word: "Historic", ipa: "/hɪˈstɒr.ɪk/", type: "adj", def: "Famous or important in history", example: "We have many historic buildings that date back to the 18th century." }
+            ],
+            expressions: [
+                { phrase: "Hustle and bustle", def: "Busy and noisy activity", example: "I love the hustle and bustle of the market place." },
+                { phrase: "Stone's throw away", def: "Very close", example: "The beach is just a stone's throw away from my house." },
+                { phrase: "Heart of the city", def: "The city center", example: "My office is located right in the heart of the city." },
+                { phrase: "Peace and quiet", def: "Calmness and silence", example: "I moved to the countryside for some peace and quiet." },
+                { phrase: "Off the beaten track", def: "Away from populated areas", example: "My hometown is a bit off the beaten track, so not many tourists visit." },
+                { phrase: "Up-and-coming", def: "Likely to become successful", example: "It's an up-and-coming neighborhood with lots of new cafes opening." },
+                { phrase: "Home away from home", def: "A place where you feel comfortable", example: "This coffee shop is my home away from home." },
+                { phrase: "Sense of community", def: "Feeling that you belong to a group", example: "There is a strong sense of community in my village." },
+                { phrase: "In the middle of nowhere", def: "Far away from other people", example: "My grandparents live in the middle of nowhere." },
+                { phrase: "Walking distance", def: "Close enough to walk to", example: "Everything I need is within walking distance." }
+            ],
+            analytics: {
+                composition: [5, 5, 0],
+                difficulty: [10, 60, 30]
+            }
+        },
+        work: {
+            title: "Work & Study",
+            intro: "You will almost certainly be asked if you work or are a student. Be ready to discuss your responsibilities and ambitions.",
+            questions: [
+                "Do you work or are you a student?",
+                "What do you dislike about your job/studies?",
+                "What would you like to do in the future?",
+                "Do you prefer working alone or with others?",
+                "Is your job/subject popular in your country?"
+            ],
+            vocab: [
+                { word: "Curriculum", ipa: "/kəˈrɪk.jə.ləm/", type: "noun", def: "The subjects comprising a course of study", example: "The medical curriculum is extremely demanding." },
+                { word: "Productivity", ipa: "/ˌprɒd.ʌkˈtɪv.ə.ti/", type: "noun", def: "The state of producing something", example: "Listening to music actually boosts my productivity." },
+                { word: "Deadline", ipa: "/ˈded.laɪn/", type: "noun", def: "The latest time for completion", example: "I'm under a lot of pressure to meet a tight deadline." },
+                { word: "Colleague", ipa: "/ˈkɒl.iːg/", type: "noun", def: "A person with whom one works", example: "I get along very well with my colleagues." },
+                { word: "Qualification", ipa: "/ˌkwɒl.ɪ.fɪˈkeɪ.ʃən/", type: "noun", def: "Official completion of a course", example: "You need specific qualifications to practice law." },
+                { word: "Lucrative", ipa: "/ˈluː.krə.tɪv/", type: "adj", def: "Producing a great deal of profit", example: "He gave up a lucrative career in finance to become a teacher." },
+                { word: "Monotonous", ipa: "/məˈnɒt.ən.əs/", type: "adj", def: "Dull, tedious, and repetitious", example: "Data entry can be a bit monotonous at times." },
+                { word: "Ambition", ipa: "/æmˈbɪʃ.ən/", type: "noun", def: "A strong desire to achieve something", example: "My ambition is to run my own business one day." },
+                { word: "Workload", ipa: "/ˈwɜːk.ləʊd/", type: "noun", def: "The amount of work to be done", example: "My workload has increased significantly this semester." },
+                { word: "Specialization", ipa: "/ˌspeʃ.əl.aɪˈzeɪ.ʃən/", type: "noun", def: "Concentrating on a specific subject", example: "My specialization is in digital marketing." }
+            ],
+            expressions: [
+                { phrase: "Burn the midnight oil", def: "To work late into the night", example: "I had to burn the midnight oil to finish my thesis." },
+                { phrase: "Hit the books", def: "To study hard", example: "I have an exam tomorrow so I need to hit the books." },
+                { phrase: "Land a job", def: "To successfully get a job", example: "I managed to land a job at a top tech company." },
+                { phrase: "Climb the career ladder", def: "To advance professionally", example: "It takes years to climb the career ladder in this industry." },
+                { phrase: "Call it a day", def: "To stop working for the day", example: "I'm exhausted, let's call it a day and continue tomorrow." },
+                { phrase: "Learn the ropes", def: "To learn how to do a job", example: "It took me a few weeks to learn the ropes." },
+                { phrase: "Hands-on experience", def: "Practical experience", example: "This course offers plenty of hands-on experience." },
+                { phrase: "A dead-end job", def: "A job with no chance of promotion", example: "I quit because it was just a dead-end job." },
+                { phrase: "Team player", def: "Someone who works well with others", example: "Employers are always looking for a good team player." },
+                { phrase: "Get the sack", def: "To be fired", example: "He got the sack for being late every day." }
+            ],
+            analytics: {
+                composition: [6, 3, 1],
+                difficulty: [30, 40, 30]
+            }
+        },
+        hobbies: {
+            title: "Hobbies & Leisure",
+            intro: "A chance to show your personality. Don't just list hobbies; explain WHY you enjoy them.",
+            questions: [
+                "What do you do in your free time?",
+                "Do you have a hobby?",
+                "Did you have different hobbies when you were a child?",
+                "Is it important to have a hobby?",
+                "What is a popular hobby in your country?"
+            ],
+            vocab: [
+                { word: "Pastime", ipa: "/ˈpɑːs.taɪm/", type: "noun", def: "An activity done for enjoyment", example: "Reading is my favorite pastime." },
+                { word: "Recreational", ipa: "/ˌrek.riˈeɪ.ʃən.əl/", type: "adj", def: "Relating to activity done for enjoyment", example: "The city has excellent recreational facilities like parks and gyms." },
+                { word: "Sedentary", ipa: "/ˈsed.ən.tər.i/", type: "adj", def: "Spending much time seated", example: "I want a hobby that isn't sedentary because I sit at a desk all day." },
+                { word: "Passionate", ipa: "/ˈpæʃ.ən.ət/", type: "adj", def: "Showing strong feelings", example: "I am passionate about photography." },
+                { word: "Creative", ipa: "/kriˈeɪ.tɪv/", type: "adj", def: "Involving the use of imagination", example: "I enjoy creative activities like painting and writing." },
+                { word: "Therapeutic", ipa: "/ˌθer.əˈpjuː.tɪk/", type: "adj", def: "Having a healing effect", example: "I find gardening very therapeutic after a stressful week." },
+                { word: "Fascinating", ipa: "/ˈfæs.ən.eɪ.tɪŋ/", type: "adj", def: "Extremely interesting", example: "I find history documentaries fascinating." },
+                { word: "Engaging", ipa: "/ɪnˈgeɪ.dʒɪŋ/", type: "adj", def: "Capturing attention", example: "Chess is a mentally engaging game." },
+                { word: "Outdoor", ipa: "/ˈaʊt.dɔːr/", type: "adj", def: "Done outside", example: "I prefer outdoor activities like hiking." },
+                { word: "Competitive", ipa: "/kəmˈpet.ɪ.tɪv/", type: "adj", def: "Involving competition", example: "I'm not very competitive, I play sports just for fun." }
+            ],
+            expressions: [
+                { phrase: "Take up", def: "To start a new hobby", example: "I've decided to take up yoga." },
+                { phrase: "My cup of tea", def: "Something I like", example: "Football isn't really my cup of tea." },
+                { phrase: "Let my hair down", def: "To relax and enjoy oneself", example: "The weekend is my time to let my hair down." },
+                { phrase: "Blow off steam", def: "To release strong emotions/energy", example: "I go boxing to blow off steam." },
+                { phrase: "Recharge my batteries", def: "To rest and recover energy", example: "I need a holiday to recharge my batteries." },
+                { phrase: "Quality time", def: "Time spent giving all your attention", example: "I spend quality time with my family on Sundays." },
+                { phrase: "Keep fit", def: "To stay physically healthy", example: "I go swimming to keep fit." },
+                { phrase: "Have a knack for", def: "To have a natural skill", example: "She has a knack for learning languages." },
+                { phrase: "Lose track of time", def: "To be unaware of time passing", example: "When I'm reading, I completely lose track of time." },
+                { phrase: "Keen on", def: "Interested in", example: "I'm quite keen on cooking." }
+            ],
+            analytics: {
+                composition: [2, 7, 1],
+                difficulty: [10, 50, 40]
+            }
+        },
+        travel: {
+            title: "Travel",
+            intro: "Examiners love asking about holidays. Focus on describing places, experiences, and cultural feelings.",
+            questions: [
+                "Do you like travelling?",
+                "Where was the last place you visited?",
+                "Do you prefer travelling alone or with friends?",
+                "Have you ever travelled abroad?",
+                "Where would you like to go for your next holiday?"
+            ],
+            vocab: [
+                { word: "Itinerary", ipa: "/aɪˈtɪn.ər.ər.i/", type: "noun", def: "A planned route or journey", example: "We have a very packed itinerary for our trip to Japan." },
+                { word: "Destination", ipa: "/ˌdes.tɪˈneɪ.ʃən/", type: "noun", def: "The place someone is going", example: "Paris is a very popular tourist destination." },
+                { word: "Excursion", ipa: "/ɪkˈskɜː.ʃən/", type: "noun", def: "A short journey or trip", example: "We went on a day excursion to the mountains." },
+                { word: "Accommodation", ipa: "/əˌkɒm.əˈdeɪ.ʃən/", type: "noun", def: "A place to live or stay", example: "Accommodation in the city center can be quite expensive." },
+                { word: "Souvenir", ipa: "/ˌsuː.vənˈɪər/", type: "noun", def: "A thing kept as a reminder", example: "I bought a magnet as a souvenir." },
+                { word: "Breathtaking", ipa: "/ˈbreθˌteɪ.kɪŋ/", type: "adj", def: "Astonishing or awe-inspiring", example: "The view from the top was absolutely breathtaking." },
+                { word: "Scenic", ipa: "/ˈsiː.nɪk/", type: "adj", def: "Providing beautiful views", example: "We took the scenic route along the coast." },
+                { word: "Exotic", ipa: "/ɪgˈzɒt.ɪk/", type: "adj", def: "Characteristic of a distant country", example: "I'd love to visit an exotic location like Bali." },
+                { word: "Local", ipa: "/ˈləʊ.kəl/", type: "adj", def: "Relating to a particular area", example: "I always try to eat local food when I travel." },
+                { word: "Memorable", ipa: "/ˈmem.ər.ə.bəl/", type: "adj", def: "Worth remembering", example: "It was a truly memorable trip." }
+            ],
+            expressions: [
+                { phrase: "Travel light", def: "To bring very little luggage", example: "I prefer to travel light to avoid checking bags." },
+                { phrase: "Hit the road", def: "To begin a journey", example: "We hit the road at 6 AM to beat the traffic." },
+                { phrase: "Culture shock", def: "Disorientation in an unfamiliar culture", example: "I experienced some culture shock when I first moved to Asia." },
+                { phrase: "Broaden horizons", def: "To expand interests/knowledge", example: "Travelling really helps to broaden your horizons." },
+                { phrase: "Tourist trap", def: "A place charging high prices to tourists", example: "That restaurant is a total tourist trap." },
+                { phrase: "Off the beaten track", def: "Isolated or not well-known", example: "We looked for a beach that was off the beaten track." },
+                { phrase: "Live out of a suitcase", def: "To travel constantly", example: "I've been living out of a suitcase for two months now." },
+                { phrase: "Thirst for adventure", def: "Strong desire for excitement", example: "He has a real thirst for adventure." },
+                { phrase: "Get away from it all", def: "To escape a busy life", example: "I need a holiday to get away from it all." },
+                { phrase: "Red-eye flight", def: "A flight late at night", example: "I took the red-eye flight to save money." }
+            ],
+            analytics: {
+                composition: [5, 5, 0],
+                difficulty: [20, 60, 20]
+            }
+        },
+        routine: {
+            title: "Daily Routine",
+            intro: "Questions about your daily life require good use of adverbs of frequency and sequencing words.",
+            questions: [
+                "What is your daily routine?",
+                "Do you usually do the same things at the same time each day?",
+                "What part of the day do you like most?",
+                "Would you like to change your daily routine?",
+                "Are you a morning person?"
+            ],
+            vocab: [
+                { word: "Hectic", ipa: "/ˈhek.tɪk/", type: "adj", def: "Full of frantic activity", example: "My mornings are usually quite hectic." },
+                { word: "Productive", ipa: "/prəˈdʌk.tɪv/", type: "adj", def: "Achieving a significant result", example: "I feel most productive in the early morning." },
+                { word: "Leisurely", ipa: "/ˈleʒ.ə.li/", type: "adj/adv", def: "Unhurried or relaxed", example: "I enjoyed a leisurely breakfast on Sunday." },
+                { word: "Prioritize", ipa: "/praɪˈɒr.ɪ.taɪz/", type: "verb", def: "Treat something as more important", example: "I have to prioritize my tasks to get everything done." },
+                { word: "Habitual", ipa: "/həˈbɪt.ju.əl/", type: "adj", def: "Done constantly or as a habit", example: "My habitual route to work is blocked today." },
+                { word: "Efficient", ipa: "/ɪˈfɪʃ.ənt/", type: "adj", def: "Achieving productivity with minimum waste", example: "I'm trying to be more efficient with my time." },
+                { word: "Schedule", ipa: "/ˈʃed.juːl/", type: "noun", def: "A plan for carrying out a process", example: "I have a very tight schedule today." },
+                { word: "Balance", ipa: "/ˈbæl.əns/", type: "noun", def: "Condition where elements are equal", example: "It's hard to find a good work-life balance." },
+                { word: "Typical", ipa: "/ˈtɪp.ɪ.kəl/", type: "adj", def: "Having distinctive qualities of a type", example: "On a typical day, I wake up at 7 AM." },
+                { word: "Occasional", ipa: "/əˈkeɪ.ʒən.əl/", type: "adj", def: "Occurring infrequently", example: "I enjoy an occasional nap in the afternoon." }
+            ],
+            expressions: [
+                { phrase: "Early bird", def: "A person who gets up early", example: "I'm an early bird, I love watching the sunrise." },
+                { phrase: "Night owl", def: "A person who is active at night", example: "My brother is a night owl, he studies until 3 AM." },
+                { phrase: "Crack of dawn", def: "Very early in the morning", example: "We got up at the crack of dawn." },
+                { phrase: "Stuck in a rut", def: "Trapped in a boring routine", example: "I felt stuck in a rut so I started a new hobby." },
+                { phrase: "Kick the habit", def: "To stop doing something harmful", example: "I'm trying to kick the habit of checking my phone in bed." },
+                { phrase: "Get into the swing of things", def: "To become familiar with an activity", example: "It took a while to get into the swing of things at my new job." },
+                { phrase: "On the go", def: "Very busy/active", example: "I've been on the go all day." },
+                { phrase: "Nine-to-five", def: "Standard office hours", example: "I don't want a boring nine-to-five job." },
+                { phrase: "Call it a day", def: "Stop working", example: "I'm tired, let's call it a day." },
+                { phrase: "Lie in", def: "To stay in bed later than usual", example: "I love having a lie-in on weekends." }
+            ],
+            analytics: {
+                composition: [3, 6, 1],
+                difficulty: [20, 50, 30]
+            }
+        },
+        family: {
+            title: "Family & Friends",
+            intro: "A personal topic. You might be asked to describe a family member or discuss the importance of friendship.",
+            questions: [
+                "Do you have a large family?",
+                "Who are you closest to in your family?",
+                "Do you spend much time with your family?",
+                "What do you like doing with your friends?",
+                "Is friendship important to you?"
+            ],
+            vocab: [
+                { word: "Sibling", ipa: "/ˈsɪb.lɪŋ/", type: "noun", def: "A brother or sister", example: "I have three siblings." },
+                { word: "Adolescent", ipa: "/ˌæd.əˈles.ənt/", type: "noun/adj", def: "A young person developing into an adult", example: "Adolescent years can be challenging for families." },
+                { word: "Bond", ipa: "/bɒnd/", type: "noun", def: "A relationship between people", example: "There is a strong bond between my sisters." },
+                { word: "Upbringing", ipa: "/ˈʌpˌbrɪŋ.ɪŋ/", type: "noun", def: "Treatment received by a child", example: "I had a very strict upbringing." },
+                { word: "Resemble", ipa: "/rɪˈzem.bəl/", type: "verb", def: "To look like or be similar to", example: "People say I resemble my father." },
+                { word: "Maternal", ipa: "/məˈtɜː.nəl/", type: "adj", def: "Relating to a mother", example: "My maternal grandmother lives with us." },
+                { word: "Paternal", ipa: "/pəˈtɜː.nəl/", type: "adj", def: "Relating to a father", example: "My paternal grandfather was a sailor." },
+                { word: "Inherit", ipa: "/ɪnˈher.ɪt/", type: "verb", def: "Derive a quality genetically", example: "I inherited my mother's blue eyes." },
+                { word: "Acquaintance", ipa: "/əˈkweɪn.təns/", type: "noun", def: "A person one knows slightly", example: "He's just an acquaintance, not a close friend." },
+                { word: "Gathering", ipa: "/ˈgæð.ər.ɪŋ/", type: "noun", def: "An assembly of people", example: "We have a big family gathering every Christmas." }
+            ],
+            expressions: [
+                { phrase: "Flesh and blood", def: "Family member", example: "I have to help him, he's my own flesh and blood." },
+                { phrase: "Look up to", def: "To admire and respect someone", example: "I've always looked up to my older brother." },
+                { phrase: "Get along with", def: "To have a good relationship", example: "I don't really get along with my cousin." },
+                { phrase: "Run in the family", def: "A common characteristic in a family", example: "Artistic talent runs in the family." },
+                { phrase: "Black sheep", def: "A disreputable family member", example: "He's the black sheep of the family." },
+                { phrase: "Spitting image", def: "Looks exactly like someone", example: "She is the spitting image of her mother." },
+                { phrase: "Close-knit", def: "United by strong relationships", example: "We are a very close-knit family." },
+                { phrase: "See eye to eye", def: "To agree fully", example: "My father and I don't always see eye to eye." },
+                { phrase: "Keep in touch", def: "To maintain contact", example: "It's important to keep in touch with old friends." },
+                { phrase: "Fair-weather friend", def: "A friend who leaves when things get hard", example: "Avoid fair-weather friends." }
+            ],
+            analytics: {
+                composition: [6, 2, 2],
+                difficulty: [20, 50, 30]
+            }
+        },
+        food: {
+            title: "Food & Cooking",
+            intro: "Everyone eats! You may need to describe a dish, discuss healthy eating, or talk about restaurants.",
+            questions: [
+                "What is your favorite food?",
+                "Do you like cooking?",
+                "Is there any food you dislike?",
+                "Do you prefer home-cooked food or restaurant food?",
+                "What is a popular meal in your country?"
+            ],
+            vocab: [
+                { word: "Cuisine", ipa: "/kwɪˈziːn/", type: "noun", def: "A style or method of cooking", example: "I absolutely love Italian cuisine." },
+                { word: "Nutritious", ipa: "/njuːˈtrɪʃ.əs/", type: "adj", def: "Efficient as food; nourishing", example: "I try to make sure my meals are nutritious." },
+                { word: "Appetizing", ipa: "/ˈæp.ə.taɪ.zɪŋ/", type: "adj", def: "Stimulating one's appetite", example: "The food looked very appetizing." },
+                { word: "Delicacy", ipa: "/ˈdel.ɪ.kə.si/", type: "noun", def: "A luxury food item", example: "Caviar is considered a delicacy." },
+                { word: "Ingredients", ipa: "/ɪnˈgriː.di.ənts/", type: "noun", def: "Foods combined to make a dish", example: "Fresh ingredients are essential for a good meal." },
+                { word: "Recipe", ipa: "/ˈres.ɪ.pi/", type: "noun", def: "Instructions for preparing a dish", example: "I followed a recipe from a cookbook." },
+                { word: "Vegetarian", ipa: "/ˌvedʒ.ɪˈteə.ri.ən/", type: "noun/adj", def: "Person who does not eat meat", example: "I've been a vegetarian for five years." },
+                { word: "Spicy", ipa: "/ˈspaɪ.si/", type: "adj", def: "Flavored with strong spices", example: "I can't handle very spicy food." },
+                { word: "Processed", ipa: "/ˈprəʊ.sest/", type: "adj", def: "Altered from natural state", example: "I try to avoid processed foods." },
+                { word: "Authentic", ipa: "/ɔːˈθen.tɪk/", type: "adj", def: "Of undisputed origin; genuine", example: "This restaurant serves authentic Thai food." }
+            ],
+            expressions: [
+                { phrase: "Have a sweet tooth", def: "To like sweet foods", example: "I have a terrible sweet tooth, I love chocolate." },
+                { phrase: "Make my mouth water", def: "To make you feel hungry", example: " The smell of baking makes my mouth water." },
+                { phrase: "Grab a bite", def: "To eat quickly", example: "Let's grab a bite before the movie." },
+                { phrase: "Wining and dining", def: "Entertaining with food and drink", example: "The company spent a fortune wining and dining clients." },
+                { phrase: "Fussy eater", def: "Someone who is picky about food", example: "My son is a very fussy eater." },
+                { phrase: "Eat like a horse", def: "To eat a lot", example: "He's thin but he eats like a horse." },
+                { phrase: "Spoil your appetite", def: "Eat something that stops you being hungry", example: "Don't eat those crisps, you'll spoil your appetite." },
+                { phrase: "Processed food", def: "Food with chemicals/additives", example: "We eat too much processed food nowadays." },
+                { phrase: "Balanced diet", def: "Diet containing proper proportions", example: "A balanced diet is key to good health." },
+                { phrase: "Bolt down", def: "To eat very quickly", example: "He bolted down his lunch and ran back to work." }
+            ],
+            analytics: {
+                composition: [5, 4, 1],
+                difficulty: [20, 40, 40]
+            }
+        }
+    };
+
+    // --- STATE MANAGEMENT ---
+    let currentTopic = 'weather';
+    let currentView = 'vocab';
+    let compositionChartInstance = null;
+    let difficultyChartInstance = null;
+
+    // --- DOM ELEMENTS ---
+    const topicListEl = document.getElementById('topicList');
+    const mobileTopicListEl = document.getElementById('mobileTopicList');
+    const currentTopicTitleEl = document.getElementById('currentTopicTitle');
+    const currentTopicIntroEl = document.getElementById('currentTopicIntro');
+    const vocabGridEl = document.getElementById('vocabGrid');
+    const expressionGridEl = document.getElementById('expressionGrid');
+    const questionsListEl = document.getElementById('questionsList');
+    const examinerNoteEl = document.getElementById('examinerNote');
+
+    // --- INITIALIZATION ---
+    function init() {
+        renderSidebar();
+        renderContent();
+        setupCharts();
+        setupMobileMenu();
+    }
+
+    // --- RENDER FUNCTIONS ---
+    function renderSidebar() {
+        const topics = Object.keys(ieltsData);
+        const generateHTML = (key) => `
+            <button onclick="switchTopic('${key}')" 
+                class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${key === currentTopic ? 'bg-rose-50 text-rose-700' : 'text-slate-600 hover:bg-slate-50'}">
+                ${ieltsData[key].title}
+            </button>
+        `;
+
+        topicListEl.innerHTML = topics.map(generateHTML).join('');
+        mobileTopicListEl.innerHTML = topics.map(generateHTML).join('');
+    }
+
+    function renderContent() {
+        const data = ieltsData[currentTopic];
+        
+        // Header
+        currentTopicTitleEl.textContent = data.title;
+        currentTopicIntroEl.textContent = data.intro;
+        examinerNoteEl.textContent = `For the topic of ${data.title}, examiners are looking for your ability to describe ${data.title === 'Routine' ? 'frequency and sequence' : 'feelings and details'}. The vocabulary provided is heavily weighted towards ${data.analytics.composition[1] > data.analytics.composition[0] ? 'adjectives' : 'nouns'} to help you paint a vivid picture. Try to use at least 2 idioms from the list to push your score above Band 7.`;
+
+        // Vocab
+        vocabGridEl.innerHTML = data.vocab.map(item => `
+            <div class="vocab-card bg-white p-6 rounded-lg shadow-sm card-hover group cursor-pointer relative overflow-hidden" onclick="this.classList.toggle('bg-rose-50')">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex items-baseline">
+                        <h4 class="text-lg font-bold text-slate-800">${item.word}</h4>
+                        <span class="ipa-text">${item.ipa}</span>
+                    </div>
+                    <span class="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded ml-2">${item.type}</span>
+                </div>
+                <p class="text-sm text-slate-600 mb-3 border-b border-slate-100 pb-2">${item.def}</p>
+                <div class="text-sm text-slate-500 italic bg-slate-50 p-3 rounded-md border border-slate-100 group-hover:bg-white transition-colors">
+                    "${item.example}"
+                </div>
+                <div class="absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-bl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+        `).join('');
+
+        // Expressions
+        expressionGridEl.innerHTML = data.expressions.map(item => `
+            <div class="expression-card bg-white p-6 rounded-lg shadow-sm card-hover group cursor-pointer relative overflow-hidden" onclick="this.classList.toggle('bg-indigo-50')">
+                <h4 class="text-lg font-bold text-slate-800 mb-2">${item.phrase}</h4>
+                <p class="text-sm text-slate-600 mb-3 border-b border-slate-100 pb-2">${item.def}</p>
+                <div class="text-sm text-slate-500 italic bg-slate-50 p-3 rounded-md border border-slate-100 group-hover:bg-white transition-colors">
+                    "${item.example}"
+                </div>
+            </div>
+        `).join('');
+
+        // Questions
+        questionsListEl.innerHTML = data.questions.map((q, index) => `
+            <li class="flex items-start">
+                <span class="flex-shrink-0 w-8 h-8 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center font-bold text-sm mr-4">${index + 1}</span>
+                <span class="text-lg text-slate-700 pt-1">${q}</span>
+            </li>
+        `).join('');
+
+        updateCharts(data.analytics);
+    }
+
+    // --- LOGIC ---
+    function switchTopic(topicKey) {
+        currentTopic = topicKey;
+        renderSidebar();
+        renderContent();
+        
+        // Close mobile menu if open
+        document.getElementById('mobileSidebar').classList.add('hidden');
+    }
+
+    function switchTab(tabName) {
+        currentView = tabName;
+        
+        // Update Tab UI
+        ['vocab', 'questions', 'analytics'].forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            const view = document.getElementById(`view-${t}`);
+            
+            if (t === tabName) {
+                btn.classList.replace('tab-inactive', 'tab-active');
+                view.classList.remove('hidden');
+            } else {
+                btn.classList.replace('tab-active', 'tab-inactive');
+                view.classList.add('hidden');
+            }
+        });
+    }
+
+    function setupMobileMenu() {
+        const btn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('mobileSidebar');
+        const close = document.getElementById('closeMobileSidebar');
+
+        btn.addEventListener('click', () => sidebar.classList.remove('hidden'));
+        close.addEventListener('click', () => sidebar.classList.add('hidden'));
+    }
+
+    // --- CHARTS ---
+    function setupCharts() {
+        const ctx1 = document.getElementById('compositionChart').getContext('2d');
+        const ctx2 = document.getElementById('difficultyChart').getContext('2d');
+
+        compositionChartInstance = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nouns', 'Adjectives', 'Verbs/Other'],
+                datasets: [{
+                    data: [1, 1, 1],
+                    backgroundColor: ['#E11D48', '#4F46E5', '#94A3B8'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        difficultyChartInstance = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Basic', 'Intermediate', 'Advanced'],
+                datasets: [{
+                    label: 'Vocabulary Difficulty',
+                    data: [1, 1, 1],
+                    backgroundColor: '#E11D48',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    function updateCharts(analytics) {
+        if (compositionChartInstance) {
+            compositionChartInstance.data.datasets[0].data = analytics.composition;
+            compositionChartInstance.update();
+        }
+        if (difficultyChartInstance) {
+            difficultyChartInstance.data.datasets[0].data = analytics.difficulty;
+            difficultyChartInstance.update();
+        }
+    }
+
+    // Start
+    document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body> </html>
