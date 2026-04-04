@@ -259,7 +259,7 @@ E.
  As paving spread and streets became cleaner, shoe design evolved to reflect new possibilities. Lighter materials, including softer leathers and even silk and satin for evening wear, became fashionable. Heels grew more delicate, and soles thinner. This was particularly evident in women's footwear, where shoes became objects of display rather than mere utility. The French fashion for ornate buckles, often set with paste jewels, was widely adopted by London's elite. Men's shoes also became more refined, with the heavy riding boot giving way to the buckled court shoe for those not obliged to travel on horseback. This was not merely a matter of aesthetics; it represented a fundamental change in how Londoners inhabited their city. To walk in comfort and style was to announce one's participation in the new urban order.
 
 F.
- The rise of promenading as a social ritual further accelerated these trends. By the 1780s, certain London spaces had become established venues for the display of fashionable clothing, including footwear. Parks such as St James's and Kensington Gardens attracted crowds of strollers during the season, their circuits providing opportunities for social encounter and the mutual inspection of attire. Shoemakers responded to this demand by producing ever more varied and decorative styles. The craft of shoemaking itself was transformed, with specialist lasts—the forms around which shoes were shaped—being developed for left and right feet, a refinement not universally applied in earlier decades. This improved fit and comfort, encouraging yet more walking. >> 🔥 Nhắn zalo 0905834420 join group zalo Hóng đề thi máy 4 skills để cập nhật đề thi thật 4 kĩ năng hằng ngày [Kèm giải & đề làm online] 
+ The rise of promenading as a social ritual further accelerated these trends. By the 1780s, certain London spaces had become established venues for the display of fashionable clothing, including footwear. Parks such as St James's and Kensington Gardens attracted crowds of strollers during the season, their circuits providing opportunities for social encounter and the mutual inspection of attire. Shoemakers responded to this demand by producing ever more varied and decorative styles. The craft of shoemaking itself was transformed, with specialist lasts—the forms around which shoes were shaped—being developed for left and right feet, a refinement not universally applied in earlier decades. This improved fit and comfort, encouraging yet more walking.
 
 G.
  The new culture of walking also had its critics. Moralists complained that the freedom to stroll encouraged idleness and frivolous display. Young people of both sexes, it was feared, might use the promenade as an opportunity for unsuitable liaisons. The very anonymity of the crowd, so different from the close-knit community of the village, was seen by some as a threat to social order. Yet such complaints were themselves a testament to how thoroughly walking had been transformed. What had once been a dangerous necessity for the poor had become a leisure activity pursued by all ranks of society, accompanied by its own etiquette, its own spaces, and its own distinctive footwear. The pedestrian had become a familiar figure in the London scene, and the shoe had become far more than a mere protection for the foot.
@@ -380,3 +380,18 @@ In boxes 23–26 on your answer sheet, write
 24. Bristlecone pines grow rapidly because of the nutrient-rich soil in their habitat.
 25. Dead bristlecone wood decomposes quickly due to the moist climate.
 26. Climate change may allow bark beetles to threaten bristlecone pine populations.
+
+## Keys
+14. B
+15. D
+16. G
+17. A
+18. F
+19. 3000
+20. Methuselah
+21. resinous
+22. precipitation
+23. TRUE
+24. FALSE
+25. FALSE
+26. TRUE
