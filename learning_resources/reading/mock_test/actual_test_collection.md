@@ -395,3 +395,372 @@ In boxes 23–26 on your answer sheet, write
 24. FALSE
 25. FALSE
 26. TRUE
+
+# Passage 6: Rebranding Art Museums
+A study of the reopened National Gallery of Victoria
+
+As anyone with even a passing interest in cultural institutions will know, art museums are adapting to keep up with changes in society. Do any of these newly developed spaces indicate a fundamental shift in the ways we engage with art at the beginning of the twenty-first century? The answer is a qualified Yes—and also, it must be said, No. A clear sense of this can be gained by considering the 2003 redevelopment of the National Gallery of Victoria (NGV) in Melbourne, Australia's second-largest city, in the light of the aspirations embodied in the original building that served as its template.
+
+The first building was considered a thoroughly modern museum when it opened to the public in 1968. We should not forget that it was not all bad; there were certainly innovative aspects that one must credit to the vision and insight of the architect, Roy Grounds. For one thing, the 1968 building signaled a strong sense of engagement both in its design and layout.
+
+It was set apart from traditional notions of art museums, and over the years, this idea has been questioned and superseded by the growing impetus towards an alternative model of the museum—one that engages the public in more open-ended ways. The layout of its galleries was designed to facilitate the rapid and efficient circulation of visitors. It also contained a series of greatly expanded temporary exhibition galleries and a vast Great Hall, which represented an unprecedented emphasis on the ancillary roles of corporate functions and public performances in the contemporary museum.
+
+This last feature might have seemed excessive to some, yet how wise it has proven over the years as museums have come to place increasing emphasis on corporate sponsorship and the need to generate additional funds via room hire. Furthermore, the Great Hall has, for forty years, provided an area for children to roam at large before being escorted through the much less spatially accommodating galleries themselves. As an unintimidating introduction to the lifelong rigors of visiting art museums, its impact on attendance cannot be overestimated.
+
+At the same time, other aspects of the 1968 NGV have not withstood the test of time so well. Foremost among these are the huge expanse of the exterior's windowless wall and the surrounding moat, which creates a rather unwelcoming expression of the institution.
+
+With these considerations in mind, Mario Bellini's redeveloped NGV opened in 2003, and his design reflects what the new, improved, twenty-first-century global museum feels it should be emphasizing to its visitors. Here, the institution's energies are focused not so much on the technical subtleties of how to design the galleries themselves, but rather on presenting to the public a spectacular image of the museum itself as a welcoming yet efficient facilitator of social interaction, popular entertainment, and public knowledge.
+
+All of this is certainly impressive, but where has the art gone? We are not allowed to see the exhibitions until we have completed the necessary inductions. We are greeted by a hugely expanded cloakroom, screening off our vision to the right, followed by a large visitor information office leading to the ticket booths. Above us is the café, and to our left, we cannot escape the NGV shop, set alongside the exit.
+
+And what of the redesigned galleries themselves? In fact, they represent a wonderfully elegant reframing of the permanent collections in ways that should offer first-time visitors and seasoned members alike many new avenues for engagement in the years to come. But herein lies the conundrum posed by the NGV renovation and by the global sweep of new museum projects more generally. The mainstay elements of a permanent collection can become all too easily lost in the increased prominence that these rebranding exercises tend to place on the more glamorously spectacular aspects of the institution itself.
+
+At its most extreme, this results in the construction of new buildings that supplant the artworks inside them, becoming the major attractions themselves.
+
+These challenges are most keenly felt in the area of the temporary exhibition. Entrance to the NGV permanent collection is now free, so the NGV needs something to keep the paying public coming back. The answer lies in the international 'blockbuster' exhibition.
+
+For example, The Impressionists netted a total of 380,000 visitors, making it one of the most popular exhibitions in Australian history. There has also been, it needs to be said, a commendable attempt to leaven the international masterpieces with selected highlights from the permanent collection. Overall, though, the prevalence of these 'rental' blockbusters cannot help but introduce a certain 'off-the-rack' feeling to the institution's exhibition program.
+
+More importantly, they narrow the options for other worthy but less glamorous projects, and they take energy away from the curators' potential to do further work on and around the permanent collection itself.
+
+Yet the show must go on, and shows can't exist without the public. Even the most adroit organization, as the NGV assuredly is, needs to be able to juggle numerous, often conflicting priorities:
+- The need to advance scholarship versus the imperative of access.
+- The need to introduce audiences to new areas versus the necessity of luring them in with instant brand recognition.
+
+Nobody said it was going to be easy, and the effect of too much innovation in museums can be disastrous.
+
+**Questions 27-30**
+Choose the correct letter, A, B, C, or D.
+Write the correct letter in boxes 27-30 on your answer sheet.
+
+27. What is the writer doing in paragraph 1?
+A Comparing the old NGV with the new NGV
+B Describing the role of art museums in Australian culture
+C Considering the influence of gallery design on art appreciation
+D Suggesting there has been little recent change in gallery design
+
+28. The writer criticises the old NGV because:
+A The permanent collection was poorly displayed.
+B The building tended to make art seem remote.
+C Asian and Pacific art was neglected.
+D The foyer resembled a shop.
+
+29. What does the writer notice about the new NGV?
+A He thinks the ticket booths are well positioned.
+B He is upset that he is made to move so quickly.
+C He is frustrated because the art is obscured by the entrance.
+D He thinks the redevelopment fails to keep up with international trends.
+
+30. The writer argues that rental "blockbuster" exhibitions:
+A Should be cheaper.
+B Are a financial necessity.
+C Should be increased in number.
+D Allow the museum to present an original programme.
+
+**Questions 31-35**
+Do the following statements agree with the claims of the writer in Reading Passage 3?
+In boxes 31-35 on your answer sheet, write:
+
+**YES** if the statement agrees with the claims of the writer
+**NO** if the statement contradicts the claims of the writer
+**NOT GIVEN** if it is impossible to say what the writer thinks about this
+31. Roy Grounds’s design failed to recognise the importance of functions and performances in museums.
+32. Mario Bellini’s new NGV rejects international museum design trends.
+33. Mario Bellini’s work on subsequent museum projects has been less successful than that on the NGV.
+34. The NGV monitors the number of first-time visitors to permanent collections.
+35. Too much change may have negative impacts on museums.
+
+**Questions 36-40**
+Complete each sentence with the correct ending A-G, below.
+Write the correct letter, A-G, in boxes 36-40 on your answer sheet.
+
+36. If a large space is available in the museum,
+37. If children are allowed to move freely in parts of the gallery,
+38. If too much emphasis is placed on the museum building itself,
+39. If there is an over-reliance on blockbuster exhibitions,
+40. If the NGV wants to continue to be successful,
+
+A The museum programme will lose its individuality.
+B The museum will lose credibility.
+C The art loses its importance.
+D It will have to balance opposing demands.
+E This will encourage museum visitors in the future.
+F It will have the capability of increasing revenue.
+G The architect’s reputation might suffer.
+
+## Keys
+27. A
+28. B
+29. C
+30. B
+31. NO
+32. NO
+33. NOT GIVEN
+34. NOT GIVEN
+35. YES
+36. F
+37. E
+38. C
+39. A
+40. D
+
+# Passage 7: Katsushika Hokusai
+
+Hokusai (born October 1760, Edo [now Tokyo]), Japan – died May 10, 1848. Edo was a Japanese master artist and printmaker of the ukyō-e (“pictures of the floating world”) school. His early works represent the full spectrum of ukyō-e art, including single-sheet prints of landscapes and squares, hand paintings, and surimon (“printed things”), such as greetings and announcements. Later he concentrated on the classical themes of the samurai and Chinese subjects. His famous print series “Thirty-six Views of Mount Fuji,” published between 1825 and 1833, marked the summit in the history of the Japanese landscape print.
+
+**Early years**
+
+Hokusai was born in the Hong quarter during the age of two. He was adopted named Nakajima but he never accepted though the true son of Nakajima, he had been born of a concubine.
+
+Hokusai is said to have served in his youth as clerk in a lending bookshop, and from 15 to 18 years of age he was apprenticed to a wood-block engraver. This early training in the book and printing trades obviously contributed to Hokusai’s artistic development as a printmaker.
+
+The earliest contemporary record of Hokusai dates from the year 1778, when, at the age of 18, he became a pupil of the leading ukyō-e master, Katsukawa Shunshō. The young Hokusai’s first published works appeared the following year – actor prints of the kabuki theatre, the genre that Shunshō and the Katsukawa school practically dominated.
+
+To judge from the ages of his several children, Hokusai must have married in his mid-20s. Possibly under the influence of family life, from this period his designs tended to turn from prints of actors and women to historical and landscape subjects, especially uki-e (semi-historical landscapes using Western-influenced perspective techniques), as well as prints of children. The artist’s book illustrations and texts turned as well from the earlier themes to historical and didactic subjects. At the same time, Hokusai’s work in the surimon genre during the subsequent decade marks one of the early peaks in his career. Surimon were prints issued privately for special occasions – New Year’s and other greetings, musical programs and announcements, private verse selections – in limited editions and featuring immaculate printing of the highest quality.
+
+**Middle years**
+
+In his middle years, Hokusai experienced significant artistic evolution and personal hardship. He began to distance himself from the Katsukawa school, partly due to the death of his master Shunshō in 1792 and partly due to his own burgeoning interest in other Japanese and Chinese artistic traditions. He started using the name “Hokusai” around 1797, and his work from this period shows a broader range of influences.
+
+A series of personal tragedies, including the death of his wife and his own financial struggles, seemed to fuel rather than hinder his artistic output. He moved residences frequently – some accounts say over ninety times in his life – often to avoid creditors. Despite this instability, the period from 1800 to 1820 was one of prodigious production. He created several major illustrated books, including the first volumes of his instructional manga (random drawings), which were sketchbooks of countless subjects – animals, people, mythological figures – intended as model books for other artists. These manga volumes became widely popular and demonstrated his incredible draftsmanship and observational skill.
+
+**Later years and legacy**
+
+Hokusai’s most celebrated work was created in his seventies. It was during this period that he produced the iconic “Thirty-six Views of Mount Fuji,” which includes the world-renowned print “The Great Wave off Kanagawa.” This series was revolutionary for its bold composition, innovative use of the newly affordable Prussian blue pigment, and its focus on the daily lives of common people within dramatic landscapes. The series was so popular that ten additional prints were added to the original thirty-six.
+
+In his later writings, Hokusai expressed a profound belief in his own artistic growth with age. He famously wrote that by the age of 110, every dot and line he drew would be alive. Though he never reached that age, he continued working relentlessly until his death at 88. Hokusai’s influence extended far beyond Japan; after the country opened up in the Meiji period, his prints reached Europe and profoundly impacted the Impressionist and Art Nouveau movements. Artists like Claude Monet and Vincent van Gogh collected his prints and were inspired by his compositions and use of color.
+
+ 
+**Questions 1–6**
+Do the following statements agree with the information given in Reading Passage 1?
+In boxes 1–6 on your answer sheet, write:
+
+**TRUE** if the statement agrees with the information
+**FALSE** if the statement contradicts the information
+**NOT GIVEN** if there is no information on this
+
+1. Hokusai’s series "Thirty-six Views of Mount Fuji" was published over an eight-year period.
+2. Hokusai was the biological son of the Nakajima family.
+3. Hokusai’s apprenticeship with a wood-block engraver lasted for four years.
+4. Hokusai’s first published works were landscapes.
+5. Hokusai’s work in the surimon genre is considered one of the early high points of his career.
+6. The death of his master Shunshō was the only reason Hokusai distanced himself from the Katsukawa school.
+
+**Questions 7–13**
+Complete the notes below.
+Choose **NO MORE THAN TWO WORDS** from the passage for each answer.
+Write your answers in boxes 7–13 on your answer sheet.
+ 
+**Hokusai's Life and Work**
+**Early Training:**
+- Worked as a clerk in a 7_____________________
+- Apprenticed to a 8 _____________________ from age 15 to 18.
+
+**Artistic Shifts:**
+- After marriage, his subjects changed to historical scenes and 9 _____________________ which used Western perspective.
+- His surimon were known for their high-quality 10 _____________________
+
+**Middle Years:**
+- Began using the name 'Hokusai' around 11 _____________________
+- Published 12 _____________________ which were sketchbooks for artists.
+
+**Later Work:**
+- His famous series "Thirty-six Views of Mount Fuji" used a new blue pigment called 13 _____________________
+- His work greatly influenced European art movements, including Impressionism.
+
+## Keys
+1. TRUE
+2. FALSE
+3. TRUE
+4. FALSE
+5. TRUE
+6. FALSE
+7. bookshop
+8. wood-block engraver
+9. landscapes
+10. printing
+11. 1797
+12. manga
+13. Prussian blue
+
+# Passage 8: Marketing And Mind Control
+
+How marketing and advertising appeal to the associative nature of the brain
+
+While there had been a long tradition of giving rings as a commitment to marry, the custom of giving diamond engagement rings was in large part manufactured by one of the most effective marketing campaigns in history . In the early 1900s, diamond sales were declining, posing a serious problem for the company that essentially had control over the diamond market. In 1938, this company hired an advertising agency. Which proposed reshaping social attitudes toward diamonds? As well as magazines showing film stars draped in diamonds, the agency arranged for movies to incorporate diamond engagement rings into their plots. The campaign culminated with the slogan:’ A diamond is forever. At the time, the approach was unique. Rather than pushing a brand, the objective was to promote diamonds as the symbol of everlasting love. This was achieved by exploiting the associative nature of the brain: associating neurons! Activated by the concept of’ love ‘ with neurons that encoded the concept of “diamonds. By 1941, diamond sales had increased by 55 %.
+
+Advertising comes in many forms, from blatant neon signs to subtly embedded products in movies. In each case, the goal is to mold our habits, desires and opinions. Our visual system is targeted by an avalanche of information on the internet, street posters, and billboards and in movie theatres. Our auditory system submits to catchy radio jingles and telemarketers. More surreptitiously, our olfactory system is targeted by variations of vanilla and citrus perfumes aimed at enticing the US to linger in a retail outlet. It is difficult to measure how effective these campaigns are, but as in the ‘ A diamond is forever ’ campaign, they can be so successful that they change the fabric of our culture. In the case of bottled water, we are swayed by advertising into paying for something that we can obtain for free. Most people cannot distinguish bottled from tap water, much less between brands of bottled water, which is why you rarely hear of a bottled water company proposing a blind taste test.
+
+So why is marketing such an effective mind – control technique? It is interesting to consider whether other animals exhibit anything analogous to humans ‘ susceptibility to advertising. If we provide a lab rat with two types of cereal, it will consume approximately the same amount of each. However, if we put that rat with another rat that spent its day eating just one type, when faced with a choice, our rat will now show a preference for the same type as the other rat was eating. Psychologists call this ‘ socially transmitted food preference ‘.
+
+What many regard as the first documented examples of cultural learning in primates started with a clever monkey that lived in a colony of Japanese monkeys on the island of Koshima. She began taking her dirt – covered sweet potatoes to the river to wash them before eating them. Upon seeing this, a few 11 other open – minded monkeys picked up on the idea. Potato washing then spread from monkey to monkey and, over the course of a few years, most monkeys were eating clean potatoes. Humans are clearly not the only animals to engage in imitation and social learning.
+
+Learning by observation can be an extraordinarily valuable brain feature, this is how we learn to communicate and perform motor skills as well as deal with many everyday problems. For example, a newcomer struggling to purchase tickets and navigate the subway system in a foreign city may step back to learn from the people nearby. Humans and other primates exhibit multiple forms of imitative learning and this is called cultural transmission.
+
+A component of advertising relies on the marketer’s ability to tap into the brain’s propensity for imitation. Anybody who has watched TV knows advertisements are disproportionately populated with attractive, successful looking individuals. If we are going to imitate someone, we are more inclined to imitate those who appear to be popular and appealing.
+
+Although not all researchers are convinced by the findings, a number of studies indicate that some animals also imitate dominant members of their group. Primatologist Frans de Waal provides anecdotal evidence of preferential imitation among chimpanzees. He noted that in one particular group the dominant male was hurt and was limping as a result. Soon unlikely if a non-dominant male had been injured.
+
+Imitation is undoubtedly an invaluable ability, but often our propensity to imitate generalises indiscriminately, leading to poor decisions. When athlete Dick Fosbury revolutionised the high jump by jumping over the bar backward in 1968, imitators obviously copied his jumping style, not his brand of sports shoes. However, today, sports people appear in advertisements asking the US to buy the laptops or sports drinks that they promote. Rationally, we know these people’s success did not depend on these products, so it seems our propensity to purchase products relates more to neural programs that evolved to encourage imitation of those further up the social ladder. Today , companies engage in stealth marketing campaigns in which people are paid to frequent bars or websites to covertly promote certain products. Companies also perform studies in which they track the eye movements of people viewing displays , and carefully craft names , packages and jingles associated with their products. While we may like to believe that manipulation on a grand scale would not be possible, that’s not to say that advertising is innately harmful. To the contrary, the marketing of products or ideas is essential to human culture. The point is that we should ensure our choices reflect our actual goals and desires, and we must distinguish between the dissemination of information which is for our own good, and our manipulation for the benefit of companies.
+
+**Questions 1-5**
+
+Choose the correct letter, A, B, c or D.
+Write the correct letter in boxes 1-5 on your answer sheet.
+
+1. According to the writer, which marketing technique attempts to make consumers stay in a shop for longer?Check answers
+A playing appealing music
+B emitting pleasant scents
+C displaying attractive posters
+D making in – store announcements
+
+2. The writer mentions bottled water in order to show thatCheck answers
+A consumers buy it because of the fact that it is marketed.
+B people purchase it despite the fact that it has no taste.
+C marketers need not do taste tests when a campaign is effective.
+D tests prove that people cannot differentiate it from tap water.
+
+3. According to the writer, socially transmitted food preference occurs whenCheck answers
+A only dominant members of an animal group influence what others eat.
+B the same types of animals naturally prefer the same types of food.
+C animals are influenced by what any other animals of the same species eat.
+D a food type is more desirable because an animal views that food as scarce.
+
+4. According to the writer, how is learning by observation and imitation a useful feature of the brain?Check answers
+A it helps people overcome challenges.
+B positive models can influence social behaviour.
+C it can give an advantage when communicating with others.
+D cultural norms and relationships can be understood more easily
+
+5. According to the writer, how does television advertising exploit the human tendency to imitate others ?Check answers
+A It shows buying behaviour that marketers want to encourage in viewers.
+B It features people who have a desirable image.
+C It shows older people whom teenagers admire.
+D It features successful people endorsing products responsible for their success.
+
+**Questions 6-10**
+Do the following statements agree with the claims of the writer in Reading Passage ?
+In boxes 6-10 on your answer sheet, write
+**YES** if the statement agrees with the claims of the writer
+**NO** if the statement contradicts the claims of the writer
+**NOT GIVEN** if it is impossible to say what the writer thinks about this
+
+6. The diamond campaign worked by making a connection in people’s minds between diamonds and luxury
+7. People are more aware of visual marketing than auditory marketing.
+8. The campaign advertising diamonds had a positive influence on society.
+9. There is still some uncertainty about whether animals copy the behaviour of the most powerful animals among them.
+10. Consumers make a logical connection between celebrities ‘ achievements and the products they promote.
+
+**Questions 11-14**
+Complete each sentence with the correct ending , A – G , below.
+Write the correct letter, A – G , in boxes 37-40 on your answer sheet.
+
+A people imitated behaviour that was linked with success .
+B younger animals of a certain species are more likely to imitate each other.
+C an animal would imitate another that had higher status .
+D imitation of popular sportspeople has occurred for many decades .
+E products are marketed to potential consumers who are unaware that marketing is occurring .
+F Animals can develop new habits by observation.
+G incentives are provided for consumers who behave in a certain way.
+
+11. The behaviour of the monkeys on the island of Koshima showed that
+12. Primatologist Frans de Waal found that
+13. Dick Fosbury is mentioned in order to show that
+14. A feature of some modern marketing campaigns is that
+
+## Keys
+1. B
+2. A
+3. C
+4. A
+5. B
+6. NO
+7. NOT GIVEN
+8. NOT GIVEN
+9. YES
+10. NO
+11. F
+12. C
+13. A
+14. E
+
+# Passage 9: The Plan to Bring an Asteroid to Earth
+Scientists and engineers met last week at Caltech to discuss the possibility of capturing an asteroid and placing it in orbit near Earth to use as a base for manned space missions further into the solar system.
+
+PASADENA, Calif. — Send a robot into space. Grab an asteroid. Bring it back to Earth orbit.
+
+This may sound like a crazy plan, but it was discussed quite seriously last week by a group of scientists and engineers at the California Institute of Technology. The four-day workshop was dedicated to investigating the feasibility and requirements of capturing a near-Earth asteroid, bringing it closer to our planet and using it as a base for future manned spaceflight missions.
+
+This is not something the scientists are imagining could be done some day off in the future. This is possible with the technology we have today and could be accomplished within a decade.
+
+A robotic probe could anchor to an asteroid made mostly of nickel-iron with simple magnets or grab a rocky asteroid with a harpoon or specialized claws and then push the asteroid using solar-electric propulsion. For asteroids too big for a robot to handle, a large spacecraft could fly near the object to act as a gravity tractor that deflects the asteroid's trajectory, sending it toward Earth.
+
+"Once you get over the initial reaction — 'You want to do what?!' — it actually starts to seem like a reasonable idea," said engineer John Brophy from NASA's Jet Propulsion Laboratory, who helped organize the workshop.
+
+In fact, many of these ideas have been on the drawing board for years as part of NASA's planetary defense program against large space-based objects that might threaten Earth. And there's no shortage of potential targets. NASA estimates there are 19,500 asteroids at least 330 feet wide — large enough to detect with telescopes — within 28 million miles of Earth.
+
+Though rearranging the heavens may seem an excessive undertaking, the mission has its merits. The Obama administration already plans to send astronauts to a near-Earth asteroid, a mission that would coop them up in a tiny capsule for three to six months, and involve all the risks of a long deep-space voyage. Instead, robots could shoulder some of that burden by bringing an asteroid close enough for astronauts to get there in just a month.
+
+Considering the resources available in any asteroid, private industry might be interested in getting involved. One possible mission would be to simply execute the first part of the plan — pushing the asteroid to near-Earth orbit — and then convene a commercial competition inviting anyone who wants to develop the capabilities to reach and mine the object.
+
+Though the undertaking might be scientifically exciting, this wouldn't be the primary motivation. An asteroid would provide great insight into the solar system's formation, but it's not enough to justify the expense of bringing one to Earth. Any interesting science can be done much cheaper with an unmanned robotic spacecraft, said chemist Joseph A Nuth from NASA's Goddard Spaceflight Center.
+
+"Ultimately, we would be developing this target in order to help move out into the solar system," Brophy said.
+
+Though they did not reach a consensus on all the details, the group will reconvene in January to hammer out further specifications and potentially get the interest of NASA.
+
+In the end, many agreed that bringing an asteroid back to Earth could create an interesting destination for repeated manned missions and that the undertaking would help build up experience for future jaunts into space.
+
+**Questions 14–18**
+Complete the sentences below.
+Choose **NO MORE THAN TWO WORDS** from the passage for each answer.
+Write your answers in boxes 14–18 on your answer sheet.
+
+14. Scientists and engineers met at Caltech for a __________ workshop to discuss capturing an asteroid.
+15. The plan involves bringing an asteroid closer to Earth to use as a __________ for future manned missions.
+16. The technology required to accomplish this plan is available today and could be implemented within a __________.
+17. A robotic probe could anchor to a nickel-iron asteroid using simple __________.
+18. For asteroids that are too large, a spacecraft could act as a __________ to alter the object's path.
+
+**Questions 19–22**
+
+Do the following statements agree with the information given in Reading Passage 2?
+In boxes 19–22 on your answer sheet, write
+
+**TRUE** if the statement agrees with the information
+**FALSE** if the statement contradicts the information
+**NOT GIVEN** if there is no information on this
+
+19. John Brophy initially thought the plan to capture an asteroid was unreasonable.
+20. NASA's planetary defense program was created to find asteroids that could be mined for resources.
+21. There are approximately 19,500 asteroids large enough to detect within 28 million miles of Earth.
+22. The Obama administration's plan would send astronauts to an asteroid for a mission lasting one month.
+
+**Questions 23–26**
+
+Choose the correct letter, A, B, C, or D.
+Write your answers in boxes 23–26 on your answer sheet.
+
+23. What advantage does the asteroid-capture plan offer compared to sending astronauts on a long deep-space voyage?
+A. It would be cheaper to launch from Earth.
+B. It would reduce the travel time for astronauts.
+C. It would require no robotic assistance.
+D. It would eliminate all risks of space travel.
+
+24. According to the passage, why might private industry be interested in the asteroid mission?
+A. To develop new propulsion technologies
+B. To win a government competition
+C. To access and extract valuable materials
+D. To conduct scientific research on solar system formation
+
+25. What is Joseph A Nuth's view on the scientific value of bringing an asteroid to Earth?
+A. It would provide unique insights that justify the expense.
+B. It is less cost-effective than using robotic spacecraft for science.
+C. It is the only way to study the solar system's formation.
+D. It would be more scientifically valuable than manned missions.
+
+26. What was the main outcome of the workshop at Caltech?
+A. A detailed budget was approved for the mission.
+B. NASA agreed to fund the project immediately.
+C. Participants agreed on all technical specifications.
+D. The group decided to meet again to develop the plan further.
