@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Speaking Guide: Weather</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f0f9ff; /* sky-50 */
+            background-image: 
+                radial-gradient(#bae6fd 2px, transparent 2px),
+                radial-gradient(#bae6fd 2px, transparent 2px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            opacity: 0.95;
+        }
+
+        h1, h2, h3, h4, h5, h6, .weather-font {
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        /* Flashcard 3D CSS */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .card-transition { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        /* Accordion transition */
+        .accordion-content { transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, opacity 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .accordion-content.open { max-height: 800px; opacity: 1; padding: 24px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #7dd3fc; border-radius: 10px; border: 2px solid #f0f9ff; }
+        ::-webkit-scrollbar-thumb:hover { background: #0ea5e9; }
+        
+        .hide { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Timer Bar */
+        .timer-bar { transition: width 0.1s linear; }
+
+        .theme-highlight {
+            color: #0284c7; /* sky-600 */
+            background-color: #e0f2fe; /* sky-100 */
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.375rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-sky-900 text-white p-4 flex justify-between items-center shadow-lg z-20">
+        <div class="font-bold text-xl flex items-center gap-2 weather-font">
+            <i class="ph-fill ph-cloud-sun text-yellow-400 text-3xl"></i>
+            IELTS Chan Truong
+        </div>
+        <button id="mobile-menu-btn" class="text-3xl p-1 text-sky-200 hover:text-white"><i class="ph ph-list"></i></button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="bg-sky-900 text-sky-100 w-full md:w-72 flex-shrink-0 flex flex-col absolute md:relative z-10 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r border-sky-800">
+        <div class="p-8 hidden md:block text-center border-b border-sky-800/50">
+            <div class="w-20 h-20 bg-sky-800 rounded-full mx-auto flex items-center justify-center shadow-inner mb-4 relative overflow-hidden border border-sky-700">
+                <i class="ph-fill ph-cloud-sun text-5xl text-yellow-400"></i>
+            </div>
+            <h1 class="text-white font-bold text-2xl tracking-wide mb-1 weather-font">
+                IELTS Chan Truong
+            </h1>
+            <p class="text-xs text-sky-300 font-bold tracking-[0.2em] uppercase mt-2 bg-sky-950/50 inline-block px-3 py-1 rounded-full border border-sky-800/50">Weather Topic</p>
+        </div>
+        
+        <div class="flex flex-col gap-2 p-5 flex-grow mt-12 md:mt-0">
+            <button onclick="switchTab('vocab')" id="tab-vocab" class="tab-btn flex items-center gap-4 p-4 rounded-2xl hover:bg-sky-800 hover:text-white transition-all text-left w-full bg-sky-500 text-white shadow-md font-bold weather-font text-lg">
+                <i class="ph-bold ph-book-open-text text-2xl"></i>
+                <span class="tracking-wide">1. Vocab & Idioms</span>
+            </button>
+            <button onclick="switchTab('qa')" id="tab-qa" class="tab-btn flex items-center gap-4 p-4 rounded-2xl hover:bg-sky-800 hover:text-white transition-all text-left w-full text-sky-200 font-semibold border border-transparent weather-font text-lg">
+                <i class="ph-bold ph-chats text-2xl"></i>
+                <span class="tracking-wide">2. Topic Q&A</span>
+            </button>
+            <button onclick="switchTab('flashcards')" id="tab-flashcards" class="tab-btn flex items-center gap-4 p-4 rounded-2xl hover:bg-sky-800 hover:text-white transition-all text-left w-full text-sky-200 font-semibold border border-transparent weather-font text-lg">
+                <i class="ph-bold ph-cards text-2xl"></i>
+                <span class="tracking-wide">3. Flashcards</span>
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn flex items-center gap-4 p-4 rounded-2xl hover:bg-sky-800 hover:text-white transition-all text-left w-full text-sky-200 font-semibold border border-transparent weather-font text-lg">
+                <i class="ph-bold ph-game-controller text-2xl"></i>
+                <span class="tracking-wide">4. Vocab Test</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow relative overflow-y-auto w-full">
+        
+        <!-- SECTION 1: Vocabulary -->
+        <section id="sec-vocab" class="p-5 md:p-10 max-w-6xl mx-auto fade-in">
+            <header class="mb-10 text-center md:text-left flex flex-col md:flex-row md:justify-between md:items-end border-b-2 border-sky-200 pb-6">
+                <div>
+                    <h2 class="text-4xl font-bold text-sky-900 mb-2 weather-font tracking-tight">Lexical Resource</h2>
+                    <p class="text-slate-500 text-lg font-medium">Expressions to accurately describe climates and weather conditions.</p>
+                </div>
+                <div class="mt-4 md:mt-0 text-sky-700 bg-sky-100 px-5 py-2.5 rounded-2xl font-bold border border-sky-200 inline-flex items-center gap-2 shadow-sm">
+                    <i class="ph-fill ph-thermometer text-xl"></i> 13 Expressions
+                </div>
+            </header>
+            <div id="vocab-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 2: Q&A -->
+        <section id="sec-qa" class="p-5 md:p-10 max-w-4xl mx-auto hide fade-in">
+            <header class="mb-10 border-b-2 border-sky-200 pb-6 text-center">
+                <h2 class="text-4xl font-bold text-sky-900 mb-2 weather-font tracking-tight">Topic Questions & Answers</h2>
+                <p class="text-slate-500 text-lg font-medium">Review these Band 7+ responses. Target vocabulary is highlighted in <span class="text-sky-600 font-bold">sky blue</span>.</p>
+            </header>
+            <div id="qa-container" class="flex flex-col gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 3: Flashcards -->
+        <section id="sec-flashcards" class="p-5 md:p-10 max-w-4xl mx-auto h-full flex flex-col hide fade-in">
+            <header class="mb-8 text-center border-b-2 border-sky-200 pb-6">
+                <h2 class="text-4xl font-bold text-sky-900 mb-2 weather-font tracking-tight">Flashcard Trainer</h2>
+                <p class="text-slate-500 text-lg font-medium">Tap the card to flip between the word and its meaning.</p>
+                <div class="mt-5 flex justify-center gap-4 text-sm font-bold tracking-widest uppercase">
+                    <span class="bg-white text-sky-700 border border-sky-200 px-5 py-2 rounded-2xl shadow-sm"><span id="fc-remaining">0</span> cards remaining</span>
+                </div>
+            </header>
+            
+            <div class="flex-grow flex flex-col items-center justify-center mb-10 w-full max-w-xl mx-auto">
+                
+                <!-- Flashcard Container -->
+                <div id="flashcard" class="relative w-full h-80 md:h-96 perspective-1000 cursor-pointer group mb-10">
+                    <div id="flashcard-inner" class="relative w-full h-full card-transition transform-style-3d shadow-xl hover:shadow-2xl rounded-3xl">
+                        
+                        <!-- Front -->
+                        <div class="absolute w-full h-full backface-hidden bg-white border-2 border-sky-100 rounded-3xl flex flex-col items-center justify-center p-8 text-center overflow-hidden">
+                            <div class="absolute top-0 right-0 w-40 h-40 bg-sky-50 rounded-bl-full -z-10"></div>
+                            <i class="ph-duotone ph-hand-tap text-sky-200 text-6xl absolute top-6 right-6"></i>
+                            <h3 id="fc-word" class="text-3xl md:text-4xl font-bold text-sky-900 mb-4 capitalize leading-tight weather-font">Word</h3>
+                            <p class="text-sky-400 font-bold tracking-[0.2em] uppercase text-xs mt-6 bg-sky-50 px-4 py-2 rounded-xl">Tap to Reveal</p>
+                        </div>
+                        
+                        <!-- Back -->
+                        <div class="absolute w-full h-full backface-hidden bg-sky-900 border-2 border-sky-800 rounded-3xl p-6 md:p-8 rotate-y-180 flex flex-col items-center justify-center text-center overflow-y-auto custom-scrollbar">
+                            <h3 id="fc-word-back" class="text-2xl font-bold text-sky-300 mb-1 capitalize weather-font">Word</h3>
+                            <p id="fc-ipa" class="text-sky-200/70 font-mono text-sm mb-5 bg-sky-950/50 px-3 py-1 rounded-lg border border-sky-800/50">/ipa/</p>
+                            <p id="fc-def" class="text-white text-lg font-medium mb-6 leading-relaxed">Definition</p>
+                            <div class="bg-black/20 p-5 rounded-2xl w-full text-left italic text-sky-100 border-l-4 border-yellow-400 relative shadow-inner">
+                                <span id="fc-example" class="relative z-10 leading-relaxed font-medium">Example</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex flex-wrap justify-center gap-3 w-full">
+                    <button onclick="prevCard()" class="px-6 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 shadow-sm hover:border-sky-400 hover:text-sky-700 font-bold flex items-center gap-2 transition-all"><i class="ph-bold ph-caret-left text-xl"></i> Prev</button>
+                    <button onclick="markLearned()" class="px-8 py-4 rounded-2xl bg-sky-500 text-white hover:bg-sky-600 font-bold flex items-center gap-2 transition-all shadow-md shadow-sky-500/30"><i class="ph-bold ph-check-circle text-xl"></i> Memorized</button>
+                    <button onclick="nextCard()" class="px-6 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 shadow-sm hover:border-sky-400 hover:text-sky-700 font-bold flex items-center gap-2 transition-all">Next <i class="ph-bold ph-caret-right text-xl"></i></button>
+                    <button onclick="shuffleDeck()" class="px-5 py-4 rounded-2xl bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 font-bold ml-2 transition-all" title="Shuffle Deck"><i class="ph-bold ph-shuffle text-xl"></i></button>
+                </div>
+
+                <!-- Completion State -->
+                <div id="fc-complete" class="hidden text-center mt-12 bg-white p-12 rounded-3xl border border-sky-100 shadow-xl w-full max-w-md mx-auto">
+                    <div class="w-24 h-24 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ph-fill ph-sun text-6xl animate-spin-slow"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-sky-900 mb-3 weather-font">Clear Skies Ahead!</h3>
+                    <p class="text-slate-500 font-medium mb-8">You've successfully mastered the weather deck.</p>
+                    <button onclick="resetFlashcards()" class="w-full py-4 bg-sky-900 text-white rounded-2xl hover:bg-sky-800 font-bold tracking-wide transition-colors shadow-lg">Review Again</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Vocab Testing Tool -->
+        <section id="sec-quiz" class="p-5 md:p-10 max-w-3xl mx-auto h-full flex flex-col hide fade-in">
+            
+            <!-- Setup Screen -->
+            <div id="quiz-setup" class="bg-white rounded-3xl shadow-xl border border-sky-100 p-10 text-center mt-6 relative overflow-hidden">
+                <div class="w-24 h-24 bg-sky-50 text-sky-500 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-3 border border-sky-100">
+                    <i class="ph-duotone ph-cloud-lightning text-5xl transform rotate-3"></i>
+                </div>
+                <h2 class="text-4xl font-bold text-sky-900 mb-3 relative z-10 weather-font">Weather Forecast Quiz</h2>
+                <p class="text-slate-500 mb-10 text-lg font-medium relative z-10">Test your mastery of meteorological terminology under time pressure.</p>
+                
+                <h3 class="font-bold text-slate-400 mb-5 uppercase tracking-[0.1em] text-sm relative z-10">Select Forecast Length</h3>
+                <div class="flex justify-center gap-5 mb-4 relative z-10">
+                    <button onclick="startQuiz(5)" class="w-24 h-24 rounded-3xl bg-slate-50 hover:bg-sky-500 text-slate-700 hover:text-white border-2 border-slate-200 hover:border-sky-500 font-black text-3xl transition-all flex flex-col items-center justify-center gap-1 shadow-sm"><span class="text-xs font-bold uppercase tracking-widest opacity-60">Short</span>5</button>
+                    <button onclick="startQuiz(10)" class="w-24 h-24 rounded-3xl bg-slate-50 hover:bg-sky-500 text-slate-700 hover:text-white border-2 border-slate-200 hover:border-sky-500 font-black text-3xl transition-all flex flex-col items-center justify-center gap-1 shadow-sm"><span class="text-xs font-bold uppercase tracking-widest opacity-60">Standard</span>10</button>
+                    <button onclick="startQuiz(vocabData.length)" class="w-24 h-24 rounded-3xl bg-slate-50 hover:bg-sky-500 text-slate-700 hover:text-white border-2 border-slate-200 hover:border-sky-500 font-black text-3xl transition-all flex flex-col items-center justify-center gap-1 shadow-sm"><span class="text-xs font-bold uppercase tracking-widest opacity-60">Full</span>All</button>
+                </div>
+            </div>
+
+            <!-- Active Quiz Screen -->
+            <div id="quiz-active" class="hidden flex-col h-full mt-4">
+                <!-- Header & Timer -->
+                <div class="flex justify-between items-end mb-4 px-2">
+                    <span class="text-slate-500 font-bold tracking-widest uppercase text-xs border border-slate-200 bg-white px-4 py-2 rounded-xl shadow-sm"><span id="quiz-progress">Question 1/10</span></span>
+                    <span class="text-3xl font-black font-mono text-sky-600 drop-shadow-sm flex items-center gap-2 bg-sky-100 px-4 py-1.5 rounded-xl border border-sky-200"><i class="ph-bold ph-hourglass text-2xl text-yellow-500"></i><span id="quiz-time">30s</span></span>
+                </div>
+                <div class="w-full bg-slate-200 h-3 mb-8 rounded-full overflow-hidden shadow-inner">
+                    <div id="timer-bar" class="bg-sky-400 h-full w-full timer-bar"></div>
+                </div>
+
+                <!-- Question Container -->
+                <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-8 md:p-12 flex-grow flex flex-col justify-center relative overflow-hidden">
+                    <!-- decorative background -->
+                    <div class="absolute -bottom-10 -right-10 text-sky-50 opacity-40 pointer-events-none z-0">
+                        <i class="ph-fill ph-cloud text-[200px]"></i>
+                    </div>
+
+                    <div id="quiz-question-type" class="text-xs font-bold text-sky-600 uppercase tracking-[0.2em] mb-5 bg-sky-50 px-4 py-1.5 rounded-lg inline-block w-max z-10 border border-sky-100">Question Type</div>
+                    <h3 id="quiz-question-text" class="text-2xl md:text-3xl font-bold text-slate-800 mb-10 leading-relaxed z-10">Question text goes here?</h3>
+                    
+                    <!-- Dynamic Answer Area -->
+                    <div id="quiz-answer-area" class="w-full z-10">
+                        <!-- Filled by JS based on question type -->
+                    </div>
+                </div>
+                
+                <!-- Feedback overlay during transition -->
+                <div id="quiz-feedback" class="hidden p-5 rounded-2xl mt-6 font-bold text-center text-xl shadow-sm border"></div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="quiz-results" class="hidden bg-white rounded-3xl shadow-xl border border-sky-100 p-10 text-center mt-6">
+                <div id="result-icon-container" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border">
+                    <div id="result-icon" class="text-5xl"></div>
+                </div>
+                <h2 class="text-4xl font-bold text-sky-900 mb-2 tracking-tight weather-font">Forecast Complete</h2>
+                <div class="text-6xl font-black text-sky-500 my-8 font-mono border-y border-slate-100 py-6 inline-block w-full max-w-xs" id="quiz-score-display">0/0</div>
+                <p class="text-slate-500 mb-8 text-lg font-bold" id="quiz-message">Good effort.</p>
+                
+                <div class="text-left bg-slate-50 p-6 rounded-2xl max-h-72 overflow-y-auto mb-8 border border-slate-200 custom-scrollbar shadow-inner" id="quiz-review">
+                    <!-- Review items injected here -->
+                </div>
+
+                <button onclick="resetQuiz()" class="w-full md:w-auto px-12 py-5 bg-sky-900 text-white rounded-2xl hover:bg-sky-800 font-bold text-lg transition-colors shadow-lg uppercase tracking-wider">Play Again</button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // --- DATA ---
+        const vocabData = [
+            {
+                word: "scorching / boiling / sweltering",
+                matchWord: "sweltering", // used for fill-in-the-blank targeting
+                ipa: "/ˈskɔːtʃɪŋ/ /ˈbɔɪlɪŋ/ /ˈswɛltərɪŋ/",
+                definition: "Extremely hot weather conditions.",
+                example: "During summer, the sweltering heat makes it almost impossible to go outside at noon."
+            },
+            {
+                word: "overcast",
+                matchWord: "overcast",
+                ipa: "/ˈəʊvəkɑːst/",
+                definition: "Cloudy; covered with gray clouds making the sky dark.",
+                example: "The sky was completely overcast all morning, threatening to ruin our outdoor picnic."
+            },
+            {
+                word: "be caught off guard",
+                matchWord: "caught off guard",
+                ipa: "/bi kɔːt ɒf gɑːd/",
+                definition: "To be surprised by something unexpected, like a sudden weather change.",
+                example: "I was completely caught off guard by the sudden thunderstorm because it was sunny just an hour ago."
+            },
+            {
+                word: "chilly / freezing",
+                matchWord: "chilly", // used for fill-in-the-blank targeting
+                ipa: "/ˈtʃɪli/ /ˈfriːzɪŋ/",
+                definition: "Uncomfortably cool or very cold weather.",
+                example: "It gets extremely chilly in the evenings here, so you always need to bring a thick jacket."
+            },
+            {
+                word: "drizzle",
+                matchWord: "drizzle",
+                ipa: "/ˈdrɪzl/",
+                definition: "Light rain falling in very fine drops.",
+                example: "It was just a light drizzle, but we still decided to take our umbrellas just in case."
+            },
+            {
+                word: "relentless rain",
+                matchWord: "relentless rain",
+                ipa: "/rɪˈlɛntləs reɪn/",
+                definition: "Heavy rain that continues continuously for a long period without stopping.",
+                example: "The relentless rain flooded the streets and forced everyone to stay indoors for three days."
+            },
+            {
+                word: "feel upbeat",
+                matchWord: "feel upbeat",
+                ipa: "/fiːl ˈʌpbiːt/",
+                definition: "To feel cheerful, optimistic, and energetic, often influenced by good weather.",
+                example: "Waking up to a bright, sunny morning always makes me feel upbeat and ready to tackle the day."
+            },
+            {
+                word: "religiously",
+                matchWord: "religiously",
+                ipa: "/rɪˈlɪdʒəsli/",
+                definition: "Doing something regularly, consistently, and with great dedication.",
+                example: "Because the climate here is so unpredictable, I check the weather forecast religiously every single morning."
+            },
+            {
+                word: "light, breathable fabrics",
+                matchWord: "light, breathable fabrics",
+                ipa: "/laɪt, ˈbriːðəbl ˈfæbrɪks/",
+                definition: "Clothing materials (like cotton or linen) that are thin and allow air to pass through, keeping you cool.",
+                example: "To survive the scorching summer, it is essential to wear light, breathable fabrics when going outdoors."
+            },
+            {
+                word: "feel sluggish",
+                matchWord: "feel sluggish",
+                ipa: "/fiːl ˈslʌgɪʃ/",
+                definition: "To feel slow, tired, and lacking in energy.",
+                example: "Dark, rainy days often make me feel sluggish and completely unmotivated to do any work."
+            },
+            {
+                word: "torrential rain",
+                matchWord: "torrential rain",
+                ipa: "/təˈrɛnʃəl reɪn/",
+                definition: "Extremely heavy and fast-falling rain.",
+                example: "We had to cancel our hiking trip due to the unexpected torrential rain warning issued by the city."
+            },
+            {
+                word: "breeze",
+                matchWord: "breeze",
+                ipa: "/briːz/",
+                definition: "A gentle, cool, and pleasant wind.",
+                example: "The cool evening breeze was incredibly refreshing after experiencing such a sweltering day."
+            },
+            {
+                word: "dress in layers",
+                matchWord: "dress in layers",
+                ipa: "/drɛs ɪn ˈleɪəz/",
+                definition: "To wear multiple pieces of clothing on top of each other to adjust to changing temperatures.",
+                example: "In autumn, it's best to dress in layers so you can easily take off a sweater when it gets warmer in the afternoon."
+            }
+        ];
+
+        const qaData = [
+            {
+                q: "1. What's the weather like where you live?",
+                a: "Well, my city has a tropical climate. We usually have a distinct dry season where it gets absolutely <strong class='theme-highlight'>scorching / boiling / sweltering</strong>, and a rainy season characterized by <strong class='theme-highlight'>torrential rain</strong>. It's quite extreme, to be honest."
+            },
+            {
+                q: "2. Do you prefer cold or hot weather?",
+                a: "I definitely lean towards colder weather. When it's <strong class='theme-highlight'>chilly / freezing</strong>, you can just <strong class='theme-highlight'>dress in layers</strong> to stay warm and cozy. On the other hand, the intense heat just makes me <strong class='theme-highlight'>feel sluggish</strong> and drained of all my energy."
+            },
+            {
+                q: "3. Are you in the habit of checking the weather forecast?",
+                a: "Yes, absolutely. I check my phone's weather app <strong class='theme-highlight'>religiously</strong> every morning before leaving the house. The weather here changes rapidly, and I hate to <strong class='theme-highlight'>be caught off guard</strong> without an umbrella if a sudden downpour starts."
+            },
+            {
+                q: "4. Would you like to visit other cities that have different climates from where you live?",
+                a: "I'd love to! Since I live in a place that is almost always hot, I really want to visit a city with snowy winters. Experiencing a truly <strong class='theme-highlight'>chilly / freezing</strong> climate would be a fascinating change of pace from my usual environment."
+            },
+            {
+                q: "5. How does the weather affect your mood?",
+                a: "It has a massive impact on me. When it's sunny with a cool <strong class='theme-highlight'>breeze</strong>, I instantly <strong class='theme-highlight'>feel upbeat</strong> and productive. Conversely, days with <strong class='theme-highlight'>relentless rain</strong> or <strong class='theme-highlight'>overcast</strong> skies tend to dampen my spirits and make me quite lethargic."
+            },
+            {
+                q: "6. What's your favorite season and why?",
+                a: "Autumn is my absolute favorite. The sweltering summer heat finally breaks, and there's a constant, refreshing <strong class='theme-highlight'>breeze</strong>. It's neither too hot nor too cold, just perfect for taking long walks without ending up sweating or freezing."
+            },
+            {
+                q: "7. What do you usually wear in different weather conditions?",
+                a: "During the hot months, I stick entirely to <strong class='theme-highlight'>light, breathable fabrics</strong> to stay cool. But when the temperature drops in winter, I make sure to <strong class='theme-highlight'>dress in layers</strong> so I can easily adjust my body temperature. If there's a light <strong class='theme-highlight'>drizzle</strong>, a waterproof windbreaker is my go-to item."
+            }
+        ];
+
+        // --- NAVIGATION LOGIC ---
+        const sections = ['vocab', 'qa', 'flashcards', 'quiz'];
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-sky-500', 'text-white', 'shadow-md', 'font-bold');
+                btn.classList.add('text-sky-200', 'font-semibold', 'border-transparent');
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('text-sky-200', 'font-semibold', 'border-transparent');
+            activeBtn.classList.add('bg-sky-500', 'text-white', 'shadow-md', 'font-bold');
+
+            // Update sections
+            sections.forEach(sec => {
+                document.getElementById(`sec-${sec}`).classList.add('hide');
+            });
+            document.getElementById(`sec-${tabId}`).classList.remove('hide');
+
+            // Close mobile menu if open
+            if(window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // --- UTILS ---
+        function playAudio(text) {
+            // Clean up text for TTS (handling slashes to make pronunciation natural)
+            let speechText = text.replace(/sth/g, 'something').replace(/sb/g, 'somebody');
+            if(speechText.includes('/')) {
+                speechText = speechText.replace(/\//g, ' or ');
+            }
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.lang = 'en-GB'; 
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // --- INIT SECTION 1: VOCAB ---
+        function initVocab() {
+            const grid = document.getElementById('vocab-grid');
+            let html = '';
+            vocabData.forEach((item) => {
+                html += `
+                <div class="bg-white p-7 rounded-3xl shadow-sm border border-sky-100 hover:border-sky-300 hover:shadow-lg transition-all duration-300 group relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
+                        <i class="ph-fill ph-cloud-sun text-9xl text-sky-500"></i>
+                    </div>
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div class="pr-3">
+                            <h3 class="text-2xl font-bold text-sky-900 capitalize group-hover:text-sky-600 transition-colors weather-font">${item.word}</h3>
+                            <p class="text-sky-600 font-bold font-mono text-xs mt-2 bg-sky-50 inline-block px-3 py-1 rounded-lg border border-sky-100">${item.ipa}</p>
+                        </div>
+                        <button onclick="playAudio('${item.word}')" class="flex-shrink-0 p-3 bg-slate-50 hover:bg-sky-100 text-slate-400 hover:text-sky-600 rounded-2xl border border-slate-100 transition-all shadow-sm" title="Listen">
+                            <i class="ph-fill ph-speaker-high text-2xl"></i>
+                        </button>
+                    </div>
+                    <p class="text-slate-600 mb-5 pb-5 border-b border-slate-100 relative z-10 text-lg font-medium leading-relaxed">${item.definition}</p>
+                    <p class="text-slate-500 italic relative z-10 bg-slate-50 p-4 rounded-2xl border border-slate-100"><span class="font-bold not-italic text-sky-800 mr-2">E.g.</span> "${item.example}"</p>
+                </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        // --- INIT SECTION 2: Q&A ---
+        function initQA() {
+            const container = document.getElementById('qa-container');
+            let html = '';
+            qaData.forEach((item, index) => {
+                html += `
+                <div class="bg-white rounded-3xl shadow-sm border border-sky-100 overflow-hidden hover:border-sky-300 transition-colors">
+                    <button class="w-full text-left p-6 md:p-8 bg-white hover:bg-slate-50 transition-colors flex justify-between items-center font-bold text-xl text-slate-800 weather-font" onclick="toggleAccordion(${index})">
+                        <span class="pr-6 leading-snug">${item.q}</span>
+                        <div class="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center flex-shrink-0 group-hover:bg-sky-100 text-sky-500">
+                            <i id="acc-icon-${index}" class="ph-bold ph-caret-down transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div id="acc-content-${index}" class="accordion-content bg-slate-50 border-t border-slate-100">
+                        <div class="text-slate-700 leading-relaxed text-lg font-medium border-l-4 border-sky-400 pl-5">
+                            ${item.a}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleAccordion(index) {
+            const content = document.getElementById(`acc-content-${index}`);
+            const icon = document.getElementById(`acc-icon-${index}`);
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.style.transform = "rotate(0deg)";
+            } else {
+                content.classList.add('open');
+                icon.style.transform = "rotate(180deg)";
+            }
+        }
+
+        // --- INIT SECTION 3: FLASHCARDS ---
+        let flashcardDeck = [];
+        let fcIndex = 0;
+        const fcInner = document.getElementById('flashcard-inner');
+
+        function initFlashcards() {
+            resetFlashcards();
+            document.getElementById('flashcard').addEventListener('click', () => {
+                fcInner.classList.toggle('rotate-y-180');
+            });
+        }
+
+        function renderFlashcard() {
+            if(flashcardDeck.length === 0) {
+                document.getElementById('flashcard').classList.add('hidden');
+                document.getElementById('fc-complete').classList.remove('hidden');
+                document.querySelector('.flex-wrap').classList.add('hidden');
+                document.getElementById('fc-remaining').innerText = '0';
+                return;
+            }
+            
+            document.getElementById('flashcard').classList.remove('hidden');
+            document.getElementById('fc-complete').classList.add('hidden');
+            document.querySelector('.flex-wrap').classList.remove('hidden');
+            
+            fcInner.classList.remove('rotate-y-180');
+            
+            setTimeout(() => {
+                const card = flashcardDeck[fcIndex];
+                document.getElementById('fc-word').innerText = card.word;
+                document.getElementById('fc-word-back').innerText = card.word;
+                document.getElementById('fc-ipa').innerText = card.ipa;
+                document.getElementById('fc-def').innerText = card.definition;
+                document.getElementById('fc-example').innerText = card.example;
+                document.getElementById('fc-remaining').innerText = flashcardDeck.length;
+            }, 150); 
+        }
+
+        function nextCard() {
+            if(flashcardDeck.length === 0) return;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(() => {
+                fcIndex = (fcIndex + 1) % flashcardDeck.length;
+                renderFlashcard();
+            }, 200);
+        }
+
+        function prevCard() {
+            if(flashcardDeck.length === 0) return;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(() => {
+                fcIndex = (fcIndex - 1 + flashcardDeck.length) % flashcardDeck.length;
+                renderFlashcard();
+            }, 200);
+        }
+
+        function markLearned() {
+            if(flashcardDeck.length === 0) return;
+            flashcardDeck.splice(fcIndex, 1);
+            if(fcIndex >= flashcardDeck.length) fcIndex = 0;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(renderFlashcard, 200);
+        }
+
+        function shuffleDeck() {
+            if(flashcardDeck.length <= 1) return;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(() => {
+                shuffleArray(flashcardDeck);
+                fcIndex = 0;
+                renderFlashcard();
+            }, 200);
+        }
+
+        function resetFlashcards() {
+            flashcardDeck = [...vocabData];
+            fcIndex = 0;
+            renderFlashcard();
+        }
+
+        // --- INIT SECTION 4: QUIZ ENGINE ---
+        let quizQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft;
+        let totalTime = 30; 
+        let userAnswersRecord = [];
+
+        function startQuiz(numQuestions) {
+            document.getElementById('quiz-setup').classList.add('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            document.getElementById('quiz-active').classList.add('flex');
+            
+            score = 0;
+            currentQIndex = 0;
+            userAnswersRecord = [];
+            generateQuizQuestions(numQuestions);
+            renderQuizQuestion();
+        }
+
+        function generateQuizQuestions(num) {
+            quizQuestions = [];
+            let shuffledVocab = shuffleArray([...vocabData]);
+            let qCount = Math.min(num, shuffledVocab.length);
+            
+            for(let i=0; i<qCount; i++) {
+                let wordObj = shuffledVocab[i];
+                let type = Math.floor(Math.random() * 3);
+                let q = { type: type, correct: wordObj, options: [] };
+
+                if (type === 0) { // MCQ Match Definition
+                    let options = [wordObj.definition];
+                    let wrongOptions = shuffleArray(vocabData.filter(v => v.word !== wordObj.word)).slice(0, 3);
+                    wrongOptions.forEach(w => options.push(w.definition));
+                    q.options = shuffleArray(options);
+                } else if (type === 1) { // Fill in the blank
+                    let regex = new RegExp(wordObj.matchWord, "gi");
+                    q.sentence = wordObj.example.replace(regex, "________");
+                    
+                    let options = [wordObj.word];
+                    let wrongOptions = shuffleArray(vocabData.filter(v => v.word !== wordObj.word)).slice(0, 3);
+                    wrongOptions.forEach(w => options.push(w.word));
+                    q.options = shuffleArray(options);
+                }
+                
+                quizQuestions.push(q);
+            }
+        }
+
+        function renderQuizQuestion() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-answer-area').style.pointerEvents = 'auto';
+            document.getElementById('quiz-answer-area').style.opacity = '1';
+
+            const q = quizQuestions[currentQIndex];
+            document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1}/${quizQuestions.length}`;
+            
+            const qTypeEl = document.getElementById('quiz-question-type');
+            const qTextEl = document.getElementById('quiz-question-text');
+            const ansArea = document.getElementById('quiz-answer-area');
+            
+            ansArea.innerHTML = ''; 
+
+            if (q.type === 0) {
+                qTypeEl.innerText = "Match the Meaning";
+                qTextEl.innerHTML = `Identify the correct meaning of:<br/><span class="text-sky-800 font-bold text-4xl capitalize block mt-4 bg-sky-50 py-3 px-6 rounded-2xl border border-sky-200 w-max shadow-sm weather-font">${q.correct.word}</span>`;
+                
+                let html = '<div class="grid grid-cols-1 gap-4">';
+                q.options.forEach((opt, idx) => {
+                    html += `<button onclick="submitAnswer(0, '${opt.replace(/'/g, "\\'")}')" class="text-left p-5 rounded-2xl bg-white border-2 border-slate-100 hover:border-sky-400 hover:bg-sky-50 transition-all font-semibold text-slate-700 text-lg flex items-center gap-4"><div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold shrink-0 shadow-sm">${String.fromCharCode(65+idx)}</div> ${opt}</button>`;
+                });
+                html += '</div>';
+                ansArea.innerHTML = html;
+
+            } else if (q.type === 1) {
+                qTypeEl.innerText = "Fill in the Blank";
+                qTextEl.innerHTML = `"${q.sentence}"`;
+                
+                let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+                q.options.forEach((opt) => {
+                    html += `<button onclick="submitAnswer(1, '${opt}')" class="p-6 rounded-2xl bg-white border-2 border-slate-100 hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700 transition-all font-bold text-slate-700 capitalize text-center text-xl weather-font">${opt}</button>`;
+                });
+                html += '</div>';
+                ansArea.innerHTML = html;
+
+            } else if (q.type === 2) {
+                qTypeEl.innerText = "Memory Recall (Type it Out)";
+                qTextEl.innerHTML = `${q.correct.definition}`;
+                
+                let placeholder = "Type the exact expression...";
+                if(q.correct.word.includes('/')) {
+                    placeholder = "Type any of the valid words (e.g. scorching)";
+                }
+
+                ansArea.innerHTML = `
+                    <form onsubmit="submitAnswer(2, document.getElementById('recall-input').value); return false;" class="w-full mt-4">
+                        <input type="text" id="recall-input" class="w-full p-6 text-2xl font-bold text-center bg-slate-50 border-2 border-slate-200 text-sky-900 rounded-2xl focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-100 mb-6 transition-all placeholder-slate-400 shadow-inner weather-font" placeholder="${placeholder}" autocomplete="off">
+                        <button type="submit" class="w-full py-5 bg-sky-900 text-white font-bold text-xl rounded-2xl hover:bg-sky-800 transition-colors shadow-lg uppercase tracking-widest">Submit Answer</button>
+                    </form>
+                `;
+                setTimeout(() => document.getElementById('recall-input').focus(), 100);
+            }
+
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = totalTime;
+            document.getElementById('quiz-time').innerText = timeLeft + 's';
+            document.getElementById('timer-bar').style.width = '100%';
+            
+            let tickTime = 100; 
+            let totalTicks = totalTime * 1000 / tickTime;
+            let currentTick = 0;
+
+            timerInterval = setInterval(() => {
+                currentTick++;
+                let percentage = 100 - (currentTick / totalTicks * 100);
+                document.getElementById('timer-bar').style.width = percentage + '%';
+                
+                if (currentTick % 10 === 0) {
+                    timeLeft--;
+                    document.getElementById('quiz-time').innerText = timeLeft + 's';
+                    if(timeLeft <= 10) {
+                        document.getElementById('quiz-time').classList.add('text-rose-600');
+                        document.getElementById('quiz-time').classList.remove('text-sky-600');
+                    } else {
+                        document.getElementById('quiz-time').classList.remove('text-rose-600');
+                        document.getElementById('quiz-time').classList.add('text-sky-600');
+                    }
+                }
+
+                if (currentTick >= totalTicks) {
+                    clearInterval(timerInterval);
+                    submitAnswer(-1, null); 
+                }
+            }, tickTime);
+        }
+
+        function submitAnswer(type, userAnswer) {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-answer-area').style.pointerEvents = 'none';
+            document.getElementById('quiz-answer-area').style.opacity = '0.6';
+
+            const q = quizQuestions[currentQIndex];
+            let isCorrect = false;
+            let expectedAnswer = "";
+
+            if (type === -1) { 
+                expectedAnswer = q.type === 0 ? q.correct.definition : q.correct.word;
+            } else if (type === 0) {
+                expectedAnswer = q.correct.definition;
+                isCorrect = (userAnswer === expectedAnswer);
+            } else if (type === 1) {
+                expectedAnswer = q.correct.word;
+                isCorrect = (userAnswer === expectedAnswer);
+            } else if (type === 2) {
+                expectedAnswer = q.correct.word;
+                let normalizedUser = userAnswer.trim().toLowerCase().replace(/[^a-z0-9 \/]/g, '').replace(/\s+/g, ' ');
+                let normalizedCorrectFull = expectedAnswer.toLowerCase().replace(/[^a-z0-9 \/]/g, '').replace(/\s+/g, ' ');
+                let normalizedCorrectMatch = q.correct.matchWord.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ');
+                
+                // Extra forgiveness for words with slashes (e.g. "scorching / boiling / sweltering")
+                if(normalizedCorrectFull.includes('/')) {
+                    let parts = normalizedCorrectFull.split('/').map(p => p.trim());
+                    isCorrect = parts.includes(normalizedUser) || normalizedCorrectMatch === normalizedUser || normalizedUser === normalizedCorrectFull;
+                } else {
+                    isCorrect = (
+                        normalizedUser === normalizedCorrectFull || 
+                        normalizedUser === normalizedCorrectMatch
+                    );
+                }
+            }
+
+            if (isCorrect) score++;
+
+            // Record for review
+            userAnswersRecord.push({
+                word: q.correct.word,
+                correct: isCorrect,
+                userAnswer: type === -1 ? "[Time Expired]" : userAnswer,
+                expected: expectedAnswer
+            });
+
+            // Visual Feedback
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200', 'bg-rose-50', 'text-rose-700', 'border-rose-200');
+            
+            if (isCorrect) {
+                feedback.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                feedback.innerHTML = '<div class="flex items-center justify-center gap-2"><i class="ph-fill ph-check-circle text-3xl"></i> Correct!</div>';
+            } else {
+                feedback.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+                feedback.innerHTML = `<div class="flex flex-col items-center justify-center gap-1"><div class="flex items-center gap-2 text-rose-600"><i class="ph-fill ph-x-circle text-3xl"></i> Incorrect</div><div class="text-base font-bold mt-1 text-rose-900">The correct answer is: <br><span class="text-xl">${expectedAnswer}</span></div></div>`;
+            }
+
+            setTimeout(() => {
+                currentQIndex++;
+                if (currentQIndex < quizQuestions.length) {
+                    renderQuizQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 2200);
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('flex');
+            document.getElementById('quiz-results').classList.remove('hidden');
+
+            const scoreDisplay = document.getElementById('quiz-score-display');
+            const message = document.getElementById('quiz-message');
+            const icon = document.getElementById('result-icon');
+            const iconContainer = document.getElementById('result-icon-container');
+            
+            scoreDisplay.innerText = `${score}/${quizQuestions.length}`;
+            
+            let percentage = score / quizQuestions.length;
+            
+            // reset classes
+            iconContainer.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border shadow-sm";
+
+            if (percentage === 1) {
+                message.innerText = "Perfect! Your forecast is 100% accurate.";
+                icon.innerHTML = '<i class="ph-fill ph-sun text-yellow-500"></i>';
+                iconContainer.classList.add('bg-yellow-50', 'border-yellow-200');
+            } else if (percentage >= 0.7) {
+                message.innerText = "Great job! A mostly sunny result.";
+                icon.innerHTML = '<i class="ph-fill ph-cloud-sun text-sky-500"></i>';
+                iconContainer.classList.add('bg-sky-50', 'border-sky-200');
+            } else {
+                message.innerText = "Looks like a little rain. Review the flashcards and try again!";
+                icon.innerHTML = '<i class="ph-fill ph-cloud-rain text-slate-400"></i>';
+                iconContainer.classList.add('bg-slate-50', 'border-slate-200');
+            }
+
+            // Build Review list
+            const reviewContainer = document.getElementById('quiz-review');
+            let reviewHtml = '';
+            userAnswersRecord.forEach(rec => {
+                if(rec.correct) {
+                    reviewHtml += `<div class="mb-4 pb-4 border-b border-slate-200 last:border-0"><div class="text-emerald-600 font-bold flex items-center gap-2 text-lg capitalize"><i class="ph-fill ph-check-circle text-2xl"></i> ${rec.word}</div></div>`;
+                } else {
+                    reviewHtml += `<div class="mb-4 pb-4 border-b border-slate-200 last:border-0">
+                        <div class="text-rose-600 font-bold flex items-center gap-2 text-lg capitalize"><i class="ph-fill ph-x-circle text-2xl"></i> ${rec.word}</div>
+                        <div class="text-sm text-slate-600 mt-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm font-medium">
+                            <div class="mb-1">Correct Answer: <span class="text-sky-900 font-bold">${rec.expected}</span></div>
+                            <div>Your Entry: <span class="line-through text-rose-500">${rec.userAnswer}</span></div>
+                        </div>
+                    </div>`;
+                }
+            });
+            reviewContainer.innerHTML = reviewHtml;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-setup').classList.remove('hidden');
+        }
+
+        // --- ON LOAD ---
+        window.onload = () => {
+            initVocab();
+            initQA();
+            initFlashcards();
+        };
+
+    </script>
+</body>
+</html>
