@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong - Arts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-color: #fafafa; /* neutral-50 */
+            --panel-bg: #ffffff; 
+            --indigo-primary: #6366f1; /* indigo-500 */
+            --violet-accent: #8b5cf6; /* violet-500 */
+            --text-main: #171717; /* neutral-900 */
+            --text-muted: #737373; /* neutral-500 */
+            --border-color: #e5e5e5; /* neutral-200 */
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            
+            /* Subtle canvas texture overlay */
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20zM20 0h20v20H20V0z' fill='%23000000' fill-opacity='0.01' fill-rule='evenodd'/%3E%3C/svg%3E");
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, .theme-font {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        
+        /* Flashcard 3D CSS */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .card-transition { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Accordion transition */
+        .accordion-content { transition: max-height 0.5s ease, padding 0.5s ease, opacity 0.5s ease; max-height: 0; opacity: 0; overflow: hidden; }
+        .accordion-content.open { max-height: 1200px; opacity: 1; padding: 24px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); border-left: 1px solid var(--border-color); }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 0px; } 
+        ::-webkit-scrollbar-thumb:hover { background: var(--indigo-primary); } 
+        
+        .hide { display: none !important; }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Timer Bar */
+        .timer-bar { transition: width 0.1s linear; }
+
+        /* Highlight for Keywords in Q&A */
+        .theme-highlight {
+            background: linear-gradient(120deg, rgba(167, 139, 250, 0.2) 0%, rgba(129, 140, 248, 0.2) 100%);
+            padding: 0.1em 0.3em;
+            color: #4338ca; /* indigo-700 */
+            font-weight: 600;
+            border-radius: 2px;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.5);
+            transition: all 0.3s ease;
+        }
+        .theme-highlight:hover {
+            background: linear-gradient(120deg, rgba(167, 139, 250, 0.4) 0%, rgba(129, 140, 248, 0.4) 100%);
+        }
+
+        /* Gallery panel */
+        .gallery-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.04);
+            border-radius: 0px; /* Sharp corners for gallery look */
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            border-radius: 0px;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .accent-indigo {
+            color: var(--indigo-primary);
+        }
+
+        /* Framed image effect */
+        .framed {
+            position: relative;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .framed::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(0,0,0,0.1);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden selection:bg-indigo-200 selection:text-indigo-900">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden gallery-panel text-neutral-900 p-4 flex justify-between items-center z-20 border-b border-neutral-200 bg-white/90 backdrop-blur-md">
+        <div class="font-bold text-xl flex items-center gap-2 theme-font tracking-tight">
+            <i class="ph-fill ph-palette accent-indigo text-3xl"></i>
+            IELTS Chan Truong
+        </div>
+        <button id="mobile-menu-btn" class="text-3xl p-1 text-neutral-500 hover:text-indigo-600 transition-colors"><i class="ph ph-list"></i></button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="bg-white text-neutral-600 w-full md:w-72 flex-shrink-0 flex flex-col absolute md:relative z-30 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 border-r border-neutral-200 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <div class="p-8 hidden md:block text-center border-b border-neutral-100 relative overflow-hidden bg-neutral-50">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-white to-white"></div>
+            <div class="w-20 h-20 bg-white rounded-none mx-auto flex items-center justify-center shadow-sm mb-6 relative overflow-hidden border border-neutral-200 transform rotate-3 hover:rotate-0 transition-transform">
+                <i class="ph-duotone ph-palette text-4xl text-indigo-500"></i>
+            </div>
+            <h1 class="text-neutral-900 font-bold text-2xl tracking-tight mb-2 theme-font relative z-10">
+                IELTS Chan Truong
+            </h1>
+            <p class="text-[10px] text-neutral-500 font-bold tracking-[0.3em] uppercase mt-2 relative z-10 font-sans border-t border-neutral-200 pt-2 mx-4">The Art Exhibition</p>
+        </div>
+        
+        <div class="flex flex-col gap-2 p-5 flex-grow mt-12 md:mt-0 relative z-10 bg-white">
+            <button onclick="switchTab('vocab')" id="tab-vocab" class="tab-btn flex items-center gap-4 p-4 transition-all text-left w-full font-medium font-sans text-sm tracking-wide border-l-2 bg-neutral-50 border-indigo-600 text-indigo-700 relative overflow-hidden uppercase">
+                <i class="ph-duotone ph-text-aa text-2xl relative z-10"></i>
+                <span class="relative z-10">1. Masterpieces</span>
+            </button>
+            <button onclick="switchTab('qa')" id="tab-qa" class="tab-btn flex items-center gap-4 p-4 hover:bg-neutral-50 hover:text-indigo-600 transition-all text-left w-full text-neutral-500 font-medium border-l-2 border-transparent font-sans text-sm tracking-wide uppercase">
+                <i class="ph-duotone ph-microphone-stage text-2xl"></i>
+                <span class="">2. Artist Q&A</span>
+            </button>
+            <button onclick="switchTab('flashcards')" id="tab-flashcards" class="tab-btn flex items-center gap-4 p-4 hover:bg-neutral-50 hover:text-indigo-600 transition-all text-left w-full text-neutral-500 font-medium border-l-2 border-transparent font-sans text-sm tracking-wide uppercase">
+                <i class="ph-duotone ph-cards text-2xl"></i>
+                <span class="">3. Visual Cards</span>
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn flex items-center gap-4 p-4 hover:bg-neutral-50 hover:text-indigo-600 transition-all text-left w-full text-neutral-500 font-medium border-l-2 border-transparent font-sans text-sm tracking-wide uppercase">
+                <i class="ph-duotone ph-paint-brush text-2xl"></i>
+                <span class="">4. The Critique</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow relative overflow-y-auto w-full scroll-smooth">
+        
+        <!-- SECTION 1: Vocabulary -->
+        <section id="sec-vocab" class="p-6 md:p-12 max-w-6xl mx-auto fade-in">
+            <header class="mb-12 text-center md:text-left flex flex-col md:flex-row md:justify-between md:items-end border-b border-neutral-200 pb-8">
+                <div>
+                    <h2 class="text-4xl md:text-6xl font-bold text-neutral-900 mb-4 theme-font tracking-tight">Curated Vocabulary</h2>
+                    <p class="text-neutral-500 text-lg font-light font-sans max-w-xl">Essential lexicon for analyzing, appreciating, and discussing the fine arts eloquently.</p>
+                </div>
+                <div class="mt-6 md:mt-0 text-indigo-700 bg-indigo-50 px-6 py-3 font-medium border border-indigo-100 inline-flex items-center gap-3 tracking-[0.2em] text-xs font-sans uppercase">
+                    <i class="ph-fill ph-images text-indigo-400 text-lg"></i> 8 Art Concepts
+                </div>
+            </header>
+            <div id="vocab-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 2: Q&A -->
+        <section id="sec-qa" class="p-6 md:p-12 max-w-4xl mx-auto hide fade-in">
+            <header class="mb-12 border-b border-neutral-200 pb-8 text-center">
+                <h2 class="text-4xl md:text-6xl font-bold text-neutral-900 mb-4 theme-font tracking-tight">The Interview</h2>
+                <p class="text-neutral-500 text-lg font-light font-sans">Observe how the <span class="theme-highlight">highlighted terminology</span> acts as the pigment that colors these Band 7+ responses.</p>
+            </header>
+            <div id="qa-container" class="flex flex-col gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 3: Flashcards -->
+        <section id="sec-flashcards" class="p-6 md:p-12 max-w-4xl mx-auto h-full flex flex-col hide fade-in">
+            <header class="mb-10 text-center border-b border-neutral-200 pb-8">
+                <h2 class="text-4xl md:text-6xl font-bold text-neutral-900 mb-4 theme-font tracking-tight">Visual Memory</h2>
+                <p class="text-neutral-500 text-lg font-light font-sans">Interact with the canvas to reveal the meaning behind the strokes.</p>
+                <div class="mt-6 flex justify-center gap-4 text-xs font-semibold tracking-[0.2em] uppercase font-sans">
+                    <span class="bg-neutral-100 text-neutral-600 border border-neutral-200 px-6 py-2 shadow-sm"><span id="fc-remaining">0</span> Exhibits Left</span>
+                </div>
+            </header>
+            
+            <div class="flex-grow flex flex-col items-center justify-center mb-10 w-full max-w-2xl mx-auto">
+                
+                <!-- Flashcard Container -->
+                <div id="flashcard" class="relative w-full h-80 md:h-[400px] perspective-1000 cursor-pointer group mb-12">
+                    <div id="flashcard-inner" class="relative w-full h-full card-transition transform-style-3d framed">
+                        
+                        <!-- Front -->
+                        <div class="absolute inset-0 backface-hidden bg-neutral-50 flex flex-col items-center justify-center p-8 text-center overflow-hidden hover:bg-neutral-100 transition-colors m-2 border border-neutral-200 border-dashed">
+                            <i class="ph-duotone ph-hand-tap text-neutral-300 text-6xl absolute top-8 right-8 opacity-50"></i>
+                            <h3 id="fc-word" class="text-4xl md:text-5xl font-bold text-neutral-900 mb-6 capitalize leading-snug theme-font tracking-wide">Word</h3>
+                            <p class="text-neutral-400 font-semibold tracking-[0.2em] uppercase text-xs mt-6 bg-white px-5 py-2.5 border border-neutral-200 font-sans shadow-sm">Tap Canvas to Reveal</p>
+                        </div>
+                        
+                        <!-- Back -->
+                        <div class="absolute inset-0 backface-hidden bg-white m-2 border border-neutral-100 p-8 md:p-10 rotate-y-180 flex flex-col items-center justify-center text-center overflow-y-auto custom-scrollbar shadow-inner">
+                            <i class="ph-fill ph-palette text-indigo-50 text-8xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50 pointer-events-none"></i>
+                            <h3 id="fc-word-back" class="text-3xl font-bold text-indigo-700 mb-3 capitalize theme-font tracking-wide relative z-10">Word</h3>
+                            <p id="fc-ipa" class="text-neutral-500 font-mono text-sm mb-6 bg-neutral-50 px-3 py-1 border border-neutral-200 relative z-10">/ipa/</p>
+                            <p id="fc-def" class="text-neutral-800 text-lg font-medium mb-8 leading-relaxed font-sans relative z-10">Definition</p>
+                            <div class="bg-indigo-50/50 p-6 w-full text-left italic text-neutral-700 border-l-2 border-indigo-400 relative z-10 font-sans">
+                                <span id="fc-example" class="relative z-10 leading-relaxed font-normal text-[0.95rem]">Example</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex flex-wrap justify-center gap-4 w-full font-sans text-sm tracking-wide uppercase">
+                    <button onclick="prevCard()" class="px-6 py-4 bg-white border border-neutral-200 text-neutral-600 hover:border-indigo-300 hover:text-indigo-600 font-semibold flex items-center gap-2 transition-all shadow-sm"><i class="ph-bold ph-caret-left text-lg"></i> Back</button>
+                    <button onclick="markLearned()" class="px-8 py-4 btn-gradient font-semibold flex items-center gap-2 transition-all shadow-md"><i class="ph-bold ph-check text-lg"></i> Memorized</button>
+                    <button onclick="nextCard()" class="px-6 py-4 bg-white border border-neutral-200 text-neutral-600 hover:border-indigo-300 hover:text-indigo-600 font-semibold flex items-center gap-2 transition-all shadow-sm">Next <i class="ph-bold ph-caret-right text-lg"></i></button>
+                    <button onclick="shuffleDeck()" class="px-5 py-4 bg-white border border-neutral-200 text-neutral-400 hover:text-indigo-500 transition-all ml-2 shadow-sm" title="Shuffle"><i class="ph-bold ph-shuffle text-lg"></i></button>
+                </div>
+
+                <!-- Completion State -->
+                <div id="fc-complete" class="hidden text-center mt-12 bg-white p-14 border border-neutral-200 shadow-sm w-full max-w-md mx-auto">
+                    <div class="w-20 h-20 bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto mb-8 border border-indigo-100">
+                        <i class="ph-fill ph-check-circle text-4xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-neutral-900 mb-4 theme-font">Gallery Tour Complete</h3>
+                    <p class="text-neutral-500 font-light mb-10 font-sans">You have successfully analyzed all the conceptual pieces.</p>
+                    <button onclick="resetFlashcards()" class="w-full py-4 bg-neutral-900 text-white hover:bg-neutral-800 font-semibold tracking-[0.2em] uppercase transition-colors font-sans text-sm">Review Exhibition</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Vocab Testing Tool -->
+        <section id="sec-quiz" class="p-6 md:p-12 max-w-3xl mx-auto h-full flex flex-col hide fade-in">
+            
+            <!-- Setup Screen -->
+            <div id="quiz-setup" class="gallery-panel shadow-lg p-12 text-center mt-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-500"></div>
+                <div class="w-20 h-20 bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto mb-8 border border-indigo-100">
+                    <i class="ph-duotone ph-exam text-4xl"></i>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold text-neutral-900 mb-4 relative z-10 theme-font tracking-tight">The Critique</h2>
+                <p class="text-neutral-500 mb-10 text-lg font-light relative z-10 font-sans">Evaluate your understanding of these artistic concepts.</p>
+                
+                <h3 class="font-semibold text-indigo-400 mb-6 uppercase tracking-[0.2em] text-xs relative z-10 font-sans">Select Examination Length</h3>
+                <div class="flex justify-center gap-5 mb-4 relative z-10 font-sans">
+                    <button onclick="startQuiz(4)" class="w-24 h-24 bg-white hover:bg-indigo-50 text-neutral-600 hover:text-indigo-700 border border-neutral-200 hover:border-indigo-300 font-bold text-3xl transition-all flex flex-col items-center justify-center gap-1 shadow-sm"><span class="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Short</span>4</button>
+                    <button onclick="startQuiz(6)" class="w-24 h-24 bg-white hover:bg-indigo-50 text-neutral-600 hover:text-indigo-700 border border-neutral-200 hover:border-indigo-300 font-bold text-3xl transition-all flex flex-col items-center justify-center gap-1 shadow-sm"><span class="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Med</span>6</button>
+                    <button onclick="startQuiz(vocabData.length)" class="w-24 h-24 bg-white hover:bg-indigo-50 text-neutral-600 hover:text-indigo-700 border border-neutral-200 hover:border-indigo-400 font-bold text-2xl transition-all flex flex-col items-center justify-center gap-1 shadow-sm"><span class="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Full</span>ALL</button>
+                </div>
+            </div>
+
+            <!-- Active Quiz Screen -->
+            <div id="quiz-active" class="hidden flex-col h-full mt-4 font-sans">
+                <!-- Header & Timer -->
+                <div class="flex justify-between items-end mb-4 px-2 border-b border-neutral-200 pb-4">
+                    <span class="text-indigo-600 font-semibold tracking-[0.2em] uppercase text-xs"><span id="quiz-progress">Artwork 1/8</span></span>
+                    <span class="text-2xl font-bold text-neutral-900 flex items-center gap-2"><i class="ph-bold ph-hourglass-high text-xl text-indigo-400 animate-pulse"></i><span id="quiz-time">30s</span></span>
+                </div>
+                <div class="w-full bg-neutral-100 h-1 mb-8 overflow-hidden">
+                    <div id="timer-bar" class="bg-indigo-500 h-full w-full timer-bar"></div>
+                </div>
+
+                <!-- Question Container -->
+                <div class="gallery-panel p-8 md:p-12 flex-grow flex flex-col justify-center relative overflow-hidden shadow-md">
+                    <div id="quiz-question-type" class="text-[10px] font-semibold text-neutral-500 font-sans uppercase tracking-[0.3em] mb-6 inline-block w-max z-10 border-b border-neutral-200 pb-1">TYPE</div>
+                    <h3 id="quiz-question-text" class="text-2xl md:text-3xl font-bold text-neutral-900 mb-10 leading-relaxed z-10 theme-font">Question text goes here?</h3>
+                    
+                    <!-- Dynamic Answer Area -->
+                    <div id="quiz-answer-area" class="w-full z-10">
+                        <!-- Filled by JS based on question type -->
+                    </div>
+                </div>
+                
+                <!-- Feedback overlay during transition -->
+                <div id="quiz-feedback" class="hidden p-6 mt-6 font-bold text-center text-xl border"></div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="quiz-results" class="hidden gallery-panel shadow-lg p-12 text-center mt-6 font-sans">
+                <div id="result-icon-container" class="w-20 h-20 flex items-center justify-center mx-auto mb-8 bg-neutral-50 border border-neutral-200">
+                    <div id="result-icon" class="text-4xl"></div>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold text-neutral-900 mb-4 tracking-tight theme-font">Exhibition Review</h2>
+                <div class="text-6xl font-bold text-transparent bg-clip-text btn-gradient my-8 font-sans border-y border-neutral-100 py-6 inline-block w-full max-w-xs" id="quiz-score-display">0/0</div>
+                <p class="text-neutral-500 mb-10 text-lg font-light" id="quiz-message">Calculating score...</p>
+                
+                <div class="text-left bg-neutral-50 p-6 max-h-72 overflow-y-auto mb-10 border border-neutral-200 custom-scrollbar" id="quiz-review">
+                    <!-- Review items injected here -->
+                </div>
+
+                <button onclick="resetQuiz()" class="w-full md:w-auto px-14 py-4 btn-gradient font-semibold text-sm tracking-[0.2em] uppercase transition-all shadow-md font-sans text-white">Re-evaluate</button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // --- DATA ---
+        const vocabData = [
+            {
+                word: "visual art",
+                matchWord: "visual art(s)?",
+                ipa: "/ˈvɪʒuəl ɑːt/",
+                definition: "Art forms such as ceramics, drawing, painting, sculpture, printmaking, design, crafts, photography, video, filmmaking, and architecture.",
+                example: "She has always been drawn to visual art, particularly large-scale oil paintings."
+            },
+            {
+                word: "Masterpiece",
+                matchWord: "masterpiece(s)?",
+                ipa: "/ˈmɑːstəpiːs/",
+                definition: "A work of outstanding artistry, skill, or workmanship; an artist's best piece of work.",
+                example: "The Mona Lisa is considered by many to be Leonardo da Vinci's greatest masterpiece."
+            },
+            {
+                word: "abstract art",
+                matchWord: "abstract art",
+                ipa: "/ˈæbstrækt ɑːt/",
+                definition: "Art that does not attempt to represent an accurate depiction of a visual reality but instead uses shapes, colours, forms and gestural marks.",
+                example: "I prefer abstract art because it allows me to interpret the shapes and colors in my own way."
+            },
+            {
+                word: "Art for art's sake",
+                matchWord: "art for art'?s sake",
+                ipa: "/ɑːt fɔːr ɑːts seɪk/",
+                definition: "The principle that the pursuit of art is its own justification, needing no moral or educational purpose.",
+                example: "He paints purely based on the philosophy of art for art's sake, without worrying about commercial success."
+            },
+            {
+                word: "sketch",
+                matchWord: "sketch(es|ed|ing)?",
+                ipa: "/skɛtʃ/",
+                definition: "A rough or unfinished drawing or painting, often made to assist in making a more finished picture.",
+                example: "The artist quickly drew a charcoal sketch of the landscape before the sun went down."
+            },
+            {
+                word: "aesthetic appeal",
+                matchWord: "aesthetic appeal",
+                ipa: "/iːsˈθɛtɪk əˈpiːl/",
+                definition: "The quality of being visually pleasing, beautiful, or attractive.",
+                example: "The new sculpture in the city square has a tremendous aesthetic appeal that draws tourists."
+            },
+            {
+                word: "have what it takes",
+                matchWord: "have what it takes",
+                ipa: "/hæv wɒt ɪt teɪks/",
+                definition: "To possess the necessary qualities, skills, or character needed to be successful at something.",
+                example: "Being a professional musician is tough; you really need to have what it takes to handle the pressure."
+            },
+            {
+                word: "appreciate art",
+                matchWord: "appreciate art",
+                ipa: "/əˈpriːʃɪeɪt ɑːt/",
+                definition: "To understand, enjoy, and value artistic creations and the skill involved in making them.",
+                example: "Taking an art history course helped me to truly appreciate art from the Renaissance period."
+            }
+        ];
+
+        const qaData = [
+            {
+                q: "1. Do you like art?",
+                a: "Yes, absolutely. I genuinely <strong class='theme-highlight'>appreciate art</strong>, especially <strong class='theme-highlight'>visual art</strong> like paintings and sculptures. It allows me to see the world from different perspectives and gives me a sense of peace."
+            },
+            {
+                q: "2. Do you like visiting art galleries?",
+                a: "I do. Walking through a gallery and observing a <strong class='theme-highlight'>masterpiece</strong> up close has a certain <strong class='theme-highlight'>aesthetic appeal</strong> that you just can't get from looking at a small photo on a digital screen."
+            },
+            {
+                q: "3. Do you want to be an artist?",
+                a: "To be honest, no. While I immensely enjoy looking at creative works, I don't think I <strong class='theme-highlight'>have what it takes</strong> to be a professional artist. It requires a level of dedication and natural talent that I don't possess."
+            },
+            {
+                q: "4. Have you ever tried painting or drawing?",
+                a: "Yes, when I was younger. I used to <strong class='theme-highlight'>sketch</strong> portraits and scenery in my free time. It was a relaxing hobby, but nothing too serious or professional."
+            },
+            {
+                q: "5. What's your favorite type of art?",
+                a: "I'm really drawn to <strong class='theme-highlight'>abstract art</strong>. I love how it doesn't represent external reality directly, leaving the interpretation completely up to the viewer's personal imagination and emotions."
+            },
+            {
+                q: "6. Do you have any artwork in your home?",
+                a: "Yes, a few pieces. They aren't by famous painters, but I bought them purely based on the philosophy of <strong class='theme-highlight'>art for art's sake</strong>—I simply loved their colors and the vibe they brought to the room."
+            },
+            {
+                q: "7. Did you study art in school?",
+                a: "Yes, we had basic <strong class='theme-highlight'>visual art</strong> classes where we learned how to <strong class='theme-highlight'>sketch</strong> proportions and mix watercolors. It was a wonderful creative outlet during my childhood years."
+            },
+            {
+                q: "8. Have you ever bought a piece of art?",
+                a: "I have. I recently purchased a small painting from an independent local artist. It had such a strong <strong class='theme-highlight'>aesthetic appeal</strong> that I couldn't resist bringing it home to hang in my living room."
+            }
+        ];
+
+        // --- NAVIGATION LOGIC ---
+        const sections = ['vocab', 'qa', 'flashcards', 'quiz'];
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-neutral-50', 'border-indigo-600', 'text-indigo-700');
+                btn.classList.add('text-neutral-500', 'border-transparent');
+                
+                // Remove decorative background from non-active
+                const bgDiv = btn.querySelector('.absolute.inset-0');
+                if(bgDiv) bgDiv.remove();
+                
+                const icon = btn.querySelector('i');
+                if(icon) icon.classList.remove('relative', 'z-10');
+                const text = btn.querySelector('span');
+                if(text) text.classList.remove('relative', 'z-10');
+            });
+            
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('text-neutral-500', 'border-transparent');
+            activeBtn.classList.add('bg-neutral-50', 'border-indigo-600', 'text-indigo-700', 'relative', 'overflow-hidden');
+            
+            // Add decorative bg to active
+            if(!activeBtn.querySelector('.absolute.inset-0')) {
+                activeBtn.insertAdjacentHTML('afterbegin', '<div class="absolute inset-0 bg-indigo-50/30"></div>');
+            }
+            
+            const activeIcon = activeBtn.querySelector('i');
+            if(activeIcon) activeIcon.classList.add('relative', 'z-10');
+            const activeText = activeBtn.querySelector('span');
+            if(activeText) activeText.classList.add('relative', 'z-10');
+
+            // Update sections
+            sections.forEach(sec => {
+                document.getElementById(`sec-${sec}`).classList.add('hide');
+            });
+            document.getElementById(`sec-${tabId}`).classList.remove('hide');
+
+            // Close mobile menu if open
+            if(window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // --- UTILS ---
+        function playAudio(text) {
+            let speechText = text;
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.lang = 'en-US'; 
+            utterance.rate = 0.9;
+            
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => voice.name.includes('Google US English')) || 
+                                voices.find(voice => voice.name.toLowerCase().includes('female') && voice.lang.startsWith('en')) ||
+                                voices.find(voice => (voice.name.includes('Samantha') || voice.name.includes('Zira') || voice.name.includes('Victoria')) && voice.lang.startsWith('en'));
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // --- INIT SECTION 1: VOCAB ---
+        function initVocab() {
+            const grid = document.getElementById('vocab-grid');
+            let html = '';
+            vocabData.forEach((item) => {
+                html += `
+                <div class="gallery-panel p-8 hover:border-indigo-200 hover:shadow-xl transition-all duration-500 group relative overflow-hidden font-sans bg-white">
+                    <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-indigo-50 rounded-full blur-3xl group-hover:bg-indigo-100 transition-colors opacity-50"></div>
+                    <div class="flex justify-between items-start mb-6 relative z-10 border-b border-neutral-100 pb-5">
+                        <div class="pr-3">
+                            <h3 class="text-2xl md:text-3xl font-bold text-neutral-900 group-hover:text-indigo-600 transition-colors theme-font leading-tight capitalize">${item.word}</h3>
+                            <p class="text-indigo-400 font-mono text-xs mt-3 tracking-widest">${item.ipa}</p>
+                        </div>
+                        <button onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" class="flex-shrink-0 p-3 bg-neutral-50 hover:bg-indigo-50 text-neutral-400 hover:text-indigo-600 border border-neutral-200 hover:border-indigo-200 transition-all shadow-sm rounded-none" title="Play Pronunciation">
+                            <i class="ph-fill ph-speaker-high text-xl"></i>
+                        </button>
+                    </div>
+                    <p class="text-neutral-600 mb-6 relative z-10 text-[1.05rem] font-normal leading-relaxed">${item.definition}</p>
+                    <p class="text-neutral-500 italic relative z-10 bg-neutral-50 p-5 border-l-2 border-indigo-200 text-sm"><span class="font-bold not-italic text-indigo-500 mr-2 uppercase text-[10px] tracking-widest font-sans">Context:</span> "${item.example}"</p>
+                </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        // --- INIT SECTION 2: Q&A ---
+        function initQA() {
+            const container = document.getElementById('qa-container');
+            let html = '';
+            qaData.forEach((item, index) => {
+                html += `
+                <div class="gallery-panel overflow-hidden hover:border-indigo-300 transition-all font-sans bg-white">
+                    <button class="w-full text-left p-6 md:p-8 bg-transparent hover:bg-neutral-50 transition-colors flex justify-between items-center font-bold text-xl md:text-2xl text-neutral-900 theme-font tracking-wide" onclick="toggleAccordion(${index})">
+                        <span class="pr-6 leading-snug">${item.q}</span>
+                        <div class="w-10 h-10 bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-50 text-neutral-400 group-hover:text-indigo-600 border border-neutral-200 shadow-sm transition-colors rounded-none">
+                            <i id="acc-icon-${index}" class="ph-bold ph-caret-down transition-transform duration-500"></i>
+                        </div>
+                    </button>
+                    <div id="acc-content-${index}" class="accordion-content bg-neutral-50 border-t border-neutral-100 flex flex-col gap-6">
+                        
+                        <!-- Recording Feature -->
+                        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center bg-white p-5 border border-neutral-200 shadow-sm">
+                            <div class="flex items-center gap-3 w-full md:w-auto">
+                                <button id="record-btn-${index}" onclick="toggleRecording(${index})" class="flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white hover:bg-indigo-600 font-semibold transition-all shadow-sm w-full md:w-auto justify-center text-xs uppercase tracking-[0.2em] font-sans rounded-none">
+                                    <i id="record-icon-${index}" class="ph-fill ph-microphone text-lg"></i>
+                                    <span id="record-text-${index}">Record Draft</span>
+                                </button>
+                            </div>
+                            <div id="record-status-${index}" class="hidden text-indigo-500 font-semibold animate-pulse flex items-center gap-2 text-xs tracking-widest uppercase font-sans">
+                                <div class="w-2.5 h-2.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div> Recording
+                            </div>
+                            <audio id="audio-player-${index}" class="hidden h-10 w-full md:max-w-sm ml-auto" controls></audio>
+                        </div>
+
+                        <!-- Sample Answer -->
+                        <div class="text-neutral-700 leading-relaxed text-[1.05rem] font-normal border-l-2 border-indigo-400 pl-6 bg-white p-6 shadow-sm">
+                            <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block mb-3 font-sans">Curator's Note (Model Answer)</span>
+                            ${item.a}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleAccordion(index) {
+            const content = document.getElementById(`acc-content-${index}`);
+            const icon = document.getElementById(`acc-icon-${index}`);
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.style.transform = "rotate(0deg)";
+            } else {
+                content.classList.add('open');
+                icon.style.transform = "rotate(180deg)";
+            }
+        }
+
+        // --- INIT SECTION 3: FLASHCARDS ---
+        let flashcardDeck = [];
+        let fcIndex = 0;
+        const fcInner = document.getElementById('flashcard-inner');
+
+        function initFlashcards() {
+            resetFlashcards();
+            document.getElementById('flashcard').addEventListener('click', () => {
+                fcInner.classList.toggle('rotate-y-180');
+            });
+        }
+
+        function renderFlashcard() {
+            if(flashcardDeck.length === 0) {
+                document.getElementById('flashcard').classList.add('hidden');
+                document.getElementById('fc-complete').classList.remove('hidden');
+                document.querySelector('.flex-wrap').classList.add('hidden');
+                document.getElementById('fc-remaining').innerText = '0';
+                return;
+            }
+            
+            document.getElementById('flashcard').classList.remove('hidden');
+            document.getElementById('fc-complete').classList.add('hidden');
+            document.querySelector('.flex-wrap').classList.remove('hidden');
+            
+            fcInner.classList.remove('rotate-y-180');
+            
+            setTimeout(() => {
+                const card = flashcardDeck[fcIndex];
+                document.getElementById('fc-word').innerText = card.word;
+                document.getElementById('fc-word-back').innerText = card.word;
+                document.getElementById('fc-ipa').innerText = card.ipa;
+                document.getElementById('fc-def').innerText = card.definition;
+                document.getElementById('fc-example').innerText = card.example;
+                document.getElementById('fc-remaining').innerText = flashcardDeck.length;
+            }, 250); // slight delay to wait for flip animation
+        }
+
+        function nextCard() {
+            if(flashcardDeck.length === 0) return;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(() => {
+                fcIndex = (fcIndex + 1) % flashcardDeck.length;
+                renderFlashcard();
+            }, 300);
+        }
+
+        function prevCard() {
+            if(flashcardDeck.length === 0) return;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(() => {
+                fcIndex = (fcIndex - 1 + flashcardDeck.length) % flashcardDeck.length;
+                renderFlashcard();
+            }, 300);
+        }
+
+        function markLearned() {
+            if(flashcardDeck.length === 0) return;
+            flashcardDeck.splice(fcIndex, 1);
+            if(fcIndex >= flashcardDeck.length) fcIndex = 0;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(renderFlashcard, 300);
+        }
+
+        function shuffleDeck() {
+            if(flashcardDeck.length <= 1) return;
+            fcInner.classList.remove('rotate-y-180');
+            setTimeout(() => {
+                shuffleArray(flashcardDeck);
+                fcIndex = 0;
+                renderFlashcard();
+            }, 300);
+        }
+
+        function resetFlashcards() {
+            flashcardDeck = [...vocabData];
+            fcIndex = 0;
+            renderFlashcard();
+        }
+
+        // --- AUDIO RECORDING ENGINE ---
+        let mediaRecorders = {};
+        let audioChunks = {};
+
+        async function toggleRecording(index) {
+            const btn = document.getElementById(`record-btn-${index}`);
+            const icon = document.getElementById(`record-icon-${index}`);
+            const text = document.getElementById(`record-text-${index}`);
+            const status = document.getElementById(`record-status-${index}`);
+            const audioPlayer = document.getElementById(`audio-player-${index}`);
+
+            // Reset error state
+            status.classList.remove('text-red-500');
+            status.classList.add('text-indigo-500');
+            status.innerHTML = `<div class="w-2.5 h-2.5 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div> Recording`;
+
+            // If already recording, stop it
+            if (mediaRecorders[index] && mediaRecorders[index].state === 'recording') {
+                mediaRecorders[index].stop();
+                
+                // Update UI back to normal
+                btn.classList.remove('bg-indigo-50', 'text-indigo-600', 'border-indigo-300');
+                btn.classList.add('bg-neutral-900', 'text-white', 'hover:bg-indigo-600');
+                icon.className = "ph-bold ph-arrow-counter-clockwise text-lg";
+                text.innerText = "Redraft";
+                status.classList.add('hidden');
+                return;
+            }
+
+            // Start Recording
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorders[index] = new MediaRecorder(stream);
+                audioChunks[index] = [];
+
+                mediaRecorders[index].ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        audioChunks[index].push(event.data);
+                    }
+                };
+
+                mediaRecorders[index].onstop = () => {
+                    const audioBlob = new Blob(audioChunks[index], { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.classList.remove('hidden');
+                    
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorders[index].start();
+
+                // Update UI to recording state
+                audioPlayer.classList.add('hidden'); 
+                btn.classList.remove('bg-neutral-900', 'text-white', 'hover:bg-indigo-600');
+                btn.classList.add('bg-indigo-50', 'text-indigo-600', 'border', 'border-indigo-300');
+                icon.className = "ph-fill ph-stop text-lg text-indigo-600";
+                text.innerText = "Stop";
+                status.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                status.classList.remove('hidden');
+                status.classList.remove('text-indigo-500');
+                status.classList.add('text-red-500');
+                status.innerHTML = `<i class="ph-fill ph-warning"></i> Mic Access Denied`;
+            }
+        }
+
+        // --- INIT SECTION 4: QUIZ ENGINE ---
+        let quizQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft;
+        let totalTime = 40; 
+        let userAnswersRecord = [];
+
+        function startQuiz(numQuestions) {
+            document.getElementById('quiz-setup').classList.add('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            document.getElementById('quiz-active').classList.add('flex');
+            
+            score = 0;
+            currentQIndex = 0;
+            userAnswersRecord = [];
+            generateQuizQuestions(numQuestions);
+            renderQuizQuestion();
+        }
+
+        function generateQuizQuestions(num) {
+            quizQuestions = [];
+            let shuffledVocab = shuffleArray([...vocabData]);
+            let qCount = Math.min(num, shuffledVocab.length);
+            
+            for(let i=0; i<qCount; i++) {
+                let wordObj = shuffledVocab[i];
+                let type = Math.floor(Math.random() * 3);
+                let q = { type: type, correct: wordObj, options: [] };
+
+                if (type === 0) { // MCQ Match Definition
+                    let options = [wordObj.definition];
+                    let wrongOptions = shuffleArray(vocabData.filter(v => v.word !== wordObj.word)).slice(0, 3);
+                    wrongOptions.forEach(w => options.push(w.definition));
+                    q.options = shuffleArray(options);
+                } else if (type === 1) { // Fill in the blank
+                    let wordRegex = wordObj.matchWord;
+                    let regex = new RegExp(wordRegex, "gi");
+                    q.sentence = wordObj.example.replace(regex, "________");
+                    
+                    if(!q.sentence.includes("________")) {
+                        q.sentence = wordObj.example.replace(new RegExp(wordObj.word, "gi"), "________");
+                    }
+
+                    let options = [wordObj.word];
+                    let wrongOptions = shuffleArray(vocabData.filter(v => v.word !== wordObj.word)).slice(0, 3);
+                    wrongOptions.forEach(w => options.push(w.word));
+                    q.options = shuffleArray(options);
+                }
+                
+                quizQuestions.push(q);
+            }
+        }
+
+        function renderQuizQuestion() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-answer-area').style.pointerEvents = 'auto';
+            document.getElementById('quiz-answer-area').style.opacity = '1';
+
+            const q = quizQuestions[currentQIndex];
+            document.getElementById('quiz-progress').innerText = `Artwork ${currentQIndex + 1}/${quizQuestions.length}`;
+            
+            const qTypeEl = document.getElementById('quiz-question-type');
+            const qTextEl = document.getElementById('quiz-question-text');
+            const ansArea = document.getElementById('quiz-answer-area');
+            
+            ansArea.innerHTML = ''; 
+
+            if (q.type === 0) {
+                qTypeEl.innerText = "Match Interpretation";
+                qTextEl.innerHTML = `Identify the correct definition for this conceptual term:<br/><span class="text-indigo-600 font-bold text-3xl md:text-4xl capitalize block mt-5 bg-indigo-50 py-4 px-8 border border-indigo-100 w-max theme-font leading-tight tracking-tight shadow-sm">${q.correct.word}</span>`;
+                
+                let html = '<div class="grid grid-cols-1 gap-4 font-sans">';
+                q.options.forEach((opt, idx) => {
+                    html += `<button onclick="submitAnswer(0, '${opt.replace(/'/g, "\\'")}')" class="text-left p-6 bg-white border border-neutral-200 hover:border-indigo-400 hover:bg-neutral-50 transition-all font-medium text-neutral-700 text-lg flex items-start gap-5 shadow-sm"><div class="w-8 h-8 bg-neutral-100 flex items-center justify-center text-indigo-500 font-bold shrink-0 border border-neutral-200 text-sm mt-0.5">${String.fromCharCode(65+idx)}</div> <span class="leading-relaxed text-[0.95rem]">${opt}</span></button>`;
+                });
+                html += '</div>';
+                ansArea.innerHTML = html;
+
+            } else if (q.type === 1) {
+                qTypeEl.innerText = "Complete the Stroke";
+                qTextEl.innerHTML = `"${q.sentence}"`;
+                
+                let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">';
+                q.options.forEach((opt) => {
+                    html += `<button onclick="submitAnswer(1, '${opt.replace(/'/g, "\\'")}')" class="p-6 bg-white border border-neutral-200 hover:border-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 transition-all font-bold text-neutral-700 capitalize text-center text-[1.1rem] theme-font tracking-wide leading-snug shadow-sm">${opt}</button>`;
+                });
+                html += '</div>';
+                ansArea.innerHTML = html;
+
+            } else if (q.type === 2) {
+                qTypeEl.innerText = "Recall & Etch";
+                qTextEl.innerHTML = `${q.correct.definition}`;
+                
+                let placeholder = "Enter the term...";
+
+                ansArea.innerHTML = `
+                    <form onsubmit="submitAnswer(2, document.getElementById('recall-input').value); return false;" class="w-full mt-6 font-sans">
+                        <input type="text" id="recall-input" class="w-full p-6 text-xl font-bold text-center bg-neutral-50 border border-neutral-200 text-neutral-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 mb-6 transition-all placeholder-neutral-400 shadow-inner theme-font tracking-wide" placeholder="${placeholder}" autocomplete="off">
+                        <button type="submit" class="w-full py-5 btn-gradient font-bold uppercase tracking-[0.2em] text-sm transition-colors shadow-md flex items-center justify-center gap-3">Submit Interpretation <i class="ph-bold ph-paper-plane-right text-lg"></i></button>
+                    </form>
+                `;
+                setTimeout(() => document.getElementById('recall-input').focus(), 100);
+            }
+
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = totalTime;
+            document.getElementById('quiz-time').innerText = timeLeft + 's';
+            document.getElementById('timer-bar').style.width = '100%';
+            
+            let tickTime = 100; 
+            let totalTicks = totalTime * 1000 / tickTime;
+            let currentTick = 0;
+
+            timerInterval = setInterval(() => {
+                currentTick++;
+                let percentage = 100 - (currentTick / totalTicks * 100);
+                document.getElementById('timer-bar').style.width = percentage + '%';
+                
+                if (currentTick % 10 === 0) {
+                    timeLeft--;
+                    document.getElementById('quiz-time').innerText = timeLeft + 's';
+                    if(timeLeft <= 10) {
+                        document.getElementById('quiz-time').classList.add('text-red-500');
+                        document.getElementById('quiz-time').classList.remove('text-neutral-900');
+                        document.getElementById('timer-bar').classList.remove('bg-indigo-500');
+                        document.getElementById('timer-bar').classList.add('bg-red-500');
+                    } else {
+                        document.getElementById('quiz-time').classList.remove('text-red-500');
+                        document.getElementById('quiz-time').classList.add('text-neutral-900');
+                        document.getElementById('timer-bar').classList.add('bg-indigo-500');
+                        document.getElementById('timer-bar').classList.remove('bg-red-500');
+                    }
+                }
+
+                if (currentTick >= totalTicks) {
+                    clearInterval(timerInterval);
+                    submitAnswer(-1, null); 
+                }
+            }, tickTime);
+        }
+
+        function submitAnswer(type, userAnswer) {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-answer-area').style.pointerEvents = 'none';
+            document.getElementById('quiz-answer-area').style.opacity = '0.4';
+
+            const q = quizQuestions[currentQIndex];
+            let isCorrect = false;
+            let expectedAnswer = "";
+
+            if (type === -1) { 
+                expectedAnswer = q.type === 0 ? q.correct.definition : q.correct.word;
+            } else if (type === 0) {
+                expectedAnswer = q.correct.definition;
+                isCorrect = (userAnswer === expectedAnswer);
+            } else if (type === 1) {
+                expectedAnswer = q.correct.word;
+                isCorrect = (userAnswer === expectedAnswer);
+            } else if (type === 2) {
+                expectedAnswer = q.correct.word;
+                
+                let normalizedUser = userAnswer.trim().toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+                let normalizedCorrectFull = expectedAnswer.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+                
+                let cleanMatchWord = q.correct.matchWord.replace(/\(\?.*?\)/g, '').replace(/[\?\*\+\\\(\)\|]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+                isCorrect = (
+                    normalizedUser === normalizedCorrectFull || 
+                    normalizedUser === cleanMatchWord ||
+                    (q.correct.word === "have what it takes" && normalizedUser.includes("have") && normalizedUser.includes("what it takes"))
+                );
+            }
+
+            if (isCorrect) score++;
+
+            userAnswersRecord.push({
+                word: q.correct.word,
+                correct: isCorrect,
+                userAnswer: type === -1 ? "[Time Expired]" : userAnswer,
+                expected: expectedAnswer
+            });
+
+            // Visual Feedback
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200', 'bg-red-50', 'text-red-700', 'border-red-200');
+            
+            if (isCorrect) {
+                feedback.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                feedback.innerHTML = '<div class="flex items-center justify-center gap-3 font-sans"><i class="ph-fill ph-check-circle text-2xl"></i> Masterful!</div>';
+            } else {
+                feedback.classList.add('bg-red-50', 'text-red-700', 'border-red-200');
+                feedback.innerHTML = `<div class="flex flex-col items-center justify-center gap-2 font-sans"><div class="flex items-center gap-2 text-red-500 font-bold"><i class="ph-fill ph-x-circle text-2xl"></i> Inaccurate Stroke</div><div class="text-sm font-medium mt-1 text-neutral-700">The correct term is: <br><span class="text-xl font-bold text-neutral-900 capitalize theme-font mt-2 inline-block">${expectedAnswer}</span></div></div>`;
+            }
+
+            setTimeout(() => {
+                currentQIndex++;
+                if (currentQIndex < quizQuestions.length) {
+                    renderQuizQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 2500);
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('flex');
+            document.getElementById('quiz-results').classList.remove('hidden');
+
+            const scoreDisplay = document.getElementById('quiz-score-display');
+            const message = document.getElementById('quiz-message');
+            const icon = document.getElementById('result-icon');
+            const iconContainer = document.getElementById('result-icon-container');
+            
+            scoreDisplay.innerText = `${score}/${quizQuestions.length}`;
+            
+            let percentage = score / quizQuestions.length;
+            
+            iconContainer.className = "w-24 h-24 flex items-center justify-center mx-auto mb-8 bg-white border border-neutral-200 shadow-sm";
+
+            if (percentage === 1) {
+                message.innerText = "Flawless! A true masterpiece of memory.";
+                icon.innerHTML = '<i class="ph-fill ph-medal text-indigo-500"></i>';
+                iconContainer.classList.add('border-indigo-200');
+            } else if (percentage >= 0.7) {
+                message.innerText = "Excellent execution! You have a great eye for detail.";
+                icon.innerHTML = '<i class="ph-fill ph-thumbs-up text-indigo-400"></i>';
+                iconContainer.classList.add('border-indigo-100');
+            } else {
+                message.innerText = "The canvas is still blank in places. Review the exhibits and try again.";
+                icon.innerHTML = '<i class="ph-fill ph-paint-roller text-neutral-400"></i>';
+                iconContainer.classList.add('border-neutral-200');
+            }
+
+            // Build Review list
+            const reviewContainer = document.getElementById('quiz-review');
+            let reviewHtml = '';
+            userAnswersRecord.forEach(rec => {
+                if(rec.correct) {
+                    reviewHtml += `<div class="mb-4 pb-4 border-b border-neutral-200 last:border-0"><div class="text-emerald-600 font-bold flex items-center gap-2 text-xl capitalize theme-font"><i class="ph-fill ph-check-circle text-2xl"></i> ${rec.word}</div></div>`;
+                } else {
+                    reviewHtml += `<div class="mb-5 pb-5 border-b border-neutral-200 last:border-0">
+                        <div class="text-red-500 font-bold flex items-center gap-2 text-xl capitalize theme-font"><i class="ph-fill ph-x-circle text-2xl"></i> ${rec.word}</div>
+                        <div class="text-sm text-neutral-600 mt-3 bg-white p-5 border border-neutral-100 shadow-sm font-medium">
+                            <div class="mb-1 text-indigo-400 text-[10px] uppercase tracking-widest font-mono">Curator's Answer</div>
+                            <div class="text-neutral-900 font-bold mb-3 text-base">${rec.expected}</div>
+                            <div class="text-neutral-400 text-[10px] uppercase tracking-widest font-mono">Your Impression</div>
+                            <div class="line-through text-red-400">${rec.userAnswer}</div>
+                        </div>
+                    </div>`;
+                }
+            });
+            reviewContainer.innerHTML = reviewHtml;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-setup').classList.remove('hidden');
+        }
+
+        // --- ON LOAD ---
+        window.onload = () => {
+            initVocab();
+            initQA();
+            initFlashcards();
+        };
+
+    </script>
+</body>
+</html>
