@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive 02 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc; /* Pastel Purple */
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 500px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        /* Custom Scrollbar Hide */
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fdf2f8; color: #db2777; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <!-- Header Actions (Hidden initially) -->
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Exam Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-3">PET Intensive 02</h2>
+            <p class="text-gray-500 text-lg mb-8">Reading Mock Test Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Total Time</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-pink-900 text-left shadow-sm">
+                <h3 class="font-bold mb-3 flex items-center gap-2 text-pink-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    Important Instructions
+                </h3>
+                <ul class="list-disc list-inside space-y-2 ml-2 text-sm md:text-base text-pink-800/80">
+                    <li>You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li>You can navigate between passages using the tabs at the top.</li>
+                    <li>The timer will not pause once you begin.</li>
+                    <li>Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
+                </ul>
+            </div>
+
+            <div class="text-center">
+                <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">
+                    Start Mock Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Test View -->
+    <div id="view-main" class="hidden flex-auto flex-col overflow-hidden bg-white">
+        
+        <!-- Result Summary Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Test Completed</h2>
+                <p class="text-gray-300 text-sm mt-1">Review your answers, explore explanations, and click highlighted words for vocabulary.</p>
+            </div>
+            <div class="flex gap-6 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">0/0</div>
+                </div>
+                <div class="text-center border-l border-gray-600 pl-6">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Time Taken</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative">
+            <!-- Generated by JS -->
+        </nav>
+
+        <!-- Split Panes Container (This is where the magic happens) -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            
+            <!-- Left Pane: Passage (Independent Scroll) -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200"></h2>
+                    <div id="passage-content" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-4">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions (Independent Scroll) -->
+            <div id="pane-questions-container" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative h-full">
+                    <div id="questions-content" class="space-y-8 pb-10">
+                        <!-- Injected by JS -->
+                    </div>
+                    
+                    <!-- Floating Submit Button inside Questions Pane -->
+                    <div id="floating-submit-container" class="mt-8 text-center border-t border-gray-200 pt-8 pb-4">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors w-full sm:w-auto">
+                            Finish & Submit All Parts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Navigator (Fixed at Bottom) -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-sm font-semibold text-gray-600 whitespace-nowrap sticky left-0 bg-white pr-2 py-1">Navigator:</span>
+                <div id="navigator-grid" class="flex gap-2">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 flex-shrink-0 hidden md:flex items-center gap-4 text-xs text-gray-500 font-medium">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Tooltip (Floating) -->
+    <div id="vocab-tooltip" class="bg-white rounded-xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-500 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-tight">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-sm font-mono mt-0.5">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-4 bg-gray-50">
+            <div class="mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">Nghĩa chung</span>
+                <p id="tt-vi" class="text-gray-800 text-sm font-medium"></p>
+            </div>
+            <div class="border-t border-gray-200 pt-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1 text-purple-600">Ngữ cảnh trong bài</span>
+                <p id="tt-context" class="text-gray-700 text-sm bg-purple-50 p-2 rounded border border-purple-100"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Submit -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Submit Test?</h3>
+            <p id="modal-message" class="text-center text-gray-600 mb-8"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors shadow-md">Submit Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA SETUP ---
+        const HEADING_LIST = [
+            { id: 'i', text: 'i. Not enough tea to meet demand' },
+            { id: 'ii', text: 'ii. Religious objections' },
+            { id: 'iii', text: 'iii. In – and sometimes out – of fashion' },
+            { id: 'iv', text: 'iv. A connection between tea and religion' },
+            { id: 'v', text: 'v. A luxury item' },
+            { id: 'vi', text: 'vi. News of tea reaches another continent' },
+            { id: 'vii', text: 'vii. Is tea a good or a bad thing?' },
+            { id: 'viii', text: 'viii. A chance discovery' },
+            { id: 'ix', text: 'ix. Tea-making as a ritual' },
+            { id: 'x', text: 'x. Difficulties in importing tea' }
+        ];
+
+        const HEADING_LIST_P2 = [
+            { id: 'i', text: 'i. Different areas of professional expertise' },
+            { id: 'ii', text: 'ii. Reasons why it is unfair to criticise lawyers' },
+            { id: 'iii', text: 'iii. The disadvantages of the legal system' },
+            { id: 'iv', text: 'iv. The law applies throughout our lives' },
+            { id: 'v', text: 'v. The law has affected historical events' },
+            { id: 'vi', text: 'vi. A negative regard for lawyers' },
+            { id: 'vii', text: 'vii. The public’s increasing ability to influence the law' },
+            { id: 'viii', text: 'viii. Growth in laws' }
+        ];
+
+        const COUNTRY_LIST = [
+            { id: 'A', text: 'A. China' },
+            { id: 'B', text: 'B. Japan' },
+            { id: 'C', text: 'C. Portugal' },
+            { id: 'D', text: 'D. Holland' },
+            { id: 'E', text: 'E. France' },
+            { id: 'F', text: 'F. England' },
+            { id: 'G', text: 'G. Russia' }
+        ];
+
+        const TEST_DATA = {
+            totalDurationSeconds: 3600,
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: A Brief History of Tea",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> The story of tea began in ancient China over 5,000 years ago. According to legend, the Emperor Shen Nung was a skilled ruler, creative scientist and <span class="vocab-word" data-en="Patron" data-vi="Người bảo trợ" data-pron="/ˈpeɪtrən/" data-context="Người ủng hộ, bảo trợ cho nghệ thuật">patron</span> of the arts. His far-sighted edicts required, among other things, that all drinking water be boiled as a hygienic precaution. One summer day, while visiting a distant region of his realm, he and the court stopped to rest. In accordance with his ruling, the servants began to boil water for the court to drink. <span id="loc_p1_q1" class="highlight-target">Dried leaves from a nearby bush fell into the boiling water, and as the leaves <span class="vocab-word" data-en="Infused" data-vi="Ngấm, ngâm" data-pron="/ɪnˈfjuːzd/" data-context="Lá trà ngấm vào nước tạo ra màu và vị">infused</span> the water turned brown.</span> <span id="loc_p1_q13" class="highlight-target">As a scientist, the Emperor was intrigued by the new liquid, drank some, and found it very refreshing.</span> And so, according to legend, tea was created.</p>
+                        <p class="mb-4"><strong>B.</strong> Tea consumption spread throughout Chinese culture, reaching into every aspect of society. The first definitive book was written on tea – a book clearly reflecting Zen Buddhist philosophy – 1,200 years ago. The first tea seeds were brought to Japan by a returning Buddhist priest, who had seen the value of tea in enhancing meditation in China. As a result, he is known as the “Father of Tea” in Japan. <span id="loc_p1_q2" class="highlight-target">Because of this early association, tea in Japan has always been linked with Zen Buddhism.</span> Tea received the Japanese Emperor’s support almost instantly and spread rapidly from the royal court and <span class="vocab-word" data-en="Monasteries" data-vi="Tu viện" data-pron="/ˈmɒnəstriz/" data-context="Nơi các nhà sư sống và tu tập">monasteries</span> to other sections of society.</p>
+                        <p class="mb-4"><strong>C.</strong> <span id="loc_p1_q3" class="highlight-target">Tea was elevated to an art form in the Japanese tea ceremony, in which supreme importance is given to making tea in the most perfect, most polite, most graceful, most charming manner possible.</span> <span id="loc_p1_q11" class="highlight-target">Such a purity of expression prompted the creation of a particular form of architecture for tea houses, duplicating the simplicity of a forest cottage.</span> The cultural/artistic hostesses of Japan, the geishas, began to specialise in the presentation of the tea ceremony. However, as more and more people became involved in the excitement surrounding tea, the purity of the original concept was lost, and for a period the tea ceremony became corrupted, <span class="vocab-word" data-en="Boisterous" data-vi="Náo nhiệt, ồn ào" data-pron="/ˈbɔɪstərəs/" data-context="Trở nên ồn ào, mất đi sự thanh tịnh ban đầu">boisterous</span> and highly embellished. Efforts were then made to return to the earlier simplicity, with the result that, in the 15th and 16th centuries, tea was viewed as the ultimate gift. Even warlords paused for tea before battles.</p>
+                        <p class="mb-4"><strong>D.</strong> While tea was at this high level of development in parts of Asia, <span id="loc_p1_q4" class="highlight-target">information concerning the then-unknown beverage began to filter back to Europe.</span> Earlier traders had mentioned it, but were unclear as to whether tea should be eaten or drunk. The first European to personally encounter tea and write about it was Portuguese – Portugal, with her technologically advanced navy, had been successful in gaining the first right of trade with China.</p>
+                        <p class="mb-4"><strong>E.</strong> Tea finally arrived in Europe in the 16th century, brought to Holland by the country’s navy, and became very fashionable in the Dutch capital, The Hague. <span id="loc_p1_q5" class="highlight-target">This was due in part to tea being very expensive (over $100 per pound), which immediately made it the <span class="vocab-word" data-en="Domain" data-vi="Lãnh địa, khu vực" data-pron="/dəʊˈmeɪn/" data-context="Trở thành thứ dành riêng cho giới nhà giàu">domain</span> of the wealthy.</span> Slowly, as the amount of tea imported increased, the price fell, and by 1675 it was available in common food shops throughout Holland.</p>
+                        <p class="mb-4"><strong>F.</strong> As the consumption of tea increased dramatically in Dutch society, <span id="loc_p1_q6" class="highlight-target">doctors and university authorities in Holland argued as to its benefits or drawbacks.</span> <span id="loc_p1_q9" class="highlight-target">The public largely ignored the scholarly debate and continued to enjoy their new beverage,</span> though the controversy lasted from 1635 to roughly 1657. Throughout this period, France and Holland led Europe in the use of tea.</p>
+                        <p class="mb-4"><strong>G.</strong> As the craze for all things oriental swept through Europe, tea became part of everyday life. Adding milk to the drink was first mentioned in 1680. Around that time, Dutch inns provided the first restaurant service of tea. Innkeepers would furnish guests with a portable tea set complete with a heating unit. The Dutchman would then prepare tea for himself and his friends outside in the inn garden. <span id="loc_p1_q7" class="highlight-target"><span id="loc_p1_q10" class="highlight-target">Tea remained popular in France for only about fifty years, being replaced by a preference for wine, chocolate and exotic coffees.</span> Tea was introduced into England in 1660 by King Charles II and his Portuguese queen, who were both confirmed tea drinkers. Tea mania swept across England as it had earlier spread throughout France and Holland.</span> By 1708, tea importation had risen to thirteen times the 1699 level. Tea was drunk by all levels of society.</p>
+                        <p class="mb-4"><strong>H.</strong> Russian interest in tea began as early as 1618, when the Chinese embassy in Moscow presented several chests of tea to the Emperor, Czar Alexis. Later in the century, a trade treaty between Russia and China allowed <span class="vocab-word" data-en="Caravans" data-vi="Đoàn lữ hành" data-pron="/ˈkærəvænz/" data-context="Đoàn người và lạc đà vận chuyển hàng hóa qua sa mạc hoặc đường dài">caravans</span> to cross back and forth freely between the two countries. Still, the journey was not easy. <span id="loc_p1_q8" class="highlight-target"><span id="loc_p1_q12" class="highlight-target">The average caravan consisted of 200 to 300 camels, and the 18,000-kilometre trip took over 16 months to complete.</span></span> Eventually, however, tea became – as it still is – one of the most popular drinks in the country.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1',
+                            displayType: 'dropdown',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–8</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 1 has eight paragraphs, <strong>A–H</strong>.<br>Choose the correct heading for each paragraph from the list of headings below.</p>
+                                    <div class="bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm">
+                                        <h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">List of Headings</h4>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 font-medium">
+                                            ${HEADING_LIST.map(h => `<div>${h.text}</div>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            text: '1. Paragraph A',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q1_${h.id}`, text: h.text, isCorrect: h.id === 'viii',
+                                explanation: h.id === 'viii' ? 'Paragraph A tells the story of tea leaves accidentally falling into Emperor Shen Nung\'s boiling water, leading to a chance discovery.' : 'Incorrect. Please refer to Paragraph A.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q2',
+                            displayType: 'dropdown',
+                            text: '2. Paragraph B',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q2_${h.id}`, text: h.text, isCorrect: h.id === 'iv',
+                                explanation: h.id === 'iv' ? 'Paragraph B clearly links the spread of tea to Zen Buddhist philosophy and priests in Japan.' : 'Incorrect. Please refer to Paragraph B.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q3',
+                            displayType: 'dropdown',
+                            text: '3. Paragraph C',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q3_${h.id}`, text: h.text, isCorrect: h.id === 'ix',
+                                explanation: h.id === 'ix' ? 'Paragraph C describes how making tea was elevated to an art form and a special ceremony/ritual in Japan.' : 'Incorrect. Please refer to Paragraph C.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q4',
+                            displayType: 'dropdown',
+                            text: '4. Paragraph D',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q4_${h.id}`, text: h.text, isCorrect: h.id === 'vi',
+                                explanation: h.id === 'vi' ? 'Paragraph D notes that information about this unknown beverage began to filter back to Europe via Portuguese traders.' : 'Incorrect. Please refer to Paragraph D.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q5',
+                            displayType: 'dropdown',
+                            text: '5. Paragraph E',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q5_${h.id}`, text: h.text, isCorrect: h.id === 'v',
+                                explanation: h.id === 'v' ? 'Paragraph E explains that tea was initially very expensive in Holland, making it exclusively a domain for the wealthy.' : 'Incorrect. Please refer to Paragraph E.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'dropdown',
+                            text: '6. Paragraph F',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q6_${h.id}`, text: h.text, isCorrect: h.id === 'vii',
+                                explanation: h.id === 'vii' ? 'Paragraph F discusses the scholarly debate between doctors and authorities in Holland over the benefits and drawbacks of tea.' : 'Incorrect. Please refer to Paragraph F.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q7',
+                            displayType: 'dropdown',
+                            text: '7. Paragraph G',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q7_${h.id}`, text: h.text, isCorrect: h.id === 'iii',
+                                explanation: h.id === 'iii' ? 'Paragraph G details how tea became a craze in France but lost favor after 50 years, while becoming highly fashionable in England (in and out of fashion).' : 'Incorrect. Please refer to Paragraph G.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q8',
+                            displayType: 'dropdown',
+                            text: '8. Paragraph H',
+                            options: HEADING_LIST.map(h => ({
+                                id: `p1_q8_${h.id}`, text: h.text, isCorrect: h.id === 'x',
+                                explanation: h.id === 'x' ? 'Paragraph H highlights the extreme difficulties of importing tea to Russia, involving an 18,000 km journey taking 16 months.' : 'Incorrect. Please refer to Paragraph H.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q9',
+                            displayType: 'dropdown',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 9–13</h3>
+                                    <p class="mb-4 text-gray-700">Look at the following statements (Questions 9–13) and the list of countries below.<br>Match each statement with the correct country, <strong>A–G</strong>.<br><span class="italic text-gray-500 text-sm mt-1 block">NB You may use any letter more than once.</span></p>
+                                    <div class="bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm max-w-sm">
+                                        <h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">List of Countries</h4>
+                                        <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-800 font-medium ml-4">
+                                            ${COUNTRY_LIST.map(c => `<div>${c.text}</div>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            text: '9. Claims that tea might be harmful failed to affect its popularity.',
+                            options: COUNTRY_LIST.map(c => ({
+                                id: `p1_q9_${c.id}`, text: c.text, isCorrect: c.id === 'D',
+                                explanation: c.id === 'D' ? 'In paragraph F, despite academic debates over its drawbacks in Holland, the public ignored the claims and continued enjoying tea.' : 'Incorrect. Please review the passage.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q10',
+                            displayType: 'dropdown',
+                            text: '10. Tea lost favour to other drinks.',
+                            options: COUNTRY_LIST.map(c => ({
+                                id: `p1_q10_${c.id}`, text: c.text, isCorrect: c.id === 'E',
+                                explanation: c.id === 'E' ? 'In paragraph G, tea lost popularity in France after 50 years, being replaced by a preference for wine, chocolate, and exotic coffees.' : 'Incorrect. Please review the passage.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q11',
+                            displayType: 'dropdown',
+                            text: '11. Special buildings were constructed in which to drink tea.',
+                            options: COUNTRY_LIST.map(c => ({
+                                id: `p1_q11_${c.id}`, text: c.text, isCorrect: c.id === 'B',
+                                explanation: c.id === 'B' ? 'Paragraph C mentions that a particular form of architecture for tea houses was created in Japan.' : 'Incorrect. Please review the passage.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q12',
+                            displayType: 'dropdown',
+                            text: '12. Animals were involved in importing tea.',
+                            options: COUNTRY_LIST.map(c => ({
+                                id: `p1_q12_${c.id}`, text: c.text, isCorrect: c.id === 'G',
+                                explanation: c.id === 'G' ? 'Paragraph H details that Russian caravans used 200 to 300 camels (animals) to import tea.' : 'Incorrect. Please review the passage.'
+                            }))
+                        },
+                        {
+                            id: 'p1_q13',
+                            displayType: 'dropdown',
+                            text: '13. A ruler’s specialist knowledge led to an interest in tea.',
+                            options: COUNTRY_LIST.map(c => ({
+                                id: `p1_q13_${c.id}`, text: c.text, isCorrect: c.id === 'A',
+                                explanation: c.id === 'A' ? 'Paragraph A states that Emperor Shen Nung of China, acting as a creative scientist (specialist knowledge), was intrigued by the new liquid.' : 'Incorrect. Please review the passage.'
+                            }))
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: The Importance of Law",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> The law influences all of us virtually all the time. <span id="loc_p2_q14" class="highlight-target">It governs almost all aspects of our behaviour, and even what happens to us when we are no longer alive. It affects us from the embryo onwards.</span> It governs the air we breathe, the food and drink we consume, our travel, family relationships, and our property. It applies at the bottom of the ocean and in space. Each time we examine a label on a food product, engage in work as an employee or employer, travel on the roads, go to school to learn or to teach, stay in a hotel, borrow a library book, create or dissolve a commercial company, play sports, or engage the services of someone for anything from plumbing a sink to planning a city, we are in the world of law.</p>
+                        <p class="mb-4"><strong>B.</strong> Law has also become much more widely recognised as the standard by which behaviour needs to be judged. A very telling development in recent history is the way in which the idea of law has <span class="vocab-word" data-en="Permeated" data-vi="Thấm nhuần, lan tỏa" data-pron="/ˈpɜːmieɪtɪd/" data-context="Lan tỏa và ảnh hưởng đến mọi khía cạnh của đời sống xã hội">permeated</span> all parts of social life. The universal standard of whether something is socially tolerated is progressively becoming whether it is legal, rather than something that has always been considered acceptable. In earlier times, most people were illiterate. Today, by contrast, a vast number of people can read, and <span id="loc_p2_q15" class="highlight-target">it is becoming easier for people to take an interest in law, and for the general population to help actually shape the law in many countries.</span> However, law is a <span class="vocab-word" data-en="Versatile" data-vi="Đa năng, linh hoạt" data-pron="/ˈvɜːsətaɪl/" data-context="Một công cụ có thể được sử dụng cho nhiều mục đích khác nhau">versatile</span> instrument that can be used equally well for the improvement or the degradation of humanity.</p>
+                        <p class="mb-4"><strong>C.</strong> This, of course, puts law in a very significant position. In our rapidly developing world, all sorts of skills and knowledge are valuable. Those people, for example, with knowledge of computers, the internet, and communications technology are relied upon by the rest of us. There is now someone with IT skills or an IT help desk in every UK school, every company, every hospital, every local and central government office. Without their knowledge, many parts of commercial and social life today would seize up in minutes. <span id="loc_p2_q16" class="highlight-target"><span id="loc_p2_q20_21" class="highlight-target">But legal understanding is just as vital and as universally needed. The American comedian Jerry Seinfeld put it like this, ‘We are all throwing the dice, playing the game, moving our pieces around the board, but if there is a problem, the lawyer is the only person who has read the inside of the top of the box.’ In other words, the lawyer is the only person who has read and made sense of the rules.</span></span></p>
+                        <p class="mb-4"><strong>D.</strong> <span id="loc_p2_q17" class="highlight-target">The number of laws has never been greater. In the UK alone, about 35 new Acts of Parliament are produced every year, thereby delivering thousands of new rules. The legislative output of the British Parliament has more than doubled in recent times from 1,100 pages a year in the early 1970s, to over 2,500 pages a year today.</span> Between 1997 and 2006, the legislature passed 365 Acts of Parliament and more than 32,000 legally binding statutory instruments. In a system with so much law, lawyers do a great deal not just to <span class="vocab-word" data-en="Vindicate" data-vi="Bảo vệ, minh oan" data-pron="/ˈvɪndɪkeɪt/" data-context="Bảo vệ và đòi lại quyền lợi chính đáng cho công dân">vindicate</span> the rights of citizens and organisations but also to help develop the law through legal arguments, some of which are adapted by judges to become laws. Law courts can and do produce new law and revise old law, but they do so having heard the arguments of lawyers.</p>
+                        <p class="mb-4"><strong>E.</strong> However, despite their important role in developing the rules, lawyers are not universally admired. <span id="loc_p2_q18" class="highlight-target">Anti-lawyer jokes have a long history going back to the ancient Greeks. More recently, the son of a famous Hollywood actor was asked at his junior school what his father did for a living, to which he replied, ‘My daddy is a movie actor, and sometimes he plays the good guy, and sometimes, he plays the lawyer.’</span> For balance, though, it is worth remembering that there are and have been many heroic and <span class="vocab-word" data-en="Revered" data-vi="Được tôn kính" data-pron="/rɪˈvɪəd/" data-context="Được kính trọng và ngưỡng mộ sâu sắc">revered</span> lawyers such as the Roman philosopher and politician Cicero, and Mahatma Gandhi, the Indian campaigner for Independence.</p>
+                        <p class="mb-4"><strong>F.</strong> <span id="loc_p2_q22" class="highlight-target">People sometimes make comments that characterise lawyers as professionals whose concerns put personal reward above truth</span>, or who gain financially from misfortune. There are undoubtedly lawyers that would fit that bill, <span id="loc_p2_q23" class="highlight-target">just as there are some scientists, journalists and others in that category.</span> <span id="loc_p2_q19" class="highlight-target"><span id="loc_p2_q24" class="highlight-target">But, in general, it is no more just to say that lawyers are bad because they make a living from people’s problems than it is to make the same accusation in respect of nurses or IT consultants.</span></span> A great many lawyers are involved in public law work, such as that involving civil liberties, housing and other issues. Such work is not <span class="vocab-word" data-en="Lavishly remunerated" data-vi="Được trả lương hậu hĩnh" data-pron="/ˈlævɪʃli rɪˈmjuːnəreɪtɪd/" data-context="Được trả thù lao rất cao cho công việc">lavishly remunerated</span> and <span id="loc_p2_q25" class="highlight-target">the quality of the service provided by these lawyers relies on considerable professional dedication.</span> Moreover, <span id="loc_p2_q26" class="highlight-target">much legal work has nothing to do with conflict or misfortune, but is primarily concerned with drafting documents.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14',
+                            displayType: 'dropdown',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–19</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 2 has six paragraphs, <strong>A–F</strong>.<br>Choose the correct heading for each paragraph from the list of headings below.</p>
+                                    <div class="bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm">
+                                        <h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">List of Headings</h4>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 font-medium">
+                                            ${HEADING_LIST_P2.map(h => `<div>${h.text}</div>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            text: '14. Paragraph A',
+                            options: HEADING_LIST_P2.map(h => ({
+                                id: `p2_q14_${h.id}`, text: h.text, isCorrect: h.id === 'iv',
+                                explanation: h.id === 'iv' ? 'Paragraph A lists numerous everyday situations (birth to death, travel, work) demonstrating that the law applies throughout our lives.' : 'Incorrect. Please refer to Paragraph A.'
+                            }))
+                        },
+                        {
+                            id: 'p2_q15',
+                            displayType: 'dropdown',
+                            text: '15. Paragraph B',
+                            options: HEADING_LIST_P2.map(h => ({
+                                id: `p2_q15_${h.id}`, text: h.text, isCorrect: h.id === 'vii',
+                                explanation: h.id === 'vii' ? 'Paragraph B points out that increased literacy allows the general population to take an interest in and help actually shape the law.' : 'Incorrect. Please refer to Paragraph B.'
+                            }))
+                        },
+                        {
+                            id: 'p2_q16',
+                            displayType: 'dropdown',
+                            text: '16. Paragraph C',
+                            options: HEADING_LIST_P2.map(h => ({
+                                id: `p2_q16_${h.id}`, text: h.text, isCorrect: h.id === 'i',
+                                explanation: h.id === 'i' ? 'Paragraph C compares the reliance on IT professionals with the vital necessity of lawyers, illustrating different areas of professional expertise.' : 'Incorrect. Please refer to Paragraph C.'
+                            }))
+                        },
+                        {
+                            id: 'p2_q17',
+                            displayType: 'dropdown',
+                            text: '17. Paragraph D',
+                            options: HEADING_LIST_P2.map(h => ({
+                                id: `p2_q17_${h.id}`, text: h.text, isCorrect: h.id === 'viii',
+                                explanation: h.id === 'viii' ? 'Paragraph D provides extensive statistics (e.g., thousands of new rules, doubled output) demonstrating the massive growth in the number of laws.' : 'Incorrect. Please refer to Paragraph D.'
+                            }))
+                        },
+                        {
+                            id: 'p2_q18',
+                            displayType: 'dropdown',
+                            text: '18. Paragraph E',
+                            options: HEADING_LIST_P2.map(h => ({
+                                id: `p2_q18_${h.id}`, text: h.text, isCorrect: h.id === 'vi',
+                                explanation: h.id === 'vi' ? 'Paragraph E discusses anti-lawyer jokes and actors playing "bad guys", representing a widespread negative regard for lawyers.' : 'Incorrect. Please refer to Paragraph E.'
+                            }))
+                        },
+                        {
+                            id: 'p2_q19',
+                            displayType: 'dropdown',
+                            text: '19. Paragraph F',
+                            options: HEADING_LIST_P2.map(h => ({
+                                id: `p2_q19_${h.id}`, text: h.text, isCorrect: h.id === 'ii',
+                                explanation: h.id === 'ii' ? 'Paragraph F argues that just like nurses or IT staff, lawyers should not be criticized simply for making a living from people\'s problems.' : 'Incorrect. Please refer to Paragraph F.'
+                            }))
+                        },
+                        {
+                            id: 'p2_q20_21',
+                            displayType: 'checkbox',
+                            maxChoices: 2,
+                            answersIds: ['p2_q20', 'p2_q21'],
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 20–21</h3>
+                                    <p class="mb-4 text-gray-700">Choose <strong>TWO</strong> letters, A–E.<br>Which TWO of the following statements does the writer make about legal skills in today’s world?</p>
+                                </div>
+                            `,
+                            text: 'Select your two answers below:',
+                            options: [
+                                { id: 'A', text: 'A. There should be a person with legal training in every hospital.', isCorrect: false, explanation: 'The passage mentions IT staff in hospitals, but does not suggest placing a lawyer in every hospital.' },
+                                { id: 'B', text: 'B. Lawyers with experience in commercial law are the most in demand.', isCorrect: false, explanation: 'The passage does not compare the demand for different types of law specializations.' },
+                                { id: 'C', text: 'C. Knowledge of the law is as important as having computer skills.', isCorrect: true, explanation: 'Paragraph C states that "legal understanding is just as vital" as IT skills.' },
+                                { id: 'D', text: 'D. Society could not function effectively without legal experts.', isCorrect: true, explanation: 'Paragraph C explains that when there is a problem, "the lawyer is the only person who has read and made sense of the rules", making them essential to function.' },
+                                { id: 'E', text: 'E. Schools should teach students about the law.', isCorrect: false, explanation: 'This is not mentioned in the passage.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q22_26',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 22–26</h3>
+                                    <p class="mb-4 text-gray-700">Complete the summary below.<br>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-pink-50 border border-pink-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-center mb-6 text-pink-800 uppercase tracking-wide text-sm">Lawyers as professionals</h4>
+                                    People sometimes say that <strong>22</strong> <input type="text" data-qid="p2_q22" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> is of little interest to lawyers, who are more concerned with making money. This may well be the case with some individuals, in the same way that some <strong>23</strong> <input type="text" data-qid="p2_q23" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> or scientific experts may also be driven purely by financial greed. However, criticising lawyers because their work is concerned with people’s problems would be similar to attacking IT staff or <strong>24</strong> <input type="text" data-qid="p2_q24" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> for the same reason. In fact, many lawyers focus on questions relating, for example, to housing or civil liberties, which requires them to have <strong>25</strong> <input type="text" data-qid="p2_q25" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> to their work. What’s more, a lot of lawyers’ time is spent writing <strong>26</strong> <input type="text" data-qid="p2_q26" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> rather than dealing with people’s misfortunes.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q22', correct: 'truth', explanation: 'Paragraph F: "People sometimes make comments that characterise lawyers as professionals whose concerns put personal reward above truth..."' },
+                                { id: 'p2_q23', correct: 'journalists', explanation: 'Paragraph F: "...just as there are some scientists, journalists and others in that category."' },
+                                { id: 'p2_q24', correct: 'nurses', explanation: 'Paragraph F: "...than it is to make the same accusation in respect of nurses or IT consultants."' },
+                                { id: 'p2_q25', correct: 'dedication', explanation: 'Paragraph F: "...the quality of the service provided by these lawyers relies on considerable professional dedication."' },
+                                { id: 'p2_q26', correct: 'documents', explanation: 'Paragraph F: "...is primarily concerned with drafting documents."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Tasmania's Museum of Old and New Art",
+                    passage: `
+                        <p class="mb-4 text-sm italic text-gray-500">Katelin Butler, returning to her home city of Hobart, reflects on how a new museum has brought about change.</p>
+                        <p class="mb-4"><strong>A.</strong> <span id="loc_p3_q27" class="highlight-target">As an eighteen-year-old living in the small Australian island state of Tasmania, moving to the 'mainland' could not happen soon enough. Now, ten years later, I look forward to going home.</span> This is probably because I've grown up, but also perhaps because the cultural landscape of Tasmania has matured. The latest addition to Tasmania's cultural scene is David Walsh's Museum of Old and New Art (MONA), a museum that has established Hobart, the capital city of Tasmania, on the global art circuit.</p>
+                        <p class="mb-4"><strong>B.</strong> This building is an example of how art and architecture can have an instant impact on the social and cultural reputation of a place. <span id="loc_p3_q28" class="highlight-target">Andrew Bain of The Sydney Morning Herald wrote, 'In a virtual blink, Hobart's cultural landscape has been transformed,</span> with art, wine, fine food and stylish accommodation becoming integral features of the city ... If Hobart's makeover has an origin, it's the opening of MONA - the Museum of Old and New Art.' <span id="loc_p3_q29" class="highlight-target">MONA is said to have been solely instrumental in the reinvention of Hobart as a cultural hub.</span></p>
+                        <p class="mb-4"><strong>C.</strong> MONA made the national press and international blogs before it opened. After that, <span id="loc_p3_q30" class="highlight-target">Tourism Industry Council of Tasmania's chief executive, Luke Martin, claimed that MONA was proving so popular it was underpinning the tourism industry in Tasmania.</span> However, MONA's effect on Hobart has broader ramifications for Tasmania's tourism industry. <span id="loc_p3_q31" class="highlight-target">As reported in Hobart's local paper, The Mercury, there is concern about how long people are staying in Tasmania.</span> <span id="loc_p3_q32" class="highlight-target">Rather than spending a week in the state and hiring a car to experience the beauty of the Tasmanian landscape, people are making short stays in Hobart only to visit the gallery.</span> The next challenge for the state is how to entice holiday-makers to stay longer, and to venture further afield. Tasmania is more than a one-hit wonder.</p>
+                        <p class="mb-4"><strong>D.</strong> <span id="loc_p3_q33" class="highlight-target">According to Martin, possibilities for packaging up MONA with visits to other galleries around Tasmania are being investigated.</span> Although not directly related to these investigations, the 1891 Queen Victoria Museum and Art Gallery at Royal Park in Launceston is currently being restored to its original condition; there are also plans to extensively redevelop the Tasmanian Museum and Art Gallery in Hobart. In addition to this, there are up to twenty other existing quality galleries in the state. So there is more to see than just MONA.</p>
+                        <p class="mb-4"><strong>E.</strong> Although large, the building is rather <span class="vocab-word" data-en="Nondescript" data-vi="Khó tả, bình thường" data-pron="/ˌnɒndɪˈskrɪpt/" data-context="Nhìn từ bên ngoài không có đặc điểm gì nổi bật hoặc dễ nhận biết">nondescript</span>, sitting heavily on the edge of the Derwent River. <span id="loc_p3_q34" class="highlight-target">MONA's 'wow factor' comes from the <span class="vocab-word" data-en="Notoriety" data-vi="Sự khét tiếng" data-pron="/ˌnəʊtəˈraɪəti/" data-context="Sự nổi tiếng vì một lý do gây sốc, khác thường">notoriety</span> of David Walsh, the museum's millionaire founder, and his choice of unusual artworks.</span> The architecture has more depth of meaning and does exactly as it should: it supports the vision of the museum, essentially the vision of Walsh. It's a new building in the context of a maturing city. The dark, moody <span class="vocab-word" data-en="Labyrinth" data-vi="Mê cung" data-pron="/ˈlæbərɪnθ/" data-context="Hệ thống đường hầm và không gian phòng trưng bày phức tạp, lắt léo">labyrinth</span> of gallery spaces could be likened to the mind of the eccentric founder himself. Each artwork appears to be integrated into the dark materiality of the architecture - the interiors are far from light, bright and neutral, as might be seen in a more traditional gallery. The dim lighting and rough, rocky surfaces are a reminder that visitors are three levels underground.</p>
+                        <p class="mb-4"><strong>F.</strong> The warped, mirrored surface at the museum's entry could be seen as the start of a journey of reflecting on one's existence. Much of the art explores the human condition - there are <span class="vocab-word" data-en="Uninhibited" data-vi="Không bị kiềm chế, tự do" data-pron="/ˌʌnɪnˈhɪbɪtɪd/" data-context="Thể hiện nghệ thuật một cách thoải mái, không bị gò bó bởi chuẩn mực xã hội">uninhibited</span> artistic descriptions of human relationships, death, and even the digestion process. Going to a gallery with such confronting artworks with your parents is an interesting experience; I was pleasantly surprised by my parents' openness to the exhibitions. My father, who normally whisks through a gallery while my mother likes to take her time, happily spent almost five hours at MONA; the urge to linger is a common feeling here. <span id="loc_p3_q35" class="highlight-target">This is because the gallery engages all of the senses, and visitors often pause to experience the effect each artwork has on them.</span> This raises the question of who is actually visiting MONA - and it's definitely not just the normal gallery-goers. <span id="loc_p3_q36" class="highlight-target">People from all kinds of socioeconomic backgrounds are curious about what lies within the <span class="vocab-word" data-en="Subterranean" data-vi="Dưới lòng đất" data-pron="/ˌsʌbtəˈreɪniən/" data-context="Nằm ngầm dưới mặt đất">subterranean</span> maze of MONA.</span> Conservative minds are being opened, which is a good thing anywhere.</p>
+                        <p class="mb-4"><strong>G.</strong> Walsh's antiquities collection is superb, but he knew that old coins would compete for attention against new works that are more challenging in scale and subject matter, hence the device of setting antiquities among twentieth- and twenty-first-century works. <span id="loc_p3_q37" class="highlight-target">For me, one of the intriguing outcomes of this strategy was an intensified feeling that the makers of the coins and antiquities were the great contemporary artists of their time.</span></p>
+                        <p class="mb-4"><strong>H.</strong> The so-called Bilbao Effect has worked its magic on Hobart because, just as Frank Gehry's Guggenheim Museum has transformed the city of Bilbao in Spain, MONA has been a magnet for tourists in Hobart. However, the architectural 'wow' factor of the Guggenheim was the most famous component of that city's transformation, whereas <span id="loc_p3_q38" class="highlight-target">Fender Katsalidis's MONA does not have the same spectacular impact as the shimmering metal surfaces of Gehry's building.</span> Walsh himself <span class="vocab-word" data-en="Abhors" data-vi="Ghê tởm, ghét cay ghét đắng" data-pron="/əbˈhɔːz/" data-context="Rất ghét và từ chối việc bị so sánh">abhors</span> descriptions of MONA as the Bilbao of the south, <span id="loc_p3_q39" class="highlight-target">saying that Fender Katsalidis solved a problem when he designed MONA, in executing a project of this scale in an underground location.</span> Walsh contrasts this with what he describes as the "architectural <span class="vocab-word" data-en="Self-indulgence" data-vi="Sự nuông chiều bản thân" data-pron="/ˌsɛlf ɪnˈdʌldʒəns/" data-context="Sự phô trương, làm theo ý thích cá nhân quá mức trong kiến trúc">self-indulgence</span> of Gehry when designing the Guggenheim in Bilbao." Call it the Bilbao Effect, but this phenomenon has been around for thousands of years - good public architecture forms the centrepiece of a city. This is probably true, but like the Guggenheim, MONA has initiated something very important for Tasmania, and for Hobart in particular. <span id="loc_p3_q40" class="highlight-target">Now the question is how Tasmania will build on David Walsh's input into its cultural setting.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_32_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–32</h3>
+                                    <p class="mb-2 text-gray-700">Do the following statements agree with the claims of the writer in Reading Passage 3?</p>
+                                    <ul class="mb-4 space-y-1 text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <li><strong>YES</strong> - if the statement agrees with the claims of the writer</li>
+                                        <li><strong>NO</strong> - if the statement contradicts the claims of the writer</li>
+                                        <li><strong>NOT GIVEN</strong> - if it is impossible to say what the writer thinks about this</li>
+                                    </ul>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q27',
+                            displayType: 'radio',
+                            text: '27. The writer changed her mind about spending time in Tasmania.',
+                            options: [
+                                { id: 'p3_q27_y', text: 'YES', isCorrect: true, explanation: 'Paragraph A states the writer wanted to leave Tasmania at 18, but 10 years later looks forward to going home, showing a clear change of mind.' },
+                                { id: 'p3_q27_n', text: 'NO', isCorrect: false, explanation: 'Incorrect. The writer did change her mind.' },
+                                { id: 'p3_q27_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q28',
+                            displayType: 'radio',
+                            text: '28. Andrew Bain believes that the effect MONA had on Hobart was immediate.',
+                            options: [
+                                { id: 'p3_q28_y', text: 'YES', isCorrect: true, explanation: 'Paragraph B quotes Andrew Bain saying the transformation happened \'In a virtual blink\', which means immediately.' },
+                                { id: 'p3_q28_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q28_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q29',
+                            displayType: 'radio',
+                            text: '29. Other factors have contributed as much as MONA to Hobart\'s transformation.',
+                            options: [
+                                { id: 'p3_q29_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q29_n', text: 'NO', isCorrect: true, explanation: 'Paragraph B states MONA was \'solely instrumental\' in the reinvention of Hobart, contradicting the idea that other factors contributed just as much.' },
+                                { id: 'p3_q29_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q30',
+                            displayType: 'radio',
+                            text: '30. The Tourism Industry Council of Tasmania works closely with the director of MONA.',
+                            options: [
+                                { id: 'p3_q30_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q30_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q30_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph C mentions Luke Martin\'s views on MONA, but gives absolutely no information on whether his council works closely with MONA\'s director.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q31',
+                            displayType: 'radio',
+                            text: '31. Many local residents are writing to The Mercury expressing concern about the length of tourists\' stays in Hobart.',
+                            options: [
+                                { id: 'p3_q31_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q31_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q31_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph C notes \'there is concern\' reported in the paper, but does not state that local residents are actively writing letters to express this concern.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q32',
+                            displayType: 'radio',
+                            text: '32. Tourists now regard MONA as a starting point for longer trips in Tasmania.',
+                            options: [
+                                { id: 'p3_q32_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q32_n', text: 'NO', isCorrect: true, explanation: 'Paragraph C contradicts this, saying tourists make \'short stays in Hobart only to visit the gallery\' rather than using it to venture further afield.' },
+                                { id: 'p3_q32_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q33_37_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 33–37</h3>
+                                    <p class="mb-2 text-gray-700">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q33',
+                            displayType: 'radio',
+                            text: '33. Luke Martin plans to promote tourism in Tasmania by',
+                            options: [
+                                { id: 'p3_q33_a', text: 'A. focusing more on MONA as the leading attraction.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q33_b', text: 'B. combining trips to MONA with visits to other galleries.', isCorrect: true, explanation: 'Paragraph D notes that Martin is investigating \'possibilities for packaging up MONA with visits to other galleries around Tasmania\'.' },
+                                { id: 'p3_q33_c', text: 'C. encouraging visitors to do activities that are not connected with art galleries.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q33_d', text: 'D. improving the quality of promotional information about Tasmania\'s galleries.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q34',
+                            displayType: 'radio',
+                            text: '34. According to the writer, what is especially interesting about MONA?',
+                            options: [
+                                { id: 'p3_q34_a', text: 'A. the man who founded the gallery', isCorrect: true, explanation: 'Paragraph E claims MONA\'s \'wow factor\' comes from the notoriety of its millionaire founder, David Walsh, and his unusual choices.' },
+                                { id: 'p3_q34_b', text: 'B. its location close to a river', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q34_c', text: 'C. visitors\' responses to the gallery spaces', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q34_d', text: 'D. the striking architecture of the building', isCorrect: false, explanation: 'Incorrect. The outside architecture is described as \'nondescript\'.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q35',
+                            displayType: 'radio',
+                            text: '35. Why do visitors spend a long time at the gallery?',
+                            options: [
+                                { id: 'p3_q35_a', text: 'A. There is a great number of exhibits.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q35_b', text: 'B. Visitors tend to come in family groups.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q35_c', text: 'C. Many of the works are difficult to understand.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q35_d', text: 'D. The gallery has a physical effect on visitors.', isCorrect: true, explanation: 'Paragraph F states the urge to linger is common \'because the gallery engages all of the senses, and visitors often pause to experience the effect...\'' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q36',
+                            displayType: 'radio',
+                            text: '36. What does the writer say about the visitors to MONA?',
+                            options: [
+                                { id: 'p3_q36_a', text: 'A. Older people spend longer there than younger people do.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q36_b', text: 'B. A wide variety of people are interested in MONA.', isCorrect: true, explanation: 'Paragraph F observes that \'People from all kinds of socioeconomic backgrounds are curious about what lies within\' the maze of MONA.' },
+                                { id: 'p3_q36_c', text: 'C. The majority of visitors are young people.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q36_d', text: 'D. The visitors are representative of gallery enthusiasts generally.', isCorrect: false, explanation: 'Incorrect. It states they are \'definitely not just the normal gallery-goers\'.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q37',
+                            displayType: 'radio',
+                            text: '37. Why does the writer mention the coins at MONA?',
+                            options: [
+                                { id: 'p3_q37_a', text: 'A. to illustrate how interesting they are to visitors to modern galleries', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q37_b', text: 'B. to explain why they are displayed in a separate section of the gallery', isCorrect: false, explanation: 'Incorrect. They are mixed with modern works.' },
+                                { id: 'p3_q37_c', text: 'C. to argue that Walsh\'s collection is among the best in the world', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q37_d', text: 'D. to express admiration for the way that the exhibits are presented', isCorrect: true, explanation: 'Paragraph G says the author felt an intensified feeling that the makers of the coins were \'great contemporary artists\', expressing admiration for this presentation strategy.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q38_40',
+                            displayType: 'inline_dropdown',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 38–40</h3>
+                                    <p class="mb-4 text-gray-700">Complete the summary using the list of words, A–H, below.</p>
+                                    <div class="bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm max-w-lg mb-6">
+                                        <h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">List of Words</h4>
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-2 text-sm text-gray-800 font-medium ml-4">
+                                            <div>A. challenge</div>
+                                            <div>B. pipe</div>
+                                            <div>C. visual</div>
+                                            <div>D. contribution</div>
+                                            <div>E. lasting</div>
+                                            <div>F. essential</div>
+                                            <div>G. ambition</div>
+                                            <div>H. attraction</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-pink-50 border border-pink-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-center mb-6 text-pink-800 uppercase tracking-wide text-sm">The Bilbao Effect</h4>
+                                    MONA has huge appeal for visitors to Hobart, just as Gehry's Guggenheim Museum has for Bilbao. While MONA may lack the <strong>38</strong> <select data-qid="p3_q38" class="inline-blank w-32 mx-1 px-2 py-1 border border-gray-400 bg-white rounded focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors shadow-sm"></select> effect of the Guggenheim, David Walsh explains that MONA's architect had a different objective when designing MONA: unlike the architectural showcasing of the Guggenheim, with MONA there was a major <strong>39</strong> <select data-qid="p3_q39" class="inline-blank w-32 mx-1 px-2 py-1 border border-gray-400 bg-white rounded focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors shadow-sm"></select> that needed to be dealt with; the gallery was set beneath the ground. In any case, both galleries have transformed their cities, just as successful public buildings have for thousands of years. It remains to be seen how the <strong>40</strong> <select data-qid="p3_q40" class="inline-blank w-32 mx-1 px-2 py-1 border border-gray-400 bg-white rounded focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors shadow-sm"></select> of David Walsh will be expanded upon in Tasmania.
+                                </div>
+                            `,
+                            wordBank: [
+                                { id: 'A', text: 'challenge' }, { id: 'B', text: 'pipe' }, { id: 'C', text: 'visual' }, { id: 'D', text: 'contribution' },
+                                { id: 'E', text: 'lasting' }, { id: 'F', text: 'essential' }, { id: 'G', text: 'ambition' }, { id: 'H', text: 'attraction' }
+                            ],
+                            blanks: [
+                                { id: 'p3_q38', correct: 'C', explanation: 'Paragraph H: "MONA does not have the same spectacular impact as the shimmering metal surfaces of Gehry\'s building." (Visual effect).' },
+                                { id: 'p3_q39', correct: 'A', explanation: 'Paragraph H: "Fender Katsalidis solved a problem when he designed MONA, in executing a project of this scale in an underground location." (A challenge).' },
+                                { id: 'p3_q40', correct: 'D', explanation: 'Paragraph H: "Now the question is how Tasmania will build on David Walsh\'s input into its cultural setting." (Input = contribution).' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. APPLICATION STATE ---
+        let state = {
+            mode: 'START', // 'START' | 'TEST' | 'RESULT'
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, // Stores user selected option IDs: { 'p1_q1': 'p1_q1_a' }
+            totalQuestions: 0,
+            questionsList: [] // Flattened list for the navigator
+        };
+
+        // --- 3. DOM ELEMENTS ---
+        const DOM = {
+            views: {
+                start: document.getElementById('view-start'),
+                main: document.getElementById('view-main')
+            },
+            header: {
+                actions: document.getElementById('test-header-actions'),
+                timer: document.getElementById('timer-display'),
+                btnSubmit: document.getElementById('btn-submit-header')
+            },
+            resultBanner: {
+                container: document.getElementById('result-banner'),
+                score: document.getElementById('score-display'),
+                timeTaken: document.getElementById('time-taken-display')
+            },
+            navigation: {
+                tabs: document.getElementById('part-tabs')
+            },
+            navigator: {
+                container: document.getElementById('question-navigator'),
+                grid: document.getElementById('navigator-grid'),
+                legend: document.getElementById('navigator-legend')
+            },
+            panes: {
+                title: document.getElementById('passage-title'),
+                content: document.getElementById('passage-content'),
+                questions: document.getElementById('questions-content'),
+                btnSubmitBottom: document.getElementById('btn-submit-bottom'),
+                floatingSubmit: document.getElementById('floating-submit-container')
+            },
+            tooltip: {
+                container: document.getElementById('vocab-tooltip'),
+                word: document.getElementById('tt-word'),
+                pron: document.getElementById('tt-pron'),
+                vi: document.getElementById('tt-vi'),
+                context: document.getElementById('tt-context'),
+                btnClose: document.getElementById('btn-close-tooltip')
+            },
+            modal: {
+                container: document.getElementById('submit-modal'),
+                message: document.getElementById('modal-message'),
+                btnCancel: document.getElementById('btn-cancel-submit'),
+                btnConfirm: document.getElementById('btn-confirm-submit')
+            }
+        };
+
+        // --- 4. CORE FUNCTIONS ---
+
+        function init() {
+            // Build flattened question list for navigator
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach((q) => {
+                    if (q.displayType === 'checkbox' && q.answersIds) {
+                        const correctOpts = q.options.filter(o => o.isCorrect);
+                        q.answersIds.forEach((ansId, idx) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: ansId, absNum: absNum++,
+                                isCorrect: correctOpts[idx]?.id,
+                                displayType: 'checkbox',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_blanks' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_blank',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_dropdown' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_dropdown',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'instruction') {
+                        // skip instruction blocks in navigator
+                    } else {
+                        state.questionsList.push({
+                            partIndex: pIdx, qId: q.id, absNum: absNum++,
+                            isCorrect: q.options?.find(o => o.isCorrect)?.id,
+                            displayType: q.displayType
+                        });
+                    }
+                });
+            });
+
+            // Set the exact total questions count (40 items) based on the flattened list
+            state.totalQuestions = state.questionsList.length;
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', confirmSubmit);
+            DOM.panes.btnSubmitBottom.addEventListener('click', confirmSubmit);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+            
+            // Custom Modal Events
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', () => {
+                DOM.modal.container.classList.add('hidden');
+                finishTest();
+            });
+
+            // Global click to close tooltip
+            document.addEventListener('click', (e) => {
+                if(state.mode !== 'RESULT') return;
+                const isVocab = e.target.classList.contains('vocab-word');
+                const isTooltip = DOM.tooltip.container.contains(e.target);
+                if (!isVocab && !isTooltip) {
+                    hideTooltip();
+                }
+            });
+
+            // Format initial timer on start screen
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            
+            // View Transitions
+            DOM.views.start.classList.add('hidden');
+            DOM.views.start.classList.remove('flex', 'flex-col');
+            
+            DOM.views.main.classList.remove('hidden');
+            DOM.views.main.classList.add('flex', 'flex-col');
+            
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+
+            renderTabs();
+            loadPart(0);
+            updateNavigator();
+            
+            // Start Timer
+            state.timerInterval = setInterval(tickTimer, 1000);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function tickTimer() {
+            if (state.timeRemaining <= 0) {
+                clearInterval(state.timerInterval);
+                finishTest(); // Auto submit
+                return;
+            }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            
+            // Change color if running low (< 5 mins)
+            if(state.timeRemaining < 300) {
+                DOM.header.timer.parentElement.classList.add('bg-red-50', 'border-red-200');
+                DOM.header.timer.classList.add('text-red-600');
+            }
+        }
+
+        function renderTabs() {
+            DOM.navigation.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((part, index) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors border border-b-0 outline-none ${
+                    index === state.currentPart 
+                    ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' 
+                    : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
+                }`;
+                btn.textContent = `Part ${index + 1}`;
+                btn.onclick = () => loadPart(index);
+                DOM.navigation.tabs.appendChild(btn);
+            });
+        }
+
+        function loadPart(index) {
+            // Save current inputs implicitly handled by event listeners on radio buttons
+            state.currentPart = index;
+            const partData = TEST_DATA.parts[index];
+            
+            // Update UI Tabs
+            renderTabs();
+
+            // Render Passage
+            DOM.panes.title.textContent = partData.title;
+            DOM.panes.content.innerHTML = partData.passage;
+
+            // Apply vocab styling based on mode
+            const vocabWords = DOM.panes.content.querySelectorAll('.vocab-word');
+            vocabWords.forEach(word => {
+                if (state.mode === 'RESULT') {
+                    word.classList.add('mode-result');
+                    word.addEventListener('click', handleVocabClick);
+                } else {
+                    word.classList.remove('mode-result');
+                }
+            });
+
+            // Render Questions
+            DOM.panes.questions.innerHTML = '';
+            partData.questions.forEach((q, qIndex) => {
+
+                const qDiv = document.createElement('div');
+                qDiv.id = 'container_' + q.id;
+                qDiv.className = 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
+                
+                if (q.displayType === 'dropdown') {
+                    const flexContainer = document.createElement('div');
+                    flexContainer.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4';
+
+                    const qLabel = document.createElement('label');
+                    qLabel.className = 'font-bold text-gray-800 flex-1 leading-relaxed flex items-start';
+                    qLabel.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qIndex + 1}</span> <span>${q.text}</span>`;
+
+                    const selectWrap = document.createElement('div');
+                    selectWrap.className = 'w-full sm:w-64 relative shrink-0';
+
+                    const select = document.createElement('select');
+                    select.className = 'w-full p-3 pr-10 border rounded-xl text-gray-700 focus:ring-pink-500 focus:border-pink-500 appearance-none bg-gray-50 cursor-pointer transition-colors outline-none font-medium text-sm text-ellipsis overflow-hidden';
+                    
+                    if (state.mode === 'RESULT') {
+                        select.disabled = true;
+                        select.className += ' cursor-default';
+                        const userAns = state.answers[q.id];
+                        const correctOpt = q.options.find(o => o.isCorrect);
+                        
+                        if (userAns === correctOpt.id) {
+                            select.classList.replace('bg-gray-50', 'bg-green-50');
+                            select.classList.replace('border', 'border-green-500');
+                            select.classList.add('text-green-800');
+                        } else {
+                            select.classList.replace('bg-gray-50', 'bg-red-50');
+                            select.classList.replace('border', 'border-red-500');
+                            select.classList.add('text-red-800');
+                        }
+                    } else {
+                        if (state.answers[q.id]) {
+                            select.classList.replace('bg-gray-50', 'bg-pink-50');
+                            select.classList.replace('border', 'border-pink-300');
+                        }
+                        select.onchange = (e) => selectOption(q.id, e.target.value);
+                    }
+
+                    const defaultOpt = document.createElement('option');
+                    defaultOpt.value = '';
+                    defaultOpt.text = 'Select answer...';
+                    if (!state.answers[q.id]) defaultOpt.selected = true;
+                    defaultOpt.disabled = true;
+                    select.appendChild(defaultOpt);
+
+                    q.options.forEach(opt => {
+                        const optionEl = document.createElement('option');
+                        optionEl.value = opt.id;
+                        optionEl.textContent = opt.text;
+                        if (state.answers[q.id] === opt.id) optionEl.selected = true;
+                        select.appendChild(optionEl);
+                    });
+
+                    selectWrap.appendChild(select);
+                    
+                    const arrow = document.createElement('div');
+                    arrow.className = 'pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500';
+                    arrow.innerHTML = `<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>`;
+                    selectWrap.appendChild(arrow);
+
+                    flexContainer.appendChild(qLabel);
+                    flexContainer.appendChild(selectWrap);
+                    qDiv.appendChild(flexContainer);
+
+                    // Add Explanations for Dropdowns
+                    if (state.mode === 'RESULT') {
+                        const userAns = state.answers[q.id];
+                        const correctOpt = q.options.find(o => o.isCorrect);
+                        
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-5 pt-4 border-t border-gray-100';
+
+                        if (userAns !== correctOpt.id) {
+                            const corrAnsMsg = document.createElement('p');
+                            corrAnsMsg.className = 'text-sm text-green-600 font-bold mb-3 flex items-center gap-1.5';
+                            corrAnsMsg.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Correct Answer: <span class="ml-1 text-gray-800">${correctOpt.text}</span>`;
+                            expContainer.appendChild(corrAnsMsg);
+                        }
+
+                        const expBtn = document.createElement('button');
+                        expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
+                        expBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            View Explanation
+                        `;
+                        
+                        const expBox = document.createElement('div');
+                        expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                        expBox.innerHTML = `
+                            <strong class="text-pink-600 block mb-1">Explanation:</strong> ${correctOpt.explanation}
+                            <div class="mt-2 text-right">
+                                <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                    Locate in Passage
+                                </button>
+                            </div>
+                        `;
+
+                        expBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            expBox.classList.toggle('open');
+                        };
+
+                        expContainer.appendChild(expBtn);
+                        expContainer.appendChild(expBox);
+                        qDiv.appendChild(expContainer);
+                    }
+
+                } else if (q.displayType === 'checkbox') {
+                    // Checkbox display logic
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+
+                    const qHeader = document.createElement('h3');
+                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                    qHeader.innerHTML = `<span>${q.text}</span>`;
+                    qDiv.appendChild(qHeader);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'space-y-3';
+
+                    let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+
+                    q.options.forEach(opt => {
+                        const isSelected = currentSelections.includes(opt.id);
+                        const optWrapper = document.createElement('div');
+                        
+                        let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                        
+                        if (state.mode === 'TEST') {
+                            baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
+                        } else if (state.mode === 'RESULT') {
+                            baseClasses += ' cursor-default ';
+                            if (opt.isCorrect) {
+                                baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                            } else if (isSelected && !opt.isCorrect) {
+                                baseClasses += 'border-red-500 bg-red-50 ';
+                            } else {
+                                baseClasses += 'border-gray-200 opacity-60 ';
+                            }
+                        }
+
+                        optWrapper.className = baseClasses;
+                        
+                        if (state.mode === 'TEST') {
+                            optWrapper.onclick = () => toggleCheckbox(q.id, opt.id);
+                        }
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = isSelected;
+                        checkbox.disabled = state.mode === 'RESULT';
+                        checkbox.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 rounded border-gray-300 pointer-events-none shrink-0';
+
+                        const labelContent = document.createElement('div');
+                        labelContent.className = 'ml-3 flex-1';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                        textSpan.textContent = opt.text;
+                        labelContent.appendChild(textSpan);
+
+                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            labelContent.appendChild(expBtn);
+                            labelContent.appendChild(expBox);
+                            
+                            if (opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            } else if (isSelected && !opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            }
+                        }
+
+                        optWrapper.prepend(checkbox);
+                        optWrapper.appendChild(labelContent);
+                        optionsContainer.appendChild(optWrapper);
+                    });
+
+                    qDiv.appendChild(optionsContainer);
+
+                } else if (q.displayType === 'inline_blanks') {
+                    // Inline Blanks logic
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+                    
+                    const htmlContainer = document.createElement('div');
+                    htmlContainer.innerHTML = q.html;
+                    
+                    const inputs = htmlContainer.querySelectorAll('input[data-qid]');
+                    inputs.forEach(input => {
+                        const qid = input.getAttribute('data-qid');
+                        const blankInfo = q.blanks.find(b => b.id === qid);
+                        
+                        input.value = state.answers[qid] || '';
+                        
+                        if (state.mode === 'RESULT') {
+                            input.disabled = true;
+                            const userAns = (state.answers[qid] || '').trim().toLowerCase();
+                            const correctText = blankInfo.correct.toLowerCase();
+                            
+                            if (userAns === correctText) {
+                                input.classList.add('border-green-500', 'text-green-700', 'bg-green-50');
+                                input.classList.remove('border-gray-400', 'bg-transparent');
+                            } else {
+                                input.classList.add('border-red-500', 'text-red-700', 'line-through', 'opacity-75');
+                                input.classList.remove('border-gray-400');
+                                
+                                const corrSpan = document.createElement('span');
+                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-1.5 py-0.5 rounded border border-green-200';
+                                corrSpan.textContent = blankInfo.correct;
+                                input.parentNode.insertBefore(corrSpan, input.nextSibling);
+                            }
+                        } else {
+                            if (state.answers[qid] && state.answers[qid].trim() !== '') {
+                                input.classList.add('border-pink-500', 'text-pink-700');
+                                input.classList.remove('border-gray-400');
+                            }
+                            input.oninput = (e) => {
+                                state.answers[qid] = e.target.value;
+                                if (e.target.value.trim() !== '') {
+                                    input.classList.add('border-pink-500', 'text-pink-700');
+                                    input.classList.remove('border-gray-400');
+                                } else {
+                                    input.classList.remove('border-pink-500', 'text-pink-700');
+                                    input.classList.add('border-gray-400');
+                                }
+                                updateNavigator();
+                            };
+                        }
+                    });
+                    
+                    wrapper.appendChild(htmlContainer);
+                    
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                        
+                        q.blanks.forEach(blank => {
+                            const btn = document.createElement('button');
+                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p2_q','').replace('p3_q','')}`;
+                            
+                            const box = document.createElement('div');
+                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                            box.innerHTML = `
+                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            btn.onclick = () => box.classList.toggle('open');
+                            
+                            expContainer.appendChild(btn);
+                            expContainer.appendChild(box);
+                        });
+                        wrapper.appendChild(expContainer);
+                    }
+                    
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'inline_dropdown') {
+                    // Inline Dropdown logic (for summary with word bank)
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+                    
+                    const htmlContainer = document.createElement('div');
+                    htmlContainer.innerHTML = q.html;
+                    
+                    const selects = htmlContainer.querySelectorAll('select[data-qid]');
+                    selects.forEach(select => {
+                        const qid = select.getAttribute('data-qid');
+                        const blankInfo = q.blanks.find(b => b.id === qid);
+                        
+                        // Populate options
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.text = 'Select...';
+                        defaultOpt.disabled = true;
+                        if (!state.answers[qid]) defaultOpt.selected = true;
+                        select.appendChild(defaultOpt);
+                        
+                        q.wordBank.forEach(word => {
+                            const opt = document.createElement('option');
+                            opt.value = word.id;
+                            opt.textContent = `${word.id}. ${word.text}`;
+                            if (state.answers[qid] === word.id) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+
+                        if (state.mode === 'RESULT') {
+                            select.disabled = true;
+                            select.className += ' cursor-default appearance-none pr-6 border-2';
+                            const userAns = state.answers[qid];
+                            
+                            if (userAns === blankInfo.correct) {
+                                select.classList.add('border-green-500', 'text-green-800', 'bg-green-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            } else {
+                                select.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                                
+                                const corrSpan = document.createElement('span');
+                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200 inline-block align-middle';
+                                corrSpan.textContent = blankInfo.correct;
+                                select.parentNode.insertBefore(corrSpan, select.nextSibling);
+                            }
+                        } else {
+                            if (state.answers[qid]) {
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            }
+                            select.onchange = (e) => {
+                                state.answers[qid] = e.target.value;
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                                updateNavigator();
+                            };
+                        }
+                    });
+                    
+                    wrapper.appendChild(htmlContainer);
+
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                        
+                        q.blanks.forEach(blank => {
+                            const btn = document.createElement('button');
+                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
+                            
+                            const box = document.createElement('div');
+                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                            const correctWord = q.wordBank.find(w => w.id === blank.correct).text;
+                            box.innerHTML = `
+                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct} (${correctWord})</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            btn.onclick = () => box.classList.toggle('open');
+                            
+                            expContainer.appendChild(btn);
+                            expContainer.appendChild(box);
+                        });
+                        wrapper.appendChild(expContainer);
+                    }
+                    
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'instruction') {
+                    // Just render instruction, no inputs
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+                    
+                    // Remove borders and padding so instruction blocks blend smoothly
+                    qDiv.className = 'mb-2';
+                } else {
+                    // Handle standard questions (e.g. Radio buttons)
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+
+                    const qHeader = document.createElement('h3');
+                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                    
+                    // Prevent double numbering if text already starts with a number (e.g. "27. Text")
+                    if (/^\d+\./.test(q.text)) {
+                        qHeader.innerHTML = `<span>${q.text}</span>`;
+                    } else {
+                        qHeader.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qIndex + 1}</span> <span>${q.text}</span>`;
+                    }
+                    
+                    const flexContainer = document.createElement('div');
+                    flexContainer.className = 'flex items-start';
+                    flexContainer.appendChild(qHeader);
+                    qDiv.appendChild(flexContainer);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'space-y-3';
+
+                    if (q.options) {
+                        q.options.forEach(opt => {
+                            const isSelected = state.answers[q.id] === opt.id;
+                            const optWrapper = document.createElement('div');
+                        
+                            let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                            
+                            if (state.mode === 'TEST') {
+                                baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
+                            } else if (state.mode === 'RESULT') {
+                                baseClasses += ' cursor-default ';
+                                if (opt.isCorrect) {
+                                    baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                                } else if (isSelected && !opt.isCorrect) {
+                                    baseClasses += 'border-red-500 bg-red-50 ';
+                                } else {
+                                    baseClasses += 'border-gray-200 opacity-60 ';
+                                }
+                            }
+
+                            optWrapper.className = baseClasses;
+
+                        if (state.mode === 'TEST') {
+                            optWrapper.onclick = () => selectOption(q.id, opt.id);
+                        }
+
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = q.id;
+                        radio.checked = isSelected;
+                        radio.disabled = state.mode === 'RESULT';
+                        radio.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 border-gray-300 pointer-events-none shrink-0';
+
+                        const labelContent = document.createElement('div');
+                        labelContent.className = 'ml-3 flex-1';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                        textSpan.textContent = opt.text;
+                        labelContent.appendChild(textSpan);
+
+                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            labelContent.appendChild(expBtn);
+                            labelContent.appendChild(expBox);
+                            
+                            if (opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            } else if (isSelected && !opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            }
+                        }
+
+                        optWrapper.prepend(radio);
+                        optWrapper.appendChild(labelContent);
+                        optionsContainer.appendChild(optWrapper);
+                        });
+                    }
+
+                    qDiv.appendChild(optionsContainer);
+                }
+                
+                DOM.panes.questions.appendChild(qDiv);
+            });
+            
+            // Scroll to top when changing parts
+            DOM.panes.content.parentElement.parentElement.scrollTop = 0;
+            DOM.panes.questions.parentElement.scrollTop = 0;
+
+            // Handle bottom submit button visibility
+            if (state.mode === 'TEST') {
+                DOM.panes.floatingSubmit.classList.remove('hidden');
+                // Only show big submit button on the last part, otherwise it's just padding
+                if (index === TEST_DATA.parts.length - 1) {
+                    DOM.panes.btnSubmitBottom.style.display = 'inline-block';
+                } else {
+                    DOM.panes.btnSubmitBottom.style.display = 'none';
+                }
+            } else {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+            }
+        }
+
+        function selectOption(questionId, optionId) {
+            if (state.mode !== 'TEST') return;
+            state.answers[questionId] = optionId;
+            loadPart(state.currentPart);
+            updateNavigator();
+        }
+
+        function toggleCheckbox(parentQid, optionId) {
+            if (state.mode !== 'TEST') return;
+            const q = TEST_DATA.parts[state.currentPart].questions.find(q => q.id === parentQid);
+            
+            let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+            
+            if (currentSelections.includes(optionId)) {
+                currentSelections = currentSelections.filter(id => id !== optionId);
+            } else {
+                if (currentSelections.length >= q.maxChoices) return; // Prevent more than max
+                currentSelections.push(optionId);
+            }
+            
+            // Map back to the individual question IDs
+            q.answersIds.forEach((id, idx) => {
+                if (idx < currentSelections.length) {
+                    state.answers[id] = currentSelections[idx];
+                } else {
+                    delete state.answers[id];
+                }
+            });
+            
+            loadPart(state.currentPart);
+            updateNavigator();
+        }
+
+        function confirmSubmit() {
+            // Safely count how many exact questions have been answered based on the navigator map
+            let answeredCount = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (ans && ans.toString().trim() !== '') {
+                    answeredCount++;
+                }
+            });
+
+            if (answeredCount < state.totalQuestions) {
+                DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.totalQuestions}</strong> questions.<br><br>You can submit even if there are unanswered questions. Proceed?`;
+            } else {
+                DOM.modal.message.innerHTML = `You have answered all questions.<br>Are you sure you want to submit your test?`;
+            }
+            
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            clearInterval(state.timerInterval);
+            state.mode = 'RESULT';
+            
+            let correctCount = 0;
+            
+            // Calculate Score
+            TEST_DATA.parts.forEach(part => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'text') {
+                        const userAns = state.answers[q.id];
+                        const correctText = q.options[0].text.toLowerCase().trim();
+                        if (userAns && userAns.toLowerCase().trim() === correctText) correctCount++;
+                    } else if (q.displayType === 'checkbox') {
+                        const selectedAns = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                        const correctIds = q.options.filter(o => o.isCorrect).map(o => o.id);
+                        selectedAns.forEach(ans => {
+                            if (correctIds.includes(ans)) correctCount++;
+                        });
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns && userAns.toLowerCase().trim() === blank.correct.toLowerCase().trim()) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType === 'inline_dropdown') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns === blank.correct) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType !== 'instruction') {
+                        const userAns = state.answers[q.id];
+                        const correctOpt = q.options.find(o => o.isCorrect);
+                        if (userAns === correctOpt.id) correctCount++;
+                    }
+                });
+            });
+
+            // Update UI Header
+            DOM.header.actions.classList.add('hidden');
+            DOM.header.actions.classList.remove('flex');
+            
+            // Show Result Banner
+            DOM.resultBanner.container.classList.remove('hidden');
+            DOM.resultBanner.container.classList.add('flex');
+            
+            // Populate Stats
+            DOM.resultBanner.score.textContent = `${correctCount}/${state.totalQuestions}`;
+            const timeTakenSec = TEST_DATA.totalDurationSeconds - state.timeRemaining;
+            DOM.resultBanner.timeTaken.textContent = formatTime(timeTakenSec);
+
+            updateNavigator();
+
+            // Reload current part to show explanation UI
+            loadPart(state.currentPart);
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            state.questionsList.forEach(qInfo => {
+                const btn = document.createElement('button');
+                let baseClass = 'w-8 h-8 flex-shrink-0 rounded-md font-bold text-sm transition-colors flex items-center justify-center border focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-pink-400 ';
+                
+                const userAns = state.answers[qInfo.qId];
+                
+                if (state.mode === 'TEST') {
+                    if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-pink-500 text-white border-pink-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50';
+                    }
+                } else if (state.mode === 'RESULT') {
+                    let isAnsCorrect = false;
+                    if (qInfo.displayType === 'text' || qInfo.displayType === 'inline_blank') {
+                        isAnsCorrect = userAns && userAns.toString().toLowerCase().trim() === qInfo.isCorrect.toLowerCase().trim();
+                    } else if (qInfo.displayType === 'checkbox') {
+                         let correctArr = [];
+                         TEST_DATA.parts.forEach(p => p.questions.forEach(q => {
+                             if(q.id === qInfo.parentQid) correctArr = q.options.filter(o=>o.isCorrect).map(o=>o.id);
+                         }));
+                         isAnsCorrect = correctArr.includes(userAns);
+                    } else {
+                        isAnsCorrect = userAns === qInfo.isCorrect;
+                    }
+
+                    if (isAnsCorrect) {
+                        baseClass += 'bg-green-500 text-white border-green-500 shadow-sm';
+                    } else if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-red-500 text-white border-red-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-gray-100 text-gray-400 border-gray-200';
+                    }
+                }
+                
+                btn.className = baseClass;
+                btn.textContent = qInfo.absNum;
+                btn.onclick = () => jumpToQuestion(qInfo.partIndex, qInfo.qId);
+                
+                DOM.navigator.grid.appendChild(btn);
+            });
+
+            // Update Legend
+            if (state.mode === 'TEST') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-purple-500"></div> Answered</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] border border-gray-300 bg-white"></div> Unanswered</div>
+                `;
+            } else if (state.mode === 'RESULT') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-green-500"></div> Correct</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-red-500"></div> Incorrect</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-gray-100 border border-gray-200"></div> Skipped</div>
+                `;
+            }
+        }
+
+        function jumpToQuestion(partIndex, qId) {
+            if (state.currentPart !== partIndex) {
+                loadPart(partIndex);
+            }
+            setTimeout(() => {
+                const el = document.getElementById('container_' + qId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-pink-400', 'ring-offset-2');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-pink-400', 'ring-offset-2'), 1500);
+                }
+            }, 50);
+        }
+
+        function handleVocabClick(e) {
+            const wordEl = e.currentTarget;
+            
+            // Populate Tooltip Data
+            DOM.tooltip.word.textContent = wordEl.dataset.en;
+            DOM.tooltip.pron.textContent = wordEl.dataset.pron;
+            DOM.tooltip.vi.textContent = wordEl.dataset.vi;
+            DOM.tooltip.context.textContent = wordEl.dataset.context;
+
+            // Positioning
+            const rect = wordEl.getBoundingClientRect();
+            const ttWidth = 300;
+            const ttHeight = DOM.tooltip.container.offsetHeight || 150; // estimate if not visible
+            
+            let top = rect.bottom + 10;
+            let left = rect.left;
+
+            // Prevent going off screen horizontally
+            if (left + ttWidth > window.innerWidth - 20) {
+                left = window.innerWidth - ttWidth - 20;
+            }
+            
+            // Prevent going off screen vertically (flip to top if needed)
+            if (top + ttHeight > window.innerHeight - 20) {
+                top = rect.top - ttHeight - 10;
+            }
+
+            DOM.tooltip.container.style.top = `${top}px`;
+            DOM.tooltip.container.style.left = `${left}px`;
+            
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            DOM.tooltip.container.classList.remove('visible');
+        }
+
+        window.locateInPassage = function(targetId) {
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Clear existing highlights
+                document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+                
+                // Apply temporary highlight
+                targetEl.classList.add('highlight-active');
+                
+                // Remove highlight after 3.5 seconds
+                setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+            }
+        };
+
+        // Initialize App
+        init();
+    </script>
+</body>
+</html>
