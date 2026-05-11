@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive 05 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc; /* Pastel Purple */
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 500px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        /* Custom Scrollbar Hide */
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fdf2f8; color: #db2777; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <!-- Header Actions (Hidden initially) -->
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Exam Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-3">PET Intensive 05</h2>
+            <p class="text-gray-500 text-lg mb-8">Reading Mock Test Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Total Time</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-pink-900 text-left shadow-sm">
+                <h3 class="font-bold mb-3 flex items-center gap-2 text-pink-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    Important Instructions
+                </h3>
+                <ul class="list-disc list-inside space-y-2 ml-2 text-sm md:text-base text-pink-800/80">
+                    <li>You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li>You can navigate between passages using the tabs at the top.</li>
+                    <li>The timer will not pause once you begin.</li>
+                    <li>Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
+                </ul>
+            </div>
+
+            <div class="text-center">
+                <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">
+                    Start Mock Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Test View -->
+    <div id="view-main" class="hidden flex-auto flex-col overflow-hidden bg-white">
+        
+        <!-- Result Summary Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Test Completed</h2>
+                <p class="text-gray-300 text-sm mt-1">Review your answers, explore explanations, and click highlighted words for vocabulary.</p>
+            </div>
+            <div class="flex gap-6 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">0/0</div>
+                </div>
+                <div class="text-center border-l border-gray-600 pl-6">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Time Taken</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative">
+            <!-- Generated by JS -->
+        </nav>
+
+        <!-- Split Panes Container -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            
+            <!-- Left Pane: Passage (Independent Scroll) -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200"></h2>
+                    <div id="passage-content" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-4">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions (Independent Scroll) -->
+            <div id="pane-questions-container" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative h-full">
+                    <div id="questions-content" class="space-y-8 pb-10">
+                        <!-- Injected by JS -->
+                    </div>
+                    
+                    <!-- Floating Submit Button inside Questions Pane -->
+                    <div id="floating-submit-container" class="mt-8 text-center border-t border-gray-200 pt-8 pb-4">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors w-full sm:w-auto">
+                            Finish & Submit All Parts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Navigator (Fixed at Bottom) -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-sm font-semibold text-gray-600 whitespace-nowrap sticky left-0 bg-white pr-2 py-1">Navigator:</span>
+                <div id="navigator-grid" class="flex gap-2">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 flex-shrink-0 hidden md:flex items-center gap-4 text-xs text-gray-500 font-medium">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Tooltip (Floating) -->
+    <div id="vocab-tooltip" class="bg-white rounded-xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-500 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-tight">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-sm font-mono mt-0.5">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-4 bg-gray-50">
+            <div class="mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">Nghĩa chung</span>
+                <p id="tt-vi" class="text-gray-800 text-sm font-medium"></p>
+            </div>
+            <div class="border-t border-gray-200 pt-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1 text-purple-600">Ngữ cảnh trong bài</span>
+                <p id="tt-context" class="text-gray-700 text-sm bg-purple-50 p-2 rounded border border-purple-100"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Submit -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Submit Test?</h3>
+            <p id="modal-message" class="text-center text-gray-600 mb-8"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors shadow-md">Submit Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA SETUP ---
+        
+        // Add global lists here if needed (like pool lists for matching)
+        const SECTION_LIST_P2 = [
+            { id: 'A', text: 'A. Paragraph A' },
+            { id: 'B', text: 'B. Paragraph B' },
+            { id: 'C', text: 'C. Paragraph C' },
+            { id: 'D', text: 'D. Paragraph D' },
+            { id: 'E', text: 'E. Paragraph E' }
+        ];
+
+        const PEOPLE_LIST_P2 = [
+            { id: 'A', text: 'A. Phil Rasmussen' },
+            { id: 'B', text: 'B. Malcolm Douglas' },
+            { id: 'C', text: 'C. Sandra Clair' },
+            { id: 'D', text: 'D. Isla Burgess' }
+        ];
+
+        const RESEARCHERS_LIST_P3 = [
+            { id: 'A', text: 'A. Domas and Tiedeman' },
+            { id: 'B', text: 'B. Rostker' },
+            { id: 'C', text: 'C. Rolfe' },
+            { id: 'D', text: 'D. Barr' },
+            { id: 'E', text: 'E. Stevens' },
+            { id: 'F', text: 'F. Morrison' },
+            { id: 'G', text: 'G. Lewin, Lippitt and White' }
+        ];
+
+        const PARAGRAPHS_LIST_P3 = [
+            { id: 'A', text: 'A. Paragraph A' },
+            { id: 'B', text: 'B. Paragraph B' },
+            { id: 'C', text: 'C. Paragraph C' },
+            { id: 'D', text: 'D. Paragraph D' },
+            { id: 'E', text: 'E. Paragraph E' },
+            { id: 'F', text: 'F. Paragraph F' },
+            { id: 'G', text: 'G. Paragraph G' },
+            { id: 'H', text: 'H. Paragraph H' },
+            { id: 'I', text: 'I. Paragraph I' }
+        ];
+
+        const TEST_DATA = {
+            totalDurationSeconds: 3600,
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Katherine Mansfield",
+                    passage: `
+                        <p class="mb-4 font-semibold text-gray-600">Katherine Mansfield was a modernist writer of short fiction who was born and brought up in New Zealand.</p>
+
+                        <p class="mb-4"><span id="loc_p1_q1" class="highlight-target">Katherine Mansfield Beauchamp Murry was born in 1888, into a <span class="vocab-word" data-en="Prominent" data-vi="Nổi bật, xuất chúng" data-pron="/ˈprɒmɪnənt/" data-context="Gia đình quan trọng, có địa vị và được nhiều người biết đến">prominent</span> family in Wellington, New Zealand. She became one of New Zealand’s best-known writers, using the pen name of Katherine Mansfield.</span> The daughter of a banker, and born into a middle-class family, she was also a first cousin of Countess Elizabeth von Arnim, a <span class="vocab-word" data-en="Distinguished" data-vi="Lỗi lạc, xuất sắc" data-pron="/dɪˈstɪŋɡwɪʃt/" data-context="Rất thành công và được kính trọng trong lĩnh vực của mình">distinguished</span> novelist in her time. Mansfield had two older sisters and a younger brother. Her father, Harold Beauchamp, went on to become the chairman of the Bank of New Zealand. In 1893, the Mansfield family moved to Karori, a suburb of Wellington, where Mansfield would spend the happiest years of her childhood; she later used her memories of this time as an inspiration for her Prelude story.</p>
+
+                        <p class="mb-4"><span id="loc_p1_q2" class="highlight-target">Her first published stories appeared in the High School Reporter and the Wellington Girls’ High School magazine in 1898 and 1899.</span> In 1902, she developed strong feelings for a musician who played the cello, Arnold Trowell, although her feelings were not, for the most part, returned. Mansfield herself was an <span class="vocab-word" data-en="Accomplished" data-vi="Tài năng, hoàn mỹ" data-pron="/əˈkʌmplɪʃt/" data-context="Rất giỏi và có nhiều kỹ năng về một lĩnh vực nào đó">accomplished</span> cellist, having received lessons from Trowell’s father. Mansfield wrote in her journals of feeling isolated to some extent in New Zealand, and, in general terms, of her interest in the Maori people (New Zealand’s native people), <span id="loc_p1_q3" class="highlight-target">who were often portrayed in a sympathetic light in her later stories, such as How Pearl Button Was Kidnapped.</span></p>
+
+                        <p class="mb-4">She moved to London in 1903, where she attended Queen’s College, along with her two sisters. <span id="loc_p1_q4" class="highlight-target">Mansfield recommenced playing the cello, an occupation that she believed, during her time at Queen’s, she would take up professionally.</span> She also began contributing to the college newspaper, with such a dedication to it that she eventually became its editor. She was particularly interested in the works of the French writers of this period and in the 19th-century British writer, Oscar Wilde, and <span id="loc_p1_q5" class="highlight-target">she was appreciated amongst fellow students at Queen’s for her lively and <span class="vocab-word" data-en="Charismatic" data-vi="Có sức hút, lôi cuốn" data-pron="/ˌkærɪzˈmætɪk/" data-context="Có khả năng thu hút và gây ấn tượng mạnh với người khác">charismatic</span> approach to life and work.</span> She met fellow writer Ida Baker, a South African, at the college, and the pair became lifelong friends. <span id="loc_p1_q6" class="highlight-target">Mansfield did not actively support the suffragette movement in the UK.</span> Women in New Zealand had gained the right to vote in 1893.</p>
+
+                        <p class="mb-4">Mansfield first began journeying into other parts of Europe in the period 1903–1906, mainly to Belgium and Germany. <span id="loc_p1_q7" class="highlight-target">After finishing her schooling in England, she returned to her New Zealand home in 1906</span>, only then beginning to write short stories in a serious way. <span id="loc_p1_q8" class="highlight-target">She had several works published in Australia in a magazine called The Native Companion, which was her first paid writing work</span>, and by this time she had her mind set on becoming a professional writer. It was also the first occasion on which she used the <span class="vocab-word" data-en="Pseudonym" data-vi="Bút danh, tên giả" data-pron="/ˈsjuːdənɪm/" data-context="Tên được một nhà văn sử dụng thay cho tên thật của mình">pseudonym</span> “K. Mansfield”.</p>
+
+                        <p class="mb-4"><span id="loc_p1_q9" class="highlight-target">Mansfield rapidly grew <span class="vocab-word" data-en="Discontented" data-vi="Bất mãn, không hài lòng" data-pron="/ˌdɪskənˈtɛntɪd/" data-context="Cảm giác không thỏa mãn với hoàn cảnh hiện tại">discontented</span> with the provincial New Zealand lifestyle, and with her family.</span> Two years later she headed again to London. Her father sent her an annual subsidy of £100 for the rest of her life. In later years, she would express both admiration and <span class="vocab-word" data-en="Disdain" data-vi="Sự khinh miệt, coi thường" data-pron="/dɪsˈdeɪn/" data-context="Cảm giác coi thường hoặc không tôn trọng điều gì đó">disdain</span> for New Zealand in her journals.</p>
+
+                        <p class="mb-4">In 1911, Mansfield met John Middleton Murry, the Oxford scholar and editor of the literary magazine Rhythm. They were later to marry in 1918. Mansfield became a co-editor of Rhythm, which was subsequently called The Blue Review, in which more of her works were published. She and Murry lived in various houses in England and briefly in Paris. The Blue Review failed to gain enough readers and was no longer published. <span id="loc_p1_q10" class="highlight-target">Their attempt to set up as writers in Paris was cut short by Murry’s <span class="vocab-word" data-en="Bankruptcy" data-vi="Sự phá sản" data-pron="/ˈbæŋkrʌptsi/" data-context="Tình trạng không thể trả nợ và bị hủy bỏ tư cách tài chính">bankruptcy</span></span>, which resulted from the failure of this and other journals. Life back in England meant frequently changed addresses and very limited funds.</p>
+
+                        <p class="mb-4">Between 1915 and 1918, Mansfield moved between England and Bandol, France. <span id="loc_p1_q11" class="highlight-target">She and Murry developed close contact with other well-known writers of the time such as D. H. Lawrence, Bertrand Russell and Aldous Huxley.</span> By October 1918 Mansfield had become seriously ill; she had been diagnosed with tuberculosis and was advised to enter a <span class="vocab-word" data-en="Sanatorium" data-vi="Viện điều dưỡng" data-pron="/ˌsænəˈtɔːriəm/" data-context="Cơ sở y tế dành cho những người mắc bệnh mãn tính, đặc biệt là bệnh lao">sanatorium</span>. She could no longer spend winters in London. In the autumn of 1918 she was so ill that she decided to go to Ospedaletti in Italy. <span id="loc_p1_q12" class="highlight-target">It was the publication of Bliss and Other Stories in 1920 that was to <span class="vocab-word" data-en="Solidify" data-vi="Củng cố, làm vững chắc" data-pron="/səˈlɪdɪfaɪ/" data-context="Làm cho một vị trí, danh tiếng trở nên chắc chắn hơn">solidify</span> Mansfield’s reputation as a writer.</span></p>
+
+                        <p class="mb-4">Mansfield also spent time in Menton, France, as the tenant of her father’s cousin at “The Villa Isola Bella”. There she wrote eight stories including Miss Brill and The Daughters of the Late Colonel, the latter of which she pronounced to be “…the only story that satisfies me to any extent”.</p>
+
+                        <p class="mb-4">Mansfield produced a great deal of work in the final years of her life, and much of her <span class="vocab-word" data-en="Prose" data-vi="Văn xuôi" data-pron="/prəʊz/" data-context="Ngôn ngữ viết theo hình thức bình thường, không phải thơ ca">prose</span> and poetry remained unpublished at her death in 1923. <span id="loc_p1_q13" class="highlight-target">After her death, her husband, Murry, took on the task of editing and publishing her works.</span> His efforts resulted in two additional volumes of short stories, The Doves’ Nest and Something Childish, published in 1923 and 1924 respectively; the publication of her Poems; as well as a collection of critical writings (Novels and Novelists) and a number of editions of Mansfield’s previously unpublished letters and journals.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_6_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–6</h3>
+                                    <p class="mb-2 text-gray-700">Do the following statements agree with the information given in Reading Passage 1?</p>
+                                    <ul class="mb-4 space-y-1 text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <li><strong>TRUE</strong> - if the statement agrees with the information</li>
+                                        <li><strong>FALSE</strong> - if the statement contradicts the information</li>
+                                        <li><strong>NOT GIVEN</strong> - if there is no information on this</li>
+                                    </ul>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1',
+                            displayType: 'radio',
+                            text: '1. The name Katherine Mansfield, which appears on the writer’s books, was exactly the same as her original name.',
+                            options: [
+                                { id: 'p1_q1_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q1_f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 2 states: "Katherine Mansfield Beauchamp Murry was born in 1888... using the pen name of Katherine Mansfield." Therefore, her original name was not exactly the same as her pen name.' },
+                                { id: 'p1_q1_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q2',
+                            displayType: 'radio',
+                            text: '2. Mansfield won a prize for a story she wrote for the High School Reporter.',
+                            options: [
+                                { id: 'p1_q2_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q2_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q2_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph 3 notes: "Her first published stories appeared in the High School Reporter..." but it does not mention whether she won any prize for them.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q3',
+                            displayType: 'radio',
+                            text: '3. How Pearl Button Was Kidnapped portrayed Maori people in a favourable way.',
+                            options: [
+                                { id: 'p1_q3_t', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 3 states that the Maori people "were often portrayed in a sympathetic light in her later stories, such as How Pearl Button Was Kidnapped," which aligns with "a favourable way."' },
+                                { id: 'p1_q3_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q3_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q4',
+                            displayType: 'radio',
+                            text: '4. When Mansfield was at Queen’s College, she planned to be a professional writer.',
+                            options: [
+                                { id: 'p1_q4_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q4_f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 4 contradicts this, stating: "Mansfield recommenced playing the cello, an occupation that she believed, during her time at Queen’s, she would take up professionally."' },
+                                { id: 'p1_q4_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q5',
+                            displayType: 'radio',
+                            text: '5. Mansfield was unpopular with the other students at Queen’s College.',
+                            options: [
+                                { id: 'p1_q5_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q5_f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 4 contradicts this by saying: "...she was appreciated amongst fellow students at Queen’s for her lively and charismatic approach to life and work."' },
+                                { id: 'p1_q5_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'radio',
+                            text: '6. In London, Mansfield showed little interest in politics.',
+                            options: [
+                                { id: 'p1_q6_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q6_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q6_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph 4 mentions that "Mansfield did not actively support the suffragette movement in the UK", but it does not provide information on whether she had an interest in politics in general.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7_13',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 7–13</h3>
+                                    <p class="mb-4 text-gray-700">Complete the notes below.<br>Choose <strong>ONE WORD AND/OR A NUMBER</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-4 border-b border-indigo-200 pb-2">Katherine Mansfield’s adult years</h4>
+                                    
+                                    <ul class="list-disc pl-5 mb-4 space-y-3 font-medium">
+                                        <li><strong>7</strong> <input type="text" data-qid="p1_q7" class="inline-blank w-24 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">
+                                            <ul class="list-none pl-5 mt-2 space-y-2 border-l-2 border-indigo-200 ml-1">
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">moved from England back to New Zealand</li>
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">first paid writing work was in a publication based in <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></li>
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">her <strong>9</strong> <input type="text" data-qid="p1_q9" class="inline-blank w-24 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> and the New Zealand way of life made her feel dissatisfied</li>
+                                            </ul>
+                                        </li>
+                                        <li>1908
+                                            <ul class="list-none pl-5 mt-2 space-y-2 border-l-2 border-indigo-200 ml-1">
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">returned to London</li>
+                                            </ul>
+                                        </li>
+                                        <li>1911–1919
+                                            <ul class="list-none pl-5 mt-2 space-y-2 border-l-2 border-indigo-200 ml-1">
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">Met John Middleton Murry in 1911</li>
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4"><strong>10</strong> <input type="text" data-qid="p1_q10" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> prevented Mansfield and Murry from staying together in Paris</li>
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">spent time with distinguished <strong>11</strong> <input type="text" data-qid="p1_q11" class="inline-blank w-24 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></li>
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">from 1916, tuberculosis restricted the time she spent in London</li>
+                                            </ul>
+                                        </li>
+                                        <li>1920
+                                            <ul class="list-none pl-5 mt-2 space-y-2 border-l-2 border-indigo-200 ml-1">
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">her <strong>12</strong> <input type="text" data-qid="p1_q12" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> was consolidated when Bliss and Other Stories was published</li>
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">wrote several stories at “Villa Isola Bella”</li>
+                                            </ul>
+                                        </li>
+                                        <li>1923–1924
+                                            <ul class="list-none pl-5 mt-2 space-y-2 border-l-2 border-indigo-200 ml-1">
+                                                <li class="relative before:content-['-'] before:absolute before:-left-4">Mansfield’s <strong>13</strong> <input type="text" data-qid="p1_q13" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> published more of her works after her death</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q7', correct: '1906', explanation: 'Paragraph 5 mentions she "returned to her New Zealand home in 1906". This is the heading for that period.' },
+                                { id: 'p1_q8', correct: 'Australia', explanation: 'Paragraph 5 states: "She had several works published in Australia in a magazine called The Native Companion, which was her first paid writing work."' },
+                                { id: 'p1_q9', correct: 'family', explanation: 'Paragraph 6 reveals: "Mansfield rapidly grew discontented with the provincial New Zealand lifestyle, and with her family."' },
+                                { id: 'p1_q10', correct: 'bankruptcy', explanation: 'Paragraph 7 explains: "Their attempt to set up as writers in Paris was cut short by Murry’s bankruptcy..."' },
+                                { id: 'p1_q11', correct: 'writers', explanation: 'Paragraph 8 mentions: "She and Murry developed close contact with other well-known writers of the time..."' },
+                                { id: 'p1_q12', correct: 'reputation', explanation: 'Paragraph 8 states: "It was the publication of Bliss and Other Stories in 1920 that was to solidify Mansfield’s reputation as a writer."' },
+                                { id: 'p1_q13', correct: 'husband', explanation: 'Paragraph 10 says: "After her death, her husband, Murry, took on the task of editing and publishing her works."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: Herbal Medicines",
+                    passage: `
+                        <p class="mb-4 font-semibold text-gray-600">The popularity of herbs and plants as medicines could be good for New Zealand</p>
+                        
+                        <p class="mb-4"><strong>A.</strong> There is an age-old practice of <span class="vocab-word" data-en="Harvesting" data-vi="Thu hoạch" data-pron="/ˈhɑːvɪstɪŋ/" data-context="Thu thập thực vật, cây trồng từ tự nhiên hoặc trang trại">harvesting</span> plants and herbs in their natural environment for use as medicines. And today there is <span id="loc_p2_q25" class="highlight-target">huge potential for New Zealand to develop a herb industry based on the excellent growing conditions and expertise there, according to Phil Rasmussen</span>, a pharmacist and medical herbalist. <span id="loc_p2_q15" class="highlight-target">Take arnica, for example, a popular <span class="vocab-word" data-en="Pharmaceutical" data-vi="Dược phẩm" data-pron="/ˌfɑːməˈsuːtɪkl/" data-context="Liên quan đến sản xuất và sử dụng thuốc chữa bệnh">pharmaceutical</span> herb used to treat bruises and joint problems.</span> Traditionally collected by Romany communities in Europe, it is now in high demand worldwide as interest develops in the capabilities of the small alpine plant. A 2008 report for the Plant and Food Research organisation concluded that New Zealand has a good opportunity to <span class="vocab-word" data-en="Cultivate" data-vi="Trồng trọt, canh tác" data-pron="/ˈkʌltɪveɪt/" data-context="Trồng và chăm sóc cây cối để thu hoạch">cultivate</span> arnica flowers and roots for the international markets. However, the initiative was stopped in its tracks when the government abruptly halted funding for the research programme. <span id="loc_p2_q23" class="highlight-target">It was an unjustified move, according to <span class="vocab-word" data-en="Agronomist" data-vi="Nhà nông học" data-pron="/əˈɡrɒnəmɪst/" data-context="Chuyên gia nghiên cứu về đất đai và cây trồng">agronomist</span> Malcolm Douglas</span>, based on a number of inaccurate views about weed invasion.</p>
+
+                        <p class="mb-4"><strong>B.</strong> The history of herbal medicines in New Zealand has long featured disagreements of this sort. For the early Maori people – the original inhabitants of New Zealand – the forest was well stocked with <span class="vocab-word" data-en="Edible" data-vi="Có thể ăn được" data-pron="/ˈɛdɪbl/" data-context="An toàn để con người làm thức ăn">edible</span> plants that were an obvious source of nutrition, <span id="loc_p2_q18" class="highlight-target">but that were taken for the relief of pain as well.</span> While the earliest European doctors in New Zealand relied on imported dried herbs, many were keen to include native plants in their practices: <span id="loc_p2_q19" class="highlight-target">in his book published in 1891, herbalist James Neil described manuka and koromiko as among New Zealand’s most valuable herbs.</span> Despite its popularity among some, however, herbalism continued to have its <span class="vocab-word" data-en="Detractors" data-vi="Người gièm pha, phản đối" data-pron="/dɪˈtræktəz/" data-context="Những người thường xuyên chỉ trích và làm giảm giá trị của một thứ gì đó">detractors</span>. In 1907 Neil, president of the then very young New Zealand Association of Medical Herbalists (NZAMH), petitioned parliament for legal status for herbalists, but he was unsuccessful. The Evening Post newspaper perhaps summed up the opposing position by claiming that herbalism ‘is <span class="vocab-word" data-en="Obsolete" data-vi="Lỗi thời" data-pron="/ˈɒbsəliːt/" data-context="Không còn được sử dụng nữa vì đã bị thay thế bởi cái mới hơn">obsolete</span>’.</p>
+
+                        <p class="mb-4"><strong>C.</strong> In fact, traditional Maori medicine faced a more determined challenge. <span id="loc_p2_q20" class="highlight-target">In 1908 the government passed a <span class="vocab-word" data-en="Controversial" data-vi="Gây tranh cãi" data-pron="/ˌkɒntrəˈvɜːʃl/" data-context="Tạo ra nhiều ý kiến trái chiều hoặc sự bất đồng gay gắt">controversial</span> law that had the effect of restricting traditional herbal practice</span>, or pushing it underground. Then for a brief period in the mid-20th century, herbal medicine was largely ignored, <span class="vocab-word" data-en="Shunned" data-vi="Bị xa lánh, tẩy chay" data-pron="/ʃʌnd/" data-context="Bị tránh né hoặc cố tình không được chấp nhận">shunned</span> by the majority of the medical profession, and absent from medical school curricula. But a centuries-old tradition was not going to disappear so easily, and in the 1980s the NZAMH was revived, and <span id="loc_p2_q21" class="highlight-target">it became possible to complete a course in herbal medicine at several polytechnics</span> around the country. However, the problem remained of how to connect the culture of plant-based medicine with <span class="vocab-word" data-en="Conventional" data-vi="Truyền thống, thông thường" data-pron="/kənˈvɛnʃənl/" data-context="Theo những cách thức, tư duy đã được chấp nhận và sử dụng rộng rãi từ lâu">conventional</span> scientific thinking in order to promote herbal use within the general population. For many years, the limited evidence there was that herbal medicines worked was undermined by lack of interest among general practitioners and within the scientific community.</p>
+
+                        <p class="mb-4"><strong>D.</strong> Today, the ideas of herbalists in the 1980s – eat a varied diet, include lots of fresh fruit and vegetables, recognise stress – are completely accepted by the medical establishment and widely practised in society as a whole. Natural health products are big sellers in pharmacies, and <span id="loc_p2_q14" class="highlight-target">global pharmaceutical companies are buying up natural supplement brands or developing their own.</span> What’s more, according to Rasmussen, <span class="vocab-word" data-en="Robust" data-vi="Mạnh mẽ, vững chắc" data-pron="/rəʊˈbʌst/" data-context="Đáng tin cậy, mạnh mẽ và khó có thể bị phá vỡ hay phủ nhận">robust</span> clinical trials show that herbal medicine is generally safe – safer than most drugs. <span id="loc_p2_q17" class="highlight-target">‘It doesn’t do everything,’ he says, ‘but there’s a lot it does do, particularly in terms of <span class="vocab-word" data-en="Preventative" data-vi="Phòng ngừa" data-pron="/prɪˈvɛntətɪv/" data-context="Nhằm ngăn chặn bệnh tật trước khi chúng xảy ra">preventative</span> health care.’</span> One significant issue for today’s export-oriented herbal medicine producers is the question of how to guarantee standards for consumers in different countries. In other words, there is the need for some form of globally recognised system of documentation. Rasmussen’s range of extracts are produced under the Good Manufacturing Practice (GMP) scheme, which is respected around the world. <span id="loc_p2_q26" class="highlight-target">So too is the range produced by Sandra Clair, who says that such assurance is expensive but necessary if you want to export herbal remedies</span> to the rest of the world. Moves to launch a joint Australia–New Zealand agency to regulate herbal remedies under a single, <span class="vocab-word" data-en="Streamlined" data-vi="Được tinh giản, hợp lý hóa" data-pron="/ˈstriːmlaɪnd/" data-context="Được làm cho đơn giản và hiệu quả hơn">streamlined</span> licensing process have recently been revived, after being abandoned in 2007 through lack of support in parliament.</p>
+
+                        <p class="mb-4"><strong>E.</strong> There are those in the industry who support further regulation still. <span id="loc_p2_q22" class="highlight-target">According to Rasmussen, some herbs should require a <span class="vocab-word" data-en="Prescription" data-vi="Đơn thuốc" data-pron="/prɪˈskrɪpʃn/" data-context="Yêu cầu phải có chỉ định bằng văn bản từ bác sĩ để mua thuốc">prescription</span> from a suitably qualified medical herbalist or doctor. For example, consumers shouldn’t be able to go to their local supermarket and buy St John’s Wort</span>, according to Rasmussen, because it can interact in harmful ways with at least ten pharmaceutical drugs. Isla Burgess, who is part of the International Research Group for the Conservation of Medicinal Plants, agrees that tighter regulation is necessary, but for a different reason. <span id="loc_p2_q24" class="highlight-target">‘More than 400,000 tonnes of medicinal and aromatic plants are traded in the world each year,’ says Burgess. ‘The great majority of these are harvested from the wild, so they each have an impact on their local <span class="vocab-word" data-en="Ecosystem" data-vi="Hệ sinh thái" data-pron="/ˈiːkəʊsɪstəm/" data-context="Môi trường và các sinh vật sống tương tác với nhau trong một khu vực">ecosystem</span>.’</span> She gives the example of elm trees in the USA, ringbarked and stripped for the growing market for a product called ‘slippery elm’: this endangered tree should be protected. <span id="loc_p2_q16" class="highlight-target">But others argue that more regulation would be <span class="vocab-word" data-en="Prohibitively" data-vi="Quá cao/đắt (đến mức không thể)" data-pron="/prəˈhɪbɪtɪvli/" data-context="Chi phí quá cao đến mức ngăn cản mọi người làm hoặc mua thứ gì đó">prohibitively</span> expensive for all but the largest manufacturers – a change, cautions Clair, that would probably put some local companies out of business.</span> So, for the time being at least, it seems that the topic of herbal medicines will continue to provoke debate.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_17',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–17</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 2 has five paragraphs, <strong>A–E</strong>.<br>Which paragraph contains the following information?<br><span class="italic text-gray-500 text-sm mt-1 block">NB You may use any letter more than once.</span></p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Paragraphs',
+                            pool: SECTION_LIST_P2,
+                            questions: [
+                                { id: 'p2_q14', text: '14. a reference to the interest shown by large corporations in herbal remedies', correct: 'D', explanation: 'Paragraph D states: "global pharmaceutical companies are buying up natural supplement brands or developing their own," demonstrating the interest from large corporations.' },
+                                { id: 'p2_q15', text: '15. examples of the uses of one particular herbal medicine', correct: 'A', explanation: 'Paragraph A provides the example: "Take arnica, for example, a popular pharmaceutical herb used to treat bruises and joint problems."' },
+                                { id: 'p2_q16', text: '16. a warning that small companies cannot afford stricter controls of the herbal medicine industry', correct: 'E', explanation: 'Paragraph E notes: "others argue that more regulation would be prohibitively expensive for all but the largest manufacturers – a change, cautions Clair, that would probably put some local companies out of business."' },
+                                { id: 'p2_q17', text: '17. a statement by one expert about the effectiveness and limitations of herbal medicines', correct: 'D', explanation: 'Paragraph D quotes Rasmussen on its effectiveness and limits: "‘It doesn’t do everything,’ he says, ‘but there’s a lot it does do, particularly in terms of preventative health care.’"' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q18_21',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 18–21</h3>
+                                    <p class="mb-4 text-gray-700">Complete the summary below.<br>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-4 border-b border-indigo-200 pb-2">The history of herbal medicines in New Zealand</h4>
+                                    
+                                    <p class="leading-loose">
+                                        Originally, the Maori people consumed plants to help deal with <strong>18</strong> <input type="text" data-qid="p2_q18" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">, and also as food. When Europeans settled in the country, a <strong>19</strong> <input type="text" data-qid="p2_q19" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> by James Neil showed that some of them also recognised the medicinal value of native plants. However, criticism of herbal medicine appeared in one newspaper in 1907. The following year, the use of herbal medicines was made more difficult because of a new <strong>20</strong> <input type="text" data-qid="p2_q20" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">, and for a time in the mid-20th century, they were largely ignored. Then in the 1980s a number of institutions started offering a <strong>21</strong> <input type="text" data-qid="p2_q21" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> in the subject, although for many years there was still little evidence to support their use, because doctors and academics were not interested.
+                                    </p>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q18', correct: 'pain', explanation: 'Paragraph B states the Maori found plants "that were an obvious source of nutrition, but that were taken for the relief of pain as well."' },
+                                { id: 'p2_q19', correct: 'book', explanation: 'Paragraph B notes: "...in his book published in 1891, herbalist James Neil described manuka and koromiko as among New Zealand’s most valuable herbs."' },
+                                { id: 'p2_q20', correct: 'law', explanation: 'Paragraph C explains: "In 1908 the government passed a controversial law that had the effect of restricting traditional herbal practice..."' },
+                                { id: 'p2_q21', correct: 'course', explanation: 'Paragraph C states: "...and in the 1980s the NZAMH was revived, and it became possible to complete a course in herbal medicine..."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q22_26',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 22–26</h3>
+                                    <p class="mb-4 text-gray-700">Look at the following statements (Questions 22–26) and the list of people below.<br>Match each statement with the correct person, <strong>A, B, C or D</strong>.<br><span class="italic text-gray-500 text-sm mt-1 block">NB You may use any letter more than once.</span></p>
+                                </div>
+                            `,
+                            poolLabel: 'List of People',
+                            pool: PEOPLE_LIST_P2,
+                            questions: [
+                                { id: 'p2_q22', text: '22. There ought to be restrictions on where you can buy some herbal medicines.', correct: 'A', explanation: 'Paragraph E attributes this to Rasmussen: "According to Rasmussen, some herbs should require a prescription... consumers shouldn’t be able to go to their local supermarket and buy St John’s Wort..."' },
+                                { id: 'p2_q23', text: '23. The authorities stopped supporting one project without a good reason.', correct: 'B', explanation: 'Paragraph A attributes this to Malcolm Douglas: "It was an unjustified move, according to agronomist Malcolm Douglas, based on a number of inaccurate views..."' },
+                                { id: 'p2_q24', text: '24. The herbal medicine industry has an effect on the environment where some plant-based medicines are found.', correct: 'D', explanation: 'Paragraph E attributes this to Isla Burgess: "The great majority of these are harvested from the wild, so they each have an impact on their local ecosystem, says Burgess."' },
+                                { id: 'p2_q25', text: '25. New Zealand has the human resources and natural environment to grow herbs commercially.', correct: 'A', explanation: 'Paragraph A attributes this to Phil Rasmussen: "there is huge potential for New Zealand to develop a herb industry based on the excellent growing conditions and expertise there, according to Phil Rasmussen..."' },
+                                { id: 'p2_q26', text: '26. It is essential for herbal medicines to have international certification, despite the cost.', correct: 'C', explanation: 'Paragraph D attributes this to Sandra Clair: "So too is the range produced by Sandra Clair, who says that such assurance is expensive but necessary if you want to export herbal remedies..."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Research into the effects of different teaching styles",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> Prior to 1960, most <span class="vocab-word" data-en="Inquiries" data-vi="Cuộc điều tra, nghiên cứu" data-pron="/ɪnˈkwaɪəriz/" data-context="Sự tìm hiểu sâu hoặc thu thập thông tin về một vấn đề">inquiries</span> into pupils' learning skills explored the relationship between factors such as children's social background, personality or measured intelligence and their achievement in various school subjects. Studies of teachers were largely a <span class="vocab-word" data-en="Quest" data-vi="Sự tìm kiếm" data-pron="/kwɛst/" data-context="Một nỗ lực kéo dài để tìm ra một điều gì đó quan trọng">quest</span> for criteria of effectiveness, and numerous investigations sought links between personality or attitude and 'success' at teaching. By 1950, Domas and Tiedeman were able to survey 672 such studies of teacher effectiveness. Yet there was widespread disappointment with such research, partly because so little of value seemed to emerge. First of all, there was little agreement about what constituted 'good' teaching or who the good teachers were. Secondly, there were numerous conflicting and <span class="vocab-word" data-en="Contradictory" data-vi="Mâu thuẫn, trái ngược" data-pron="/ˌkɒntrəˈdɪktəri/" data-context="Có chứa thông tin hoặc ý kiến hoàn toàn trái ngược nhau">contradictory</span> findings. No sooner had one investigator found a relationship which appeared to be significant, than another discovered the opposite effect.</p>
+
+                        <p class="mb-4"><strong>B.</strong> For example, in 1945, two American researchers, Rostker and Rolfe, both using standardized testing techniques and broad samples of teachers, reached exactly opposite conclusions. <span id="loc_p3_q34" class="highlight-target">Rostker concluded that the intelligence of the teacher is the most important single factor</span> conditioning teaching ability, and that there is no significant relationship between personality and teaching ability. <span id="loc_p3_q37" class="highlight-target">Rolfe, however, found no correlation between intelligence and teaching efficiency: he claimed that the teacher's personality was what produced good teaching.</span> Another American writer, Barr (1961), summarized a massive amount of American research and underlined the chaos in the research literature on effectiveness: "Some teachers were preferred by administrators, some were liked by the pupils, and some taught in classes where there were substantial pupil gains, and generally speaking these were not the same teachers.”</p>
+
+                        <p class="mb-4"><strong>C.</strong> One of the earliest pieces of research dates from 1912, when <span id="loc_p3_q36" class="highlight-target">Stevens made 100 random observations of lessons in a variety of subject areas, in order to analyze the number and nature of questions being asked by teachers.</span> Stevens's overall total was 64% teacher talk and 36% pupil talk, figures which are remarkably similar to a number of findings half a century later.</p>
+
+                        <p class="mb-4"><strong>D.</strong> For many years in the first half of the 20th century, so-called 'formal' teaching was the norm. <span id="loc_p3_q40" class="highlight-target">Teachers taught their classes as a whole group, gave out information, asked questions which <span class="vocab-word" data-en="Predominantly" data-vi="Phần lớn, chủ yếu" data-pron="/prɪˈdɒmɪnəntli/" data-context="Chủ yếu hoặc chiếm ưu thế trong một tình huống">predominantly</span> required factual recall, and frequently set a common written task for the children to complete in a prescribed period of time. It was hardly surprising, therefore, that one focus of classroom interaction research in the decades following Stevens's inquiry was on the <span class="vocab-word" data-en="Phenomenon" data-vi="Hiện tượng" data-pron="/fɪˈnɒmɪnən/" data-context="Một sự việc hoặc sự kiện đáng chú ý có thể quan sát được">phenomenon</span> of 'attentiveness'.</span> A number of studies in the 1920s and 1930s, by Morrison and others, sought <span id="loc_p3_q27" class="highlight-target">relationships between the degree of attention being paid by children and the amount they subsequently appeared to have learnt.</span> Such research was usually based on observing teachers at work, a technique which was also employed extensively by United States administrators in the 1920s and 1930s, in order to <span id="loc_p3_q28" class="highlight-target">assess teachers' competence</span> and allocate merit payments to so-called 'superior' teachers.</p>
+
+                        <p class="mb-4"><strong>E.</strong> As the 1930s came to an end, <span id="loc_p3_q38" class="highlight-target">it was partly the emergence of <span class="vocab-word" data-en="Totalitarian" data-vi="Độc tài, toàn trị" data-pron="/təʊˌtælɪˈteəriən/" data-context="Chế độ chính trị kiểm soát hoàn toàn cuộc sống của người dân">totalitarian</span> regimes in Europe which led to a shift in interest</span> in the United States away from attentiveness, with its emphasis on the authority of the teacher, and <span id="loc_p3_q29" class="highlight-target">towards a <span class="vocab-word" data-en="Scrutiny" data-vi="Sự xem xét kỹ lưỡng" data-pron="/ˈskruːtɪni/" data-context="Sự kiểm tra cẩn thận và chi tiết">scrutiny</span> of authoritarianism itself.</span> A number of people began to feel that if dictatorship were to be avoided, children must learn in school how to handle democracy. <span id="loc_p3_q30" class="highlight-target">Several investigators examined the processes taking place within small discussion groups</span>, and tried to establish superiority for discussion groups over lecture classes, but with conflicting results. The movement towards what was becoming known as child-centred education was gathering <span class="vocab-word" data-en="Momentum" data-vi="Đà, động lực" data-pron="/məˈmɛntəm/" data-context="Tốc độ hoặc sự phát triển mạnh mẽ của một quá trình">momentum</span>, and as interest in child development increased, investigators began to discover the usefulness of direct observation and the categorization of child behavior.</p>
+
+                        <p class="mb-4"><strong>F.</strong> This was when systematic observation of teacher-pupil interaction began in earnest. <span id="loc_p3_q39" class="highlight-target">Anderson (1939) studied what he called 'domination' and 'integration' amongst kindergarten children. Dominative acts by children included blaming and snatching toys</span>, and such acts by teachers included restricting children's activities; <span id="loc_p3_q39_part2" class="highlight-target">while children's integrative acts included sharing facilities and playing <span class="vocab-word" data-en="Harmoniously" data-vi="Một cách hài hòa" data-pron="/hɑːˈməʊniəsli/" data-context="Hoạt động cùng nhau một cách êm ả, không có xung đột">harmoniously</span></span>, and those of teachers included expanding opportunities for self-direction and co-operation. Anderson then attempted to measure what is now commonly called 'classroom climate'.</p>
+
+                        <p class="mb-4"><strong>G.</strong> <span id="loc_p3_q35" class="highlight-target">Lewin, Lippitt and White (1939 and 1943) studied the effects of different teaching styles. They arranged for three groups of five boys each to be taught in very different ways: these were labelled 'authoritarian', 'democratic' and 'laissez-faire'.</span> The first two of these were similar to Anderson's concept of dominative and integrative teachers.</p>
+
+                        <p class="mb-4"><strong>H.</strong> Beginning with Withall's work in 1949, there was much greater interest in interaction within the classroom. Withall used the term 'social-emotional climate' to describe the emotional tone created as a result of face-to-face interaction in groups, and, like many who followed him, <span id="loc_p3_q31" class="highlight-target">concentrated his analysis of this climate on the study of teachers' verbal behavior.</span> Withall also made <span id="loc_p3_q32" class="highlight-target">efforts towards increasing the reliability of analyses</span>, and this important <span class="vocab-word" data-en="Pioneering" data-vi="Tiên phong" data-pron="/ˌpaɪəˈnɪərɪŋ/" data-context="Đi đầu trong việc phát triển một lĩnh vực hoặc phương pháp mới">pioneering</span> work in the development of classroom observation methodology was followed by many others during the 1950s.</p>
+
+                        <p class="mb-4"><strong>I.</strong> Partly because of the disappointing results of the teacher-effectiveness research, and partly because of the general neglect in earlier work of the variables of actual classroom behavior, the decade 1960–70 produced <span id="loc_p3_q33" class="highlight-target">a large number of studies of classroom processes, based on observation of teachers at work.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_33',
+                            displayType: 'inline_dropdown',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–33</h3>
+                                    <p class="mb-4 text-gray-700">Complete the summary using the list of phrases, <strong>A–J</strong>, below.</p>
+                                </div>
+                            `,
+                            wordBank: [
+                                { id: 'A', text: 'authoritarianism' },
+                                { id: 'B', text: 'competence' },
+                                { id: 'C', text: 'emergence' },
+                                { id: 'D', text: 'learning' },
+                                { id: 'E', text: 'observation' },
+                                { id: 'F', text: 'personality' },
+                                { id: 'G', text: 'processes' },
+                                { id: 'H', text: 'reliability' },
+                                { id: 'I', text: 'training' },
+                                { id: 'J', text: 'verbal behavior' }
+                            ],
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-4 border-b border-indigo-200 pb-2">Research into classroom interaction: 1920–1970</h4>
+                                    
+                                    <p class="font-bold text-indigo-800 mt-4 mb-2">1920–1939</p>
+                                    <p class="leading-loose pl-2 border-l-2 border-indigo-200">
+                                        Research largely investigated the relationship between children's attentiveness and their <strong>27</strong> <select data-qid="p3_q27" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select>. In addition, attentiveness was used to measure the <strong>28</strong> <select data-qid="p3_q28" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select> of the teachers.
+                                    </p>
+
+                                    <p class="font-bold text-indigo-800 mt-6 mb-2">1939–49</p>
+                                    <p class="leading-loose pl-2 border-l-2 border-indigo-200">
+                                        Research was influenced by a growing distrust of <strong>29</strong> <select data-qid="p3_q29" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select>. The period saw the beginnings of systematic analysis of the <strong>30</strong> <select data-qid="p3_q30" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select> which occur in lecture classes and in small group discussions.
+                                    </p>
+
+                                    <p class="font-bold text-indigo-800 mt-6 mb-2">1949–60</p>
+                                    <p class="leading-loose pl-2 border-l-2 border-indigo-200">
+                                        Classroom transactions were analysed in more detail, often with a focus on the <strong>31</strong> <select data-qid="p3_q31" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select> of teachers. Researchers aimed to improve the <strong>32</strong> <select data-qid="p3_q32" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select> of their methods.
+                                    </p>
+
+                                    <p class="font-bold text-indigo-800 mt-6 mb-2">1960–70</p>
+                                    <p class="leading-loose pl-2 border-l-2 border-indigo-200">
+                                        The number of studies based on live <strong>33</strong> <select data-qid="p3_q33" class="inline-blank w-48 mx-1 px-2 py-1 border-b-2 border-gray-400 bg-white rounded-md text-sm focus:outline-none focus:border-pink-500 font-bold text-indigo-900 shadow-sm transition-colors cursor-pointer"></select> greatly increased.
+                                    </p>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p3_q27', correct: 'D', explanation: 'Paragraph D notes that researchers "sought relationships between the degree of attention being paid by children and the amount they subsequently appeared to have learnt" (learning).' },
+                                { id: 'p3_q28', correct: 'B', explanation: 'Paragraph D states that observation of teachers at work was used by administrators "in order to assess teachers\' competence".' },
+                                { id: 'p3_q29', correct: 'A', explanation: 'Paragraph E explains there was a shift in interest "towards a scrutiny of authoritarianism itself" and that people wanted to avoid dictatorship.' },
+                                { id: 'p3_q30', correct: 'G', explanation: 'Paragraph E states: "Several investigators examined the processes taking place within small discussion groups, and tried to establish superiority for discussion groups over lecture classes..."' },
+                                { id: 'p3_q31', correct: 'J', explanation: 'Paragraph H mentions that Withall (1949) "concentrated his analysis of this climate on the study of teachers\' verbal behavior."' },
+                                { id: 'p3_q32', correct: 'H', explanation: 'Paragraph H notes: "Withall also made efforts towards increasing the reliability of analyses..."' },
+                                { id: 'p3_q33', correct: 'E', explanation: 'Paragraph I describes that the decade 1960–70 "produced a large number of studies of classroom processes, based on observation of teachers at work."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q34_37',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 34–37</h3>
+                                    <p class="mb-4 text-gray-700">Look at the following descriptions (Questions 34–37) and the list of researchers below.<br>Match each description with the correct researcher(s), <strong>A–G</strong>.<br><span class="italic text-gray-500 text-sm mt-1 block">NB You may use any letter more than once.</span></p>
+                                </div>
+                            `,
+                            poolLabel: 'List of researchers',
+                            pool: RESEARCHERS_LIST_P3,
+                            questions: [
+                                { id: 'p3_q34', text: '34. claimed that the most important contribution to success in teaching is made by intelligence', correct: 'B', explanation: 'Paragraph B explicitly states: "Rostker concluded that the intelligence of the teacher is the most important single factor conditioning teaching ability..."' },
+                                { id: 'p3_q35', text: '35. set up an experiment to discover how pupils responded to various types of teaching', correct: 'G', explanation: 'Paragraph G explains: "Lewin, Lippitt and White (1939 and 1943) studied the effects of different teaching styles. They arranged for three groups of five boys each to be taught in very different ways..."' },
+                                { id: 'p3_q36', text: '36. focused on the questions which teachers asked in the classroom', correct: 'E', explanation: 'Paragraph C states: "...when Stevens made 100 random observations of lessons... in order to analyze the number and nature of questions being asked by teachers."' },
+                                { id: 'p3_q37', text: '37. discovered a connection between success in teaching and the personality of the teacher', correct: 'C', explanation: 'Paragraph B notes: "Rolfe, however... claimed that the teacher\'s personality was what produced good teaching."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q38_40',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 38–40</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 3 has nine paragraphs, <strong>A–I</strong>.<br>Which paragraph contains the following information?<br><span class="italic text-gray-500 text-sm mt-1 block">Write the correct letter, A–I, in boxes 38–40 on your answer sheet.</span></p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Paragraphs',
+                            pool: PARAGRAPHS_LIST_P3,
+                            questions: [
+                                { id: 'p3_q38', text: '38. the influence of political events on research', correct: 'E', explanation: 'Paragraph E discusses how "partly the emergence of totalitarian regimes in Europe... led to a shift in interest in the United States away from attentiveness... and towards a scrutiny of authoritarianism itself."' },
+                                { id: 'p3_q39', text: '39. an example of how children\'s behavior was categorized for research purposes', correct: 'F', explanation: 'Paragraph F gives examples of categorizing behavior: "Dominative acts by children included blaming and snatching toys... while children\'s integrative acts included sharing facilities and playing harmoniously..."' },
+                                { id: 'p3_q40', text: '40. a reason for research into children\'s attention', correct: 'D', explanation: 'Paragraph D explains the reason: because formal teaching involved teaching groups and giving out information, "It was hardly surprising, therefore, that one focus of classroom interaction research... was on the phenomenon of \'attentiveness\'."' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. APPLICATION STATE ---
+        let state = {
+            mode: 'START', // 'START' | 'TEST' | 'RESULT'
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            totalQuestions: 0,
+            questionsList: [], 
+            activeDragItem: null, 
+            _lastLoadedPart: -1,
+            _preventScrollReset: false
+        };
+
+        // --- 3. DOM ELEMENTS ---
+        const DOM = {
+            views: {
+                start: document.getElementById('view-start'),
+                main: document.getElementById('view-main')
+            },
+            header: {
+                actions: document.getElementById('test-header-actions'),
+                timer: document.getElementById('timer-display'),
+                btnSubmit: document.getElementById('btn-submit-header')
+            },
+            resultBanner: {
+                container: document.getElementById('result-banner'),
+                score: document.getElementById('score-display'),
+                timeTaken: document.getElementById('time-taken-display')
+            },
+            navigation: {
+                tabs: document.getElementById('part-tabs')
+            },
+            navigator: {
+                container: document.getElementById('question-navigator'),
+                grid: document.getElementById('navigator-grid'),
+                legend: document.getElementById('navigator-legend')
+            },
+            panes: {
+                title: document.getElementById('passage-title'),
+                content: document.getElementById('passage-content'),
+                questions: document.getElementById('questions-content'),
+                btnSubmitBottom: document.getElementById('btn-submit-bottom'),
+                floatingSubmit: document.getElementById('floating-submit-container')
+            },
+            tooltip: {
+                container: document.getElementById('vocab-tooltip'),
+                word: document.getElementById('tt-word'),
+                pron: document.getElementById('tt-pron'),
+                vi: document.getElementById('tt-vi'),
+                context: document.getElementById('tt-context'),
+                btnClose: document.getElementById('btn-close-tooltip')
+            },
+            modal: {
+                container: document.getElementById('submit-modal'),
+                message: document.getElementById('modal-message'),
+                btnCancel: document.getElementById('btn-cancel-submit'),
+                btnConfirm: document.getElementById('btn-confirm-submit')
+            }
+        };
+
+        // --- 4. CORE FUNCTIONS ---
+
+        function init() {
+            // Build flattened question list for navigator
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach((q) => {
+                    if (q.displayType === 'checkbox' && q.answersIds) {
+                        const correctOpts = q.options.filter(o => o.isCorrect);
+                        q.answersIds.forEach((ansId, idx) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: ansId, absNum: absNum++,
+                                isCorrect: correctOpts[idx]?.id,
+                                displayType: 'checkbox',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_blanks' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_blank',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_dropdown' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_dropdown',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'drag_drop' && q.questions) {
+                        q.questions.forEach((subQ) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: subQ.id, absNum: absNum++,
+                                isCorrect: subQ.correct,
+                                displayType: 'drag_drop',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'instruction') {
+                        // skip instruction blocks in navigator
+                    } else {
+                        state.questionsList.push({
+                            partIndex: pIdx, qId: q.id, absNum: absNum++,
+                            isCorrect: q.options?.find(o => o.isCorrect)?.id,
+                            displayType: q.displayType
+                        });
+                    }
+                });
+            });
+
+            // Set the exact total questions count
+            state.totalQuestions = state.questionsList.length;
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', confirmSubmit);
+            DOM.panes.btnSubmitBottom.addEventListener('click', confirmSubmit);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+            
+            // Custom Modal Events
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', () => {
+                DOM.modal.container.classList.add('hidden');
+                finishTest();
+            });
+
+            // Global click to close tooltip & deselect drag items
+            document.addEventListener('click', (e) => {
+                if(state.mode === 'RESULT') {
+                    const isVocab = e.target.classList.contains('vocab-word');
+                    const isTooltip = DOM.tooltip.container.contains(e.target);
+                    if (!isVocab && !isTooltip) {
+                        hideTooltip();
+                    }
+                } else if (state.mode === 'TEST') {
+                    // Click outside to deselect pool items
+                    if (state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                        state.activeDragItem = null;
+                        document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                    }
+                }
+            });
+
+            // Format initial timer on start screen
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            
+            // View Transitions
+            DOM.views.start.classList.add('hidden');
+            DOM.views.start.classList.remove('flex', 'flex-col');
+            
+            DOM.views.main.classList.remove('hidden');
+            DOM.views.main.classList.add('flex', 'flex-col');
+            
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+
+            renderTabs();
+            loadPart(0);
+            updateNavigator();
+            
+            // Start Timer
+            state.timerInterval = setInterval(tickTimer, 1000);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function tickTimer() {
+            if (state.timeRemaining <= 0) {
+                clearInterval(state.timerInterval);
+                finishTest(); // Auto submit
+                return;
+            }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            
+            // Change color if running low (< 5 mins)
+            if(state.timeRemaining < 300) {
+                DOM.header.timer.parentElement.classList.add('bg-red-50', 'border-red-200');
+                DOM.header.timer.classList.add('text-red-600');
+            }
+        }
+
+        function renderTabs() {
+            DOM.navigation.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((part, index) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors border border-b-0 outline-none ${
+                    index === state.currentPart 
+                    ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' 
+                    : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
+                }`;
+                btn.textContent = `Part ${index + 1}`;
+                btn.onclick = () => loadPart(index);
+                DOM.navigation.tabs.appendChild(btn);
+            });
+        }
+
+        function loadPart(index) {
+            const isNewPart = state._lastLoadedPart !== index;
+            state.currentPart = index;
+            state._lastLoadedPart = index;
+
+            const partData = TEST_DATA.parts[index];
+            
+            // Update UI Tabs
+            renderTabs();
+
+            // Render Passage
+            DOM.panes.title.textContent = partData.title;
+            DOM.panes.content.innerHTML = partData.passage;
+
+            // Apply vocab styling based on mode
+            const vocabWords = DOM.panes.content.querySelectorAll('.vocab-word');
+            vocabWords.forEach(word => {
+                if (state.mode === 'RESULT') {
+                    word.classList.add('mode-result');
+                    word.addEventListener('click', handleVocabClick);
+                } else {
+                    word.classList.remove('mode-result');
+                }
+            });
+
+            // Render Questions
+            DOM.panes.questions.innerHTML = '';
+            
+            if (partData.questions.length === 0) {
+                DOM.panes.questions.innerHTML = `
+                    <div class="p-8 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-4">
+                        <p class="text-lg italic">Questions for this part will be injected here...</p>
+                    </div>
+                `;
+            }
+
+            partData.questions.forEach((q, qIndex) => {
+
+                const qDiv = document.createElement('div');
+                qDiv.id = 'container_' + q.id;
+                qDiv.className = 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
+                
+                if (q.displayType === 'drag_drop') {
+                    // --- DRAG AND DROP DISPLAY ---
+                    const wrapper = document.createElement('div');
+                    
+                    // Instruction Block
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+
+                    // The Draggable Options Pool (Non-sticky fix applied)
+                    const poolContainer = document.createElement('div');
+                    poolContainer.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6'; 
+                    poolContainer.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">${q.poolLabel}</h4>`;
+
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-800 font-medium';
+                    
+                    const usedItems = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+
+                    q.pool.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 hover:border-pink-300 transition-colors flex items-center justify-between shadow-sm';
+                        itemDiv.textContent = item.text;
+                        
+                        if (state.mode === 'TEST') {
+                            const isUsed = !q.isReusable && usedItems.includes(item.id);
+                            
+                            if (isUsed) {
+                                itemDiv.classList.add('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                            } else {
+                                itemDiv.draggable = true;
+                                
+                                // Native Drag Events
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    e.dataTransfer.effectAllowed = 'copyMove';
+                                    itemDiv.classList.add('opacity-50'); 
+                                    state.activeDragItem = null; // reset click fallback
+                                };
+                                itemDiv.ondragend = () => itemDiv.classList.remove('opacity-50');
+                                
+                                // Click to Select Fallback
+                                itemDiv.onclick = (e) => {
+                                    e.stopPropagation();
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    
+                                    if (state.activeDragItem === item.id) {
+                                        state.activeDragItem = null; 
+                                    } else {
+                                        state.activeDragItem = item.id;
+                                        itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                    }
+                                };
+
+                                // Restore active visual state if returning
+                                if (state.activeDragItem === item.id) {
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                }
+                            }
+                        }
+
+                        poolGrid.appendChild(itemDiv);
+                    });
+                    poolContainer.appendChild(poolGrid);
+
+                    if (state.mode === 'TEST') {
+                        const dragNote = document.createElement('p');
+                        dragNote.className = 'text-xs text-gray-500 text-center mt-3';
+                        dragNote.innerHTML = '<em>Drag an item to the boxes below, or Tap an item then Tap a box to place it.</em>';
+                        poolContainer.appendChild(dragNote);
+                    }
+                    wrapper.appendChild(poolContainer);
+
+                    // Dropzone Questions List
+                    const qListContainer = document.createElement('div');
+                    qListContainer.className = 'space-y-4';
+
+                    q.questions.forEach((subQ) => {
+                        const subQDiv = document.createElement('div');
+                        subQDiv.id = 'container_' + subQ.id;
+                        subQDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-xl bg-white transition-colors';
+
+                        const qLabel = document.createElement('label');
+                        qLabel.className = 'font-bold text-gray-800 flex-1 leading-relaxed flex items-start';
+                        qLabel.innerHTML = `<span>${subQ.text}</span>`;
+
+                        const dropZone = document.createElement('div');
+                        dropZone.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm transition-all relative shrink-0 overflow-hidden';
+
+                        const userAnsId = state.answers[subQ.id];
+                        const userAnsItem = q.pool.find(i => i.id === userAnsId);
+
+                        if (state.mode === 'RESULT') {
+                            dropZone.classList.remove('border-dashed');
+                            dropZone.classList.add('border-solid');
+                            
+                            if (userAnsId === subQ.correct) {
+                                dropZone.classList.add('bg-green-50', 'border-green-500', 'text-green-800', 'font-medium');
+                                dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                            } else {
+                                dropZone.classList.add('bg-red-50', 'border-red-500', 'text-red-800', 'font-medium');
+                                dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                            }
+                        } else {
+                            if (userAnsItem) {
+                                dropZone.classList.add('border-pink-400', 'bg-pink-50', 'text-pink-800', 'font-medium', 'border-solid');
+                                dropZone.classList.remove('border-dashed', 'border-gray-300');
+                                dropZone.innerHTML = `
+                                    <div class="flex justify-between items-center w-full">
+                                        <span class="truncate pr-2">${userAnsItem.text}</span>
+                                        <button class="text-pink-500 hover:text-pink-700 p-1 font-bold text-lg" onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>
+                                    </div>`;
+                            } else {
+                                dropZone.classList.add('border-gray-300', 'text-gray-400', 'cursor-pointer');
+                                dropZone.textContent = 'Drop answer here';
+                            }
+
+                            // Drag Drop Handlers
+                            dropZone.ondragover = (e) => {
+                                e.preventDefault();
+                                dropZone.classList.add('bg-pink-100', 'border-pink-500');
+                            };
+                            dropZone.ondragleave = (e) => {
+                                e.preventDefault();
+                                dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                            };
+                            dropZone.ondrop = (e) => {
+                                e.preventDefault();
+                                dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                const itemId = e.dataTransfer.getData('text/plain');
+                                if (itemId) {
+                                    state.answers[subQ.id] = itemId;
+                                    handleDropAndReload(index);
+                                }
+                            };
+                            
+                            // Click to Drop Handler
+                            dropZone.onclick = (e) => {
+                                if (state.activeDragItem) {
+                                    state.answers[subQ.id] = state.activeDragItem;
+                                    state.activeDragItem = null;
+                                    handleDropAndReload(index);
+                                }
+                            };
+                        }
+
+                        // Build structure
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'w-full mt-4 pt-4 border-t border-gray-100';
+
+                            const correctItem = q.pool.find(i => i.id === subQ.correct);
+                            if (userAnsId !== subQ.correct) {
+                                const corrAnsMsg = document.createElement('p');
+                                corrAnsMsg.className = 'text-sm text-green-600 font-bold mb-3 flex items-center gap-1.5';
+                                corrAnsMsg.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Correct Answer: <span class="ml-1 text-gray-800">${correctItem.text}</span>`;
+                                expContainer.appendChild(corrAnsMsg);
+                            }
+
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${subQ.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            expContainer.appendChild(expBtn);
+                            expContainer.appendChild(expBox);
+                            
+                            const wrapDiv = document.createElement('div');
+                            wrapDiv.className = 'flex flex-col w-full';
+                            const upperDiv = document.createElement('div');
+                            upperDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full';
+                            upperDiv.appendChild(qLabel);
+                            upperDiv.appendChild(dropZone);
+                            wrapDiv.appendChild(upperDiv);
+                            wrapDiv.appendChild(expContainer);
+                            
+                            subQDiv.classList.remove('flex-row', 'sm:flex-row');
+                            subQDiv.appendChild(wrapDiv);
+                        } else {
+                            subQDiv.appendChild(qLabel);
+                            subQDiv.appendChild(dropZone);
+                        }
+
+                        qListContainer.appendChild(subQDiv);
+                    });
+                    
+                    wrapper.appendChild(qListContainer);
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'checkbox') {
+                    // Checkbox display logic
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+
+                    const qHeader = document.createElement('h3');
+                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                    qHeader.innerHTML = `<span>${q.text}</span>`;
+                    qDiv.appendChild(qHeader);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'space-y-3';
+
+                    let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+
+                    q.options.forEach(opt => {
+                        const isSelected = currentSelections.includes(opt.id);
+                        const optWrapper = document.createElement('div');
+                        
+                        let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                        
+                        if (state.mode === 'TEST') {
+                            baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
+                        } else if (state.mode === 'RESULT') {
+                            baseClasses += ' cursor-default ';
+                            if (opt.isCorrect) {
+                                baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                            } else if (isSelected && !opt.isCorrect) {
+                                baseClasses += 'border-red-500 bg-red-50 ';
+                            } else {
+                                baseClasses += 'border-gray-200 opacity-60 ';
+                            }
+                        }
+
+                        optWrapper.className = baseClasses;
+                        
+                        if (state.mode === 'TEST') {
+                            optWrapper.onclick = () => toggleCheckbox(q.id, opt.id);
+                        }
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = isSelected;
+                        checkbox.disabled = state.mode === 'RESULT';
+                        checkbox.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 rounded border-gray-300 pointer-events-none shrink-0';
+
+                        const labelContent = document.createElement('div');
+                        labelContent.className = 'ml-3 flex-1';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                        textSpan.textContent = opt.text;
+                        labelContent.appendChild(textSpan);
+
+                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            labelContent.appendChild(expBtn);
+                            labelContent.appendChild(expBox);
+                            
+                            if (opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            } else if (isSelected && !opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            }
+                        }
+
+                        optWrapper.prepend(checkbox);
+                        optWrapper.appendChild(labelContent);
+                        optionsContainer.appendChild(optWrapper);
+                    });
+
+                    qDiv.appendChild(optionsContainer);
+
+                } else if (q.displayType === 'inline_blanks') {
+                    // Inline Blanks logic
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+                    
+                    const htmlContainer = document.createElement('div');
+                    htmlContainer.innerHTML = q.html;
+                    
+                    const inputs = htmlContainer.querySelectorAll('input[data-qid]');
+                    inputs.forEach(input => {
+                        const qid = input.getAttribute('data-qid');
+                        const blankInfo = q.blanks.find(b => b.id === qid);
+                        
+                        input.value = state.answers[qid] || '';
+                        
+                        if (state.mode === 'RESULT') {
+                            input.disabled = true;
+                            const userAns = (state.answers[qid] || '').trim().toLowerCase();
+                            const correctText = blankInfo.correct.toLowerCase();
+                            
+                            if (userAns === correctText) {
+                                input.classList.add('border-green-500', 'text-green-700', 'bg-green-50');
+                                input.classList.remove('border-gray-400', 'bg-transparent');
+                            } else {
+                                input.classList.add('border-red-500', 'text-red-700', 'line-through', 'opacity-75');
+                                input.classList.remove('border-gray-400');
+                                
+                                const corrSpan = document.createElement('span');
+                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-1.5 py-0.5 rounded border border-green-200';
+                                corrSpan.textContent = blankInfo.correct;
+                                input.parentNode.insertBefore(corrSpan, input.nextSibling);
+                            }
+                        } else {
+                            if (state.answers[qid] && state.answers[qid].trim() !== '') {
+                                input.classList.add('border-pink-500', 'text-pink-700');
+                                input.classList.remove('border-gray-400');
+                            }
+                            input.oninput = (e) => {
+                                state.answers[qid] = e.target.value;
+                                if (e.target.value.trim() !== '') {
+                                    input.classList.add('border-pink-500', 'text-pink-700');
+                                    input.classList.remove('border-gray-400');
+                                } else {
+                                    input.classList.remove('border-pink-500', 'text-pink-700');
+                                    input.classList.add('border-gray-400');
+                                }
+                                updateNavigator();
+                            };
+                        }
+                    });
+                    
+                    wrapper.appendChild(htmlContainer);
+                    
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                        
+                        q.blanks.forEach(blank => {
+                            const btn = document.createElement('button');
+                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
+                            
+                            const box = document.createElement('div');
+                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                            box.innerHTML = `
+                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            btn.onclick = () => box.classList.toggle('open');
+                            
+                            expContainer.appendChild(btn);
+                            expContainer.appendChild(box);
+                        });
+                        wrapper.appendChild(expContainer);
+                    }
+                    
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'inline_dropdown') {
+                    // Inline Dropdown logic (for summary with word bank)
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+                    
+                    const htmlContainer = document.createElement('div');
+                    htmlContainer.innerHTML = q.html;
+                    
+                    const selects = htmlContainer.querySelectorAll('select[data-qid]');
+                    selects.forEach(select => {
+                        const qid = select.getAttribute('data-qid');
+                        const blankInfo = q.blanks.find(b => b.id === qid);
+                        
+                        // Populate options
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.text = 'Select...';
+                        defaultOpt.disabled = true;
+                        if (!state.answers[qid]) defaultOpt.selected = true;
+                        select.appendChild(defaultOpt);
+                        
+                        q.wordBank.forEach(word => {
+                            const opt = document.createElement('option');
+                            opt.value = word.id;
+                            opt.textContent = `${word.id}. ${word.text}`;
+                            if (state.answers[qid] === word.id) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+
+                        if (state.mode === 'RESULT') {
+                            select.disabled = true;
+                            select.className += ' cursor-default appearance-none pr-6 border-2';
+                            const userAns = state.answers[qid];
+                            
+                            if (userAns === blankInfo.correct) {
+                                select.classList.add('border-green-500', 'text-green-800', 'bg-green-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            } else {
+                                select.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                                
+                                const corrSpan = document.createElement('span');
+                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200 inline-block align-middle';
+                                corrSpan.textContent = blankInfo.correct;
+                                select.parentNode.insertBefore(corrSpan, select.nextSibling);
+                            }
+                        } else {
+                            if (state.answers[qid]) {
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            }
+                            select.onchange = (e) => {
+                                state.answers[qid] = e.target.value;
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                                updateNavigator();
+                            };
+                        }
+                    });
+                    
+                    wrapper.appendChild(htmlContainer);
+
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                        
+                        q.blanks.forEach(blank => {
+                            const btn = document.createElement('button');
+                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
+                            
+                            const box = document.createElement('div');
+                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                            const correctWord = q.wordBank.find(w => w.id === blank.correct).text;
+                            box.innerHTML = `
+                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct} (${correctWord})</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            btn.onclick = () => box.classList.toggle('open');
+                            
+                            expContainer.appendChild(btn);
+                            expContainer.appendChild(box);
+                        });
+                        wrapper.appendChild(expContainer);
+                    }
+                    
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'instruction') {
+                    // Just render instruction, no inputs
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+                    
+                    // Remove borders and padding so instruction blocks blend smoothly
+                    qDiv.className = 'mb-2';
+                } else {
+                    // Handle standard questions (e.g. Radio buttons)
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+
+                    const qHeader = document.createElement('h3');
+                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                    
+                    // Prevent double numbering if text already starts with a number (e.g. "27. Text")
+                    if (/^\d+\./.test(q.text)) {
+                        qHeader.innerHTML = `<span>${q.text}</span>`;
+                    } else {
+                        qHeader.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qIndex + 1}</span> <span>${q.text}</span>`;
+                    }
+                    
+                    const flexContainer = document.createElement('div');
+                    flexContainer.className = 'flex items-start';
+                    flexContainer.appendChild(qHeader);
+                    qDiv.appendChild(flexContainer);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'space-y-3';
+
+                    if (q.options) {
+                        q.options.forEach(opt => {
+                            const isSelected = state.answers[q.id] === opt.id;
+                            const optWrapper = document.createElement('div');
+                        
+                            let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                            
+                            if (state.mode === 'TEST') {
+                                baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
+                            } else if (state.mode === 'RESULT') {
+                                baseClasses += ' cursor-default ';
+                                if (opt.isCorrect) {
+                                    baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                                } else if (isSelected && !opt.isCorrect) {
+                                    baseClasses += 'border-red-500 bg-red-50 ';
+                                } else {
+                                    baseClasses += 'border-gray-200 opacity-60 ';
+                                }
+                            }
+
+                            optWrapper.className = baseClasses;
+
+                        if (state.mode === 'TEST') {
+                            optWrapper.onclick = () => selectOption(q.id, opt.id);
+                        }
+
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = q.id;
+                        radio.checked = isSelected;
+                        radio.disabled = state.mode === 'RESULT';
+                        radio.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 border-gray-300 pointer-events-none shrink-0';
+
+                        const labelContent = document.createElement('div');
+                        labelContent.className = 'ml-3 flex-1';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                        textSpan.textContent = opt.text;
+                        labelContent.appendChild(textSpan);
+
+                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            labelContent.appendChild(expBtn);
+                            labelContent.appendChild(expBox);
+                            
+                            if (opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            } else if (isSelected && !opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            }
+                        }
+
+                        optWrapper.prepend(radio);
+                        optWrapper.appendChild(labelContent);
+                        optionsContainer.appendChild(optWrapper);
+                        });
+                    }
+
+                    qDiv.appendChild(optionsContainer);
+                }
+                
+                DOM.panes.questions.appendChild(qDiv);
+            });
+            
+            // Manage Scroll position
+            if (isNewPart && !state._preventScrollReset) {
+                DOM.panes.content.parentElement.parentElement.scrollTop = 0;
+                DOM.panes.questions.parentElement.scrollTop = 0;
+            }
+
+            // Handle bottom submit button visibility
+            if (state.mode === 'TEST') {
+                DOM.panes.floatingSubmit.classList.remove('hidden');
+                // Only show big submit button on the last part, otherwise it's just padding
+                if (index === TEST_DATA.parts.length - 1) {
+                    DOM.panes.btnSubmitBottom.style.display = 'inline-block';
+                } else {
+                    DOM.panes.btnSubmitBottom.style.display = 'none';
+                }
+            } else {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+            }
+        }
+
+        function selectOption(questionId, optionId) {
+            if (state.mode !== 'TEST') return;
+            state.answers[questionId] = optionId;
+            
+            // Preserve scroll position for seamless UX
+            state._preventScrollReset = true;
+            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
+            loadPart(state.currentPart);
+            DOM.panes.questions.parentElement.scrollTop = scrollPos;
+            state._preventScrollReset = false;
+            
+            updateNavigator();
+        }
+
+        function toggleCheckbox(parentQid, optionId) {
+            if (state.mode !== 'TEST') return;
+            const q = TEST_DATA.parts[state.currentPart].questions.find(q => q.id === parentQid);
+            
+            let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+            
+            if (currentSelections.includes(optionId)) {
+                currentSelections = currentSelections.filter(id => id !== optionId);
+            } else {
+                if (currentSelections.length >= q.maxChoices) return; // Prevent more than max
+                currentSelections.push(optionId);
+            }
+            
+            // Map back to the individual question IDs
+            q.answersIds.forEach((id, idx) => {
+                if (idx < currentSelections.length) {
+                    state.answers[id] = currentSelections[idx];
+                } else {
+                    delete state.answers[id];
+                }
+            });
+            
+            state._preventScrollReset = true;
+            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
+            loadPart(state.currentPart);
+            DOM.panes.questions.parentElement.scrollTop = scrollPos;
+            state._preventScrollReset = false;
+            
+            updateNavigator();
+        }
+
+        // Dedicated helper to refresh drag-drop seamlessly
+        window.handleDropAndReload = function(partIndex) {
+            state._preventScrollReset = true;
+            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
+            loadPart(partIndex);
+            DOM.panes.questions.parentElement.scrollTop = scrollPos;
+            state._preventScrollReset = false;
+            updateNavigator();
+        };
+
+        window.clearDragDropAnswer = function(qId, partIndex, e) {
+            if(e) e.stopPropagation();
+            delete state.answers[qId];
+            window.handleDropAndReload(partIndex);
+        };
+
+        function confirmSubmit() {
+            // Safely count how many exact questions have been answered based on the navigator map
+            let answeredCount = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (ans && ans.toString().trim() !== '') {
+                    answeredCount++;
+                }
+            });
+
+            if (answeredCount < state.totalQuestions) {
+                DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.totalQuestions}</strong> questions.<br><br>You can submit even if there are unanswered questions. Proceed?`;
+            } else {
+                DOM.modal.message.innerHTML = `You have answered all questions.<br>Are you sure you want to submit your test?`;
+            }
+            
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            clearInterval(state.timerInterval);
+            state.mode = 'RESULT';
+            
+            let correctCount = 0;
+            
+            // Calculate Score
+            TEST_DATA.parts.forEach(part => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'text') {
+                        const userAns = state.answers[q.id];
+                        const correctText = q.options[0].text.toLowerCase().trim();
+                        if (userAns && userAns.toLowerCase().trim() === correctText) correctCount++;
+                    } else if (q.displayType === 'checkbox') {
+                        const selectedAns = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                        const correctIds = q.options.filter(o => o.isCorrect).map(o => o.id);
+                        selectedAns.forEach(ans => {
+                            if (correctIds.includes(ans)) correctCount++;
+                        });
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns && userAns.toLowerCase().trim() === blank.correct.toLowerCase().trim()) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType === 'inline_dropdown') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns === blank.correct) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => {
+                            const userAns = state.answers[subQ.id];
+                            if (userAns === subQ.correct) correctCount++;
+                        });
+                    } else if (q.displayType !== 'instruction') {
+                        const userAns = state.answers[q.id];
+                        const correctOpt = q.options.find(o => o.isCorrect);
+                        if (userAns === correctOpt.id) correctCount++;
+                    }
+                });
+            });
+
+            // Update UI Header
+            DOM.header.actions.classList.add('hidden');
+            DOM.header.actions.classList.remove('flex');
+            
+            // Show Result Banner
+            DOM.resultBanner.container.classList.remove('hidden');
+            DOM.resultBanner.container.classList.add('flex');
+            
+            // Populate Stats
+            DOM.resultBanner.score.textContent = `${correctCount}/${state.totalQuestions}`;
+            const timeTakenSec = TEST_DATA.totalDurationSeconds - state.timeRemaining;
+            DOM.resultBanner.timeTaken.textContent = formatTime(timeTakenSec);
+
+            updateNavigator();
+
+            // Reload current part to show explanation UI
+            state._preventScrollReset = true;
+            loadPart(state.currentPart);
+            state._preventScrollReset = false;
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            state.questionsList.forEach(qInfo => {
+                const btn = document.createElement('button');
+                let baseClass = 'w-8 h-8 flex-shrink-0 rounded-md font-bold text-sm transition-colors flex items-center justify-center border focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-pink-400 ';
+                
+                const userAns = state.answers[qInfo.qId];
+                
+                if (state.mode === 'TEST') {
+                    if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-pink-500 text-white border-pink-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50';
+                    }
+                } else if (state.mode === 'RESULT') {
+                    let isAnsCorrect = false;
+                    if (qInfo.displayType === 'text' || qInfo.displayType === 'inline_blank') {
+                        isAnsCorrect = userAns && userAns.toString().toLowerCase().trim() === qInfo.isCorrect.toLowerCase().trim();
+                    } else if (qInfo.displayType === 'checkbox') {
+                         let correctArr = [];
+                         TEST_DATA.parts.forEach(p => p.questions.forEach(q => {
+                             if(q.id === qInfo.parentQid) correctArr = q.options.filter(o=>o.isCorrect).map(o=>o.id);
+                         }));
+                         isAnsCorrect = correctArr.includes(userAns);
+                    } else {
+                        isAnsCorrect = userAns === qInfo.isCorrect;
+                    }
+
+                    if (isAnsCorrect) {
+                        baseClass += 'bg-green-500 text-white border-green-500 shadow-sm';
+                    } else if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-red-500 text-white border-red-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-gray-100 text-gray-400 border-gray-200';
+                    }
+                }
+                
+                btn.className = baseClass;
+                btn.textContent = qInfo.absNum;
+                btn.onclick = () => jumpToQuestion(qInfo.partIndex, qInfo.qId);
+                
+                DOM.navigator.grid.appendChild(btn);
+            });
+
+            // Update Legend
+            if (state.mode === 'TEST') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-pink-500"></div> Answered</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] border border-gray-300 bg-white"></div> Unanswered</div>
+                `;
+            } else if (state.mode === 'RESULT') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-green-500"></div> Correct</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-red-500"></div> Incorrect</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-gray-100 border border-gray-200"></div> Skipped</div>
+                `;
+            }
+        }
+
+        function jumpToQuestion(partIndex, qId) {
+            if (state.currentPart !== partIndex) {
+                loadPart(partIndex);
+            }
+            setTimeout(() => {
+                const el = document.getElementById('container_' + qId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-pink-400', 'ring-offset-2');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-pink-400', 'ring-offset-2'), 1500);
+                }
+            }, 50);
+        }
+
+        function handleVocabClick(e) {
+            const wordEl = e.currentTarget;
+            
+            // Populate Tooltip Data
+            DOM.tooltip.word.textContent = wordEl.dataset.en;
+            DOM.tooltip.pron.textContent = wordEl.dataset.pron;
+            DOM.tooltip.vi.textContent = wordEl.dataset.vi;
+            DOM.tooltip.context.textContent = wordEl.dataset.context;
+
+            // Positioning
+            const rect = wordEl.getBoundingClientRect();
+            const ttWidth = 300;
+            const ttHeight = DOM.tooltip.container.offsetHeight || 150;
+            
+            let top = rect.bottom + 10;
+            let left = rect.left;
+
+            if (left + ttWidth > window.innerWidth - 20) {
+                left = window.innerWidth - ttWidth - 20;
+            }
+            
+            if (top + ttHeight > window.innerHeight - 20) {
+                top = rect.top - ttHeight - 10;
+            }
+
+            DOM.tooltip.container.style.top = `${top}px`;
+            DOM.tooltip.container.style.left = `${left}px`;
+            
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            DOM.tooltip.container.classList.remove('visible');
+        }
+
+        window.locateInPassage = function(targetId) {
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Clear existing highlights
+                document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+                
+                // Apply temporary highlight
+                targetEl.classList.add('highlight-active');
+                
+                // Remove highlight after 3.5 seconds
+                setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+            }
+        };
+
+        // Initialize App
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive 01 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc; /* Pastel Purple */
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 500px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        /* Custom Scrollbar Hide */
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fdf2f8; color: #db2777; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <!-- Header Actions (Hidden initially) -->
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Exam Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-3">PET Intensive 01</h2>
+            <p class="text-gray-500 text-lg mb-8">Reading Mock Test Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Total Time</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-pink-900 text-left shadow-sm">
+                <h3 class="font-bold mb-3 flex items-center gap-2 text-pink-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    Important Instructions
+                </h3>
+                <ul class="list-disc list-inside space-y-2 ml-2 text-sm md:text-base text-pink-800/80">
+                    <li>You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li>You can navigate between passages using the tabs at the top.</li>
+                    <li>The timer will not pause once you begin.</li>
+                    <li>Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
+                </ul>
+            </div>
+
+            <div class="text-center">
+                <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">
+                    Start Mock Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Test View -->
+    <div id="view-main" class="hidden flex-auto flex-col overflow-hidden bg-white">
+        
+        <!-- Result Summary Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Test Completed</h2>
+                <p class="text-gray-300 text-sm mt-1">Review your answers, explore explanations, and click highlighted words for vocabulary.</p>
+            </div>
+            <div class="flex gap-6 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">0/0</div>
+                </div>
+                <div class="text-center border-l border-gray-600 pl-6">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Time Taken</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative">
+            <!-- Generated by JS -->
+        </nav>
+
+        <!-- Split Panes Container -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            
+            <!-- Left Pane: Passage (Independent Scroll) -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200"></h2>
+                    <div id="passage-content" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-4">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions (Independent Scroll) -->
+            <div id="pane-questions-container" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative h-full">
+                    <div id="questions-content" class="space-y-8 pb-10">
+                        <!-- Injected by JS -->
+                    </div>
+                    
+                    <!-- Floating Submit Button inside Questions Pane -->
+                    <div id="floating-submit-container" class="mt-8 text-center border-t border-gray-200 pt-8 pb-4">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors w-full sm:w-auto">
+                            Finish & Submit All Parts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Navigator (Fixed at Bottom) -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-sm font-semibold text-gray-600 whitespace-nowrap sticky left-0 bg-white pr-2 py-1">Navigator:</span>
+                <div id="navigator-grid" class="flex gap-2">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 flex-shrink-0 hidden md:flex items-center gap-4 text-xs text-gray-500 font-medium">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Tooltip (Floating) -->
+    <div id="vocab-tooltip" class="bg-white rounded-xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-500 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-tight">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-sm font-mono mt-0.5">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-4 bg-gray-50">
+            <div class="mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">Nghĩa chung</span>
+                <p id="tt-vi" class="text-gray-800 text-sm font-medium"></p>
+            </div>
+            <div class="border-t border-gray-200 pt-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1 text-purple-600">Ngữ cảnh trong bài</span>
+                <p id="tt-context" class="text-gray-700 text-sm bg-purple-50 p-2 rounded border border-purple-100"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Submit -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Submit Test?</h3>
+            <p id="modal-message" class="text-center text-gray-600 mb-8"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors shadow-md">Submit Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA SETUP ---
+        
+        // Add global lists here if needed (like pool lists for matching)
+        const PEOPLE_LIST_P2 = [
+            { id: 'A', text: 'A. Max Weber' },
+            { id: 'B', text: 'B. Douglas McGregor' },
+            { id: 'C', text: 'C. Chris Argyris' },
+            { id: 'D', text: 'D. Rensis Likert' }
+        ];
+
+        const SECTION_LIST_P3 = [
+            { id: 'A', text: 'A. Paragraph A' },
+            { id: 'B', text: 'B. Paragraph B' },
+            { id: 'C', text: 'C. Paragraph C' },
+            { id: 'D', text: 'D. Paragraph D' },
+            { id: 'E', text: 'E. Paragraph E' },
+            { id: 'F', text: 'F. Paragraph F' },
+            { id: 'G', text: 'G. Paragraph G' },
+            { id: 'H', text: 'H. Paragraph H' }
+        ];
+
+        const EVENTS_LIST_P3 = [
+            { id: 'A', text: 'A. invention of cricket' },
+            { id: 'B', text: 'B. children picking grapes' },
+            { id: 'C', text: 'C. poem about value of games' },
+            { id: 'D', text: 'D. early toy manufacturing in England' },
+            { id: 'E', text: 'E. puppets first imported into England' },
+            { id: 'F', text: 'F. dolls taxed in England' },
+            { id: 'G', text: 'G. death of Adam of Usk' },
+            { id: 'H', text: 'H. children playing tennis' },
+            { id: 'I', text: 'I. children’s gang warfare' },
+            { id: 'J', text: 'J. a description of seasonal activities' }
+        ];
+
+        const TEST_DATA = {
+            totalDurationSeconds: 3600,
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Australia's Airborne Dentists",
+                    passage: `
+                        <p class="mb-4">Australians living or traveling in rural and <span class="vocab-word" data-en="Remote" data-vi="Vùng sâu vùng xa, hẻo lánh" data-pron="/rɪˈməʊt/" data-context="Khu vực cách xa thành phố và những nơi đông dân cư">remote</span> areas can face particular difficulties when they need medical care. Hundreds of kilometres from major cities and many hours by road from the closest hospital or clinic, some rural Australians do not have easy access to doctors, nurses and dentists.</p>
+
+                        <p class="mb-4"><span id="loc_p1_q1" class="highlight-target">Organisations such as the Royal Flying Doctor Service (RFDS) have been established to bring health services to outback Australian communities. The RFDS provides free medical care to people who live, work or travel in remote and regional parts of Australia. This non-profit organisation is the oldest and largest <span class="vocab-word" data-en="Airborne" data-vi="Trên không, bằng đường hàng không" data-pron="/ˈeəbɔːn/" data-context="Được vận chuyển hoặc hoạt động bằng máy bay">airborne</span> health service of its kind in the world</span>, and since 1928 it has used small aircraft to provide health services to some of Australia's most far-away communities.</p>
+
+                        <p class="mb-4">In recent years, the RFDS has also started to fly dentists to regional Australia. As well as offering mobile dental clinics, the RFDS offers a range of <span class="vocab-word" data-en="Preventative" data-vi="Phòng ngừa" data-pron="/prɪˈvɛntətɪv/" data-context="Các biện pháp nhằm ngăn chặn bệnh tật trước khi chúng xảy ra">preventative</span> and educational services. Looking after the teeth of people in remote areas presents special challenges. These include providing care to <span class="vocab-word" data-en="Disparate" data-vi="Khác biệt, đa dạng" data-pron="/ˈdɪspərət/" data-context="Những nhóm người hoặc cộng đồng rất khác nhau và nằm rải rác">disparate</span> communities with no established dental facilities, and dealing with higher <span class="vocab-word" data-en="Incidences" data-vi="Tỷ lệ mắc phải, sự cố" data-pron="/ˈɪnsɪdənsɪz/" data-context="Mức độ thường xuyên xảy ra của một căn bệnh">incidences</span> of other diseases which are linked to, or caused by poor dental health.</p>
+
+                        <p class="mb-4">People in remote areas have very <span class="vocab-word" data-en="Infrequent" data-vi="Không thường xuyên, hiếm khi" data-pron="/ɪnˈfriːkwənt/" data-context="Xảy ra rất ít hoặc cách xa nhau về thời gian">infrequent</span> visits by health staff. <span id="loc_p1_q2" class="highlight-target">RFDS dentists might only visit a community once every few months, or sometimes once per year.</span> Because of infrequent dentist visits, patients in these areas often need to put up with their dental problems before they can get treatment; consequently, people in remote areas are more likely to have tooth decay (the blackening and <span class="vocab-word" data-en="Deterioration" data-vi="Sự suy giảm, làm hỏng" data-pron="/dɪˌtɪəriəˈreɪʃn/" data-context="Quá trình trở nên tồi tệ hơn hoặc bị phá hủy dần">deterioration</span> of teeth) and develop gum and other mouth diseases.</p>
+
+                        <p class="mb-4">In some locations that the RFDS visits, there are no suitable dental facilities, so dentists have to bring everything with them. <span id="loc_p1_q8" class="highlight-target">This includes drills, dentists' chairs, portable X-ray machines, and computers for keeping track of patients' treatments.</span> Equipment can weigh up to 100 kilograms, and <span id="loc_p1_q9" class="highlight-target">since the small planes that transport dentists have limited space</span>, dentists cannot always bring everything that they need.</p>
+
+                        <p class="mb-4"><span id="loc_p1_q4" class="highlight-target">While dentists in town or city centres can specialise in certain types of treatment, RFDS dentists need to be '<span class="vocab-word" data-en="All-rounders" data-vi="Người đa năng, toàn diện" data-pron="/ˌɔːlˈraʊndəz/" data-context="Người có khả năng thực hiện nhiều loại kỹ năng hoặc công việc khác nhau">all-rounders</span>'. They need to be able to do all kinds of dental procedures, as they don't have the ability to refer patients to more specialised dentists.</span> Even with their broad experience, there are some services that are particularly challenging for RFDS dentists. For example, <span id="loc_p1_q10" class="highlight-target">dentures (for artificial teeth) can be very difficult to provide</span>, as they need to be the right shape and size for the patient, and this requires many visits over a long period of time. As a result, it is not practical to make dentures available.</p>
+
+                        <p class="mb-4">Some <span class="vocab-word" data-en="Chronic" data-vi="Mãn tính, kéo dài" data-pron="/ˈkrɒnɪk/" data-context="Căn bệnh kéo dài trong một khoảng thời gian rất lâu">chronic</span> illnesses are more common in remote communities than in the rest of Australia. These illnesses can in turn lead to a lowered resistance to infection, including gum and other oral infections. As a result, people in outback Australian communities are more likely to experience oral health problems than city folk, and this poses extra challenges for both the dentists and the doctors of the RFDS.</p>
+
+                        <p class="mb-4"><span id="loc_p1_q5" class="highlight-target">Because there aren't a lot of dental services in remote areas, people living in these areas also receive less education about good dental <span class="vocab-word" data-en="Hygiene" data-vi="Vệ sinh" data-pron="/ˈhaɪdʒiːn/" data-context="Các biện pháp giữ gìn sự sạch sẽ để duy trì sức khỏe">hygiene</span> than their city <span class="vocab-word" data-en="Counterparts" data-vi="Người/vật tương đương" data-pron="/ˈkaʊntəpɑːts/" data-context="Những người ở vị trí hoặc hoàn cảnh tương tự tại một nơi khác">counterparts</span> do.</span> Australians in very remote communities might not be aware of things that people in cities take for granted, such as the importance of daily tooth brushing. Also, <span id="loc_p1_q11_12" class="highlight-target">basic dental hygiene items such as toothpaste and toothbrushes can be more expensive in outback areas. Many people are on low incomes, meaning they have extra difficulty affording these products. If this is the case, the RFDS supplies these.</span></p>
+
+                        <p class="mb-4"><span id="loc_p1_q6" class="highlight-target">As well as treating patients, RFDS dentists try to focus on preventative oral health and educate their patients on good oral hygiene, such as tooth brushing and flossing.</span> <span id="loc_p1_q13" class="highlight-target">The RFDS also provides mouthguards for young sports players.</span> Playing contact sports, such as rugby league or Australian rules football, can damage young people's teeth, so mouthguards provide protection which prevents accidental injuries.</p>
+
+                        <p class="mb-4">Adding fluoride to water supplies has been proven to reduce the incidence of tooth decay in many parts of the world. <span id="loc_p1_q7" class="highlight-target">City dwellers in Australia use water supplies that have been <span class="vocab-word" data-en="Fluoridated" data-vi="Được thêm flo" data-pron="/ˈflʊərɪdeɪtɪd/" data-context="Được bổ sung chất fluoride để ngăn ngừa sâu răng">fluoridated</span>, and their rates of tooth decay are lower because of this.</span> In remote areas, it is not practical to fluoridate drinking water supplies, and so people living in these areas are more subject to tooth decay. As a result, it is particularly important that people living in areas without fluoridated water pay special attention to regular brushing of their teeth with fluoridated toothpaste.</p>
+
+                        <p class="mb-4">Despite many challenges, the RFDS continues to offer much-needed dental and medical support. Its presence in isolated communities greatly improves the quality of dental health, and supports important oral hygiene and health initiatives.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_7_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–7</h3>
+                                    <p class="mb-2 text-gray-700">Do the following statements agree with the information given in Reading Passage 1?</p>
+                                    <ul class="mb-4 space-y-1 text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <li><strong>TRUE</strong> - if the statement agrees with the information</li>
+                                        <li><strong>FALSE</strong> - if the statement contradicts the information</li>
+                                        <li><strong>NOT GIVEN</strong> - if there is no information on this</li>
+                                    </ul>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1',
+                            displayType: 'radio',
+                            text: '1. Many of the RFDS doctors work as volunteers.',
+                            options: [
+                                { id: 'p1_q1_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q1_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q1_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph 2 mentions that the RFDS provides free medical care and is a non-profit organisation, but it does not state whether the doctors are volunteers or paid employees.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q2',
+                            displayType: 'radio',
+                            text: '2. RFDS dentists make trips to outback communities each month.',
+                            options: [
+                                { id: 'p1_q2_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q2_f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 4 contradicts this, stating: "RFDS dentists might only visit a community once every few months, or sometimes once per year." They do not visit each month.' },
+                                { id: 'p1_q2_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q3',
+                            displayType: 'radio',
+                            text: '3. RFDS dentists are accompanied on their journeys to remote areas by a dental nurse.',
+                            options: [
+                                { id: 'p1_q3_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q3_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q3_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'There is no mention in the passage about dental nurses travelling with the dentists on their flights.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q4',
+                            displayType: 'radio',
+                            text: '4. RFDS dentists must provide a wide range of dental services.',
+                            options: [
+                                { id: 'p1_q4_t', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 6 confirms this: "RFDS dentists need to be \'all-rounders\'. They need to be able to do all kinds of dental procedures..."' },
+                                { id: 'p1_q4_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q4_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q5',
+                            displayType: 'radio',
+                            text: '5. Rural dental patients are more informed about oral hygiene than urban patients.',
+                            options: [
+                                { id: 'p1_q5_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q5_f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 8 contradicts this: "...people living in these areas also receive less education about good dental hygiene than their city counterparts do."' },
+                                { id: 'p1_q5_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'radio',
+                            text: '6. RFDS dentists educate patients about good eating habits.',
+                            options: [
+                                { id: 'p1_q6_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q6_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q6_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph 9 mentions that dentists focus on "preventative oral health and educate their patients on good oral hygiene, such as tooth brushing and flossing." However, it does not specifically mention educating them on eating habits or diet.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7',
+                            displayType: 'radio',
+                            text: '7. Urban Australians generally have better teeth because their water is treated.',
+                            options: [
+                                { id: 'p1_q7_t', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 10 confirms this: "City dwellers in Australia use water supplies that have been fluoridated, and their rates of tooth decay are lower because of this."' },
+                                { id: 'p1_q7_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q7_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q8_13',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 8–13</h3>
+                                    <p class="mb-4 text-gray-700">Complete the notes below.<br>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-2">Challenges faced by RFDS dentists</h4>
+                                    <ul class="list-disc pl-5 mb-6 space-y-2">
+                                        <li>need to bring equipment including <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> for records</li>
+                                        <li>aircraft used to carry equipment have restricted <strong>9</strong> <input type="text" data-qid="p1_q9" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."></li>
+                                        <li>problems offering some services, e.g., fitting <strong>10</strong> <input type="text" data-qid="p1_q10" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."></li>
+                                        <li>people in remote areas are more likely to have infection in their mouth</li>
+                                    </ul>
+
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-2">Products supplied by RFDS dentists</h4>
+                                    <p class="mb-2 italic">If necessary, RFDS provides:</p>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li><strong>11</strong> <input type="text" data-qid="p1_q11" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> and <strong>12</strong> <input type="text" data-qid="p1_q12" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> for regular use</li>
+                                        <li><strong>13</strong> <input type="text" data-qid="p1_q13" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-gray-800 transition-colors" placeholder="..."> to protect teeth of sports players</li>
+                                    </ul>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q8', correct: 'computers', explanation: 'Paragraph 5: "This includes drills, dentists\' chairs, portable X-ray machines, and computers for keeping track of patients\' treatments."' },
+                                { id: 'p1_q9', correct: 'space', explanation: 'Paragraph 5: "...and since the small planes that transport dentists have limited space, dentists cannot always bring everything that they need."' },
+                                { id: 'p1_q10', correct: 'dentures', explanation: 'Paragraph 6: "For example, dentures (for artificial teeth) can be very difficult to provide, as they need to be the right shape and size..."' },
+                                { id: 'p1_q11', correct: 'toothpaste', explanation: 'Paragraph 8: "Also, basic dental hygiene items such as toothpaste and toothbrushes can be more expensive in outback areas... If this is the case, the RFDS supplies these."' },
+                                { id: 'p1_q12', correct: 'toothbrushes', explanation: 'Paragraph 8: "Also, basic dental hygiene items such as toothpaste and toothbrushes can be more expensive in outback areas... If this is the case, the RFDS supplies these."' },
+                                { id: 'p1_q13', correct: 'mouthguards', explanation: 'Paragraph 9: "The RFDS also provides mouthguards for young sports players."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: Early Approaches to Organisational Design",
+                    passage: `
+                        <p class="mb-4 text-sm font-bold text-gray-500 uppercase tracking-widest">A review of the classical and neoclassical theories of organisational structures</p>
+                        
+                        <p class="mb-4">Determining the ‘best’ type of organisational structure for a particular situation has long been an important task for managers in all types of organisations. All structures have advantages and disadvantages and managers face the challenge of developing the most <span class="vocab-word" data-en="Appropriate" data-vi="Thích hợp, phù hợp" data-pron="/əˈprəʊpriət/" data-context="Phù hợp hoặc đúng đắn nhất cho một hoàn cảnh cụ thể">appropriate</span> design for changing circumstances.</p>
+
+                        <p class="mb-4"><strong>The Classical Approach</strong><br>
+                        Early management writers attempted to approach organisational design using a set of principles that would make an organisational structure perform efficiently in most situations, independent of external conditions and internal objectives. The sociologist Max Weber and management writers Frederick Taylor and Henri Fayol were major contributors to this so-called classical approach. They believed that the most efficient organisations had a legalised, formal and <span id="loc_p2_q14_15_A" class="highlight-target"><span class="vocab-word" data-en="Hierarchical" data-vi="Có phân cấp, thứ bậc" data-pron="/ˌhaɪəˈrɑːkɪkl/" data-context="Được sắp xếp theo trật tự từ cấp cao đến cấp thấp">hierarchical</span> structure</span> called a ‘<span class="vocab-word" data-en="Bureaucracy" data-vi="Quan liêu, bộ máy hành chính" data-pron="/bjʊəˈrɒkrəsi/" data-context="Hệ thống quản lý với nhiều quy tắc và quy trình phức tạp">bureaucracy</span>’. Members of the organisation were guided by a sense of duty to the organisation and by a set of rational rules and regulations. <span id="loc_p2_q24" class="highlight-target">According to Weber, such organisations were characterised by the specialisation of tasks</span>, appointment by merit, and an <span id="loc_p2_q14_15_D" class="highlight-target">impersonal climate</span>.</p>
+
+                        <p class="mb-4">Today the word ‘bureaucracy’ sometimes has negative <span class="vocab-word" data-en="Connotations" data-vi="Hàm ý, ý nghĩa liên tưởng" data-pron="/ˌkɒnəˈteɪʃnz/" data-context="Những ý nghĩa phụ hoặc cảm xúc mà một từ gợi lên">connotations</span>. Early management writers, however, commended bureaucracy as an organisational design for its rationality, rules for decision-making, clear chain of command, and promotion of people based on ability and experience, rather than favouritism or <span class="vocab-word" data-en="Whim" data-vi="Sự ý thích bất chợt" data-pron="/wɪm/" data-context="Sự mong muốn hoặc thay đổi ý định đột ngột mà không có lý do rõ ràng">whim</span>. <span id="loc_p2_q26" class="highlight-target">Weber also believed that clearly specified authority and responsibility made performance easier to evaluate and reward.</span></p>
+
+                        <p class="mb-4"><strong>Criticism of the Classical Approach</strong><br>
+                        Weber, Taylor and Fayol developed their theories when organisations that resembled this bureaucratic model were modern and efficient. It became evident, however, that some of the major <span id="loc_p2_q16_17_B" class="highlight-target">advantages of the bureaucratic structure could become disadvantages if the theory were applied <span class="vocab-word" data-en="Dogmatically" data-vi="Một cách giáo điều, rập khuôn" data-pron="/dɒɡˈmætɪkli/" data-context="Áp dụng một cách cứng nhắc mà không xem xét thực tế">dogmatically</span></span>. For example, the safeguards against favouritism could be rigidly imposed by adhering excessively to rules, resulting in both managers and <span class="vocab-word" data-en="Subordinates" data-vi="Cấp dưới, người dưới quyền" data-pron="/səˈbɔːdɪnəts/" data-context="Những người làm việc dưới sự quản lý của một người khác">subordinates</span> becoming depersonalised.</p>
+
+                        <p class="mb-4">The classical approach has been criticised from two major <span class="vocab-word" data-en="Perspectives" data-vi="Góc nhìn, quan điểm" data-pron="/pəˈspɛktɪvz/" data-context="Cách nhìn nhận hoặc đánh giá một vấn đề">perspectives</span>. First, the theory may not have a basis in reality. Have organisations like those described by Weber and the others ever existed? Second, it claims that organisations designed and managed according to bureaucratic principles will enjoy the predicted benefits. But critics argue that the world no longer fits the assumptions in Weber’s model (if it ever did), and so <span id="loc_p2_q16_17_E" class="highlight-target">a bureaucracy might not yield beneficial results.</span></p>
+
+                        <p class="mb-4">Early human relations researchers and behavioural scientists attempted to deal with the major <span class="vocab-word" data-en="Inadequacy" data-vi="Sự thiếu sót, không đầy đủ" data-pron="/ɪnˈædɪkwəsi/" data-context="Tình trạng không đáp ứng được yêu cầu hoặc tiêu chuẩn">inadequacy</span> of the classical bureaucratic model: neglect of the human element. They argued that an industrial organisation has two objectives: economic effectiveness and employee satisfaction. They also wrote that the <span id="loc_p2_q18_19_D" class="highlight-target">bureaucratic structure could be improved by permitting more subordinate participation in decision-making.</span> Because these researchers tried to improve, and not reject, the classical model, they are sometimes called neoclassical theorists and include Douglas McGregor, Chris Argyris and Rensis Likert.</p>
+
+                        <p class="mb-4"><strong>The Neoclassical Approach</strong><br>
+                        <span id="loc_p2_q22" class="highlight-target">McGregor believed that the vertical division of labour that characterised bureaucratic organisations was derived from negative and false assumptions about workers</span> which he called Theory X. Managers assume lower-level employees lack ambition and need orders to work effectively. The rigid formal hierarchy is designed to maintain managers’ power over subordinates. Decision-making takes place at upper levels of management while the decisions are carried out by people at lower levels. McGregor argued that organisations based instead on Theory Y assumptions use their members’ potential. Theory Y assumes that most people find work satisfying, commit themselves willingly to organisational goals and seek responsibility. Members have more independence than in bureaucratic organisations and lower-level participation in decision-making is encouraged.</p>
+
+                        <p class="mb-4">Argyris was concerned that managers in bureaucratic organisations had near-total responsibility for controlling their subordinates’ work. He argued that managerial <span class="vocab-word" data-en="Domination" data-vi="Sự thống trị, chi phối" data-pron="/ˌdɒmɪˈneɪʃn/" data-context="Việc kiểm soát hoặc có quyền lực tuyệt đối đối với người khác">domination</span> makes subordinates passive and dependent, and decreases their sense of responsibility and self-control. <span id="loc_p2_q18_19_A" class="highlight-target"><span id="loc_p2_q25" class="highlight-target">Argyris argued for an alternative organisational design that acknowledged human needs and feelings</span></span>, and increased workers’ satisfaction. Like McGregor, he favoured giving subordinates more independence and decision-making power to create a more informal organisational culture.</p>
+
+                        <p class="mb-4">Likert shared the perspectives of McGregor and Argyris. In his research, he found that managers who encouraged their subordinates could motivate them more than traditional authoritarian managers. Likert based his model of four possible systems on these findings. In System 1, power and authority are distributed strictly according to the classical management subordinate relationship: a manager gives orders to lower-level members. <span id="loc_p2_q23" class="highlight-target">In System 4 organisations, by contrast, there is <span class="vocab-word" data-en="Extensive" data-vi="Sâu rộng, trên diện rộng" data-pron="/ɪksˈtɛnsɪv/" data-context="Bao phủ một phạm vi lớn hoặc ở mức độ cao">extensive</span> participation in decision-making and problem-solving groups. Some individuals in each group also belong to other work groups to ensure communication between them. System 4 represents Likert’s view of an ideal organisation.</span></p>
+
+                        <p class="mb-4"><strong>Criticisms of the Neoclassical Approach</strong><br>
+                        The neoclassical approach to organisational design <span class="vocab-word" data-en="Compensates" data-vi="Bù đắp, đền bù" data-pron="/ˈkɒmpɛnseɪts/" data-context="Làm giảm bớt tác động xấu hoặc bù đắp cho một thiếu sót">compensates</span> for limitations in the traditional classical model, but it has also been criticised. First, the neoclassicists share the classical assumption that there is one best way to design an organisation. They <span id="loc_p2_q20_21_C" class="highlight-target">overlook environmental, technological, and other variables</span> that might affect an organisation’s design, and overemphasise psychological and behavioural variables. Second, Theories X and Y oversimplify human motivation and neglect individual differences. <span id="loc_p2_q20_21_E" class="highlight-target">Not everyone is motivated by the non-monetary aspects of work, nor is all work satisfying.</span> Finally, the coordination of work groups to achieve organisational goals may be more difficult than the neoclassicists suggest, particularly when the objectives of lower-level employees are not consistent with those of upper-level managers.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_15',
+                            displayType: 'checkbox',
+                            maxChoices: 2,
+                            answersIds: ['p2_q14', 'p2_q15'],
+                            text: 'Questions 14 and 15: According to the writer, which TWO of the following are characteristics of the classical approach to organisational design?',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14 and 15</h3>
+                                    <p class="mb-4 text-gray-700">Choose <strong>TWO</strong> letters, A–E.</p>
+                                </div>
+                            `,
+                            options: [
+                                { id: 'A', text: 'A. a marked ranking order for employees', isCorrect: true, explanation: 'Paragraph 2 mentions that "the most efficient organisations had a legalised, formal and hierarchical structure". Hierarchical means a marked ranking order.' },
+                                { id: 'B', text: 'B. giving importance to everyone’s work', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. the advancement of older workers', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. a neutral working environment', isCorrect: true, explanation: 'Paragraph 2 states that such organisations were characterised by an "impersonal climate", which aligns with a neutral working environment.' },
+                                { id: 'E', text: 'E. increased benefits for workers', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q16_17',
+                            displayType: 'checkbox',
+                            maxChoices: 2,
+                            answersIds: ['p2_q16', 'p2_q17'],
+                            text: 'Questions 16 and 17: According to the writer, which TWO of the following are criticisms of the classical approach to organisational design?',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 16 and 17</h3>
+                                    <p class="mb-4 text-gray-700">Choose <strong>TWO</strong> letters, A–E.</p>
+                                </div>
+                            `,
+                            options: [
+                                { id: 'A', text: 'A. Too many guidelines are proposed', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. Certain practices become negative if they are implemented too strictly', isCorrect: true, explanation: 'Paragraph 4 states: "...advantages of the bureaucratic structure could become disadvantages if the theory were applied dogmatically." (dogmatically = too strictly).' },
+                                { id: 'C', text: 'C. Managers and workers are unable to co-operate with each other', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. The administrative standards are unsuited to some work environments', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'E', text: 'E. Positive outcomes which were expected in the past would be unlikely today', isCorrect: true, explanation: 'Paragraph 5 states: "But critics argue that the world no longer fits the assumptions in Weber’s model... and so a bureaucracy might not yield beneficial results." (Positive outcomes unlikely today).' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q18_19',
+                            displayType: 'checkbox',
+                            maxChoices: 2,
+                            answersIds: ['p2_q18', 'p2_q19'],
+                            text: 'Questions 18 and 19: According to the writer, which TWO of the following are aims of the neoclassical approach to organisational design?',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 18 and 19</h3>
+                                    <p class="mb-4 text-gray-700">Choose <strong>TWO</strong> letters, A–E.</p>
+                                </div>
+                            `,
+                            options: [
+                                { id: 'A', text: 'A. to ensure workers are treated as individual people', isCorrect: true, explanation: 'Paragraph 8 notes Argyris "argued for an alternative organisational design that acknowledged human needs and feelings", moving away from depersonalisation to treating them as individuals.' },
+                                { id: 'B', text: 'B. to create a formal atmosphere in the workplace', isCorrect: false, explanation: 'Incorrect. They wanted a more *informal* culture.' },
+                                { id: 'C', text: 'C. to change the methods of production', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. to allow workers a greater say in what happens at the workplace', isCorrect: true, explanation: 'Paragraph 6 states the structure could be improved by "permitting more subordinate participation in decision-making."' },
+                                { id: 'E', text: 'E. to standardise the procedures for promotion of workers', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q20_21',
+                            displayType: 'checkbox',
+                            maxChoices: 2,
+                            answersIds: ['p2_q20', 'p2_q21'],
+                            text: 'Questions 20 and 21: According to the writer, which TWO of the following are criticisms of the neoclassical approach to organisational design?',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 20 and 21</h3>
+                                    <p class="mb-4 text-gray-700">Choose <strong>TWO</strong> letters, A–E.</p>
+                                </div>
+                            `,
+                            options: [
+                                { id: 'A', text: 'A. It suggests that workers are involved in too many decisions', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. The effects of some psychological factors are given low importance', isCorrect: false, explanation: 'Incorrect. They overemphasise them.' },
+                                { id: 'C', text: 'C. The effects of the workplace surroundings are ignored', isCorrect: true, explanation: 'Paragraph 10 notes they "overlook environmental, technological, and other variables that might affect an organisation’s design".' },
+                                { id: 'D', text: 'D. It exaggerates the success of the organisations that use this approach', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'E', text: 'E. It assumes that all people work for enjoyment rather than financial gain', isCorrect: true, explanation: 'Paragraph 10 criticises that "Not everyone is motivated by the non-monetary aspects of work, nor is all work satisfying," directly countering the neoclassical assumption.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q22_26',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 22–26</h3>
+                                    <p class="mb-4 text-gray-700">Look at the following beliefs (Questions 22–26) and the list of people below.<br>Match each belief with the correct person, <strong>A–D</strong>.<br><span class="italic text-gray-500 text-sm mt-1 block">NB You may use any letter more than once.</span></p>
+                                </div>
+                            `,
+                            poolLabel: 'List of People',
+                            pool: PEOPLE_LIST_P2,
+                            questions: [
+                                { id: 'p2_q22', text: '22. The classical approach relied upon managers having incorrect views about workers.', correct: 'B', explanation: 'Paragraph 7: "McGregor believed that the vertical division of labour that characterised bureaucratic organisations was derived from negative and false assumptions about workers..."' },
+                                { id: 'p2_q23', text: '23. In the best organisational model, there is shared decision-making and interaction between teams at work.', correct: 'D', explanation: 'Paragraph 9 discusses Likert\'s System 4 as his "view of an ideal organisation," which features "extensive participation in decision-making and problem-solving groups" and individuals belonging to "other work groups to ensure communication between them."' },
+                                { id: 'p2_q24', text: '24. In an efficient organisation, workers develop expertise in particular areas.', correct: 'A', explanation: 'Paragraph 2: "According to Weber, such organisations were characterised by the specialisation of tasks..."' },
+                                { id: 'p2_q25', text: '25. An organisation must take into account the emotional demands of people.', correct: 'C', explanation: 'Paragraph 8: "Argyris argued for an alternative organisational design that acknowledged human needs and feelings..."' },
+                                { id: 'p2_q26', text: '26. The classical approach allowed workers’ skills to be assessed in a straightforward way.', correct: 'A', explanation: 'Paragraph 3: "Weber also believed that clearly specified authority and responsibility made performance easier to evaluate and reward."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Child's Play in Medieval England",
+                    passage: `
+                        <p class="mb-4 text-sm font-bold text-gray-500 uppercase tracking-widest">Professor Nicholas Orme investigates childhood in the Middle Ages</p>
+                        
+                        <p class="mb-4"><strong>A.</strong> 'Play up! Play up! And play the game!' The ringing chorus of Sir Henry Newbolt's celebrated cricket <span id="loc_p3_q35" class="highlight-target">poem ‘Vitai Lampada' (1908)</span> sums up views about play in 19th- and early 20th-century Britain. Children's play was important, and adults should <span class="vocab-word" data-en="Regulate" data-vi="Điều chỉnh, quy định" data-pron="/ˈrɛɡjʊleɪt/" data-context="Kiểm soát hoặc hướng dẫn thông qua các quy tắc">regulate</span> and direct it. Games promoted <span class="vocab-word" data-en="Endurance" data-vi="Sức chịu đựng" data-pron="/ɪnˈdjʊərəns/" data-context="Khả năng chịu đựng khó khăn hoặc sự mệt mỏi thể chất">endurance</span>, self-discipline and team spirit – qualities needed for the health of society and government. Newbolt was one in a long line of people who thought in this way. The notion that children's play should be used for educational and social purposes goes back at least to the ancient Greeks and the toys and games of medieval England tell us much about how adults then saw childhood. But they also reveal a good deal about children themselves, and cast light on what has recently become a <span class="vocab-word" data-en="Controversial" data-vi="Gây tranh cãi" data-pron="/ˌkɒntrəˈvɜːʃl/" data-context="Tạo ra nhiều ý kiến trái chiều hoặc sự bất đồng gay gắt">controversial</span> issue.</p>
+
+                        <p class="mb-4"><strong>B.</strong> <span id="loc_p3_q31" class="highlight-target">Forty years ago, the French historian Philippe Aries argued, in Centuries of Childhood, that childhood in the Middle Ages did not exist in its modern sense.</span> Children were regarded by adults with relatively little <span class="vocab-word" data-en="Affection" data-vi="Tình cảm, sự yêu mến" data-pron="/əˈfɛkʃn/" data-context="Cảm giác yêu thương, quý mến dịu dàng">affection</span> and followed a way of life not very different from that of their elders. More recent historians have <span class="vocab-word" data-en="Disputed" data-vi="Bác bỏ, tranh luận" data-pron="/dɪˈspjuːtɪd/" data-context="Phản đối hoặc không đồng tình với một ý kiến, lý thuyết">disputed</span> this, pointing to plentiful signs of parental affection and arguing that childhood, by its very nature, must always have been much the same.</p>
+
+                        <p class="mb-4"><strong>C.</strong> In this debate play is crucial. Did adults encourage it? If so, did they see it as <span class="vocab-word" data-en="Recreational" data-vi="Giải trí" data-pron="/ˌrɛkrɪˈeɪʃənl/" data-context="Liên quan đến các hoạt động vui chơi trong thời gian rảnh rỗi">recreational</span> (by providing toys, for example) or as educational (making children play in particular ways)? Did children play as their elders told them, or did they invent their own games, away from adults and even against their wishes? These questions can be answered from a rich body of evidence including actual toys of the period, pictures of children's activities in <span class="vocab-word" data-en="Contemporary" data-vi="Đương thời" data-pron="/kənˈtɛmprəri/" data-context="Thuộc về cùng một thời đại hoặc khoảng thời gian lịch sử đang được nói tới">contemporary</span> manuscripts and literary sources such as religious works and dictionaries. <span id="loc_p3_q36" class="highlight-target">We know not only how medieval English children played but what their elders thought on the subject.</span></p>
+
+                        <p class="mb-4"><strong>D.</strong> We know, for example, that adults gave children toys from <span class="vocab-word" data-en="Infancy" data-vi="Thời thơ ấu, giai đoạn sơ sinh" data-pron="/ˈɪnfənsi/" data-context="Giai đoạn rất sớm của cuộc đời sau khi sinh ra">infancy</span> onwards. In 1398 the writer John Trevisa described babies playing with 'a child's brooch', an object similar in function to the bright plastic toys given to babies today to bite and handle. William Horman, 16th-century author of a Latin textbook, talked of buying a rattle to stop a baby crying. Indeed, <span id="loc_p3_q37" class="highlight-target">by 1300 it appears there was a toy industry in England.</span> Boys' toys often took military forms, such as the two metal soldiers of that date, found in London, and made from a mould. Girls had dolls, known before the 17th century as 'poppets' or puppets, <span id="loc_p3_q27_34" class="highlight-target">commercially manufactured, imported and, in 1582, taxed at a halfpenny each.</span> Not that children were by any means dependent on things that were bought for them. Gerald of Wales recalls how he and his brothers built towns, palaces, churches and monasteries from sand at Manorbier Castle in about 1150 (perhaps on the nearby beach).</p>
+
+                        <p class="mb-4"><strong>E.</strong> Active games were universal. In his English-to-Latin dictionary of 1440, a mysterious <span class="vocab-word" data-en="Recluse" data-vi="Người ẩn dật" data-pron="/rɪˈkluːs/" data-context="Một người sống tách biệt khỏi xã hội hoặc những người khác">recluse</span> known as Geoffrey mentions children playing ‘tennis' and swinging on what he calls a 'totter' or 'merrytotter'. Children chased each other, swam and played ball games. Boys in the later Middle Ages shot arrows with bows, and <span id="loc_p3_q29" class="highlight-target">archery is an example of a sport encouraged by adults</span>, who wanted boys to grow up to play their part in what was, for most men, a warrior society.</p>
+
+                        <p class="mb-4"><strong>F.</strong> However, by no means all children's military activity was directed by adults. <span id="loc_p3_q30" class="highlight-target">In 1400, six months after King Richard II had been overthrown by Henry IV, the children of London gathered together and chose themselves kings.</span> Adam of Usk tells us <span id="loc_p3_q32" class="highlight-target">they <span class="vocab-word" data-en="Congregated" data-vi="Tụ tập, tập hợp" data-pron="/ˈkɒŋɡrɪɡeɪtɪd/" data-context="Tập hợp lại thành một nhóm hoặc đám đông lớn">congregated</span> 'in thousands ... and made war upon each other ... whereby many died'.</span> The new king had to order their parents and masters to stop them.</p>
+
+                        <p class="mb-4"><strong>G.</strong> This willingness of children to take the <span class="vocab-word" data-en="Initiative" data-vi="Sáng kiến, sự chủ động" data-pron="/ɪˈnɪʃətɪv/" data-context="Khả năng tự mình hành động hoặc bắt đầu một việc gì đó">initiative</span> in play, not just to wait for adults to direct them, is evident in the way they observed the calendar. Medieval life was regulated by light, weather, crops and the Church's cycle of fasts and festivals. <span id="loc_p3_q38" class="highlight-target">Children shared in the adult round of religious festivals, but had their own observances as well</span>, semi-detached from their elders. In the 1200s, the priest Thomas Docking remarked that in spring a child 'follows the ploughman; in autumn he accompanies the grape-gatherers'. <span id="loc_p3_q33" class="highlight-target">In 1518, the poet Alexander Barclay recorded children playing with tops in March, looking for fruit in summer and <span id="loc_p3_q28" class="highlight-target">making footballs by filling pigs' bladders with dried peas</span> in autumn.</span></p>
+
+                        <p class="mb-4"><strong>H.</strong> It is clear from this evidence that the <span id="loc_p3_q40" class="highlight-target">relationship between adults and children in medieval society was, in major respects, a modern one.</span> Parents took an <span class="vocab-word" data-en="Indulgent" data-vi="Khoan dung, nuông chiều" data-pron="/ɪnˈdʌldʒənt/" data-context="Sẵn sàng cho phép ai đó tận hưởng những điều họ muốn">indulgent</span> interest in their children, providing them with toys and giving them time to play. Children played in a wide variety of ways – imaginatively, skilfully, athletically and violently – developing their minds, bodies and social skills. Adults tried at times to direct play – partly to keep children in order, partly to give them skills for adult life – but children gravitated to one another and formed a culture of their own. We can answer Aries's thesis, then, with a resounding ‘No!’. Childhood has always been much the same.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_31',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–31</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 3 has eight paragraphs, <strong>A–H</strong>.<br>Which paragraph contains the following information?<br><span class="italic text-gray-500 text-sm mt-1 block">NB You may use any letter more than once.</span></p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Paragraphs',
+                            pool: SECTION_LIST_P3,
+                            questions: [
+                                { id: 'p3_q27', text: '27. economic evidence for play in medieval England', correct: 'D', explanation: 'Paragraph D notes that dolls were "commercially manufactured, imported and, in 1582, taxed at a halfpenny each," providing clear economic evidence.' },
+                                { id: 'p3_q28', text: '28. an example of how children created their own toys', correct: 'G', explanation: 'Paragraph G mentions children "making footballs by filling pigs\' bladders with dried peas", which is an example of them creating their own toys.' },
+                                { id: 'p3_q29', text: '29. an example of warlike play approved by grown-ups', correct: 'E', explanation: 'Paragraph E states: "archery is an example of a sport encouraged by adults, who wanted boys to grow up to play their part in... a warrior society."' },
+                                { id: 'p3_q30', text: '30. a political event mirrored in children’s play', correct: 'F', explanation: 'Paragraph F explains that six months after King Richard II was overthrown, children "gathered together and chose themselves kings" and made war on each other, mirroring the adult political conflict.' },
+                                { id: 'p3_q31', text: '31. the origin of an academic debate about medieval life', correct: 'B', explanation: 'Paragraph B traces the origin of the debate to Philippe Aries: "Forty years ago, the French historian Philippe Aries argued... that childhood in the Middle Ages did not exist in its modern sense."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q32_35',
+                            displayType: 'drag_drop',
+                            isReusable: false,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 32–35</h3>
+                                    <p class="mb-4 text-gray-700">Look at the following dates (Questions 32–35) and the list of events below.<br>Match each date with the correct event, <strong>A–J</strong>.</p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Events',
+                            pool: EVENTS_LIST_P3,
+                            questions: [
+                                { id: 'p3_q32', text: '32. 1400', correct: 'I', explanation: 'Paragraph F notes that in 1400, children congregated "in thousands... and made war upon each other", which equates to children\'s gang warfare.' },
+                                { id: 'p3_q33', text: '33. 1518', correct: 'J', explanation: 'Paragraph G says in 1518, Alexander Barclay recorded children playing in March, summer, and autumn, which constitutes a description of seasonal activities.' },
+                                { id: 'p3_q34', text: '34. 1582', correct: 'F', explanation: 'Paragraph D mentions that girls had dolls that were commercially manufactured, imported and "in 1582, taxed at a halfpenny each".' },
+                                { id: 'p3_q35', text: '35. 1908', correct: 'C', explanation: 'Paragraph A refers to Sir Henry Newbolt\'s celebrated cricket "poem ‘Vitai Lampada\' (1908)" which promoted endurance and team spirit.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q36_40_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 36–40</h3>
+                                    <p class="mb-2 text-gray-700">Do the following statements agree with the views of the writer in Reading Passage 3?</p>
+                                    <ul class="mb-4 space-y-1 text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <li><strong>YES</strong> - if the statement agrees with the views of the writer</li>
+                                        <li><strong>NO</strong> - if the statement contradicts the views of the writer</li>
+                                        <li><strong>NOT GIVEN</strong> - if it is impossible to say what the writer thinks about this</li>
+                                    </ul>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q36',
+                            displayType: 'radio',
+                            text: '36. Little is known about adult attitudes to children\'s play in the Middle Ages.',
+                            options: [
+                                { id: 'p3_q36_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q36_n', text: 'NO', isCorrect: true, explanation: 'Paragraph C contradicts this, stating: "We know not only how medieval English children played but what their elders thought on the subject," showing that much is actually known.' },
+                                { id: 'p3_q36_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q37',
+                            displayType: 'radio',
+                            text: '37. Most toys were imported into England before 1300.',
+                            options: [
+                                { id: 'p3_q37_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q37_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q37_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph D mentions that "by 1300 it appears there was a toy industry in England," but it does not specify whether "most" toys were imported before this date.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q38',
+                            displayType: 'radio',
+                            text: '38. Medieval children celebrated the seasons in their own ways.',
+                            options: [
+                                { id: 'p3_q38_y', text: 'YES', isCorrect: true, explanation: 'Paragraph G states: "Children shared in the adult round of religious festivals, but had their own observances as well, semi-detached from their elders." Barclay also records their different seasonal activities.' },
+                                { id: 'p3_q38_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q38_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q39',
+                            displayType: 'radio',
+                            text: '39. Medieval children made presents for their parents on special occasions.',
+                            options: [
+                                { id: 'p3_q39_y', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q39_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q39_ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'There is no information in the text about children making presents for their parents on special occasions.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q40',
+                            displayType: 'radio',
+                            text: '40. Parents and children in the Middle Ages behaved much as they do today.',
+                            options: [
+                                { id: 'p3_q40_y', text: 'YES', isCorrect: true, explanation: 'Paragraph H asserts: "...the relationship between adults and children in medieval society was, in major respects, a modern one," meaning they behaved much like they do today.' },
+                                { id: 'p3_q40_n', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q40_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. APPLICATION STATE ---
+        let state = {
+            mode: 'START', // 'START' | 'TEST' | 'RESULT'
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            totalQuestions: 0,
+            questionsList: [], 
+            activeDragItem: null, 
+            _lastLoadedPart: -1,
+            _preventScrollReset: false
+        };
+
+        // --- 3. DOM ELEMENTS ---
+        const DOM = {
+            views: {
+                start: document.getElementById('view-start'),
+                main: document.getElementById('view-main')
+            },
+            header: {
+                actions: document.getElementById('test-header-actions'),
+                timer: document.getElementById('timer-display'),
+                btnSubmit: document.getElementById('btn-submit-header')
+            },
+            resultBanner: {
+                container: document.getElementById('result-banner'),
+                score: document.getElementById('score-display'),
+                timeTaken: document.getElementById('time-taken-display')
+            },
+            navigation: {
+                tabs: document.getElementById('part-tabs')
+            },
+            navigator: {
+                container: document.getElementById('question-navigator'),
+                grid: document.getElementById('navigator-grid'),
+                legend: document.getElementById('navigator-legend')
+            },
+            panes: {
+                title: document.getElementById('passage-title'),
+                content: document.getElementById('passage-content'),
+                questions: document.getElementById('questions-content'),
+                btnSubmitBottom: document.getElementById('btn-submit-bottom'),
+                floatingSubmit: document.getElementById('floating-submit-container')
+            },
+            tooltip: {
+                container: document.getElementById('vocab-tooltip'),
+                word: document.getElementById('tt-word'),
+                pron: document.getElementById('tt-pron'),
+                vi: document.getElementById('tt-vi'),
+                context: document.getElementById('tt-context'),
+                btnClose: document.getElementById('btn-close-tooltip')
+            },
+            modal: {
+                container: document.getElementById('submit-modal'),
+                message: document.getElementById('modal-message'),
+                btnCancel: document.getElementById('btn-cancel-submit'),
+                btnConfirm: document.getElementById('btn-confirm-submit')
+            }
+        };
+
+        // --- 4. CORE FUNCTIONS ---
+
+        function init() {
+            // Build flattened question list for navigator
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach((q) => {
+                    if (q.displayType === 'checkbox' && q.answersIds) {
+                        const correctOpts = q.options.filter(o => o.isCorrect);
+                        q.answersIds.forEach((ansId, idx) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: ansId, absNum: absNum++,
+                                isCorrect: correctOpts[idx]?.id,
+                                displayType: 'checkbox',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_blanks' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_blank',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_dropdown' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_dropdown',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'drag_drop' && q.questions) {
+                        q.questions.forEach((subQ) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: subQ.id, absNum: absNum++,
+                                isCorrect: subQ.correct,
+                                displayType: 'drag_drop',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'instruction') {
+                        // skip instruction blocks in navigator
+                    } else {
+                        state.questionsList.push({
+                            partIndex: pIdx, qId: q.id, absNum: absNum++,
+                            isCorrect: q.options?.find(o => o.isCorrect)?.id,
+                            displayType: q.displayType
+                        });
+                    }
+                });
+            });
+
+            // Set the exact total questions count
+            state.totalQuestions = state.questionsList.length;
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', confirmSubmit);
+            DOM.panes.btnSubmitBottom.addEventListener('click', confirmSubmit);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+            
+            // Custom Modal Events
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', () => {
+                DOM.modal.container.classList.add('hidden');
+                finishTest();
+            });
+
+            // Global click to close tooltip & deselect drag items
+            document.addEventListener('click', (e) => {
+                if(state.mode === 'RESULT') {
+                    const isVocab = e.target.classList.contains('vocab-word');
+                    const isTooltip = DOM.tooltip.container.contains(e.target);
+                    if (!isVocab && !isTooltip) {
+                        hideTooltip();
+                    }
+                } else if (state.mode === 'TEST') {
+                    // Click outside to deselect pool items
+                    if (state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                        state.activeDragItem = null;
+                        document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                    }
+                }
+            });
+
+            // Format initial timer on start screen
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            
+            // View Transitions
+            DOM.views.start.classList.add('hidden');
+            DOM.views.start.classList.remove('flex', 'flex-col');
+            
+            DOM.views.main.classList.remove('hidden');
+            DOM.views.main.classList.add('flex', 'flex-col');
+            
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+
+            renderTabs();
+            loadPart(0);
+            updateNavigator();
+            
+            // Start Timer
+            state.timerInterval = setInterval(tickTimer, 1000);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function tickTimer() {
+            if (state.timeRemaining <= 0) {
+                clearInterval(state.timerInterval);
+                finishTest(); // Auto submit
+                return;
+            }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            
+            // Change color if running low (< 5 mins)
+            if(state.timeRemaining < 300) {
+                DOM.header.timer.parentElement.classList.add('bg-red-50', 'border-red-200');
+                DOM.header.timer.classList.add('text-red-600');
+            }
+        }
+
+        function renderTabs() {
+            DOM.navigation.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((part, index) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors border border-b-0 outline-none ${
+                    index === state.currentPart 
+                    ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' 
+                    : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
+                }`;
+                btn.textContent = `Part ${index + 1}`;
+                btn.onclick = () => loadPart(index);
+                DOM.navigation.tabs.appendChild(btn);
+            });
+        }
+
+        function loadPart(index) {
+            const isNewPart = state._lastLoadedPart !== index;
+            state.currentPart = index;
+            state._lastLoadedPart = index;
+
+            const partData = TEST_DATA.parts[index];
+            
+            // Update UI Tabs
+            renderTabs();
+
+            // Render Passage
+            DOM.panes.title.textContent = partData.title;
+            DOM.panes.content.innerHTML = partData.passage;
+
+            // Apply vocab styling based on mode
+            const vocabWords = DOM.panes.content.querySelectorAll('.vocab-word');
+            vocabWords.forEach(word => {
+                if (state.mode === 'RESULT') {
+                    word.classList.add('mode-result');
+                    word.addEventListener('click', handleVocabClick);
+                } else {
+                    word.classList.remove('mode-result');
+                }
+            });
+
+            // Render Questions
+            DOM.panes.questions.innerHTML = '';
+            
+            if (partData.questions.length === 0) {
+                DOM.panes.questions.innerHTML = `
+                    <div class="p-8 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-4">
+                        <p class="text-lg italic">Questions for this part will be injected here...</p>
+                    </div>
+                `;
+            }
+
+            partData.questions.forEach((q, qIndex) => {
+
+                const qDiv = document.createElement('div');
+                qDiv.id = 'container_' + q.id;
+                qDiv.className = 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
+                
+                if (q.displayType === 'drag_drop') {
+                    // --- DRAG AND DROP DISPLAY ---
+                    const wrapper = document.createElement('div');
+                    
+                    // Instruction Block
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+
+                    // The Draggable Options Pool (Non-sticky fix applied)
+                    const poolContainer = document.createElement('div');
+                    poolContainer.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6'; 
+                    poolContainer.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">${q.poolLabel}</h4>`;
+
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-800 font-medium';
+                    
+                    const usedItems = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+
+                    q.pool.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 hover:border-pink-300 transition-colors flex items-center justify-between shadow-sm';
+                        itemDiv.textContent = item.text;
+                        
+                        if (state.mode === 'TEST') {
+                            const isUsed = !q.isReusable && usedItems.includes(item.id);
+                            
+                            if (isUsed) {
+                                itemDiv.classList.add('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                            } else {
+                                itemDiv.draggable = true;
+                                
+                                // Native Drag Events
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    e.dataTransfer.effectAllowed = 'copyMove';
+                                    itemDiv.classList.add('opacity-50'); 
+                                    state.activeDragItem = null; // reset click fallback
+                                };
+                                itemDiv.ondragend = () => itemDiv.classList.remove('opacity-50');
+                                
+                                // Click to Select Fallback
+                                itemDiv.onclick = (e) => {
+                                    e.stopPropagation();
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    
+                                    if (state.activeDragItem === item.id) {
+                                        state.activeDragItem = null; 
+                                    } else {
+                                        state.activeDragItem = item.id;
+                                        itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                    }
+                                };
+
+                                // Restore active visual state if returning
+                                if (state.activeDragItem === item.id) {
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                }
+                            }
+                        }
+
+                        poolGrid.appendChild(itemDiv);
+                    });
+                    poolContainer.appendChild(poolGrid);
+
+                    if (state.mode === 'TEST') {
+                        const dragNote = document.createElement('p');
+                        dragNote.className = 'text-xs text-gray-500 text-center mt-3';
+                        dragNote.innerHTML = '<em>Drag an item to the boxes below, or Tap an item then Tap a box to place it.</em>';
+                        poolContainer.appendChild(dragNote);
+                    }
+                    wrapper.appendChild(poolContainer);
+
+                    // Dropzone Questions List
+                    const qListContainer = document.createElement('div');
+                    qListContainer.className = 'space-y-4';
+
+                    q.questions.forEach((subQ) => {
+                        const subQDiv = document.createElement('div');
+                        subQDiv.id = 'container_' + subQ.id;
+                        subQDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-xl bg-white transition-colors';
+
+                        const qLabel = document.createElement('label');
+                        qLabel.className = 'font-bold text-gray-800 flex-1 leading-relaxed flex items-start';
+                        qLabel.innerHTML = `<span>${subQ.text}</span>`;
+
+                        const dropZone = document.createElement('div');
+                        dropZone.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm transition-all relative shrink-0 overflow-hidden';
+
+                        const userAnsId = state.answers[subQ.id];
+                        const userAnsItem = q.pool.find(i => i.id === userAnsId);
+
+                        if (state.mode === 'RESULT') {
+                            dropZone.classList.remove('border-dashed');
+                            dropZone.classList.add('border-solid');
+                            
+                            if (userAnsId === subQ.correct) {
+                                dropZone.classList.add('bg-green-50', 'border-green-500', 'text-green-800', 'font-medium');
+                                dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                            } else {
+                                dropZone.classList.add('bg-red-50', 'border-red-500', 'text-red-800', 'font-medium');
+                                dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                            }
+                        } else {
+                            if (userAnsItem) {
+                                dropZone.classList.add('border-pink-400', 'bg-pink-50', 'text-pink-800', 'font-medium', 'border-solid');
+                                dropZone.classList.remove('border-dashed', 'border-gray-300');
+                                dropZone.innerHTML = `
+                                    <div class="flex justify-between items-center w-full">
+                                        <span class="truncate pr-2">${userAnsItem.text}</span>
+                                        <button class="text-pink-500 hover:text-pink-700 p-1 font-bold text-lg" onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>
+                                    </div>`;
+                            } else {
+                                dropZone.classList.add('border-gray-300', 'text-gray-400', 'cursor-pointer');
+                                dropZone.textContent = 'Drop answer here';
+                            }
+
+                            // Drag Drop Handlers
+                            dropZone.ondragover = (e) => {
+                                e.preventDefault();
+                                dropZone.classList.add('bg-pink-100', 'border-pink-500');
+                            };
+                            dropZone.ondragleave = (e) => {
+                                e.preventDefault();
+                                dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                            };
+                            dropZone.ondrop = (e) => {
+                                e.preventDefault();
+                                dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                const itemId = e.dataTransfer.getData('text/plain');
+                                if (itemId) {
+                                    state.answers[subQ.id] = itemId;
+                                    handleDropAndReload(index);
+                                }
+                            };
+                            
+                            // Click to Drop Handler
+                            dropZone.onclick = (e) => {
+                                if (state.activeDragItem) {
+                                    state.answers[subQ.id] = state.activeDragItem;
+                                    state.activeDragItem = null;
+                                    handleDropAndReload(index);
+                                }
+                            };
+                        }
+
+                        // Build structure
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'w-full mt-4 pt-4 border-t border-gray-100';
+
+                            const correctItem = q.pool.find(i => i.id === subQ.correct);
+                            if (userAnsId !== subQ.correct) {
+                                const corrAnsMsg = document.createElement('p');
+                                corrAnsMsg.className = 'text-sm text-green-600 font-bold mb-3 flex items-center gap-1.5';
+                                corrAnsMsg.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Correct Answer: <span class="ml-1 text-gray-800">${correctItem.text}</span>`;
+                                expContainer.appendChild(corrAnsMsg);
+                            }
+
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${subQ.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            expContainer.appendChild(expBtn);
+                            expContainer.appendChild(expBox);
+                            
+                            const wrapDiv = document.createElement('div');
+                            wrapDiv.className = 'flex flex-col w-full';
+                            const upperDiv = document.createElement('div');
+                            upperDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full';
+                            upperDiv.appendChild(qLabel);
+                            upperDiv.appendChild(dropZone);
+                            wrapDiv.appendChild(upperDiv);
+                            wrapDiv.appendChild(expContainer);
+                            
+                            subQDiv.classList.remove('flex-row', 'sm:flex-row');
+                            subQDiv.appendChild(wrapDiv);
+                        } else {
+                            subQDiv.appendChild(qLabel);
+                            subQDiv.appendChild(dropZone);
+                        }
+
+                        qListContainer.appendChild(subQDiv);
+                    });
+                    
+                    wrapper.appendChild(qListContainer);
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'checkbox') {
+                    // Checkbox display logic
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+
+                    const qHeader = document.createElement('h3');
+                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                    qHeader.innerHTML = `<span>${q.text}</span>`;
+                    qDiv.appendChild(qHeader);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'space-y-3';
+
+                    let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+
+                    q.options.forEach(opt => {
+                        const isSelected = currentSelections.includes(opt.id);
+                        const optWrapper = document.createElement('div');
+                        
+                        let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                        
+                        if (state.mode === 'TEST') {
+                            baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
+                        } else if (state.mode === 'RESULT') {
+                            baseClasses += ' cursor-default ';
+                            if (opt.isCorrect) {
+                                baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                            } else if (isSelected && !opt.isCorrect) {
+                                baseClasses += 'border-red-500 bg-red-50 ';
+                            } else {
+                                baseClasses += 'border-gray-200 opacity-60 ';
+                            }
+                        }
+
+                        optWrapper.className = baseClasses;
+                        
+                        if (state.mode === 'TEST') {
+                            optWrapper.onclick = () => toggleCheckbox(q.id, opt.id);
+                        }
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = isSelected;
+                        checkbox.disabled = state.mode === 'RESULT';
+                        checkbox.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 rounded border-gray-300 pointer-events-none shrink-0';
+
+                        const labelContent = document.createElement('div');
+                        labelContent.className = 'ml-3 flex-1';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                        textSpan.textContent = opt.text;
+                        labelContent.appendChild(textSpan);
+
+                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            labelContent.appendChild(expBtn);
+                            labelContent.appendChild(expBox);
+                            
+                            if (opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            } else if (isSelected && !opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            }
+                        }
+
+                        optWrapper.prepend(checkbox);
+                        optWrapper.appendChild(labelContent);
+                        optionsContainer.appendChild(optWrapper);
+                    });
+
+                    qDiv.appendChild(optionsContainer);
+
+                } else if (q.displayType === 'inline_blanks') {
+                    // Inline Blanks logic
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+                    
+                    const htmlContainer = document.createElement('div');
+                    htmlContainer.innerHTML = q.html;
+                    
+                    const inputs = htmlContainer.querySelectorAll('input[data-qid]');
+                    inputs.forEach(input => {
+                        const qid = input.getAttribute('data-qid');
+                        const blankInfo = q.blanks.find(b => b.id === qid);
+                        
+                        input.value = state.answers[qid] || '';
+                        
+                        if (state.mode === 'RESULT') {
+                            input.disabled = true;
+                            const userAns = (state.answers[qid] || '').trim().toLowerCase();
+                            const correctText = blankInfo.correct.toLowerCase();
+                            
+                            if (userAns === correctText) {
+                                input.classList.add('border-green-500', 'text-green-700', 'bg-green-50');
+                                input.classList.remove('border-gray-400', 'bg-transparent');
+                            } else {
+                                input.classList.add('border-red-500', 'text-red-700', 'line-through', 'opacity-75');
+                                input.classList.remove('border-gray-400');
+                                
+                                const corrSpan = document.createElement('span');
+                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-1.5 py-0.5 rounded border border-green-200';
+                                corrSpan.textContent = blankInfo.correct;
+                                input.parentNode.insertBefore(corrSpan, input.nextSibling);
+                            }
+                        } else {
+                            if (state.answers[qid] && state.answers[qid].trim() !== '') {
+                                input.classList.add('border-pink-500', 'text-pink-700');
+                                input.classList.remove('border-gray-400');
+                            }
+                            input.oninput = (e) => {
+                                state.answers[qid] = e.target.value;
+                                if (e.target.value.trim() !== '') {
+                                    input.classList.add('border-pink-500', 'text-pink-700');
+                                    input.classList.remove('border-gray-400');
+                                } else {
+                                    input.classList.remove('border-pink-500', 'text-pink-700');
+                                    input.classList.add('border-gray-400');
+                                }
+                                updateNavigator();
+                            };
+                        }
+                    });
+                    
+                    wrapper.appendChild(htmlContainer);
+                    
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                        
+                        q.blanks.forEach(blank => {
+                            const btn = document.createElement('button');
+                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
+                            
+                            const box = document.createElement('div');
+                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                            box.innerHTML = `
+                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            btn.onclick = () => box.classList.toggle('open');
+                            
+                            expContainer.appendChild(btn);
+                            expContainer.appendChild(box);
+                        });
+                        wrapper.appendChild(expContainer);
+                    }
+                    
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'inline_dropdown') {
+                    // Inline Dropdown logic (for summary with word bank)
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        wrapper.appendChild(instrDiv);
+                    }
+                    
+                    const htmlContainer = document.createElement('div');
+                    htmlContainer.innerHTML = q.html;
+                    
+                    const selects = htmlContainer.querySelectorAll('select[data-qid]');
+                    selects.forEach(select => {
+                        const qid = select.getAttribute('data-qid');
+                        const blankInfo = q.blanks.find(b => b.id === qid);
+                        
+                        // Populate options
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.text = 'Select...';
+                        defaultOpt.disabled = true;
+                        if (!state.answers[qid]) defaultOpt.selected = true;
+                        select.appendChild(defaultOpt);
+                        
+                        q.wordBank.forEach(word => {
+                            const opt = document.createElement('option');
+                            opt.value = word.id;
+                            opt.textContent = `${word.id}. ${word.text}`;
+                            if (state.answers[qid] === word.id) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+
+                        if (state.mode === 'RESULT') {
+                            select.disabled = true;
+                            select.className += ' cursor-default appearance-none pr-6 border-2';
+                            const userAns = state.answers[qid];
+                            
+                            if (userAns === blankInfo.correct) {
+                                select.classList.add('border-green-500', 'text-green-800', 'bg-green-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            } else {
+                                select.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                                
+                                const corrSpan = document.createElement('span');
+                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200 inline-block align-middle';
+                                corrSpan.textContent = blankInfo.correct;
+                                select.parentNode.insertBefore(corrSpan, select.nextSibling);
+                            }
+                        } else {
+                            if (state.answers[qid]) {
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            }
+                            select.onchange = (e) => {
+                                state.answers[qid] = e.target.value;
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                                updateNavigator();
+                            };
+                        }
+                    });
+                    
+                    wrapper.appendChild(htmlContainer);
+
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                        
+                        q.blanks.forEach(blank => {
+                            const btn = document.createElement('button');
+                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
+                            
+                            const box = document.createElement('div');
+                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                            const correctWord = q.wordBank.find(w => w.id === blank.correct).text;
+                            box.innerHTML = `
+                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct} (${correctWord})</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            btn.onclick = () => box.classList.toggle('open');
+                            
+                            expContainer.appendChild(btn);
+                            expContainer.appendChild(box);
+                        });
+                        wrapper.appendChild(expContainer);
+                    }
+                    
+                    qDiv.appendChild(wrapper);
+
+                } else if (q.displayType === 'instruction') {
+                    // Just render instruction, no inputs
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+                    
+                    // Remove borders and padding so instruction blocks blend smoothly
+                    qDiv.className = 'mb-2';
+                } else {
+                    // Handle standard questions (e.g. Radio buttons)
+                    if (q.instructionBox) {
+                        const instrDiv = document.createElement('div');
+                        instrDiv.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instrDiv);
+                    }
+
+                    const qHeader = document.createElement('h3');
+                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                    
+                    // Prevent double numbering if text already starts with a number (e.g. "27. Text")
+                    if (/^\d+\./.test(q.text)) {
+                        qHeader.innerHTML = `<span>${q.text}</span>`;
+                    } else {
+                        qHeader.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qIndex + 1}</span> <span>${q.text}</span>`;
+                    }
+                    
+                    const flexContainer = document.createElement('div');
+                    flexContainer.className = 'flex items-start';
+                    flexContainer.appendChild(qHeader);
+                    qDiv.appendChild(flexContainer);
+
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'space-y-3';
+
+                    if (q.options) {
+                        q.options.forEach(opt => {
+                            const isSelected = state.answers[q.id] === opt.id;
+                            const optWrapper = document.createElement('div');
+                        
+                            let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                            
+                            if (state.mode === 'TEST') {
+                                baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
+                            } else if (state.mode === 'RESULT') {
+                                baseClasses += ' cursor-default ';
+                                if (opt.isCorrect) {
+                                    baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                                } else if (isSelected && !opt.isCorrect) {
+                                    baseClasses += 'border-red-500 bg-red-50 ';
+                                } else {
+                                    baseClasses += 'border-gray-200 opacity-60 ';
+                                }
+                            }
+
+                            optWrapper.className = baseClasses;
+
+                        if (state.mode === 'TEST') {
+                            optWrapper.onclick = () => selectOption(q.id, opt.id);
+                        }
+
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = q.id;
+                        radio.checked = isSelected;
+                        radio.disabled = state.mode === 'RESULT';
+                        radio.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 border-gray-300 pointer-events-none shrink-0';
+
+                        const labelContent = document.createElement('div');
+                        labelContent.className = 'ml-3 flex-1';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                        textSpan.textContent = opt.text;
+                        labelContent.appendChild(textSpan);
+
+                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
+                            const expBtn = document.createElement('button');
+                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                            expBtn.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                View Explanation
+                            `;
+                            
+                            const expBox = document.createElement('div');
+                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                            expBox.innerHTML = `
+                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+
+                            expBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                expBox.classList.toggle('open');
+                            };
+
+                            labelContent.appendChild(expBtn);
+                            labelContent.appendChild(expBox);
+                            
+                            if (opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            } else if (isSelected && !opt.isCorrect) {
+                                const icon = document.createElement('div');
+                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                optWrapper.appendChild(icon);
+                            }
+                        }
+
+                        optWrapper.prepend(radio);
+                        optWrapper.appendChild(labelContent);
+                        optionsContainer.appendChild(optWrapper);
+                        });
+                    }
+
+                    qDiv.appendChild(optionsContainer);
+                }
+                
+                DOM.panes.questions.appendChild(qDiv);
+            });
+            
+            // Manage Scroll position
+            if (isNewPart && !state._preventScrollReset) {
+                DOM.panes.content.parentElement.parentElement.scrollTop = 0;
+                DOM.panes.questions.parentElement.scrollTop = 0;
+            }
+
+            // Handle bottom submit button visibility
+            if (state.mode === 'TEST') {
+                DOM.panes.floatingSubmit.classList.remove('hidden');
+                // Only show big submit button on the last part, otherwise it's just padding
+                if (index === TEST_DATA.parts.length - 1) {
+                    DOM.panes.btnSubmitBottom.style.display = 'inline-block';
+                } else {
+                    DOM.panes.btnSubmitBottom.style.display = 'none';
+                }
+            } else {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+            }
+        }
+
+        function selectOption(questionId, optionId) {
+            if (state.mode !== 'TEST') return;
+            state.answers[questionId] = optionId;
+            
+            // Preserve scroll position for seamless UX
+            state._preventScrollReset = true;
+            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
+            loadPart(state.currentPart);
+            DOM.panes.questions.parentElement.scrollTop = scrollPos;
+            state._preventScrollReset = false;
+            
+            updateNavigator();
+        }
+
+        function toggleCheckbox(parentQid, optionId) {
+            if (state.mode !== 'TEST') return;
+            const q = TEST_DATA.parts[state.currentPart].questions.find(q => q.id === parentQid);
+            
+            let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+            
+            if (currentSelections.includes(optionId)) {
+                currentSelections = currentSelections.filter(id => id !== optionId);
+            } else {
+                if (currentSelections.length >= q.maxChoices) return; // Prevent more than max
+                currentSelections.push(optionId);
+            }
+            
+            // Map back to the individual question IDs
+            q.answersIds.forEach((id, idx) => {
+                if (idx < currentSelections.length) {
+                    state.answers[id] = currentSelections[idx];
+                } else {
+                    delete state.answers[id];
+                }
+            });
+            
+            state._preventScrollReset = true;
+            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
+            loadPart(state.currentPart);
+            DOM.panes.questions.parentElement.scrollTop = scrollPos;
+            state._preventScrollReset = false;
+            
+            updateNavigator();
+        }
+
+        // Dedicated helper to refresh drag-drop seamlessly
+        window.handleDropAndReload = function(partIndex) {
+            state._preventScrollReset = true;
+            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
+            loadPart(partIndex);
+            DOM.panes.questions.parentElement.scrollTop = scrollPos;
+            state._preventScrollReset = false;
+            updateNavigator();
+        };
+
+        window.clearDragDropAnswer = function(qId, partIndex, e) {
+            if(e) e.stopPropagation();
+            delete state.answers[qId];
+            window.handleDropAndReload(partIndex);
+        };
+
+        function confirmSubmit() {
+            // Safely count how many exact questions have been answered based on the navigator map
+            let answeredCount = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (ans && ans.toString().trim() !== '') {
+                    answeredCount++;
+                }
+            });
+
+            if (answeredCount < state.totalQuestions) {
+                DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.totalQuestions}</strong> questions.<br><br>You can submit even if there are unanswered questions. Proceed?`;
+            } else {
+                DOM.modal.message.innerHTML = `You have answered all questions.<br>Are you sure you want to submit your test?`;
+            }
+            
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            clearInterval(state.timerInterval);
+            state.mode = 'RESULT';
+            
+            let correctCount = 0;
+            
+            // Calculate Score
+            TEST_DATA.parts.forEach(part => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'text') {
+                        const userAns = state.answers[q.id];
+                        const correctText = q.options[0].text.toLowerCase().trim();
+                        if (userAns && userAns.toLowerCase().trim() === correctText) correctCount++;
+                    } else if (q.displayType === 'checkbox') {
+                        const selectedAns = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                        const correctIds = q.options.filter(o => o.isCorrect).map(o => o.id);
+                        selectedAns.forEach(ans => {
+                            if (correctIds.includes(ans)) correctCount++;
+                        });
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns && userAns.toLowerCase().trim() === blank.correct.toLowerCase().trim()) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType === 'inline_dropdown') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns === blank.correct) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => {
+                            const userAns = state.answers[subQ.id];
+                            if (userAns === subQ.correct) correctCount++;
+                        });
+                    } else if (q.displayType !== 'instruction') {
+                        const userAns = state.answers[q.id];
+                        const correctOpt = q.options.find(o => o.isCorrect);
+                        if (userAns === correctOpt.id) correctCount++;
+                    }
+                });
+            });
+
+            // Update UI Header
+            DOM.header.actions.classList.add('hidden');
+            DOM.header.actions.classList.remove('flex');
+            
+            // Show Result Banner
+            DOM.resultBanner.container.classList.remove('hidden');
+            DOM.resultBanner.container.classList.add('flex');
+            
+            // Populate Stats
+            DOM.resultBanner.score.textContent = `${correctCount}/${state.totalQuestions}`;
+            const timeTakenSec = TEST_DATA.totalDurationSeconds - state.timeRemaining;
+            DOM.resultBanner.timeTaken.textContent = formatTime(timeTakenSec);
+
+            updateNavigator();
+
+            // Reload current part to show explanation UI
+            state._preventScrollReset = true;
+            loadPart(state.currentPart);
+            state._preventScrollReset = false;
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            state.questionsList.forEach(qInfo => {
+                const btn = document.createElement('button');
+                let baseClass = 'w-8 h-8 flex-shrink-0 rounded-md font-bold text-sm transition-colors flex items-center justify-center border focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-pink-400 ';
+                
+                const userAns = state.answers[qInfo.qId];
+                
+                if (state.mode === 'TEST') {
+                    if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-pink-500 text-white border-pink-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50';
+                    }
+                } else if (state.mode === 'RESULT') {
+                    let isAnsCorrect = false;
+                    if (qInfo.displayType === 'text' || qInfo.displayType === 'inline_blank') {
+                        isAnsCorrect = userAns && userAns.toString().toLowerCase().trim() === qInfo.isCorrect.toLowerCase().trim();
+                    } else if (qInfo.displayType === 'checkbox') {
+                         let correctArr = [];
+                         TEST_DATA.parts.forEach(p => p.questions.forEach(q => {
+                             if(q.id === qInfo.parentQid) correctArr = q.options.filter(o=>o.isCorrect).map(o=>o.id);
+                         }));
+                         isAnsCorrect = correctArr.includes(userAns);
+                    } else {
+                        isAnsCorrect = userAns === qInfo.isCorrect;
+                    }
+
+                    if (isAnsCorrect) {
+                        baseClass += 'bg-green-500 text-white border-green-500 shadow-sm';
+                    } else if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-red-500 text-white border-red-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-gray-100 text-gray-400 border-gray-200';
+                    }
+                }
+                
+                btn.className = baseClass;
+                btn.textContent = qInfo.absNum;
+                btn.onclick = () => jumpToQuestion(qInfo.partIndex, qInfo.qId);
+                
+                DOM.navigator.grid.appendChild(btn);
+            });
+
+            // Update Legend
+            if (state.mode === 'TEST') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-pink-500"></div> Answered</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] border border-gray-300 bg-white"></div> Unanswered</div>
+                `;
+            } else if (state.mode === 'RESULT') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-green-500"></div> Correct</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-red-500"></div> Incorrect</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-gray-100 border border-gray-200"></div> Skipped</div>
+                `;
+            }
+        }
+
+        function jumpToQuestion(partIndex, qId) {
+            if (state.currentPart !== partIndex) {
+                loadPart(partIndex);
+            }
+            setTimeout(() => {
+                const el = document.getElementById('container_' + qId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-pink-400', 'ring-offset-2');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-pink-400', 'ring-offset-2'), 1500);
+                }
+            }, 50);
+        }
+
+        function handleVocabClick(e) {
+            const wordEl = e.currentTarget;
+            
+            // Populate Tooltip Data
+            DOM.tooltip.word.textContent = wordEl.dataset.en;
+            DOM.tooltip.pron.textContent = wordEl.dataset.pron;
+            DOM.tooltip.vi.textContent = wordEl.dataset.vi;
+            DOM.tooltip.context.textContent = wordEl.dataset.context;
+
+            // Positioning
+            const rect = wordEl.getBoundingClientRect();
+            const ttWidth = 300;
+            const ttHeight = DOM.tooltip.container.offsetHeight || 150;
+            
+            let top = rect.bottom + 10;
+            let left = rect.left;
+
+            if (left + ttWidth > window.innerWidth - 20) {
+                left = window.innerWidth - ttWidth - 20;
+            }
+            
+            if (top + ttHeight > window.innerHeight - 20) {
+                top = rect.top - ttHeight - 10;
+            }
+
+            DOM.tooltip.container.style.top = `${top}px`;
+            DOM.tooltip.container.style.left = `${left}px`;
+            
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            DOM.tooltip.container.classList.remove('visible');
+        }
+
+        window.locateInPassage = function(targetId) {
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Clear existing highlights
+                document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+                
+                // Apply temporary highlight
+                targetEl.classList.add('highlight-active');
+                
+                // Remove highlight after 3.5 seconds
+                setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+            }
+        };
+
+        // Initialize App
+        init();
+    </script>
+</body>
+</html>

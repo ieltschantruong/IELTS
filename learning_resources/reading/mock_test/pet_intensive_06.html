@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive 06 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc; /* Pastel Purple */
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 500px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        /* Custom Scrollbar Hide */
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fdf2f8; color: #db2777; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <!-- Header Actions (Hidden initially) -->
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Exam Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-3">PET Intensive 06</h2>
+            <p class="text-gray-500 text-lg mb-8">Reading Mock Test Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Total Time</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-sm text-gray-400 font-semibold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-pink-900 text-left shadow-sm">
+                <h3 class="font-bold mb-3 flex items-center gap-2 text-pink-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    Important Instructions
+                </h3>
+                <ul class="list-disc list-inside space-y-2 ml-2 text-sm md:text-base text-pink-800/80">
+                    <li>You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li>You can navigate between passages using the tabs at the top.</li>
+                    <li>The timer will not pause once you begin.</li>
+                    <li>Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
+                </ul>
+            </div>
+
+            <div class="text-center">
+                <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">
+                    Start Mock Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Test View -->
+    <div id="view-main" class="hidden flex-auto flex-col overflow-hidden bg-white">
+        
+        <!-- Result Summary Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Test Completed</h2>
+                <p class="text-gray-300 text-sm mt-1">Review your answers, explore explanations, and click highlighted words for vocabulary.</p>
+            </div>
+            <div class="flex gap-6 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">0/0</div>
+                </div>
+                <div class="text-center border-l border-gray-600 pl-6">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Time Taken</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">00:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative">
+            <!-- Generated by JS -->
+        </nav>
+
+        <!-- Split Panes Container -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            
+            <!-- Left Pane: Passage (Independent Scroll) -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200"></h2>
+                    <div id="passage-content" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-4">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions (Independent Scroll) -->
+            <div id="pane-questions-container" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative h-full">
+                    <div id="questions-content" class="space-y-8 pb-10">
+                        <!-- Injected by JS -->
+                    </div>
+                    
+                    <!-- Floating Submit Button inside Questions Pane -->
+                    <div id="floating-submit-container" class="mt-8 text-center border-t border-gray-200 pt-8 pb-4">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-colors w-full sm:w-auto">
+                            Finish & Submit All Parts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Navigator (Fixed at Bottom) -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-sm font-semibold text-gray-600 whitespace-nowrap sticky left-0 bg-white pr-2 py-1">Navigator:</span>
+                <div id="navigator-grid" class="flex gap-2">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 flex-shrink-0 hidden md:flex items-center gap-4 text-xs text-gray-500 font-medium">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Tooltip (Floating) -->
+    <div id="vocab-tooltip" class="bg-white rounded-xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-500 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-tight">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-sm font-mono mt-0.5">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-4 bg-gray-50">
+            <div class="mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">Nghĩa chung</span>
+                <p id="tt-vi" class="text-gray-800 text-sm font-medium"></p>
+            </div>
+            <div class="border-t border-gray-200 pt-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1 text-purple-600">Ngữ cảnh trong bài</span>
+                <p id="tt-context" class="text-gray-700 text-sm bg-purple-50 p-2 rounded border border-purple-100"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Submit -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Submit Test?</h3>
+            <p id="modal-message" class="text-center text-gray-600 mb-8"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors shadow-md">Submit Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA SETUP ---
+        
+        const HEADING_LIST_P2 = [
+            { id: 'i', text: 'i. How company culture can have a negative impact' },
+            { id: 'ii', text: 'ii. Recommendations for employers' },
+            { id: 'iii', text: 'iii. The pressure of restraining an outgoing nature' },
+            { id: 'iv', text: 'iv. Why researchers decided to focus on the workplace' },
+            { id: 'v', text: 'v. How does personality influence your choice of career?' },
+            { id: 'vi', text: 'vi. Examples of various contexts in which we might need to act out of character' },
+            { id: 'vii', text: 'vii. How workplace facilities aid the success of one personality type' },
+            { id: 'viii', text: 'viii. Learning by trial and error' },
+            { id: 'ix', text: 'ix. The concept of \'free traits\' and personal projects' },
+            { id: 'x', text: 'x. The biological basis of personality types' },
+            { id: 'xi', text: 'xi. The costs of acting against our natural personality' }
+        ];
+
+        const HEADING_LIST_P3 = [
+            { id: 'i', text: 'i. Moving rapidly across the desert' },
+            { id: 'ii', text: 'ii. Recreating the process in a laboratory' },
+            { id: 'iii', text: 'iii. Strange music created by human movement' },
+            { id: 'iv', text: 'iv. A potential threat to industry and communications' },
+            { id: 'v', text: 'v. Dunes coming together and re-forming' },
+            { id: 'vi', text: 'vi. Needing a specific combination of conditions' },
+            { id: 'vii', text: 'vii. A continuous cycle' },
+            { id: 'viii', text: 'viii. The commonest type of dune' },
+            { id: 'ix', text: 'ix. Old superstitions demystified' }
+        ];
+
+        const TEST_DATA = {
+            totalDurationSeconds: 3600,
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Katsushika Hokusai",
+                    passage: `
+                        <p class="mb-4">Hokusai (born October 1760, Edo [now Tokyo]), Japan – died May 10, 1848. Edo was a Japanese master artist and printmaker of the ukyō-e (“pictures of the floating world”) school. His early works represent the full <span class="vocab-word" data-en="Spectrum" data-vi="Phổ, dải (rộng)" data-pron="/ˈspɛktrəm/" data-context="Một phạm vi rộng lớn hoặc toàn diện của một thứ gì đó">spectrum</span> of ukyō-e art, including single-sheet prints of landscapes and squares, hand paintings, and surimon (“printed things”), such as greetings and announcements. Later he concentrated on the classical themes of the samurai and Chinese subjects. <span id="loc_p1_q1" class="highlight-target">His famous print series “Thirty-six Views of Mount Fuji,” published between 1825 and 1833, marked the summit in the history of the Japanese landscape print.</span></p>
+
+                        <h3 class="text-xl font-bold text-gray-800 mt-6 mb-3">Early years</h3>
+                        <p class="mb-4">Hokusai was born in the Hong quarter during the age of two. <span id="loc_p1_q2" class="highlight-target">He was adopted named Nakajima but he never accepted, though the true son of Nakajima, he had been born of a <span class="vocab-word" data-en="Concubine" data-vi="Vợ lẽ, thiếp" data-pron="/ˈkɒŋkjʊbaɪn/" data-context="Một người phụ nữ sống với một người đàn ông có địa vị nhưng có vị trí thấp hơn người vợ chính thức">concubine</span>.</span></p>
+
+                        <p class="mb-4">Hokusai is said to have served in his youth as clerk in a <span id="loc_p1_q7" class="highlight-target">lending bookshop</span>, and <span id="loc_p1_q3" class="highlight-target"><span id="loc_p1_q8" class="highlight-target">from 15 to 18 years of age he was <span class="vocab-word" data-en="Apprenticed" data-vi="Học việc" data-pron="/əˈprɛntɪst/" data-context="Làm việc cho một người thợ lành nghề để học nghề">apprenticed</span> to a wood-block engraver.</span></span> This early training in the book and printing trades obviously contributed to Hokusai’s artistic development as a printmaker.</p>
+
+                        <p class="mb-4">The earliest contemporary record of Hokusai dates from the year 1778, when, at the age of 18, he became a pupil of the leading ukyō-e master, Katsukawa Shunshō. <span id="loc_p1_q4" class="highlight-target">The young Hokusai’s first published works appeared the following year – actor prints of the kabuki theatre</span>, the genre that Shunshō and the Katsukawa school practically dominated.</p>
+
+                        <p class="mb-4">To judge from the ages of his several children, Hokusai must have married in his mid-20s. Possibly under the influence of family life, from this period his designs tended to turn from prints of actors and women to <span id="loc_p1_q9" class="highlight-target">historical and landscape subjects, especially uki-e (semi-historical landscapes using Western-influenced perspective techniques)</span>, as well as prints of children. The artist’s book illustrations and texts turned as well from the earlier themes to historical and didactic subjects. <span id="loc_p1_q5" class="highlight-target">At the same time, Hokusai’s work in the surimon genre during the subsequent decade marks one of the early peaks in his career.</span> Surimon were prints issued privately for special occasions – New Year’s and other greetings, musical programs and announcements, private verse selections – in limited editions and featuring <span id="loc_p1_q10" class="highlight-target"><span class="vocab-word" data-en="Immaculate" data-vi="Hoàn hảo, không tì vết" data-pron="/ɪˈmækjʊlət/" data-context="Hoàn toàn sạch sẽ, gọn gàng hoặc không có lỗi lầm">immaculate</span> printing</span> of the highest quality.</p>
+
+                        <h3 class="text-xl font-bold text-gray-800 mt-6 mb-3">Middle years</h3>
+                        <p class="mb-4">In his middle years, Hokusai experienced significant artistic evolution and personal hardship. <span id="loc_p1_q6" class="highlight-target">He began to distance himself from the Katsukawa school, partly due to the death of his master Shunshō in 1792 and partly due to his own <span class="vocab-word" data-en="Burgeoning" data-vi="Phát triển nhanh chóng" data-pron="/ˈbɜːdʒənɪŋ/" data-context="Bắt đầu phát triển hoặc tăng lên nhanh chóng">burgeoning</span> interest in other Japanese and Chinese artistic traditions.</span> <span id="loc_p1_q11" class="highlight-target">He started using the name “Hokusai” around 1797</span>, and his work from this period shows a broader range of influences.</p>
+
+                        <p class="mb-4">A series of personal tragedies, including the death of his wife and his own financial struggles, seemed to fuel rather than hinder his artistic output. He moved residences frequently – some accounts say over ninety times in his life – often to avoid creditors. Despite this instability, the period from 1800 to 1820 was one of <span class="vocab-word" data-en="Prodigious" data-vi="Phi thường, to lớn" data-pron="/prəˈdɪdʒəs/" data-context="Tuyệt vời hoặc ấn tượng về quy mô, kích thước hoặc mức độ">prodigious</span> production. <span id="loc_p1_q12" class="highlight-target">He created several major illustrated books, including the first volumes of his instructional manga (random drawings), which were sketchbooks of countless subjects</span> – animals, people, mythological figures – intended as model books for other artists. These manga volumes became widely popular and demonstrated his incredible <span class="vocab-word" data-en="Draftsmanship" data-vi="Tài vẽ, kỹ năng phác họa" data-pron="/ˈdrɑːftsmənʃɪp/" data-context="Kỹ năng vẽ hoặc thiết kế">draftsmanship</span> and observational skill.</p>
+
+                        <h3 class="text-xl font-bold text-gray-800 mt-6 mb-3">Later years and legacy</h3>
+                        <p class="mb-4">Hokusai’s most celebrated work was created in his seventies. It was during this period that he produced the iconic “Thirty-six Views of Mount Fuji,” which includes the world-renowned print “The Great Wave off Kanagawa.” <span id="loc_p1_q13" class="highlight-target">This series was revolutionary for its bold composition, innovative use of the newly affordable Prussian blue pigment</span>, and its focus on the daily lives of common people within dramatic landscapes. The series was so popular that ten additional prints were added to the original thirty-six.</p>
+
+                        <p class="mb-4">In his later writings, Hokusai expressed a profound belief in his own artistic growth with age. He famously wrote that by the age of 110, every dot and line he drew would be alive. Though he never reached that age, he continued working <span class="vocab-word" data-en="Relentlessly" data-vi="Không ngừng nghỉ" data-pron="/rɪˈlɛntlɪsli/" data-context="Một cách liên tục và khốc liệt, không hề giảm bớt">relentlessly</span> until his death at 88. Hokusai’s influence extended far beyond Japan; after the country opened up in the Meiji period, his prints reached Europe and profoundly impacted the Impressionist and Art Nouveau movements. Artists like Claude Monet and Vincent van Gogh collected his prints and were inspired by his compositions and use of color.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_6_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–6</h3>
+                                    <p class="mb-2 text-gray-700">Do the following statements agree with the information given in Reading Passage 1?</p>
+                                    <ul class="mb-4 space-y-1 text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <li><strong>TRUE</strong> - if the statement agrees with the information</li>
+                                        <li><strong>FALSE</strong> - if the statement contradicts the information</li>
+                                        <li><strong>NOT GIVEN</strong> - if there is no information on this</li>
+                                    </ul>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1',
+                            displayType: 'radio',
+                            text: '1. Hokusai’s series "Thirty-six Views of Mount Fuji" was published over an eight-year period.',
+                            options: [
+                                { id: 'p1_q1_t', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 1 states it was "published between 1825 and 1833", which is an eight-year span.' },
+                                { id: 'p1_q1_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q1_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q2',
+                            displayType: 'radio',
+                            text: '2. Hokusai was the biological son of the Nakajima family.',
+                            options: [
+                                { id: 'p1_q2_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q2_f', text: 'FALSE', isCorrect: true, explanation: 'The text states he was adopted named Nakajima but he never accepted; this contradicts the idea of being the biological family son in the traditional sense, especially as it notes he was born of a concubine.' },
+                                { id: 'p1_q2_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q3',
+                            displayType: 'radio',
+                            text: '3. Hokusai’s apprenticeship with a wood-block engraver lasted for four years.',
+                            options: [
+                                { id: 'p1_q3_t', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 3 says he was apprenticed "from 15 to 18 years of age". This includes age 15, 16, 17, and 18, totaling four years.' },
+                                { id: 'p1_q3_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q3_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q4',
+                            displayType: 'radio',
+                            text: '4. Hokusai’s first published works were landscapes.',
+                            options: [
+                                { id: 'p1_q4_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q4_f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 4 contradicts this by stating his first published works were "actor prints of the kabuki theatre".' },
+                                { id: 'p1_q4_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q5',
+                            displayType: 'radio',
+                            text: '5. Hokusai’s work in the surimon genre is considered one of the early high points of his career.',
+                            options: [
+                                { id: 'p1_q5_t', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 5 mentions that his work in the surimon genre "marks one of the early peaks in his career".' },
+                                { id: 'p1_q5_f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q5_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'radio',
+                            text: '6. The death of his master Shunshō was the only reason Hokusai distanced himself from the Katsukawa school.',
+                            options: [
+                                { id: 'p1_q6_t', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p1_q6_f', text: 'FALSE', isCorrect: true, explanation: 'The passage says he distanced himself "partly due to the death of his master Shunshō... and partly due to his own burgeoning interest in other... traditions." Therefore, it was not the only reason.' },
+                                { id: 'p1_q6_ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7_13',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 7–13</h3>
+                                    <p class="mb-4 text-gray-700">Complete the notes below.<br>Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-4 border-b border-indigo-200 pb-2">Hokusai's Life and Work</h4>
+                                    <p class="font-bold text-indigo-800 mt-4 mb-2">Early Training:</p>
+                                    <ul class="list-disc pl-5 mb-4 space-y-3 font-medium">
+                                        <li>Worked as a clerk in a <strong>7</strong> <input type="text" data-qid="p1_q7" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></li>
+                                        <li>Apprenticed to a <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> from age 15 to 18.</li>
+                                    </ul>
+                                    <p class="font-bold text-indigo-800 mt-6 mb-2">Artistic Shifts:</p>
+                                    <ul class="list-disc pl-5 mb-4 space-y-3 font-medium">
+                                        <li>After marriage, his subjects changed to historical scenes and <strong>9</strong> <input type="text" data-qid="p1_q9" class="inline-blank w-40 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> which used Western perspective.</li>
+                                        <li>His surimon were known for their high-quality <strong>10</strong> <input type="text" data-qid="p1_q10" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></li>
+                                    </ul>
+                                    <p class="font-bold text-indigo-800 mt-6 mb-2">Middle Years:</p>
+                                    <ul class="list-disc pl-5 mb-4 space-y-3 font-medium">
+                                        <li>Began using the name 'Hokusai' around <strong>11</strong> <input type="text" data-qid="p1_q11" class="inline-blank w-24 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></li>
+                                        <li>Published <strong>12</strong> <input type="text" data-qid="p1_q12" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> which were sketchbooks for artists.</li>
+                                    </ul>
+                                    <p class="font-bold text-indigo-800 mt-6 mb-2">Later Work:</p>
+                                    <ul class="list-disc pl-5 mb-4 space-y-3 font-medium">
+                                        <li>His famous series "Thirty-six Views of Mount Fuji" used a new blue pigment called <strong>13</strong> <input type="text" data-qid="p1_q13" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></li>
+                                        <li>His work greatly influenced European art movements, including Impressionism.</li>
+                                    </ul>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q7', correct: 'bookshop', explanation: 'Paragraph 3: "...served in his youth as clerk in a lending bookshop..."' },
+                                { id: 'p1_q8', correct: 'wood-block engraver', explanation: 'Paragraph 3: "...apprenticed to a wood-block engraver."' },
+                                { id: 'p1_q9', correct: 'landscapes', explanation: 'Paragraph 5: "...designs tended to turn from prints of actors and women to historical and landscape subjects..."' },
+                                { id: 'p1_q10', correct: 'printing', explanation: 'Paragraph 5: "...featuring immaculate printing of the highest quality."' },
+                                { id: 'p1_q11', correct: '1797', explanation: 'Middle years section: "He started using the name “Hokusai” around 1797..."' },
+                                { id: 'p1_q12', correct: 'manga', explanation: 'Middle years: "...first volumes of his instructional manga (random drawings)..."' },
+                                { id: 'p1_q13', correct: 'Prussian blue', explanation: 'Later years: "...innovative use of the newly affordable Prussian blue pigment..."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: A study of introvert and extrovert characters",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> We are often labelled as introverts or extroverts, and humans do seem to have biological <span class="vocab-word" data-en="Propensities" data-vi="Thiên hướng, xu hướng" data-pron="/prəˈpɛnsɪtiz/" data-context="Khuynh hướng tự nhiên để cư xử theo một cách cụ thể">propensities</span> to behave in certain ways; some of us are naturally more talkative and sociable while others prefer more time alone. But, according to Canadian-born research psychologist Professor Brian Little, our traits are by no means fixed. In his book Me, Myself and Us: The Science of Personality and the Art of Well-Being, <span id="loc_p2_q21" class="highlight-target">Little suggests that we are often able to override our biological make-up through the adoption of what he calls 'free traits'</span>, which allow us to behave in a manner which contrasts with our natural selves. According to Little, we adopt these free traits only when we need them, in order to meet the demands of different situations and reach targets and goals that are important to us – our 'personal projects'. These projects might be big (such as career ambitions) or small (like cleaning the car) and pursuing them shapes our lives in profound ways.</p>
+                        <p class="mb-4"><strong>B.</strong> Little's interest in this topic was sparked by his own experience as a university professor. <span id="loc_p2_q22" class="highlight-target">He describes himself as a 'biological introvert' who, despite his natural <span class="vocab-word" data-en="Disposition" data-vi="Khuynh hướng, tính khí" data-pron="/ˌdɪspəˈzɪʃn/" data-context="Tính cách tự nhiên hoặc bản tính của một người">disposition</span>, must behave as an extrovert when lecturing</span> to large classes of students. This performance, he realised, required significant effort and left him feeling <span class="vocab-word" data-en="Depleted" data-vi="Cạn kiệt, suy yếu" data-pron="/dɪˈpliːtɪd/" data-context="Cảm thấy vô cùng mệt mỏi và cạn kiệt năng lượng">depleted</span> afterward. This personal observation led him to investigate more systematically how and why people act against their natural personalities in professional settings. The workplace, he reasoned, is a particularly rich environment for studying this phenomenon because it constantly demands that we interact with others, meet expectations, and achieve goals that may not align with our innate preferences.</p>
+                        <p class="mb-4"><strong>C.</strong> Little's research identified several common situations in which people feel compelled to act out of character. These include job interviews, where even introverts must project confidence and enthusiasm; sales calls, where persistence requires overcoming natural shyness; and leadership roles, where taking charge may feel unnatural to those who prefer consensus and collaboration. Perhaps most surprisingly, Little found that even extroverts sometimes need to restrain their outgoing nature – for example, when working in libraries, hospitals, or other quiet environments where loud or <span class="vocab-word" data-en="Gregarious" data-vi="Thích giao du, hòa đồng" data-pron="/ɡrɪˈɡeəriəs/" data-context="Hòa đồng và thích ở cùng những người khác">gregarious</span> behaviour would be inappropriate. In each of these contexts, individuals adopt free traits to meet situational demands, but the cost of doing so varies from person to person.</p>
+                        <p class="mb-4"><strong>D.</strong> Acting against one's natural personality, Little discovered, comes at a price. <span id="loc_p2_q23" class="highlight-target">He refers to this as 'restorative niches' – the periods of time when people need to retreat from acting out of character</span> and return to behaviours that feel more authentic. For introverts, this might mean spending time alone after a day of forced sociability. For extroverts forced to be quiet, it might mean seeking lively company after work. <span id="loc_p2_q25" class="highlight-target">Those who cannot find adequate restorative niches risk burnout, anxiety, and even physical illness.</span> Little emphasizes that while free traits are essential for success in many areas of life, they must be balanced with sufficient opportunities to recharge.</p>
+                        <p class="mb-4"><strong>E.</strong> The implications for workplace design and company culture are significant. Little argues that employers should recognise that asking employees to act against their natures is sometimes necessary but should not be constant. <span id="loc_p2_q24" class="highlight-target">He recommends that organisations create spaces and times where employees can drop their professional personas</span> and behave more naturally. This might include quiet rooms for introverts to retreat to, as well as social spaces where extroverts can interact freely. More fundamentally, Little suggests that managers should strive to understand the personal projects of their employees and align with individual strengths and preferences where possible.</p>
+                        <p class="mb-4"><strong>F.</strong> When company culture fails to accommodate different personality types, the consequences can be serious. Little cites examples of organisations that prize extroversion above all else, creating environments where introverted employees feel pressured to constantly perform as outgoing team players. Over time, this can lead to disengagement, high turnover, and even depression. Conversely, companies that value only quiet <span class="vocab-word" data-en="Introspection" data-vi="Sự tự suy ngẫm, nội tâm" data-pron="/ˌɪntrəˈspɛkʃn/" data-context="Việc xem xét cẩn thận các suy nghĩ và cảm xúc của chính mình">introspection</span> may <span class="vocab-word" data-en="Stifle" data-vi="Kìm hãm, dập tắt" data-pron="/ˈstaɪfl/" data-context="Ngăn chặn một điều gì đó phát triển hoặc được thể hiện">stifle</span> the energy and creativity that extroverts bring. <span id="loc_p2_q26" class="highlight-target">The most successful organisations, Little argues, are those that recognise the value of both personality types and create conditions where each can flourish.</span></p>
+                        <p class="mb-4"><strong>G.</strong> In conclusion, Little's research challenges the simplistic notion that personality is destiny. While we are born with certain tendencies, we have remarkable capacity to adapt our behaviour to meet the demands of our personal projects. The key is to do so mindfully, recognising when we are acting out of character and ensuring we have opportunities to restore our authentic selves. For employers, the message is clear: create workplaces that respect personality differences and provide restorative niches for all employees. In doing so, they will unlock the full potential of both introverts and extroverts, harnessing the diverse strengths that each brings to the collective enterprise.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_20',
+                            displayType: 'drag_drop',
+                            isReusable: false,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–20</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 2 has seven paragraphs, <strong>A–G</strong>.<br>Choose the correct heading for each paragraph from the list of headings below.</p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Headings',
+                            pool: HEADING_LIST_P2,
+                            questions: [
+                                { id: 'p2_q14', text: '14. Paragraph A', correct: 'ix', explanation: 'Introduces "free traits" and "personal projects".' },
+                                { id: 'p2_q15', text: '15. Paragraph B', correct: 'iv', explanation: 'Explains why the focus shifted to professional settings (the workplace).' },
+                                { id: 'p2_q16', text: '16. Paragraph C', correct: 'vi', explanation: 'Lists common situations (interviews, sales) where people act out of character.' },
+                                { id: 'p2_q17', text: '17. Paragraph D', correct: 'xi', explanation: 'Discusses the cost of acting against personality (burnout, etc.).' },
+                                { id: 'p2_q18', text: '18. Paragraph E', correct: 'ii', explanation: 'Recommends changes for organisations and employers.' },
+                                { id: 'p2_q19', text: '19. Paragraph F', correct: 'i', explanation: 'Describes negative impacts of mismatched company culture.' },
+                                { id: 'p2_q20', text: '20. Paragraph G', correct: 'ii', explanation: 'The conclusion offers final recommendations for employers to respect differences.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q21_24',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 21–24</h3>
+                                    <p class="mb-4 text-gray-700">Complete the sentences below.<br>Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <ul class="list-disc pl-5 space-y-5 font-medium">
+                                        <li><strong>21.</strong> Brian Little calls the adoption of behaviour that contrasts with our natural selves the use of <strong><input type="text" data-qid="p2_q21" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></strong>.</li>
+                                        <li><strong>22.</strong> Little describes himself as a <strong><input type="text" data-qid="p2_q22" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></strong> who must behave as an extrovert when lecturing.</li>
+                                        <li><strong>23.</strong> The periods when people need to retreat from acting out of character are called <strong><input type="text" data-qid="p2_q23" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></strong>.</li>
+                                        <li><strong>24.</strong> Employers should create spaces where employees can drop their professional <strong><input type="text" data-qid="p2_q24" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."></strong> and behave naturally.</li>
+                                    </ul>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q21', correct: 'free traits', explanation: 'Paragraph A: "...adoption of what he calls \'free traits\'..."' },
+                                { id: 'p2_q22', correct: 'biological introvert', explanation: 'Paragraph B: "He describes himself as a \'biological introvert\'..."' },
+                                { id: 'p2_q23', correct: 'restorative niches', explanation: 'Paragraph D: "He refers to this as \'restorative niches\'..."' },
+                                { id: 'p2_q24', correct: 'personas', explanation: 'Paragraph E: "...employees can drop their professional personas..."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q25',
+                            displayType: 'radio',
+                            text: '25. According to Little, what can happen to employees who cannot find adequate restorative niches?',
+                            options: [
+                                { id: 'p2_q25_a', text: 'A. They may become more productive.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p2_q25_b', text: 'B. They risk burnout, anxiety, and illness.', isCorrect: true, explanation: 'Paragraph D: "...risk burnout, anxiety, and even physical illness."' },
+                                { id: 'p2_q25_c', text: 'C. They will naturally become more extroverted.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p2_q25_d', text: 'D. They will perform better in job interviews.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q26',
+                            displayType: 'radio',
+                            text: '26. What kind of company culture does Little recommend?',
+                            options: [
+                                { id: 'p2_q26_a', text: 'A. One that values extroversion above all other traits', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p2_q26_b', text: 'B. One that requires constant professional behaviour', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p2_q26_c', text: 'C. One that recognises and accommodates different personality types', isCorrect: true, explanation: 'Paragraph F: "...recognise the value of both personality types and create conditions where each can flourish."' },
+                                { id: 'p2_q26_d', text: 'D. One that encourages employees to always act naturally without restraint', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Living dunes",
+                    passage: `
+                        <p class="mb-4 text-sm italic text-gray-500">Things don't come much stranger than heaps of sand that can move and sing of their own accord. Sally Palmer investigates.</p>
+                        <p class="mb-4"><strong>A.</strong> Armies of giant sand dunes are advancing across the world's deserts, <span class="vocab-word" data-en="Engulfing" data-vi="Nhấn chìm, nuốt chửng" data-pron="/ɪnˈɡʌlfɪŋ/" data-context="Bao phủ và làm biến mất hoàn toàn những thứ trên đường đi">engulfing</span> anything that crosses their path. They are tens of metres tall and hundreds of metres long. Fortunately, they aren't going very fast. Even the smallest, speediest dunes only travel about 100 metres over the course of a year, while the bigger ones, which weigh something in the order of 10,000 tonnes, barely move one metre in that time. <span id="loc_p3_q27" class="highlight-target">However, their <span class="vocab-word" data-en="Insidious" data-vi="Lén lút, âm thầm (gây hại)" data-pron="/ɪnˈsɪdiəs/" data-context="Sự tiến triển chậm chạp nhưng mang lại hậu quả nghiêm trọng">insidious</span> creep can have serious consequences if there is an oil installation or a railway line in their path.</span></p>
+                        <p class="mb-4"><strong>B.</strong> About 47% of the world's land mass, including Antarctica, most of Australia and large areas of Africa, is classified as arid or semi-arid desert. Only around 20% of that is sand-covered, however, and <span id="loc_p3_q28" class="highlight-target">over half of that is classified as 'linear' sand dunes.</span> <span id="loc_p3_q34" class="highlight-target">These form in a long curving wave</span>, as a result of wind blowing strongly from several quarters, flipping them from side to side. Although linear dunes are <span class="vocab-word" data-en="Static" data-vi="Tĩnh, không di chuyển" data-pron="/ˈstætɪk/" data-context="Ở yên một chỗ, không dịch chuyển">static</span>, sand blowing off them can cause problems for desert villages, burying crops and buildings.</p>
+                        <p class="mb-4"><strong>C.</strong> Moving dunes make up just a small percentage of the rest, but they are of the most interest to scientists. They are known as 'barchans': heavy, crescent-shaped sand piles with a ridged crest and two elongated arms, one curving away to either side. <span id="loc_p3_q29" class="highlight-target">'Barchan dunes only tend to form where you have one-directional winds on the edge of sandy deserts near coastal areas,'</span> says Giles Wiggs, a geomorphologist at Oxford University, who has been studying the formation and movement of sand dunes for more than a decade.</p>
+                        <p class="mb-4"><strong>D.</strong> But even with strong winds, how can entire barchans move while retaining their form? That question was first answered in the mid-20th century by British explorer Ralph Alger Bagnold, and his answer hinges on the fact that <span id="loc_p3_q35" class="highlight-target">dunes aren't solid, but <span class="vocab-word" data-en="Granular" data-vi="Có dạng hạt" data-pron="/ˈɡrænjʊlə/" data-context="Bao gồm nhiều hạt nhỏ rời rạc cấu thành">granular</span>. Bagnold figured out how barchan dunes are able to move grain by grain.</span> Imagine a single grain of sand being blown up the back of a dune by the wind and deposited on the top. More grains follow the same pattern, until the accumulated weight of piled-up sand finally pushes the top down the dune face. The grain tumbles, then stops on the face until subsequent mini-<span class="vocab-word" data-en="Avalanches" data-vi="Cát lở (như tuyết lở)" data-pron="/ˈævəlɑːnʃɪz/" data-context="Hiện tượng một lượng lớn cát trượt xuống sườn cồn cát">avalanches</span> bury it. <span id="loc_p3_q30" class="highlight-target">Eventually, it reappears at the back of the dune, ready to repeat the process.</span> As this happens to every grain of sand in the dune, the whole thing creeps in the direction of the prevailing wind.</p>
+                        <p class="mb-4"><strong>E.</strong> The relationship between the wind and barchan dunes is complex. As a dune grows, it modifies the speed and course of the wind, which in turn alters how that dune and its neighbours evolve. 'Interestingly, the dune can regulate its own shape, and maintain it as it moves,' says Dr Stéphane Douady, a physicist at École Normale Supérieure (ENS) in France. <span id="loc_p3_q31" class="highlight-target"><span id="loc_p3_q36" class="highlight-target">'Even when two dunes collide, they quickly take on their distinctive shapes again. It's like a living organism.'</span></span></p>
+                        <p class="mb-4"><strong>F.</strong> Douady and his colleagues have also been studying an even odder phenomenon than moving dunes: <span id="loc_p3_q37" class="highlight-target">some barchans actually sing.</span> <span id="loc_p3_q32" class="highlight-target">Local legends attributed the sounds to dangerous spirits which were trying to trap unwary travellers. Douady is more <span class="vocab-word" data-en="Pragmatic" data-vi="Thực tế, thực dụng" data-pron="/præɡˈmætɪk/" data-context="Giải quyết vấn đề dựa trên sự thật và logic thay vì truyền thuyết">pragmatic</span>.</span> 'It's a strong booming noise with a low frequency,' he explains, making a noise like a foghorn to demonstrate. 'It can last for a long time – up to several minutes. It's a very loud sound and you don't understand where it's coming from when you first hear it.' There are about 50 dunes distributed across 35 deserts round the world that are known to sing. Douady says the sound is caused by the way sand avalanches down the faces of particular dunes. Rather than tumbling randomly, the sand grains flow in synchrony and set each other vibrating like the membrane on a gigantic loudspeaker. The synchronisation causes the air to move in and out between the grains, creating a powerful sound wave.</p>
+                        <p class="mb-4"><strong>G.</strong> What really surprised the scientists, however, was that <span id="loc_p3_q33" class="highlight-target">they were able to take samples of the singing sand back to France and replicate the sound at ENS</span>, proving that it's the sand, not the dune shape, that causes the sound. Their studies show <span id="loc_p3_q38" class="highlight-target">the grains are a uniform shape</span>, well-rounded from years of striking each other, and that <span id="loc_p3_q39" class="highlight-target">the variations in size affect the tone</span>. Crucially, the grains are coated with a special <span class="vocab-word" data-en="Veneer" data-vi="Lớp màng, lớp phủ" data-pron="/vəˈnɪə/" data-context="Một lớp vật chất mỏng bao bọc bên ngoài">veneer</span>, which Douady calls 'desert glaze', <span id="loc_p3_q40" class="highlight-target">made from a precise combination of minerals from surrounding rocks</span> including iron, aluminium, manganese, silicon and calcium. The team found that after a month or so, the veneer wore off and the grains lost their 'voice'. 'We managed to reproduce the desert glaze and then the grains started to sing again,' says Douady. 'We tried putting the coating onto different grains, but they weren't round enough and it didn't work. But some American colleagues made some artificial grains and managed to make them sing, after covering them in desert glaze.' Douady has now made recordings of dunesong from all over the world which are to be made into a CD.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_33',
+                            displayType: 'drag_drop',
+                            isReusable: false,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–33</h3>
+                                    <p class="mb-4 text-gray-700">Reading Passage 3 has seven paragraphs, <strong>A–G</strong>.<br>Choose the correct heading for each paragraph from the list of headings below.</p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Headings',
+                            pool: HEADING_LIST_P3,
+                            questions: [
+                                { id: 'p3_q27', text: '27. Paragraph A', correct: 'iv', explanation: 'Para A describes threats to oil installations and railways (industry).' },
+                                { id: 'p3_q28', text: '28. Paragraph B', correct: 'viii', explanation: 'States linear dunes are over half of sand-covered dunes (commonest).' },
+                                { id: 'p3_q29', text: '29. Paragraph C', correct: 'vi', explanation: 'Lists conditions (coastal, one-directional winds) required for barchans.' },
+                                { id: 'p3_q30', text: '30. Paragraph D', correct: 'vii', explanation: 'Describes the continuous grain-by-grain cycle of movement.' },
+                                { id: 'p3_q31', text: '31. Paragraph E', correct: 'v', explanation: 'Dunes collide and reform their shapes.' },
+                                { id: 'p3_q32', text: '32. Paragraph F', correct: 'ix', explanation: 'Demystifies local legends about spirits and explains the sound waves.' },
+                                { id: 'p3_q33', text: '33. Paragraph G', correct: 'ii', explanation: 'Describes replicating the singing process in the lab in France.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q34_36_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 34–36</h3>
+                                    <p class="mb-2 text-gray-700">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q34',
+                            displayType: 'radio',
+                            text: '34. What are we told about linear dunes?',
+                            options: [
+                                { id: 'p3_q34_a', text: 'A. They are formed by strong winds blowing from one direction.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q34_b', text: 'B. They can move up to 100 metres in a twelve-month period.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q34_c', text: 'C. They develop in a recognisable shape.', isCorrect: true, explanation: 'Paragraph B: "These form in a long curving wave..."' },
+                                { id: 'p3_q34_d', text: 'D. They make up about 20% of the world’s deserts.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q35',
+                            displayType: 'radio',
+                            text: '35. Bagnold discovered that movement in barchans was caused by',
+                            options: [
+                                { id: 'p3_q35_a', text: 'A. the long straight shape of the dunes.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q35_b', text: 'B. the particular composition of the dunes.', isCorrect: true, explanation: 'Paragraph D: "...answer hinges on the fact that dunes aren\'t solid, but granular."' },
+                                { id: 'p3_q35_c', text: 'C. the exceptionally heavy nature of the sand grains.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q35_d', text: 'D. the unusual strength of the wind in certain seasons.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q36',
+                            displayType: 'radio',
+                            text: '36. Why does Dr Douady compare a barchan dune to a living organism?',
+                            options: [
+                                { id: 'p3_q36_a', text: 'A. It starts small and then increases in size.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q36_b', text: 'B. It has an effect on its immediate surroundings.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q36_c', text: 'C. Its relations with desert organisms are quite developed.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'p3_q36_d', text: 'D. Its outline stays the same even after a period of movement.', isCorrect: true, explanation: 'Paragraph E: "the dune can regulate its own shape, and maintain it as it moves... It\'s like a living organism."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q37_40',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 37–40</h3>
+                                    <p class="mb-4 text-gray-700">Complete the summary below.<br>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-indigo-900 uppercase tracking-wide text-sm mb-4 border-b border-indigo-200 pb-2">Singing dunes</h4>
+                                    <p class="leading-loose">
+                                        Singing dunes, which belong to the type of dunes known as <strong>37</strong> <input type="text" data-qid="p3_q37" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">, produce a very loud sound which is transmitted at a low frequency. Researchers have worked out that sand grains fall down the dune and start vibrating against other grains, forming a sound wave. Research proves that the individual grains have a similar <strong>38</strong> <input type="text" data-qid="p3_q38" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">, but the differences in dimensions alter the <strong>39</strong> <input type="text" data-qid="p3_q39" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> of the ‘song’. Each grain is covered with a mixture of different <strong>40</strong> <input type="text" data-qid="p3_q40" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">, and this is vital to the sound production.
+                                    </p>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p3_q37', correct: 'barchans', explanation: 'Paragraph F: "...some barchans actually sing."' },
+                                { id: 'p3_q38', correct: 'shape', explanation: 'Paragraph G: "...the grains are a uniform shape..."' },
+                                { id: 'p3_q39', correct: 'tone', explanation: 'Paragraph G: "...variations in size affect the tone."' },
+                                { id: 'p3_q40', correct: 'minerals', explanation: 'Paragraph G: "...made from a precise combination of minerals..."' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. APPLICATION STATE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            totalQuestions: 0,
+            questionsList: [], 
+            activeDragItem: null, 
+            _lastLoadedPart: -1,
+            _preventScrollReset: false
+        };
+
+        // --- 3. DOM ELEMENTS ---
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            resultBanner: { container: document.getElementById('result-banner'), score: document.getElementById('score-display'), timeTaken: document.getElementById('time-taken-display') },
+            navigation: { tabs: document.getElementById('part-tabs') },
+            navigator: { container: document.getElementById('question-navigator'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), content: document.getElementById('passage-content'), questions: document.getElementById('questions-content'), btnSubmitBottom: document.getElementById('btn-submit-bottom'), floatingSubmit: document.getElementById('floating-submit-container') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') }
+        };
+
+        // --- 4. CORE FUNCTIONS ---
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach((q) => {
+                    if (q.displayType === 'checkbox' && q.answersIds) {
+                        const correctOpts = q.options.filter(o => o.isCorrect);
+                        q.answersIds.forEach((ansId, idx) => {
+                            state.questionsList.push({ partIndex: pIdx, qId: ansId, absNum: absNum++, isCorrect: correctOpts[idx]?.id, displayType: 'checkbox', parentQid: q.id });
+                        });
+                    } else if (q.displayType === 'inline_blanks' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({ partIndex: pIdx, qId: blank.id, absNum: absNum++, isCorrect: blank.correct, displayType: 'inline_blank', parentQid: q.id });
+                        });
+                    } else if (q.displayType === 'inline_dropdown' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({ partIndex: pIdx, qId: blank.id, absNum: absNum++, isCorrect: blank.correct, displayType: 'inline_dropdown', parentQid: q.id });
+                        });
+                    } else if (q.displayType === 'drag_drop' && q.questions) {
+                        q.questions.forEach((subQ) => {
+                            state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, isCorrect: subQ.correct, displayType: 'drag_drop', parentQid: q.id });
+                        });
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, isCorrect: q.options?.find(o => o.isCorrect)?.id, displayType: q.displayType });
+                    }
+                });
+            });
+            state.totalQuestions = state.questionsList.length;
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', confirmSubmit);
+            DOM.panes.btnSubmitBottom.addEventListener('click', confirmSubmit);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', () => { DOM.modal.container.classList.add('hidden'); finishTest(); });
+            document.addEventListener('click', (e) => {
+                if(state.mode === 'RESULT') {
+                    if (!e.target.classList.contains('vocab-word') && !DOM.tooltip.container.contains(e.target)) hideTooltip();
+                } else if (state.mode === 'TEST') {
+                    if (state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                        state.activeDragItem = null;
+                        document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                    }
+                }
+            });
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.views.main.classList.add('flex', 'flex-col');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            renderTabs();
+            loadPart(0);
+            updateNavigator();
+            state.timerInterval = setInterval(tickTimer, 1000);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function tickTimer() {
+            if (state.timeRemaining <= 0) { clearInterval(state.timerInterval); finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if(state.timeRemaining < 300) {
+                DOM.header.timer.parentElement.classList.add('bg-red-50', 'border-red-200');
+                DOM.header.timer.classList.add('text-red-600');
+            }
+        }
+
+        function renderTabs() {
+            DOM.navigation.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((part, index) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors border border-b-0 outline-none ${index === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${index + 1}`;
+                btn.onclick = () => loadPart(index);
+                DOM.navigation.tabs.appendChild(btn);
+            });
+        }
+
+        function loadPart(index) {
+            const isNewPart = state._lastLoadedPart !== index;
+            state.currentPart = index;
+            state._lastLoadedPart = index;
+            const partData = TEST_DATA.parts[index];
+            renderTabs();
+            DOM.panes.title.textContent = partData.title;
+            DOM.panes.content.innerHTML = partData.passage;
+            DOM.panes.content.querySelectorAll('.vocab-word').forEach(word => {
+                if (state.mode === 'RESULT') { word.classList.add('mode-result'); word.addEventListener('click', handleVocabClick); }
+            });
+            DOM.panes.questions.innerHTML = '';
+            partData.questions.forEach((q, qIndex) => {
+                const qDiv = document.createElement('div');
+                qDiv.id = 'container_' + q.id;
+                qDiv.className = q.displayType === 'instruction' ? 'mb-2' : 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) { const instr = document.createElement('div'); instr.innerHTML = q.instructionBox; wrapper.appendChild(instr); }
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6 text-sm';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 uppercase tracking-wide">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2 font-medium';
+                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                    q.pool.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 transition-colors shadow-sm';
+                        itemDiv.textContent = item.text;
+                        if (state.mode === 'TEST') {
+                            if (!q.isReusable && used.includes(item.id)) { itemDiv.classList.add('opacity-40', 'cursor-not-allowed'); }
+                            else {
+                                itemDiv.draggable = true;
+                                itemDiv.ondragstart = (e) => { e.dataTransfer.setData('text/plain', item.id); state.activeDragItem = null; };
+                                itemDiv.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500')); state.activeDragItem = item.id; itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500'); };
+                            }
+                        }
+                        poolGrid.appendChild(itemDiv);
+                    });
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+                    const qList = document.createElement('div');
+                    qList.className = 'space-y-4';
+                    q.questions.forEach(subQ => {
+                        const subDiv = document.createElement('div');
+                        subDiv.id = 'container_' + subQ.id;
+                        subDiv.className = 'flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border rounded-xl';
+                        const label = document.createElement('label');
+                        label.className = 'font-bold text-gray-800 flex-1';
+                        label.textContent = subQ.text;
+                        const drop = document.createElement('div');
+                        drop.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm cursor-pointer';
+                        const ansId = state.answers[subQ.id];
+                        const ansItem = q.pool.find(i => i.id === ansId);
+                        if (state.mode === 'RESULT') {
+                            drop.className = `drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 rounded-xl flex items-center justify-center text-sm font-medium ${ansId === subQ.correct ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`;
+                            drop.textContent = ansItem ? ansItem.text : 'No Answer';
+                            const exp = document.createElement('div');
+                            exp.className = 'w-full mt-4 pt-4 border-t border-gray-100';
+                            if (ansId !== subQ.correct) { exp.innerHTML = `<p class="text-sm text-green-600 font-bold mb-2 underline">Correct: ${q.pool.find(i => i.id === subQ.correct).text}</p>`; }
+                            exp.innerHTML += `<p class="text-sm text-gray-600">${subQ.explanation}</p>`;
+                            const outer = document.createElement('div');
+                            outer.className = 'w-full';
+                            subDiv.classList.remove('items-center');
+                            const topRow = document.createElement('div'); topRow.className = 'flex justify-between items-center'; topRow.appendChild(label); topRow.appendChild(drop);
+                            outer.appendChild(topRow); outer.appendChild(exp); subDiv.innerHTML = ''; subDiv.appendChild(outer);
+                        } else {
+                            if (ansItem) { drop.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border border-pink-400 bg-pink-50 rounded-xl flex items-center justify-between text-sm font-bold'; drop.innerHTML = `<span class="truncate">${ansItem.text}</span><button onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>`; }
+                            else { drop.textContent = 'Drop answer here'; }
+                            drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('bg-pink-100'); };
+                            drop.ondragleave = () => drop.classList.remove('bg-pink-100');
+                            drop.ondrop = (e) => { e.preventDefault(); const itemId = e.dataTransfer.getData('text/plain'); if (itemId) { state.answers[subQ.id] = itemId; handleDropAndReload(index); } };
+                            drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; handleDropAndReload(index); } };
+                            subDiv.appendChild(label); subDiv.appendChild(drop);
+                        }
+                        qList.appendChild(subDiv);
+                    });
+                    wrapper.appendChild(qList); qDiv.appendChild(wrapper);
+                } else if (q.displayType === 'inline_blanks') {
+                    const wrapper = document.createElement('div');
+                    if (q.instructionBox) { const instr = document.createElement('div'); instr.innerHTML = q.instructionBox; wrapper.appendChild(instr); }
+                    const content = document.createElement('div'); content.innerHTML = q.html;
+                    content.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        input.value = state.answers[qid] || '';
+                        if (state.mode === 'RESULT') {
+                            input.disabled = true;
+                            if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) { input.className += ' border-green-500 bg-green-50 text-green-700'; }
+                            else { input.className += ' border-red-500 bg-red-50 text-red-700 line-through'; const corr = document.createElement('span'); corr.className = 'text-green-600 font-bold ml-1'; corr.textContent = info.correct; input.after(corr); }
+                            const exp = document.createElement('div'); exp.className = 'text-xs text-gray-500 mt-2 italic'; exp.textContent = info.explanation; input.closest('div').after(exp);
+                        } else {
+                            input.oninput = (e) => { state.answers[qid] = e.target.value; updateNavigator(); };
+                        }
+                    });
+                    wrapper.appendChild(content); qDiv.appendChild(wrapper);
+                } else if (q.displayType === 'radio') {
+                    if (q.instructionBox) { const instr = document.createElement('div'); instr.innerHTML = q.instructionBox; qDiv.appendChild(instr); }
+                    const header = document.createElement('h3'); header.className = 'font-bold text-gray-800 mb-4 text-lg'; header.textContent = q.text; qDiv.appendChild(header);
+                    q.options.forEach(opt => {
+                        const isSelected = state.answers[q.id] === opt.id;
+                        const row = document.createElement('div');
+                        row.className = `flex items-start p-3 border rounded-xl mb-2 cursor-pointer transition-all ${isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-200'}`;
+                        if (state.mode === 'RESULT') {
+                            row.className = `flex items-start p-3 border rounded-xl mb-2 transition-all ${opt.isCorrect ? 'border-green-500 bg-green-50' : isSelected ? 'border-red-500 bg-red-50' : 'opacity-60 border-gray-200'}`;
+                        } else {
+                            row.onclick = () => selectOption(q.id, opt.id);
+                        }
+                        row.innerHTML = `<input type="radio" class="mt-1" ${isSelected ? 'checked' : ''} disabled><div class="ml-3"><p class="text-sm font-medium">${opt.text}</p>${state.mode === 'RESULT' && (isSelected || opt.isCorrect) ? `<p class="text-xs mt-1 text-gray-500">${opt.explanation}</p>` : ''}</div>`;
+                        qDiv.appendChild(row);
+                    });
+                } else if (q.displayType === 'instruction') {
+                    qDiv.innerHTML = q.instructionBox;
+                }
+                DOM.panes.questions.appendChild(qDiv);
+            });
+            if (isNewPart && !state._preventScrollReset) { DOM.panes.content.parentElement.parentElement.scrollTop = 0; DOM.panes.questions.parentElement.scrollTop = 0; }
+            DOM.panes.btnSubmitBottom.style.display = (state.mode === 'TEST' && index === TEST_DATA.parts.length - 1) ? 'inline-block' : 'none';
+        }
+
+        function selectOption(qid, oid) { state.answers[qid] = oid; handleDropAndReload(state.currentPart); }
+        window.handleDropAndReload = function(idx) { state._preventScrollReset = true; const pos = DOM.panes.questions.parentElement.scrollTop; loadPart(idx); DOM.panes.questions.parentElement.scrollTop = pos; state._preventScrollReset = false; updateNavigator(); };
+        window.clearDragDropAnswer = function(qid, idx, e) { e.stopPropagation(); delete state.answers[qid]; window.handleDropAndReload(idx); };
+
+        function confirmSubmit() { DOM.modal.container.classList.remove('hidden'); }
+
+        function finishTest() {
+            clearInterval(state.timerInterval); state.mode = 'RESULT';
+            let score = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (q.displayType === 'inline_blank' || q.displayType === 'text') { if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++; }
+                else if (ans === q.isCorrect) score++;
+            });
+            DOM.header.actions.classList.add('hidden');
+            DOM.resultBanner.container.classList.remove('hidden');
+            DOM.resultBanner.container.classList.add('flex');
+            DOM.resultBanner.score.textContent = `${score}/${state.totalQuestions}`;
+            DOM.resultBanner.timeTaken.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            updateNavigator(); loadPart(state.currentPart);
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            state.questionsList.forEach(q => {
+                const btn = document.createElement('button');
+                const ans = state.answers[q.qId];
+                let bg = 'bg-white border-gray-300 text-gray-500';
+                if (state.mode === 'TEST' && ans) bg = 'bg-pink-500 border-pink-500 text-white';
+                if (state.mode === 'RESULT') {
+                    const corr = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
+                    bg = corr ? 'bg-green-500 text-white border-green-500' : ans ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { if (state.currentPart !== q.partIndex) loadPart(q.partIndex); setTimeout(() => document.getElementById('container_'+q.qId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); };
+                DOM.navigator.grid.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; DOM.tooltip.pron.textContent = d.pron; DOM.tooltip.vi.textContent = d.vi; DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+        init();
+    </script>
+</body>
+</html>
