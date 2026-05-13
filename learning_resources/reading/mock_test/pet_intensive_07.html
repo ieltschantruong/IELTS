@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive 07 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 800px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <!-- Header Actions -->
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PET Intensive 07</h2>
+            <p class="text-gray-500 text-lg mb-8 uppercase tracking-widest font-medium">Academic Reading Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-left shadow-sm">
+                <h3 class="font-bold text-pink-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    Instructions
+                </h3>
+                <ul class="space-y-3 text-sm text-pink-800/80">
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can navigate between passages using the tabs at the top.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> The timer will not pause once you begin.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+                Start Mock Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Main View -->
+    <div id="view-main" class="hidden flex-auto flex flex-col overflow-hidden bg-white">
+        <!-- Result Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Mock Test Result</h2>
+                <p class="text-gray-400 text-sm">Review your performance and detailed explanations below.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Raw Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">--/40</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Time Used</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative">
+            <!-- Tabs injected by JS -->
+        </nav>
+
+        <!-- Split View -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            <!-- Left Pane: Passage -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100 italic"></h2>
+                    <div id="passage-content" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-6">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions -->
+            <div id="pane-questions-container" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative">
+                    <div id="questions-content" class="space-y-10 pb-20">
+                        <!-- Questions injected by JS -->
+                    </div>
+                    
+                    <div id="floating-submit-container" class="mt-12 text-center border-t border-gray-200 pt-8 hidden">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-all w-full sm:w-auto">
+                            Submit Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigator -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-lg relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-widest mr-2">Questions:</span>
+                <div id="navigator-grid" class="flex gap-2">
+                    <!-- Nav items injected by JS -->
+                </div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 hidden md:flex items-center gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                <!-- Legend items injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocab Tooltip -->
+    <div id="vocab-tooltip" class="bg-white rounded-2xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-600 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-none">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-xs font-mono mt-1 italic">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+        <div class="p-5 bg-white space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tiếng Việt</span>
+                <p id="tt-vi" class="text-gray-900 font-bold text-sm"></p>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-1">Context</span>
+                <p id="tt-context" class="text-gray-600 text-sm leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 text-pink-500">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Finish Test?</h3>
+            <p id="modal-message" class="text-center text-gray-500 mb-8 px-4 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Resume</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-2xl bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors shadow-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA ---
+        const PARA_LIST_P1 = [
+            { id: 'A', text: 'A' }, { id: 'B', text: 'B' }, { id: 'C', text: 'C' },
+            { id: 'D', text: 'D' }, { id: 'E', text: 'E' }, { id: 'F', text: 'F' },
+            { id: 'G', text: 'G' }, { id: 'H', text: 'H' }
+        ];
+
+        const PARA_LIST_P2 = [
+            { id: 'A', text: 'A' }, { id: 'B', text: 'B' }, { id: 'C', text: 'C' },
+            { id: 'D', text: 'D' }, { id: 'E', text: 'E' }, { id: 'F', text: 'F' },
+            { id: 'G', text: 'G' }, { id: 'H', text: 'H' }, { id: 'I', text: 'I' },
+            { id: 'J', text: 'J' }, { id: 'K', text: 'K' }
+        ];
+
+        const PARA_LIST_P3 = [
+            { id: 'A', text: 'A' }, { id: 'B', text: 'B' }, { id: 'C', text: 'C' },
+            { id: 'D', text: 'D' }, { id: 'E', text: 'E' }, { id: 'F', text: 'F' },
+            { id: 'G', text: 'G' }, { id: 'H', text: 'H' }
+        ];
+
+        const RESEARCHER_LIST_P1 = [
+            { id: 'A', text: 'A. Lauren Stewart' },
+            { id: 'B', text: 'B. Ira Hyman' },
+            { id: 'C', text: 'C. Andrea Halpern' },
+            { id: 'D', text: 'D. John Seabrook' }
+        ];
+
+        const PERSON_LIST_P2 = [
+            { id: 'A', text: 'A. The choice of a certain construction material can have a socio‑economic impact.' },
+            { id: 'B', text: 'B. Throughout the world, people are rejecting traditional housing design in order to appear modern.' },
+            { id: 'C', text: 'C. Houses should not only meet people\'s physical needs but also their social and psychological needs.' },
+            { id: 'D', text: 'D. Traditional knowledge can be superior to modern knowledge.' },
+            { id: 'E', text: 'E. There is an innovation that can save costs on both air‑conditioning and heating.' },
+            { id: 'F', text: 'F. Solar energy can meet the energy needs of people living in villages in developing countries.' },
+            { id: 'G', text: 'G. There is a very simple solution that can save on the cost of air‑conditioning.' }
+        ];
+
+        const ENDING_LIST_P3 = [
+            { id: 'A', text: 'A. planning for the future.' },
+            { id: 'B', text: 'B. predicting their errors.' },
+            { id: 'C', text: 'C. continuing in the present situation.' },
+            { id: 'D', text: 'D. recent findings on the most effective solutions to problems.' },
+            { id: 'E', text: 'E. achieving a gain.' },
+            { id: 'F', text: 'F. changes occurring externally.' },
+            { id: 'G', text: 'G. a high level of agreement.' }
+        ];
+
+        const TEST_DATA = {
+            totalDurationSeconds: 3600,
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Mind Music",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> Ever had a song stuck in your head, playing on an endless loop? Scientists call them 'involuntary musical images', or 'earworms', and a wave of new research is shining light on why they occur and what can be learned from them. <span id="loc_p1_q2" class="highlight-target">Some neuroscientists and cognitive psychologists are studying earworms to explore the mysteries of memory and the part of the brain that is beyond our conscious control.</span> <span id="loc_p1_q10" class="highlight-target">'The idea that we have full control over our thought processes is an <span class="vocab-word" data-en="Illusion" data-vi="Ảo giác, ảo tưởng" data-pron="/ɪˈluːʒn/" data-context="Một ý nghĩ hoặc niềm tin sai lệch so với thực tế">illusion</span>,' says psychologist Lauren Stewart</span>, who founded the master's program in music, mind and brain at Goldsmiths, University of London, UK, where recent research has taken place. Researchers haven't been able to watch what happens in the brain when earworms occur, because they happen <span class="vocab-word" data-en="Unpredictably" data-vi="Không thể đoán trước" data-pron="/ˌʌnprɪˈdɪktəbli/" data-context="Xảy ra một cách ngẫu nhiên, không theo quy luật hay kế hoạch">unpredictably</span>. Much of what is known about them comes from surveys, questionnaires, diaries and lab experiments.</p>
+                        
+                        <p class="mb-4"><strong>B.</strong> A Goldsmiths study published in the journal Memory and Cognition this year showed that the singing we hear in our heads tends to be true to actual recordings. <span id="loc_p1_q5" class="highlight-target">Researchers had 17 volunteers tap to the beat of any earworm they heard during a four-day period while a device attached to their wrist recorded their movements.</span> The tapping tempos were within 10% of the tempos of the original recordings. <span id="loc_p1_q6" class="highlight-target">Another Goldsmith's study... found that people who report hearing earworms often... have slightly different brain structures, with more gray matter in areas associated with processing <span class="vocab-word" data-en="Emotions" data-vi="Cảm xúc" data-pron="/ɪˈməʊʃənz/" data-context="Phần não xử lý các phản ứng tình cảm của con người">emotions</span>.</span></p>
+
+                        <p class="mb-4"><strong>C.</strong> Studies also show that the music in our heads often starts playing during times of 'low cognitive load', such as while showering, getting dressed, walking, or doing chores. <span id="loc_p1_q7" class="highlight-target">Dr Stewart <span class="vocab-word" data-en="Likens" data-vi="Ví như, so sánh như" data-pron="/ˈlaɪkənz/" data-context="So sánh một thứ gì đó với một thứ khác tương đồng">likens</span> earworms to 'sonic screen savers' that keep the mind entertained while it is otherwise unoccupied.</span> She and her colleagues tested that theory by having volunteers listen to songs and giving them various tasks afterwards. The volunteers who sat idly for the next five minutes were the most likely to report hearing the music in their heads. <span id="loc_p1_q8" class="highlight-target">Dr Stewart observed that the more <span class="vocab-word" data-en="Challenging" data-vi="Đầy thử thách, khó khăn" data-pron="/ˈtʃælɪndʒɪŋ/" data-context="Mức độ khó của một nhiệm vụ đòi hỏi nhiều sự tập trung">challenging</span> the activity, the less likely the volunteers were to hear the music.</span> Diary studies also show songs tend to match people's moods and therefore they are not random. If you are energized and upbeat, an earworm that occurs is likely to be uptempo too.</p>
+
+                        <p class="mb-4"><strong>D.</strong> Songs the brain <span class="vocab-word" data-en="Fixates" data-vi="Tập trung ám ảnh" data-pron="/fɪkˈseɪts/" data-context="Sự chú ý hoặc dồn tâm trí một cách quá mức vào điều gì đó">fixates</span> on are usually those it has been exposed to recently, surveys show, which is why tunes getting heavy radio play frequently top the earworm charts. <span id="loc_p1_q11" class="highlight-target">Even tunes you may have heard but didn't pay attention to can worm their way into your <span class="vocab-word" data-en="Subconscious" data-vi="Tiềm thức" data-pron="/ˌsʌbˈkɒnʃəs/" data-context="Phần tâm trí hoạt động dưới ngưỡng nhận thức tỉnh táo">subconscious</span>, says Ira Hyman</span>, a psychologist at Western Washington University in Bellingham, USA. In an unpublished study there, participants who listened to music while doing other tasks were more likely to report that the songs returned as earworms later on, compared with participants who simply listened.</p>
+
+                        <p class="mb-4"><strong>E.</strong> Some earworms are just <span class="vocab-word" data-en="Fragments" data-vi="Mảnh vỡ, phần nhỏ" data-pron="/ˈfræɡmənts/" data-context="Những đoạn nhỏ, không hoàn chỉnh của một bài hát hoặc sự vật">fragments</span> of a song that repeat like a broken record. <span id="loc_p1_q13" class="highlight-target">So, when the mind hits a part of a song it can't remember, it loops back rather than moving on. That could make an earworm even more <span class="vocab-word" data-en="Entrenched" data-vi="Bám rễ sâu, khó thay đổi" data-pron="/ɪnˈtrɛntʃt/" data-context="Khiến một ý nghĩ hoặc thói quen trở nên rất khó loại bỏ">entrenched</span>, Dr Hyman says.</span> According to a theory known as the Zeigarik effect, named for a Soviet psychologist, Bluma Zeigarnik, unfinished thoughts and activities weigh on the mind more heavily than those that are completed, although experiments exposing students to interrupted songs have yielded mixed results.</p>
+
+                        <p class="mb-4"><strong>F.</strong> Researchers say they can't pinpoint a spot in the brain where earworms live. <span id="loc_p1_q12" class="highlight-target">Imaging studies by Andrea Halpern... have shown that <span class="vocab-word" data-en="Deliberately" data-vi="Một cách có chủ đích" data-pron="/dɪˈlɪbərətli/" data-context="Cố tình làm một việc gì đó để xem phản ứng">deliberately</span> imagining music and actually listening to music activate many of the same neurological networks.</span> <span id="loc_p1_q3" class="highlight-target">Dr Halpern's earlier studies showed that when subjects listened to the first few notes of familiar music... When the same subjects listened to unfamiliar music and were asked to recall it, there was activity in the left frontal portions of the brain instead.</span></p>
+
+                        <p class="mb-4"><strong>G.</strong> One factor that makes some songs stick might be repetition. 'Repetition leads to familiarity which leads to <span class="vocab-word" data-en="Anticipation" data-vi="Sự mong đợi, dự đoán" data-pron="/ænˌtɪsɪˈpeɪʃn/" data-context="Cảm giác chờ đợi một điều gì đó sắp xảy ra">anticipation</span>, which is satisfied by hearing the song,' <span id="loc_p1_q9" class="highlight-target">says John Seabrook... about how producers pump pop songs full of aural "hooks', the punchy melodic phrases designed to target the brain and leave it wanting more.</span> <span id="loc_p1_q1" class="highlight-target">Songs with earworm potential appear to share certain features: a repeating pattern of ups and downs in pitch, and an irregular musical interval.</span></p>
+
+                        <p class="mb-4"><strong>H.</strong> The researchers plan next to test their results in reverse, and play ringtones from songs of both the earworm and non earworm variety for volunteers several times a day to see which ones get stuck. <span id="loc_p1_q4" class="highlight-target">Drs Stewart and Halper are now working together to <span class="vocab-word" data-en="Recruit" data-vi="Tuyển mộ, chiêu mộ" data-pron="/rɪˈkruːt/" data-context="Tìm kiếm những người tình nguyện để tham gia một nghiên cứu">recruit</span> survey participants for a study looking at whether people at different stages of life experience earworms differently.</span> 'You can argue that older people might get them more often because they know more songs,' Dr Halpern says. ‘But the few responses we have so far indicate that they have earworms less often. It could be that they don't play music as often as younger people do.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_4',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–4</h3>
+                                    <p class="mb-4 text-gray-700">Which paragraph contains the following information? Write the correct letter, <strong>A–H</strong>.</p>
+                                </div>
+                            `,
+                            poolLabel: 'Paragraphs',
+                            pool: PARA_LIST_P1,
+                            questions: [
+                                { id: 'p1_q1', text: '1. a description of the characteristics common to songs with earworms', correct: 'G', explanation: 'Paragraph G states that songs with earworm potential share features like a repeating pattern of ups and downs and irregular intervals.' },
+                                { id: 'p1_q2', text: '2. a justification for research into earworms', correct: 'A', explanation: 'Paragraph A explains that neuroscientists study earworms to explore the mysteries of memory and parts of the brain beyond conscious control.' },
+                                { id: 'p1_q3', text: '3. a description of the brain\'s reaction to known and unknown songs', correct: 'F', explanation: 'Paragraph F describes how familiar music activates the right frontal/temporal portions, while unfamiliar music activates the left frontal portions.' },
+                                { id: 'p1_q4', text: '4. details of proposed research into the frequency with which earworms occur in different age groups', correct: 'H', explanation: 'Paragraph H mentions a study looking at whether people at different stages of life (age groups) experience earworms differently.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q5_8',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 5–8</h3>
+                                    <p class="mb-4 text-gray-700">Complete the summary below. Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    Researchers from Goldsmiths concluded that the music we imagine in our minds is quite similar to recordings. They proved this by asking volunteers to record the rhythm of music using a monitor on their <strong>5</strong> <input type="text" data-qid="p1_q5" class="inline-blank w-24 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="...">.
+                                    Further research has demonstrated that those who hear earworms more frequently have brains that may deal with <strong>6</strong> <input type="text" data-qid="p1_q6" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> differently from other people. 
+                                    Dr Stewart also believes that the brain is <strong>7</strong> <input type="text" data-qid="p1_q7" class="inline-blank w-28 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> by earworms when it is not focused on a task. 
+                                    In fact, a reduction in the occurrence of earworms was found to be directly related to how <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors" placeholder="..."> the task was.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q5', correct: 'wrist', explanation: 'Paragraph B: "...a device attached to their wrist recorded their movements."' },
+                                { id: 'p1_q6', correct: 'emotions', explanation: 'Paragraph B: "...more gray matter in areas associated with processing emotions."' },
+                                { id: 'p1_q7', correct: 'entertained', explanation: 'Paragraph C: "...keep the mind entertained while it is otherwise unoccupied."' },
+                                { id: 'p1_q8', correct: 'challenging', explanation: 'Paragraph C: "...the more challenging the activity, the less likely the volunteers were to hear the music."' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q9_13',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 9–13</h3>
+                                    <p class="mb-4 text-gray-700">Match each statement with the correct person, <strong>A–D</strong>. NB You may use any letter more than once.</p>
+                                </div>
+                            `,
+                            poolLabel: 'Researchers',
+                            pool: RESEARCHER_LIST_P1,
+                            questions: [
+                                { id: 'p1_q9', text: '9. Some musicians create music that is intentionally memorable.', correct: 'D', explanation: 'John Seabrook (D) talks about pop producers pumping songs with "hooks" designed to target the brain.' },
+                                { id: 'p1_q10', text: '10. People are unable to completely regulate how they think.', correct: 'A', explanation: 'Lauren Stewart (A) says "The idea that we have full control over our thought processes is an illusion."' },
+                                { id: 'p1_q11', text: '11. We can remember songs without knowing that we have heard them.', correct: 'B', explanation: 'Ira Hyman (B) states that even tunes you heard but didn\'t pay attention to can worm into your subconscious.' },
+                                { id: 'p1_q12', text: '12. Thinking about music has a similar effect on the brain to hearing music.', correct: 'C', explanation: 'Andrea Halpern (C) showed that imagining and listening to music activate many of the same networks.' },
+                                { id: 'p1_q13', text: '13. Earworms are more persistent when only a short section of the song is constantly replayed.', correct: 'B', explanation: 'Ira Hyman (B) explains that when the mind loops a forgotten fragment, it makes the earworm more entrenched.' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: Ideal Homes",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> <span id="loc_p2_q16" class="highlight-target">The traditional kampung houses of Malaysia do not need air‑conditioning. Built on stilts and with steep roofs, they have year‑round ventilation. The raised structure ensures a cooling breeze comes up through the floorboards</span>, while the high roof acts as a chimney to release hot air. The airtight, concrete boxes of modern city construction, in contrast, are heat traps, says Muhammad Peter Davis of University Putra Malaysia. <span id="loc_p2_q23" class="highlight-target">He has calculated that typical modern Malaysian houses are 5°C hotter than the air outside.</span> <span id="loc_p2_q19" class="highlight-target">The builders of kampung houses "had no knowledge of modern science or engineering but they came up with the perfect design," says Davis.</span></p>
+
+                        <p class="mb-4"><strong>B.</strong> This story of ancient architectural <span class="vocab-word" data-en="Sophistication" data-vi="Sự tinh vi, phức tạp" data-pron="/səˌfɪstɪˈkeɪʃn/" data-context="Sự phức tạp và phát triển tinh tế trong thiết kế kiến trúc">sophistication</span> and modern <span class="vocab-word" data-en="Insanity" data-vi="Sự điên rồ" data-pron="/ɪnˈsænəti/" data-context="Sự thiếu hợp lý trong việc áp dụng các thiết kế hiện đại không phù hợp">insanity</span> is repeated around world. In the name of modernism, people have thrown away architecture designed to cope with the environment in which they live, and adopted house designs originating from cold, northern environments, where the idea is to keep heat in.</p>
+
+                        <p class="mb-4"><strong>C.</strong> Once, the aim of architectural modernists was to build structures that kept nature out and to replace it with air‑conditioning. Now they are learning that they cannot do that effectively. Slowly, they are seeing the benefit of working with nature, rather than against it. In California, they probably use more power for air‑conditioning than anywhere else on Earth. <span id="loc_p2_q20" class="highlight-target"><span id="loc_p2_q18" class="highlight-target">According to Arthur Rosenfeld... what California needs is white paint. If Los Angeles painted its roofs white, planted trees to shade buildings, and chose lighter‑colored paving, it could reduce city temperatures by 3°C and cut the annual air‑conditioning bill by US$170 million a year.</span></span></p>
+
+                        <p class="mb-4"><strong>D.</strong> Modern buildings are greedy in their use of energy. Much is made of the contribution of transportation to global warming, through its <span class="vocab-word" data-en="Emissions" data-vi="Khí thải" data-pron="/ɪˈmɪʃnz/" data-context="Các chất khí thoát ra từ các hoạt động giao thông và công nghiệp">emissions</span> of greenhouse gases. <span id="loc_p2_q24" class="highlight-target">But, globally, transportation is responsible for just 22 per cent of carbon dioxide <span class="vocab-word" data-en="Emissions" data-vi="Khí thải" data-pron="/ɪˈmɪʃnz/" data-context="Các chất khí thoát ra từ các hoạt động giao thông và công nghiệp">emissions</span>. The building sector is responsible for 31 per cent</span>, mostly the result of heating and air‑conditioning systems.</p>
+
+                        <p class="mb-4"><strong>E.</strong> Before air‑conditioning, much of the Arab world kept cool through thoughtful building design. Many buildings were built according to the principles of the wind tower, a tall structure with vertical <span class="vocab-word" data-en="Vents" data-vi="Lỗ thông hơi" data-pron="/vɛnts/" data-context="Các khe hở cho phép không khí lưu thông vào và ra khỏi tòa nhà">vents</span> at the top that open in all directions to catch any passing breeze. <span id="loc_p2_q15" class="highlight-target">The buildings were <span class="vocab-word" data-en="Inward-looking" data-vi="Hướng nội" data-pron="/ˈɪnwərd ˈlʊkɪŋ/" data-context="Thiết kế kiến trúc hướng sự chú ý và không gian sinh hoạt vào bên trong">inward‑looking</span>, which served the dual function of focusing attention on the courtyard, where family members spend time together</span>, and protecting living areas from the rays of the sun.</p>
+
+                        <p class="mb-4"><strong>F.</strong> Throughout the Middle East today, <span id="loc_p2_q25" class="highlight-target">wind towers are often little more than museum pieces. But there are exceptions.</span> Jordan has won awards for the architecture of a village on the shores of the Red Sea, which is designed to <span class="vocab-word" data-en="Conserve" data-vi="Bảo tồn, tiết kiệm" data-pron="/rənˈsɜːv/" data-context="Sử dụng năng lượng một cách hiệu quả để không bị lãng phí">conserve</span> energy.</p>
+
+                        <p class="mb-4"><strong>G.</strong> <span id="loc_p2_q14" class="highlight-target">Traditional building materials, like traditional building designs, are being rediscovered... Clay is one such material: As the Dutch housing contractor R van der Ley has argued... clay has many benefits over its <span class="vocab-word" data-en="Industrialized" data-vi="Công nghiệp hóa" data-pron="/ɪnˈdʌstriəlaɪzd/" data-context="Quá trình sản xuất bằng máy móc và quy mô lớn">industrialized</span> version, brick. <span id="loc_p2_q21" class="highlight-target">Clay blocks cost only half as much as ordinary bricks. Clay also generates work because people can find it, mould it, bake it and work it themselves.</span></span> Two hundred clay bricks can be made with the fuel oil that makes just one ordinary brick.</p>
+
+                        <p class="mb-4"><strong>H.</strong> But although traditional methods and materials can be <span class="vocab-word" data-en="Revived" data-vi="Hồi sinh, phục hồi" data-pron="/rɪˈvaɪvd/" data-context="Đem lại sự sống hoặc sử dụng lại những phương pháp truyền thống">revived</span> in appropriate settings, new green, low‑energy technologies are needed, especially in urban environments. The thermal <span class="vocab-word" data-en="Insulation" data-vi="Sự cách nhiệt" data-pron="/ˌɪnsjʊˈleɪʃn/" data-context="Vật liệu dùng để ngăn nhiệt thoát ra hoặc đi vào một không gian">insulation</span> of homes in cold countries is an example. In 1983, Sweden adopted a national standard, requiring the country's homes to lose no more than 60 kilowatt‑hours per square metre over the year.</p>
+
+                        <p class="mb-4"><strong>I.</strong> In the United States, <span id="loc_p2_q22" class="highlight-target"><span id="loc_p2_q26" class="highlight-target">Amory Lovins has promoted a range of low‑energy technologies: "super‑windows"</span>, for example, which let in invisible light but can be "tuned" to either allow in, or reflect away, infrared solar radiation — the stuff that heats.</span> Buildings with large expanses of window can be designed to achieve <span class="vocab-word" data-en="Optimum" data-vi="Tối ưu" data-pron="/ˈɒptɪməm/" data-context="Điều kiện hoặc mức độ tốt nhất, có lợi nhất">optimum</span> temperatures.</p>
+
+                        <p class="mb-4"><strong>J.</strong> As well as more efficient use of energy, the world also needs new sources of <span class="vocab-word" data-en="Renewable" data-vi="Có thể tái tạo" data-pron="/rɪˈnjuːəbl/" data-context="Nguồn năng lượng có thể phục hồi tự nhiên, không bị cạn kiệt">renewable</span> power. <span id="loc_p2_q17" class="highlight-target">Every home can do its own thing with the help of a solar panel and a storage battery. Such projects demonstrate that countries... no longer need huge national grids to supply electricity.</span></p>
+
+                        <p class="mb-4"><strong>K.</strong> Houses, of course, are more than machines for living in. They are social and psychological spaces, too. Future houses may not look exactly like kampungs or wind towers or any other traditional models. But to work for us and for our environment, they will have to suit us as well as these traditional forms did.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_18',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–18</h3>
+                                    <p class="mb-4 text-gray-700">The reading passage has eleven paragraphs <strong>A–K</strong>. Which paragraph contains the following information? Write the correct letter, <strong>A–K</strong>. <em>NB You may use any letter more than once.</em></p>
+                                </div>
+                            `,
+                            poolLabel: 'Paragraphs',
+                            pool: PARA_LIST_P2,
+                            questions: [
+                                { id: 'p2_q14', text: '14. reasons why a particular construction material is advantageous', correct: 'G', explanation: 'Paragraph G explains the benefits of clay: it is cheaper, creates jobs, and uses much less fuel than ordinary bricks.' },
+                                { id: 'p2_q15', text: '15. an example of a construction design which benefits domestic interaction', correct: 'E', explanation: 'Paragraph E mentions wind-tower buildings with courtyards "where family members spend time together".' },
+                                { id: 'p2_q16', text: '16. a description of a house that is ventilated from below', correct: 'A', explanation: 'Paragraph A describes kampung houses built on stilts where "cooling breeze comes up through the floorboards".' },
+                                { id: 'p2_q17', text: '17. an example of self‑sufficient energy supply', correct: 'J', explanation: 'Paragraph J discusses how homes can "do their own thing" with solar panels and batteries, removing the need for national grids.' },
+                                { id: 'p2_q18', text: '18. suggested methods of reducing temperatures in a city', correct: 'C', explanation: 'Paragraph C suggests painting roofs white and planting trees to reduce city temperatures in Los Angeles.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q19_22',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 19–22</h3>
+                                    <p class="mb-4 text-gray-700">Match each person with the correct idea, <strong>A–G</strong> from the list below.</p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Ideas',
+                            pool: PERSON_LIST_P2,
+                            questions: [
+                                { id: 'p2_q19', text: '19. Muhammad Peter Davis', correct: 'D', explanation: 'Paragraph A: Davis says kampung builders had no modern science but "came up with the perfect design", suggesting traditional knowledge can be superior.' },
+                                { id: 'p2_q20', text: '20. Arthur Rosenfeld', correct: 'G', explanation: 'Paragraph C: Rosenfeld suggests white paint as a simple solution to cut air-conditioning bills.' },
+                                { id: 'p2_q21', text: '21. R van der Ley', correct: 'A', explanation: 'Paragraph G: R van der Ley argues clay creates work/jobs, which is a socio-economic impact.' },
+                                { id: 'p2_q22', text: '22. Amory Lovins', correct: 'E', explanation: 'Paragraph I: Lovins promotes "super-windows" that reflect heat in summer and can be tuned for efficiency, saving on both AC and heating.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q23_26_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 23–26</h3>
+                                    <p class="mb-2 text-gray-700">Do the following statements agree with the information in Reading Passage 2?</p>
+                                    <ul class="mb-4 space-y-1 text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <li><strong>TRUE</strong> - if the statement agrees with the information</li>
+                                        <li><strong>FALSE</strong> - if the statement contradicts the information</li>
+                                        <li><strong>NOT GIVEN</strong> - if there is no information on this</li>
+                                    </ul>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q23',
+                            displayType: 'radio',
+                            text: '23. The air temperature in modern Malaysian houses is lower than the air temperature outside.',
+                            options: [
+                                { id: 't', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph A states modern Malaysian houses are "5°C hotter than the air outside".' },
+                                { id: 'ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q24',
+                            displayType: 'radio',
+                            text: '24. The construction industry is more to blame than transport for global warming.',
+                            options: [
+                                { id: 't', text: 'TRUE', isCorrect: true, explanation: 'Paragraph D states transport is responsible for 22% of CO2 emissions, while the building sector (construction/maintenance) is responsible for 31%.' },
+                                { id: 'f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q25',
+                            displayType: 'radio',
+                            text: '25. The use of wind towers for cooling is widespread in the Middle East today.',
+                            options: [
+                                { id: 't', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'f', text: 'FALSE', isCorrect: true, explanation: 'Paragraph F states that wind towers today are "often little more than museum pieces" with few exceptions, meaning they are not widespread.' },
+                                { id: 'ng', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q26',
+                            displayType: 'radio',
+                            text: '26. The \'super-windows\' promoted by Amory Lovins can be installed at low cost.',
+                            options: [
+                                { id: 't', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'f', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'ng', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph I describes what super-windows do, but never mentions their installation cost.' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Risk taking",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> <span id="loc_p3_q34" class="highlight-target">We run risks. Most of the time we ignore them... Risks arise in sports, in business, in personal relationships; they are present in the laboratory, in political calculations, everywhere.</span> Acting individually, we often prefer to gain some benefit by accepting some danger. Acting <span class="vocab-word" data-en="Collectively" data-vi="Cùng nhau, tập thể" data-pron="/kəˈlɛktɪvli/" data-context="Thực hiện bởi một nhóm người thay vì từng cá nhân">collectively</span>, we make similar trade-offs.</p>
+
+                        <p class="mb-4"><strong>B.</strong> When society must assess risks, and <span id="loc_p3_q31" class="highlight-target">those risks can be clarified, at least in part, by science, technology or mathematics</span>, the responsibility of the research community is to be clear and complete. But that is not always so easy. Furthermore, too few people pay full attention to the best evidence. <span id="loc_p3_q35" class="highlight-target">Even when the evidence of high risk is clear - about smoking, for instance - many will deny the risk</span>, or dispute it, or accept that it exists and still go ahead. As a former cigarette smoker, I understand <span class="vocab-word" data-en="Denial" data-vi="Sự phủ nhận" data-pron="/dɪˈnaɪəl/" data-context="Trạng thái tâm trí từ chối chấp nhận một sự thật hiển nhiên">denial</span>.</p>
+
+                        <p class="mb-4"><strong>C.</strong> Perhaps more important than the basic facts of risk are the varied perception of it. <span id="loc_p3_q33" class="highlight-target">Hearing the prediction of a 60% chance of rain, or recognizing the <span class="vocab-word" data-en="Minuscule" data-vi="Rất nhỏ bé" data-pron="/ˈmɪnəskjuːl/" data-context="Một lượng hoặc kích thước vô cùng nhỏ bé">minuscule</span> likelihood of becoming ill from a flu shot, most people understand the right responses</span>: take your umbrella and get your flu shot. <span id="loc_p3_q39" class="highlight-target">But some, fearfully but irrationally, go to the extreme and stay at home and avoid all contact with other people.</span> <span class="vocab-word" data-en="Irrational" data-vi="Phi lý, không hợp lý" data-pron="/ɪˈræʃənl/" data-context="Dựa trên cảm xúc hơn là lý trí hoặc sự thật">Irrational</span> decisions occasionally affect us all. When it comes to risks the best odds do not always influence people to make the correct decision.</p>
+
+                        <p class="mb-4"><strong>D.</strong> In her book, The Universe and the Teacup, the science writer K. C. Cole reminds us that <span id="loc_p3_q27" class="highlight-target">the risks of losing something and gaining something appear to be calculated in our minds according to quite different scales. People will risk a lot to prevent a loss</span>, she notes; some people will rush into a burning building to save a pet. <span id="loc_p3_q38" class="highlight-target">But they will usually risk very little if the only perceived outcome is a possible gain; many people won't even risk pursuing an exciting job, if the current job, though <span class="vocab-word" data-en="Unfulfilling" data-vi="Không thỏa mãn" data-pron="/ˌʌnfʊlˈfɪlɪŋ/" data-context="Không mang lại cảm giác thành tựu hoặc hài lòng">unfulfilling</span>, remains comfortable.</span> That psychological mechanism, a desire to maintain the <span class="vocab-word" data-en="Status quo" data-vi="Hiện trạng" data-pron="/ˌsteɪtəs ˈkwəʊ/" data-context="Giữ nguyên tình trạng hiện tại, không muốn thay đổi">status quo</span>, helps explain the high hurdles that any rational risk assessment must confront.</p>
+
+                        <p class="mb-4"><strong>E.</strong> Organizations face the same hurdles whenever they must cope with major shifts in policy. In his classic examination of the character of high-tech industry, Andrew S. Grove gives a perceptive account of a crisis that took place during his tenure as Chairman of the Intel Corporation. <span id="loc_p3_q36" class="highlight-target">The business environment for Intel and its competitors was transformed by a flood of low-cost memory chips from Japan</span>, and Intel made the difficult decision to abandon its chip-making business. <span id="loc_p3_q28" class="highlight-target">Such a period of change in the outside world is filled with danger, Grove notes, precisely because it is so easy for executives to try to <span class="vocab-word" data-en="Disregard" data-vi="Bỏ qua, ngó lơ" data-pron="/ˌdɪsrɪˈɡɑːrd/" data-context="Không chú ý hoặc phớt lờ các rủi ro hiển nhiên">disregard</span> it or misinterpret the mounting evidence showing the <span class="vocab-word" data-en="Profound" data-vi="Sâu sắc, to lớn" data-pron="/prəˈfaʊnd/" data-context="Rất lớn, nghiêm trọng hoặc có tác động sâu rộng">profound</span> risks of not making change at the very core.</span></p>
+
+                        <p class="mb-4"><strong>F.</strong> Likewise, at the national level, and even the global one, institutions tend to be more willing to take a risk if it means avoiding a loss, than they are if it might confer a gain. <span id="loc_p3_q32" class="highlight-target">Reid J. Lifset's article... describes <span id="loc_p3_q29" class="highlight-target">newly developed techniques for clarifying which critical decision would have the highest pay-offs for the environment.</span> Once these 'leverage points' are located, many environmental organizations will be willing to risk the resources needed to prevent further <span class="vocab-word" data-en="Deterioration" data-vi="Sự suy thoái" data-pron="/dɪˌtɪəriəˈreɪʃn/" data-context="Quá trình trở nên tồi tệ hơn, đặc biệt là môi trường">deterioration</span>.</span></p>
+
+                        <p class="mb-4"><strong>G.</strong> More complicated are decisions by nations to invest broadly in educational research. <span id="loc_p3_q30" class="highlight-target">Some governmental leaders are <span class="vocab-word" data-en="Oblivious" data-vi="Không nhận thức được" data-pron="/əˈblɪviəs/" data-context="Không chú ý hoặc không biết về điều gì đó đang xảy ra">oblivious</span> to the risks posed by social underinvestment, because the urgent needs of the present take <span class="vocab-word" data-en="Precedence" data-vi="Sự ưu tiên" data-pron="/ˈprɛsɪdəns/" data-context="Sự quan trọng được đặt lên hàng đầu so với những thứ khác">precedence</span> over actions that would give rise to even more substantial gains in the future.</span> Their attitude is that today's risks must be manageable, and that tomorrow's gains are at the very least difficult to measure. Better consideration and decision making for what lies ahead is essential.</p>
+
+                        <p class="mb-4"><strong>H.</strong> Nevertheless, <span id="loc_p3_q37" class="highlight-target">I confess to being an optimist. My glass is generally half full - though that may not help me handle risk.</span> Whether one's <span class="vocab-word" data-en="Temperament" data-vi="Khí chất, tính khí" data-pron="/ˈtɛmprəmənt/" data-context="Bản tính tự nhiên hoặc cách phản ứng của một người">temperament</span> is optimistic or pessimistic, <span id="loc_p3_q40" class="highlight-target">everyone in our scientific and engineering community has a social responsibility: measure with care and portray with honesty the level of risk involved in any action or decision.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_30',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–30</h3>
+                                    <p class="mb-4 text-gray-700">Complete each sentence with the correct ending, <strong>A–G</strong>, below.</p>
+                                </div>
+                            `,
+                            poolLabel: 'List of Endings',
+                            pool: ENDING_LIST_P3,
+                            questions: [
+                                { id: 'p3_q27', text: '27. K. C. Cole points out that avoiding a loss seems more important to people than ______.', correct: 'E', explanation: 'Paragraph D: Cole notes that the risks of losing and gaining are calculated differently; people will risk a lot to prevent loss but very little for a gain.' },
+                                { id: 'p3_q28', text: '28. According to Andrew S. Grove, it can be very dangerous for companies to ignore ______.', correct: 'F', explanation: 'Paragraph E: Grove notes that periods of change in the outside world (external changes) are dangerous if disregarded.' },
+                                { id: 'p3_q29', text: '29. Reid J. Lifset argues that environmental agencies can benefit from ______.', correct: 'D', explanation: 'Paragraph F: Lifset describes newly developed techniques (findings) for clarifying decisions with high payoffs (effective solutions).' },
+                                { id: 'p3_q30', text: '30. The writer suggests that government leaders need to focus more on ______.', correct: 'A', explanation: 'Paragraph G: The writer critiques leaders for focusing on the present over actions that give substantial future gains (planning for the future).' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q31_39',
+                            displayType: 'drag_drop',
+                            isReusable: true,
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 31–39</h3>
+                                    <p class="mb-4 text-gray-700">Which paragraph contains the following information? Write the correct letter, <strong>A–H</strong>.</p>
+                                </div>
+                            `,
+                            poolLabel: 'Paragraphs',
+                            pool: PARA_LIST_P3,
+                            questions: [
+                                { id: 'p3_q31', text: '31. the areas of study that help us understand risk', correct: 'B', explanation: 'Paragraph B mentions science, technology, and mathematics as areas that clarify risk.' },
+                                { id: 'p3_q32', text: '32. reference to key actions that might benefit the world', correct: 'F', explanation: 'Paragraph F mentions "leverage points" and techniques to prevent environmental deterioration.' },
+                                { id: 'p3_q33', text: '33. examples of statistical predictions that the majority of the public react to in the same way', correct: 'C', explanation: 'Paragraph C mentions predictions of rain and flu shots that "most people understand".' },
+                                { id: 'p3_q34', text: '34. the variety of contexts in which risk occurs', correct: 'A', explanation: 'Paragraph A lists sports, business, personal relationships, laboratories, etc.' },
+                                { id: 'p3_q35', text: '35. mention of a habit that has been proved to be very risky', correct: 'B', explanation: 'Paragraph B mentions smoking as a clear high risk.' },
+                                { id: 'p3_q36', text: '36. reference to market forces motivating change', correct: 'E', explanation: 'Paragraph E discusses the "flood of low-cost memory chips from Japan" that forced Intel to change.' },
+                                { id: 'p3_q37', text: '37. the writer\'s current attitude towards risk', correct: 'H', explanation: 'Paragraph H states "I confess to being an optimist."' },
+                                { id: 'p3_q38', text: '38. a reason why some individuals avoid making a career change', correct: 'D', explanation: 'Paragraph D notes people won\'t risk pursuing a job if the current one is "comfortable" (status quo).' },
+                                { id: 'p3_q39', text: '39. how some people over-react to information about risk', correct: 'C', explanation: 'Paragraph C describes people who stay at home and avoid all contact fearfully/irrationally.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q40',
+                            displayType: 'radio',
+                            text: '40. At the end of the passage the writer concludes that',
+                            options: [
+                                { id: 'a', text: 'A. risk is something we must try to avoid.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. experts should be truthful about risk to the public.', isCorrect: true, explanation: 'Paragraph H concludes with the social responsibility to "measure with care and portray with honesty the level of risk".' },
+                                { id: 'c', text: 'C. optimists are better able to deal with risk than pessimists.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. it is important to take risks in order to fulfil social obligations.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. ENGINE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            questionsList: [], 
+            activeDragItem: null,
+            _lastLoadedPart: -1,
+            _preventScrollReset: false
+        };
+
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), time: document.getElementById('time-taken-display') },
+            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), content: document.getElementById('passage-content'), questions: document.getElementById('questions-content'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') }
+        };
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                    }
+                });
+            });
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
+            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+
+            document.addEventListener('click', (e) => {
+                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
+                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                    state.activeDragItem = null;
+                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                }
+            });
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            renderTabs(); loadPart(0); updateNavigator();
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) { finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderTabs() {
+            DOM.navigator.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${idx + 1}`;
+                btn.onclick = () => loadPart(idx);
+                DOM.navigator.tabs.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; 
+            DOM.tooltip.pron.textContent = d.pron; 
+            DOM.tooltip.vi.textContent = d.vi; 
+            DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
+            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function loadPart(idx) {
+            const isNew = state._lastLoadedPart !== idx;
+            state.currentPart = idx;
+            state._lastLoadedPart = idx;
+            const data = TEST_DATA.parts[idx];
+            renderTabs();
+            DOM.panes.title.textContent = data.title;
+            DOM.panes.content.innerHTML = data.passage;
+            
+            DOM.panes.content.querySelectorAll('.vocab-word').forEach(word => {
+                if (state.mode === 'RESULT') {
+                    word.classList.add('mode-result');
+                    word.onclick = handleVocabClick;
+                }
+            });
+
+            DOM.panes.questions.innerHTML = '';
+            data.questions.forEach((q, qIdx) => {
+                const div = document.createElement('div');
+                div.id = `container_${q.id}`;
+                div.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                if (q.instructionBox) {
+                    const instr = document.createElement('div');
+                    instr.innerHTML = q.instructionBox;
+                    div.appendChild(instr);
+                }
+
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                    
+                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+
+                    q.pool.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        const isUsed = !q.isReusable && used.includes(item.id);
+                        itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
+                        itemDiv.textContent = item.text;
+                        if (state.mode === 'TEST' && !isUsed) {
+                            itemDiv.setAttribute('draggable', 'true');
+                            itemDiv.ondragstart = (e) => {
+                                e.dataTransfer.setData('text/plain', item.id);
+                                state.activeDragItem = item.id;
+                            };
+                            itemDiv.onclick = () => {
+                                document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                state.activeDragItem = item.id;
+                                itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                            };
+                        }
+                        poolGrid.appendChild(itemDiv);
+                    });
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+
+                    const qList = document.createElement('div');
+                    qList.className = 'space-y-4';
+                    q.questions.forEach(subQ => {
+                        const row = document.createElement('div');
+                        row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                        const label = document.createElement('span');
+                        label.className = 'text-sm font-semibold text-gray-700';
+                        label.textContent = subQ.text;
+                        
+                        const drop = document.createElement('div');
+                        const currentAnsId = state.answers[subQ.id];
+                        const currentAns = q.pool.find(p => p.id === currentAnsId);
+                        
+                        drop.className = `drop-zone w-full min-h-[44px] border-2 border-dashed rounded-xl flex items-center justify-center text-xs transition-all ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
+                        
+                        if (currentAns) {
+                            drop.classList.remove('border-dashed');
+                            drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
+                            drop.textContent = currentAns.id.length < 3 ? currentAns.id : currentAns.text;
+                            if (state.mode === 'TEST') {
+                                drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; handleRefresh(idx); };
+                            }
+                        } else {
+                            drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                            if (state.mode === 'TEST') {
+                                drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; handleRefresh(idx); } };
+                            }
+                        }
+
+                        if (state.mode === 'TEST') {
+                            drop.ondragover = (e) => {
+                                e.preventDefault();
+                                drop.classList.add('bg-pink-50', 'border-pink-400');
+                            };
+                            drop.ondragleave = (e) => {
+                                drop.classList.remove('bg-pink-50', 'border-pink-400');
+                            };
+                            drop.ondrop = (e) => {
+                                e.preventDefault();
+                                drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                    state.answers[subQ.id] = draggedId;
+                                    state.activeDragItem = null;
+                                    handleRefresh(idx);
+                                }
+                            };
+                        }
+
+                        if (state.mode === 'RESULT') {
+                            drop.classList.remove('text-pink-600', 'border-pink-200');
+                            const isCorrect = currentAnsId === subQ.correct;
+                            if (isCorrect) {
+                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50');
+                            } else {
+                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50');
+                            }
+                            
+                            const exp = document.createElement('div');
+                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100';
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem.text.length > 2 ? '' : ''}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            row.appendChild(label); row.appendChild(drop); row.appendChild(exp);
+                        } else {
+                            row.appendChild(label); row.appendChild(drop);
+                        }
+                        qList.appendChild(row);
+                    });
+                    wrapper.appendChild(qList); div.appendChild(wrapper);
+
+                } else if (q.displayType === 'inline_blanks') {
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = q.html;
+                    wrapper.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        input.value = state.answers[qid] || '';
+                        if (state.mode === 'RESULT') {
+                            input.disabled = true;
+                            if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
+                                input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                            } else {
+                                input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                                const corr = document.createElement('span');
+                                corr.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                corr.textContent = info.correct;
+                                input.after(corr);
+                            }
+                        } else {
+                            input.oninput = (e) => { state.answers[qid] = e.target.value; updateNavigator(); };
+                        }
+                    });
+                    div.appendChild(wrapper);
+
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-8 space-y-3';
+                        q.blanks.forEach(b => {
+                            const exp = document.createElement('div');
+                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                            const absNum = state.questionsList.find(x => x.qId === b.id).absNum;
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            expContainer.appendChild(exp);
+                        });
+                        div.appendChild(expContainer);
+                    }
+                } else if (q.displayType === 'radio') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qIdx + 1}</span> ${q.text}`;
+                    div.appendChild(header);
+
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        const isSelected = state.answers[q.id] === opt.id;
+                        
+                        let classes = 'flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 ';
+                        if (state.mode === 'TEST') {
+                            classes += isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-100';
+                        } else {
+                            classes += 'cursor-default ';
+                            if (opt.isCorrect) classes += 'border-green-500 bg-green-50';
+                            else if (isSelected) classes += 'border-red-500 bg-red-50';
+                            else classes += 'border-gray-100 opacity-60';
+                        }
+
+                        label.className = classes;
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0" ${isSelected ? 'checked' : ''} ${state.mode === 'RESULT' ? 'disabled' : ''}>
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium ${state.mode === 'RESULT' && opt.isCorrect ? 'text-green-800' : 'text-gray-700'}">${opt.text}</span>
+                                ${state.mode === 'RESULT' && (isSelected || opt.isCorrect) ? `
+                                    <div class="mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                        <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                        ${opt.explanation}
+                                        <div class="mt-2 text-right">
+                                            <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                Locate in Passage
+                                            </button>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+
+                        if (state.mode === 'TEST') {
+                            label.onclick = () => { state.answers[q.id] = opt.id; updateNavigator(); handleRefresh(idx); };
+                        }
+                        div.appendChild(label);
+                    });
+                }
+                
+                DOM.panes.questions.appendChild(div);
+            });
+
+            if (isNew && !state._preventScrollReset) {
+                document.getElementById('pane-passage').scrollTop = 0;
+                document.getElementById('pane-questions-container').scrollTop = 0;
+            }
+        }
+
+        function handleRefresh(idx) {
+            state._preventScrollReset = true;
+            const scroll = document.getElementById('pane-questions-container').scrollTop;
+            loadPart(idx);
+            document.getElementById('pane-questions-container').scrollTop = scroll;
+            state._preventScrollReset = false;
+            updateNavigator();
+        }
+
+        function showSubmitModal() {
+            const answered = state.questionsList.filter(q => {
+                const ans = state.answers[q.qId];
+                return ans && ans.toString().trim() !== '';
+            }).length;
+            DOM.modal.message.innerHTML = `You have answered <strong>${answered}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            state.mode = 'RESULT';
+            clearInterval(state.timerInterval);
+            DOM.modal.container.classList.add('hidden');
+            DOM.header.actions.classList.add('hidden');
+            DOM.result.banner.classList.remove('hidden');
+            DOM.result.banner.classList.add('flex');
+
+            let score = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (q.displayType === 'inline_blank') {
+                    if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++;
+                } else {
+                    if (ans === q.isCorrect) score++;
+                }
+            });
+
+            DOM.result.score.textContent = `${score}/${state.questionsList.length}`;
+            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            updateNavigator();
+            loadPart(state.currentPart);
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                let bg = '';
+                
+                if (state.mode === 'TEST') {
+                    const isAnswered = ans && ans.toString().trim() !== '';
+                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
+                } else {
+                    const corr = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
+                    bg = corr ? 'bg-green-500 text-white border-green-500' : ans ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { 
+                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
+                    setTimeout(() => document.getElementById('container_' + (q.parentId || q.qId))?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); 
+                };
+                DOM.navigator.grid.appendChild(btn);
+            });
+        }
+
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+
+        window.locateInPassage = function(targetId) {
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+                targetEl.classList.add('highlight-active');
+                setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>

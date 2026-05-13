@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive 09 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 800px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <!-- Header Actions -->
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PET Intensive 09</h2>
+            <p class="text-gray-500 text-lg mb-8 uppercase tracking-widest font-medium">Academic Reading Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-left shadow-sm">
+                <h3 class="font-bold text-pink-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    Instructions
+                </h3>
+                <ul class="space-y-3 text-sm text-pink-800/80">
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can navigate between passages using the tabs at the top.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> The timer will not pause once you begin.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+                Start Mock Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Main View -->
+    <div id="view-main" class="hidden flex-auto flex flex-col overflow-hidden bg-white">
+        <!-- Result Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Mock Test Result</h2>
+                <p class="text-gray-400 text-sm">Review your performance and detailed explanations below.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Raw Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">--/40</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Time Used</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative">
+            <!-- Tabs injected by JS -->
+        </nav>
+
+        <!-- Split View -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            <!-- Left Pane: Passage -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100 italic"></h2>
+                    <div id="passage-content" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-6">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions -->
+            <div id="pane-questions-container" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative">
+                    <div id="questions-content" class="space-y-10 pb-20">
+                        <!-- Questions injected by JS -->
+                    </div>
+                    
+                    <div id="floating-submit-container" class="mt-12 text-center border-t border-gray-200 pt-8 hidden">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-all w-full sm:w-auto">
+                            Submit Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigator -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-lg relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-widest mr-2">Questions:</span>
+                <div id="navigator-grid" class="flex gap-2">
+                    <!-- Nav items injected by JS -->
+                </div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 hidden md:flex items-center gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                <!-- Legend items injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocab Tooltip -->
+    <div id="vocab-tooltip" class="bg-white rounded-2xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-600 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-none">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-xs font-mono mt-1 italic">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+        <div class="p-5 bg-white space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tiếng Việt</span>
+                <p id="tt-vi" class="text-gray-900 font-bold text-sm"></p>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-1">Context</span>
+                <p id="tt-context" class="text-gray-600 text-sm leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 text-pink-500">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Finish Test?</h3>
+            <p id="modal-message" class="text-center text-gray-500 mb-8 px-4 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Resume</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-2xl bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors shadow-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA ---
+        
+        const TEST_DATA = {
+            totalDurationSeconds: 3600,
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: The Rise and Fall of the British Textile Industry",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> Textile production in Britain can be said to have its roots as an industry at the beginning of the 18th century, when Thomas Crotchet and George Sorocold established what is thought to be the first factory built in Britain. It was a textile mill with a waterwheel as its source of power, the latest machinery, and even <span class="vocab-word" data-en="Accommodation" data-vi="Chỗ ở" data-pron="/əˌkɒməˈdeɪʃn/" data-context="Nơi cung cấp cho người lao động sinh sống">accommodation</span> for the workers. As well as possibly being the first <span class="vocab-word" data-en="Sweatshop" data-vi="Xưởng bóc lột" data-pron="/ˈswɛtʃɒp/" data-context="Nơi làm việc tồi tàn, trả lương thấp và bóc lột công nhân">sweatshop</span> in the modern sense, it was the beginning of the end for traditional textile production.</p>
+
+                        <p class="mb-4"><strong>B.</strong> For hundreds of years the spinning and weaving of cloth had been done manually by men, women and children in their own homes. The yarn would be combed and spun using a spindle, then woven on a hand loom, and <span id="loc_p1_q1" class="highlight-target">what they produced would be mainly for local <span class="vocab-word" data-en="Consumption" data-vi="Sự tiêu thụ" data-pron="/kənˈsʌmpʃn/" data-context="Việc sử dụng hàng hóa và dịch vụ tại địa phương">consumption</span>.</span> Technology far more <span class="vocab-word" data-en="Sophisticated" data-vi="Tinh vi, phức tạp" data-pron="/səˈfɪstɪkeɪtɪd/" data-context="Công nghệ hiện đại và phức tạp hơn">sophisticated</span> than the spindle and hand-loom would change all that.</p>
+
+                        <p class="mb-4"><strong>C.</strong> The demand for cotton textiles had been growing since the Middle Ages, <span id="loc_p1_q10" class="highlight-target"><span class="vocab-word" data-en="Fostered" data-vi="Thúc đẩy" data-pron="/ˈfɒstərd/" data-context="Được khuyến khích, thúc đẩy phát triển">fostered</span> by the importation of high quality cotton fabrics from the Middle East and India.</span> <span id="loc_p1_q2" class="highlight-target">So how were local producers able to fight off the competition?</span> The imported fabrics were of course expensive, so textile makers (not just in Britain but throughout Europe) produced mixed fabrics and cotton <span class="vocab-word" data-en="Substitutes" data-vi="Vật thay thế" data-pron="/ˈsʌbstɪtjuːts/" data-context="Sản phẩm dùng thay cho sản phẩm khác">substitutes</span>. <span id="loc_p1_q3" class="highlight-target">They also had foreign textiles banned.</span> <span id="loc_p1_q4" class="highlight-target">But the key to the increased productivity needed to meet the demand was machine production.</span> It would be faster, cheaper and the finished products would be <span class="vocab-word" data-en="Consistent" data-vi="Đồng nhất, kiên định" data-pron="/kənˈsɪstənt/" data-context="Có chất lượng không thay đổi theo thời gian">consistent</span> in quality. Not least of the advantages was that it would allow manufacturers to market their goods on a large, if not yet global, scale.</p>
+
+                        <p class="mb-4"><strong>D.</strong> The story of the growth of the British textile industry from about 1733 and for the next two hundred years is one of constant technological <span class="vocab-word" data-en="Innovation" data-vi="Sự đổi mới" data-pron="/ˌɪnəˈveɪʃn/" data-context="Việc áp dụng các ý tưởng hoặc phương pháp mới">innovation</span> and expansion. <span id="loc_p1_q5" class="highlight-target">In 1733 John Kay invented the fly-shuttle, which made the hand-loom more efficient</span>, and <span id="loc_p1_q7" class="highlight-target">in 1764 James Hargreaves came up with the spinning jenny, which among other things had the effect of raising productivity eightfold.</span> The next great innovator was Richard Arkwright, who in 1768 employed John Kay (of the fly-shuttle) to help him build more efficient machinery. <span id="loc_p1_q11" class="highlight-target">He was a man with a vision – to mechanise textile production – and by 1782 he had a network of mills across Britain. As the water-powered machinery, though not yet fully mechanised, became more complex, <span id="loc_p1_q6" class="highlight-target">Kay began to use steam engines for power.</span></span> The first power-loom, however, which was invented in 1785 by Dr Edmund Cartwright, really did mechanise the weaving stage of textile manufacture.</p>
+
+                        <p class="mb-4"><strong>E.</strong> The pace of growth quickened with the expansion of Britain’s influence in the world and the <span class="vocab-word" data-en="Acquisition" data-vi="Sự giành được" data-pron="/ˌækwɪˈzɪʃn/" data-context="Sự thu thập hoặc chiếm đoạt các thuộc địa">acquisition</span> of colonies from which cheap raw materials could be imported. For example, in a single decade, from 1781 to 1791, imports of cotton into Britain <span class="vocab-word" data-en="Quadrupled" data-vi="Tăng gấp bốn" data-pron="/kwɒˈdruːpld/" data-context="Số lượng tăng lên gấp bốn lần">quadrupled</span>, going on to reach 100 million pounds in weight in 1815 and 263 million in 1830. The increase in exports is equally impressive; in 1751 £46,000 worth of cloth was exported and by the end of the century this had risen to £5.4 million. <span id="loc_p1_q8" class="highlight-target">By the end of the 19th century the figure had soared to close to £50 million. Britain was now supplying cheaper and better quality clothing to a global market.</span> Yet during the course of the 20th century Britain lost its position as a major textile manufacturer.</p>
+
+                        <p class="mb-4"><strong>F.</strong> So what happened? There are a number of views on this question, not all of them <span class="vocab-word" data-en="Conflicting" data-vi="Mâu thuẫn" data-pron="/kənˈflɪktɪŋ/" data-context="Trái ngược nhau hoặc không thống nhất">conflicting</span>, and where there is disagreement it is usually about when the decline began. Whether it began before the First World War (1914-18), or during the inter-war years (1919-1939), or after 1945, most economists would give roughly the same reasons. <span id="loc_p1_q9" class="highlight-target">To start with, there was competition from abroad, especially from developing countries in the Far East, notably Japan.</span> It was thought by manufacturers that the best way to combat this increased competition was to modernise. However, management and the labour unions were unable to agree on how to handle this situation.</p>
+
+                        <p class="mb-4"><strong>G.</strong> Modernisation would mean people losing their jobs and possibly a change in labour practices. Such changes as were made served only to slow down the industry’s decline rather than help regain its <span class="vocab-word" data-en="Predominant" data-vi="Chiếm ưu thế" data-pron="/prɪˈdɒmɪnənt/" data-context="Vị trí đứng đầu, có sức mạnh và ảnh hưởng lớn nhất">predominant</span> position. <span id="loc_p1_q12" class="highlight-target">Economically less developed countries, on the other hand, had the advantage of being able to provide low wage competition, without the problem of powerful labour unions.</span></p>
+
+                        <p class="mb-4"><strong>H.</strong> There are, of course, many other reasons for the textile industry’s decline, two of which became particularly noticeable in the late twentieth century and are related. The first is <span class="vocab-word" data-en="Outsourcing" data-vi="Thuê ngoài" data-pron="/ˈaʊtsɔːrsɪŋ/" data-context="Giao việc sản xuất cho các nước có chi phí lao động rẻ">outsourcing</span>, when manufacturers establish factories in countries where there is cheap labour. This obviously leads to less demand for locally-produced goods. Related to this, the textile and clothing industries have acquired a bad reputation for exploiting workers, often illegal immigrants, in sweatshops where they are forced to work long hours and are paid far less than the minimum wage.</p>
+
+                        <p class="mb-4"><strong>I.</strong> We seem to be back with Crotchet and Sorocold and their first live-in factory. <span id="loc_p1_q13" class="highlight-target">The globalising trend of out-sourcing, however, was a <span class="vocab-word" data-en="Rational" data-vi="Có lý trí, hợp lý" data-pron="/ˈræʃənl/" data-context="Một phản ứng hoặc quyết định dựa trên logic">rational</span> response to the growing competition from overseas</span>, which, it goes without saying, does not excuse the exploitation of workers. The British industry itself, while no longer holding a key place in the global textile market, has adapted itself and now concentrates more on the world of fashion and design, where it seems to be doing quite well.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_6_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–6</h3>
+                                    <p class="text-gray-700">Complete the notes below. Write <strong>NO MORE THAN THREE WORDS</strong> for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1_6',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-gray-50 border border-gray-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <h4 class="font-bold text-lg text-center text-gray-900 mb-4 border-b border-gray-200 pb-2">Textile Manufacture</h4>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <strong class="text-indigo-900 block mb-1 uppercase text-sm tracking-wider">Early history</strong>
+                                            <ul class="list-disc pl-6 space-y-2">
+                                                <li>Begins as a cottage industry</li>
+                                                <li>Products hand-woven and made for <strong>1</strong> <input type="text" data-qid="p1_q1" class="inline-blank w-56 max-w-[90%] mx-1 px-3 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md text-base" placeholder="..." maxlength="40"></li>
+                                                <li>Local producers face <strong>2</strong> <input type="text" data-qid="p1_q2" class="inline-blank w-48 max-w-[90%] mx-1 px-3 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md text-base" placeholder="..." maxlength="30"> from overseas</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong class="text-indigo-900 block mb-1 uppercase text-sm tracking-wider">Ways found to deal with situation</strong>
+                                            <ul class="list-disc pl-6 space-y-2">
+                                                <li>Imported fabrics <strong>3</strong> <input type="text" data-qid="p1_q3" class="inline-blank w-48 max-w-[90%] mx-1 px-3 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md text-base" placeholder="..." maxlength="30">, mixed cottons produced</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong class="text-indigo-900 block mb-1 uppercase text-sm tracking-wider">Early technology</strong>
+                                            <ul class="list-disc pl-6 space-y-2">
+                                                <li>Machine production needed to <strong>4</strong> <input type="text" data-qid="p1_q4" class="inline-blank w-56 max-w-[90%] mx-1 px-3 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md text-base" placeholder="..." maxlength="40"> for cotton fabrics</li>
+                                                <li>Improved technology (such as the fly-shuttle) more <strong>5</strong> <input type="text" data-qid="p1_q5" class="inline-blank w-48 max-w-[90%] mx-1 px-3 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md text-base" placeholder="..." maxlength="30"> and productive</li>
+                                                <li>Machinery begins to be powered by <strong>6</strong> <input type="text" data-qid="p1_q6" class="inline-blank w-56 max-w-[90%] mx-1 px-3 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md text-base" placeholder="..." maxlength="40"></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q1', correct: 'local consumption', explanation: 'Paragraph B explicitly states that the cloth they spun and wove "would be mainly for local consumption".' },
+                                { id: 'p1_q2', correct: 'competition', explanation: 'Paragraph C asks: "So how were local producers able to fight off the competition?" referring to the influx of foreign fabrics.' },
+                                { id: 'p1_q3', correct: 'banned', explanation: 'Paragraph C notes that to deal with the situation, textile makers produced mixed fabrics and "had foreign textiles banned". ("were banned" is also contextually correct, but "banned" fits perfectly into the note).' },
+                                { id: 'p1_q4', correct: 'meet the demand', explanation: 'Paragraph C explicitly states: "the key to the increased productivity needed to meet the demand was machine production."' },
+                                { id: 'p1_q5', correct: 'efficient', explanation: 'Paragraph D notes: "John Kay invented the fly-shuttle, which made the hand-loom more efficient".' },
+                                { id: 'p1_q6', correct: 'steam engines', explanation: 'Paragraph D confirms that as machinery became complex, "Kay began to use steam engines for power."' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7_9_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 7–9</h3>
+                                    <p class="text-gray-700">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q7',
+                            displayType: 'radio',
+                            text: 'Which of the following innovations increased productivity by 800%?',
+                            options: [
+                                { id: 'a', text: 'A. the power-loom', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. the steam engine', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. the spinning jenny', isCorrect: true, explanation: 'Paragraph D states that the "spinning jenny" had the effect of "raising productivity eightfold" (which is mathematically equal to an 800% increase).' },
+                                { id: 'd', text: 'D. the fly-shuttle', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q8',
+                            displayType: 'radio',
+                            text: 'During which period was the British textile industry at its peak?',
+                            options: [
+                                { id: 'a', text: 'A. 1733-1785', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. 1781-1791', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. 1791-1830', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. 1830-1900', isCorrect: true, explanation: 'Paragraph E details the constant growth through the 1800s. It states: "By the end of the 19th century the figure had soared to close to £50 million... Yet during the course of the 20th century Britain lost its position". The end of the 19th century directly corresponds to the period up to 1900.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q9',
+                            displayType: 'radio',
+                            text: 'Which of the following was a major cause of the British textile industry’s decline?',
+                            options: [
+                                { id: 'a', text: 'A. the expansion of foreign textile industries', isCorrect: true, explanation: 'Paragraph F states that regarding the decline, economists point out: "To start with, there was competition from abroad, especially from developing countries in the Far East, notably Japan."' },
+                                { id: 'b', text: 'B. the loss of overseas markets', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. there being no demand for products', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. labour becoming too expensive', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q10_13_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 10–13</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the Reading Passage?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q10',
+                            displayType: 'radio',
+                            text: 'Foreign textiles were banned because of their inferior quality.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph C states that the demand for cotton was fostered by the importation of "high quality cotton fabrics". They were banned to fight off the competition, not because they were inferior.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q11',
+                            displayType: 'radio',
+                            text: 'Richard Arkwright built the first fully-mechanised textile mill.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph D explicitly states regarding Arkwright’s network of mills: "As the water-powered machinery, though not yet fully mechanised...". The weaving stage was not mechanised until Dr Edmund Cartwright invented the power-loom in 1785.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q12',
+                            displayType: 'radio',
+                            text: 'In less developed countries, the industry could rely on cheap labour.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph G directly confirms this: "Economically less developed countries, on the other hand, had the advantage of being able to provide low wage competition..."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q13',
+                            displayType: 'radio',
+                            text: 'Out-sourcing was one method used to compete with foreign manufacturers.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph I affirms: "The globalising trend of out-sourcing, however, was a rational response to the growing competition from overseas".' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: The development of travel under the ocean",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> For millennia, humans have been <span class="vocab-word" data-en="Intrigued" data-vi="Bị hấp dẫn, tò mò" data-pron="/ɪnˈtriːɡd/" data-context="Gợi sự tò mò hoặc thích thú sâu sắc">intrigued</span> by what lies beneath the sea and although submarine travel was attempted from time to time, it did not become <span class="vocab-word" data-en="Commonplace" data-vi="Phổ biến, bình thường" data-pron="/ˈkɒmənpleɪs/" data-context="Xảy ra thường xuyên, không có gì lạ">commonplace</span> until the middle of last century. Several clever and innovative people had experimented with designs for <span class="vocab-word" data-en="Submersible" data-vi="Có thể lặn được" data-pron="/səbˈmɜːrsəbl/" data-context="Phương tiện có thể hoạt động dưới mặt nước">submersible</span> boats before then, but there was much loss of life and little success.</p>
+
+                        <p class="mb-4"><strong>B.</strong> There had long been use of a <span id="loc_p2_q14" class="highlight-target">primitive diving bell</span> for exploratory purposes, but it was as a war machine that the submarine came into its own. The first development in the history of American submarines was a small submersible with a hand-cranked screw-like oar and a crew of one. It was built before the American Revolutionary War (1775—1783) but was adapted for use against the British during this war. Although its pilot twice failed to <span id="loc_p2_q15" class="highlight-target">fasten explosive devices</span> to British ships before losing control of his vessel, he escaped harm.</p>
+
+                        <p class="mb-4"><strong>C.</strong> In 1800, an American inventor, Robert Fulton, designed an underwater machine that he called the Nautilus. This version brought in features that can still be found in some modern submarines, notably adjustable diving planes for better underwater <span class="vocab-word" data-en="Manoeuvring" data-vi="Điều khiển, cơ động" data-pron="/məˈnuːvərɪŋ/" data-context="Chuyển động khéo léo để thay đổi hướng đi">manoeuvring</span>, dual systems of <span class="vocab-word" data-en="Propulsion" data-vi="Sự tạo động lực, lực đẩy" data-pron="/prəˈpʌlʃn/" data-context="Hệ thống cơ học đẩy tàu tiến về phía trước">propulsion</span>, and a <span id="loc_p2_q16" class="highlight-target">compressed air system</span> that allowed it to stay down for about four hours without surfacing.</p>
+
+                        <p class="mb-4"><strong>D.</strong> Development of submersible vessels lagged a long way behind the continued progress in the design of surface ships until the American Civil War (1861-1865) when both sides tried out various designs. One of those, called the Hunley — named after its financier rather than its inventor, sank twice during training missions with 11 crew members losing their lives including Hunley himself. Notwithstanding these failures, it was commissioned again in <span id="loc_p2_q17" class="highlight-target">1864</span> to attack a ship in Charleston Harbor. A torpedo was used to strike and <span class="vocab-word" data-en="Scuttle" data-vi="Làm đắm tàu" data-pron="/ˈskʌtl/" data-context="Chủ động đánh chìm một con tàu">scuttle</span> the ship – a first in naval history, but the submarine never reappeared, and once again the whole crew <span class="vocab-word" data-en="Perished" data-vi="Bỏ mạng, tử vong" data-pron="/ˈpɛrɪʃt/" data-context="Chết một cách đột ngột hoặc bi thảm">perished</span>. Its potential had been recognised, but there still remained the challenge of operating safely under the water.</p>
+
+                        <p class="mb-4"><strong>E.</strong> The US Navy could appreciate the strategic benefits of having submarines in its fleet and held a competition to encourage design and construction of these underwater craft. The inventor, John Holland, won the competition and it was his sixth prototype, the Holland, that the navy bought and added to its fleet in 1900. This submarine was quite different from previous designs. It was propelled by a <span id="loc_p2_q18" class="highlight-target">gasoline engine</span> that turned a propeller while the vessel was on the surface. When it submerged, the engine ran a generator to charge batteries to operate an electric motor. The improved propulsion methods were, unfortunately, highly dangerous. Not only is gasoline flammable and unstable, using it in the restricted environment of a submarine posed quite a hazard for the crewmen. There was another problem, too: the batteries were not only heavy, <span class="vocab-word" data-en="Cumbersome" data-vi="Cồng kềnh, vướng víu" data-pron="/ˈkʌmbərsəm/" data-context="To lớn, nặng nề và khó di chuyển">cumbersome</span> and inefficient, but they were also extremely <span class="vocab-word" data-en="Volatile" data-vi="Dễ bay hơi, bất ổn" data-pron="/ˈvɒlətaɪl/" data-context="Có thể thay đổi trạng thái đột ngột, dễ gây cháy nổ">volatile</span>.</p>
+
+                        <p class="mb-4"><strong>F.</strong> During the same period as Holland’s efforts were being trialled, a German scientist by the name of Rudolf Diesel created an engine which used a fuel <span id="loc_p2_q19" class="highlight-target">less explosive</span> than gasoline and which would consequently be stored safely. Another advantage was that there was no necessity for an electric spark to <span class="vocab-word" data-en="Ignite" data-vi="Bốc cháy, đốt cháy" data-pron="/ɪɡˈnaɪt/" data-context="Bắt lửa hoặc làm cho cái gì đó bùng cháy">ignite</span> the fuel. These safety improvements combined with better fuel economy allowed Diesel engines to power a submarine for longer on the surface; however, batteries were still needed to supply energy for underwater operation.</p>
+
+                        <p class="mb-4"><strong>G.</strong> Although diesel-powered submarines were successful and used by the US Navy for almost 50 years, the search for a single power source carried on. It wasn’t long before the concept of nuclear power was realised in Germany and taken up by an American physicist, Ross Gunn, who could <span class="vocab-word" data-en="Envisage" data-vi="Hình dung, dự tính" data-pron="/ɪnˈvɪzɪdʒ/" data-context="Tưởng tượng ra điều gì đó sẽ xảy ra trong tương lai">envisage</span> its potential in submersibles. A research team was put together to adapt the concept of nuclear power for use in submarines. In effect, modern nuclear submarines have on board a small nuclear power plant which produces a great amount of energy. This is used to heat water and create steam which drives a huge turbine which turns the propeller.</p>
+
+                        <p class="mb-4"><strong>H.</strong> There have been many adaptations and technological improvements made to submarines over the years, but the shape is basically the same. Obviously, it is a totally enclosed craft, cigar shaped with narrowed ends. The <span id="loc_p2_q26" class="highlight-target">outer hull</span> is the largest part of the boat and forms the body. The inner hull is designed to resist the considerable water pressure and <span class="vocab-word" data-en="Insulates" data-vi="Cách ly, cách nhiệt" data-pron="/ˈɪnsjʊleɪts/" data-context="Bảo vệ bằng cách ngăn nhiệt hoặc âm thanh truyền qua">insulates</span> the crew from the cold. This is where the crew works, eats and sleeps. It also contains the engine room and the apparatus that makes clean air and clean water. Between the hulls are the ballast tanks for controlling <span class="vocab-word" data-en="Buoyancy" data-vi="Sức nổi" data-pron="/ˈbɔɪənsi/" data-context="Khả năng nổi trên mặt nước">buoyancy</span>. There is a tall fin-shaped sail that comes up out of the hull. Inside the sail is the conning tower and extending from this, to the fore, there is a <span id="loc_p2_q21" class="highlight-target">periscope</span> (through which the captain can see the sea and sky when the submarine is near the surface of the water). Sonar is used for navigation deep below the surface. The other projection from the conning tower is the <span id="loc_p2_q22" class="highlight-target">radio antenna</span>.</p>
+
+                        <p class="mb-4"><strong>I.</strong> Underwater, there are two controls for steering the submarine. The <span id="loc_p2_q23" class="highlight-target">rudder</span> (like a tail fin) controls side-to-side movement, and diving planes influence rise and <span class="vocab-word" data-en="Descent" data-vi="Sự đi xuống" data-pron="/dɪˈsɛnt/" data-context="Hành động lặn xuống phía dưới sâu">descent</span>. There are two sets of diving planes: the <span id="loc_p2_q20" class="highlight-target">forward sailplanes</span> and the <span id="loc_p2_q25" class="highlight-target">stem planes</span>, which are located at the back with the rudder and <span id="loc_p2_q24" class="highlight-target">propeller</span>.</p>
+
+                        <p class="mb-4"><strong>J.</strong> Advancing technology will undoubtedly result in different shapes and modes of operation, and it is quite possible that, in the future, submarines will be manned by robots or computer technology that communicates information to land bases via satellite.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_19_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–19</h3>
+                                    <p class="text-gray-700">Answer the questions below. Choose <strong>NO MORE THAN THREE WORDS</strong> from the text for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q14_19',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-gray-50 border border-gray-200 p-6 rounded-2xl shadow-sm text-gray-800 text-base space-y-6">
+                                    <div class="flex flex-col sm:flex-row sm:items-start gap-3">
+                                        <div class="font-bold text-indigo-900 flex-none w-8 pt-1">14.</div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium mb-3">What kind of underwater device was used to investigate the ocean before submersible boats were invented?</p>
+                                            <input type="text" data-qid="p2_q14" class="inline-blank w-full max-w-sm px-4 py-2 border-2 border-gray-300 bg-white focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-lg text-base" placeholder="Your answer here..." maxlength="50">
+                                        </div>
+                                    </div>
+                                    <hr class="border-gray-200">
+                                    <div class="flex flex-col sm:flex-row sm:items-start gap-3">
+                                        <div class="font-bold text-indigo-900 flex-none w-8 pt-1">15.</div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium mb-3">What was the crewman of the first American-built submarine trying to do before his mission failed?</p>
+                                            <input type="text" data-qid="p2_q15" class="inline-blank w-full max-w-sm px-4 py-2 border-2 border-gray-300 bg-white focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-lg text-base" placeholder="Your answer here..." maxlength="50">
+                                        </div>
+                                    </div>
+                                    <hr class="border-gray-200">
+                                    <div class="flex flex-col sm:flex-row sm:items-start gap-3">
+                                        <div class="font-bold text-indigo-900 flex-none w-8 pt-1">16.</div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium mb-3">What gave the Nautilus the ability to remain submerged for a long time?</p>
+                                            <input type="text" data-qid="p2_q16" class="inline-blank w-full max-w-sm px-4 py-2 border-2 border-gray-300 bg-white focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-lg text-base" placeholder="Your answer here..." maxlength="50">
+                                        </div>
+                                    </div>
+                                    <hr class="border-gray-200">
+                                    <div class="flex flex-col sm:flex-row sm:items-start gap-3">
+                                        <div class="font-bold text-indigo-900 flex-none w-8 pt-1">17.</div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium mb-3">When was a submarine first used successfully to sink an enemy boat?</p>
+                                            <input type="text" data-qid="p2_q17" class="inline-blank w-full max-w-sm px-4 py-2 border-2 border-gray-300 bg-white focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-lg text-base" placeholder="Your answer here..." maxlength="50">
+                                        </div>
+                                    </div>
+                                    <hr class="border-gray-200">
+                                    <div class="flex flex-col sm:flex-row sm:items-start gap-3">
+                                        <div class="font-bold text-indigo-900 flex-none w-8 pt-1">18.</div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium mb-3">What new type of propulsion did the Holland use on top of the water?</p>
+                                            <input type="text" data-qid="p2_q18" class="inline-blank w-full max-w-sm px-4 py-2 border-2 border-gray-300 bg-white focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-lg text-base" placeholder="Your answer here..." maxlength="50">
+                                        </div>
+                                    </div>
+                                    <hr class="border-gray-200">
+                                    <div class="flex flex-col sm:flex-row sm:items-start gap-3">
+                                        <div class="font-bold text-indigo-900 flex-none w-8 pt-1">19.</div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium mb-3">For what reason was Diesel’s fuel considered safer than Holland’s?</p>
+                                            <input type="text" data-qid="p2_q19" class="inline-blank w-full max-w-sm px-4 py-2 border-2 border-gray-300 bg-white focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-lg text-base" placeholder="Your answer here..." maxlength="50">
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q14', correct: 'primitive diving bell', explanation: 'Paragraph B explicitly states: "There had long been use of a primitive diving bell for exploratory purposes...". ("diving bell" is also a correct interpretation).' },
+                                { id: 'p2_q15', correct: 'fasten explosive devices', explanation: 'Paragraph B notes: "Although its pilot twice failed to fasten explosive devices to British ships before losing control...".' },
+                                { id: 'p2_q16', correct: 'compressed air system', explanation: 'Paragraph C states that features included "a compressed air system that allowed it to stay down for about four hours without surfacing."' },
+                                { id: 'p2_q17', correct: '1864', explanation: 'Paragraph D recounts: "...it was commissioned again in 1864 to attack a ship... A torpedo was used to strike and scuttle the ship – a first in naval history...".' },
+                                { id: 'p2_q18', correct: 'gasoline engine', explanation: 'Paragraph E states regarding the Holland: "It was propelled by a gasoline engine that turned a propeller while the vessel was on the surface."' },
+                                { id: 'p2_q19', correct: 'less explosive', explanation: 'Paragraph F states that Rudolf Diesel created an engine "which used a fuel less explosive than gasoline and which would consequently be stored safely."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q20_26_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 20–26</h3>
+                                    <p class="text-gray-700">Label the diagram below. Choose <strong>NO MORE THAN TWO WORDS</strong> from the text for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q20_26',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-gray-50 border border-gray-200 p-6 rounded-2xl shadow-sm">
+                                    <div class="text-center mb-8">
+                                        <img src="https://ieltschantruong.github.io/IELTS/src/reading_diagrams/the_development_of_travel_under_the_ocean.png" alt="The development of travel under the ocean - IELTS Reading Diagram" class="max-w-full h-auto mx-auto rounded-xl border border-gray-300 shadow-sm">
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">20.</span>
+                                            <input type="text" data-qid="p2_q20" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">21.</span>
+                                            <input type="text" data-qid="p2_q21" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">22.</span>
+                                            <input type="text" data-qid="p2_q22" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">23.</span>
+                                            <input type="text" data-qid="p2_q23" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">24.</span>
+                                            <input type="text" data-qid="p2_q24" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">25.</span>
+                                            <input type="text" data-qid="p2_q25" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-start gap-1">
+                                            <span class="font-bold text-indigo-900">26.</span>
+                                            <input type="text" data-qid="p2_q26" class="inline-blank w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors text-base" placeholder="Answer..." maxlength="40">
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q20', correct: 'forward sailplanes', explanation: 'Paragraph I describes "two sets of diving planes: the forward sailplanes and the stem planes". The ones near the sail are the forward sailplanes.' },
+                                { id: 'p2_q21', correct: 'periscope', explanation: 'Paragraph H states: "extending from this, to the fore, there is a periscope (through which the captain can see the sea and sky...)".' },
+                                { id: 'p2_q22', correct: 'radio antenna', explanation: 'Paragraph H states: "The other projection from the conning tower is the radio antenna."' },
+                                { id: 'p2_q23', correct: 'rudder', explanation: 'Paragraph I states: "The rudder (like a tail fin) controls side-to-side movement...".' },
+                                { id: 'p2_q24', correct: 'propeller', explanation: 'Paragraph I mentions that the stem planes are located "at the back with the rudder and propeller."' },
+                                { id: 'p2_q25', correct: 'stem planes', explanation: 'Paragraph I states that "the stem planes... are located at the back with the rudder and propeller."' },
+                                { id: 'p2_q26', correct: 'outer hull', explanation: 'Paragraph H describes the main body shape: "The outer hull is the largest part of the boat and forms the body."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Robert Louis Stevenson",
+                    passage: `
+                        <p class="mb-4">Scottish novelist, poet, essayist, and travel writer, Robert Louis Stevenson was born at 8 Howard Place, Edinburgh, Scotland, on 13 November 1850. It has been more than 100 years since his death. Stevenson was a writer who caused conflicting opinions about his works. On one hand, he was often highly praised for his expert <span class="vocab-word" data-en="Prose" data-vi="Văn xuôi" data-pron="/prəʊz/" data-context="Hình thức ngôn ngữ viết hoặc nói thông thường, không có cấu trúc nhịp điệu như thơ">prose</span> and style by many English-language critics. On the other hand, others criticised the religious themes in his works, often misunderstanding Stevenson’s own religious beliefs. Since his death a century before, critics and biographers have disagreed on the <span class="vocab-word" data-en="Legacy" data-vi="Di sản" data-pron="/ˈlɛɡəsi/" data-context="Những gì được để lại hoặc truyền lại cho thế hệ sau">legacy</span> of Stevenson’s writing. Two biographers, KF and CP, wrote a biography about Stevenson with a clear focus. They chose not to criticise aspects of Stevenson’s personal life. <span id="loc_p3_q27" class="highlight-target">Instead, they focused on his writing, and gave high praise to his writing style and skill.</span></p>
+
+                        <p class="mb-4">The literary <span class="vocab-word" data-en="Pendulum" data-vi="Con lắc / Sự dao động" data-pron="/ˈpɛndjʊləm/" data-context="Sự thay đổi quan điểm dư luận theo những hướng trái ngược nhau">pendulum</span> has swung these days. Different critics have different opinions towards Robert Louis Stevenson’s works. Though today, Stevenson is one of the most translated authors in the world, his works have <span class="vocab-word" data-en="Sustained" data-vi="Hứng chịu, duy trì" data-pron="/səˈsteɪnd/" data-context="Trải qua hoặc chịu đựng một điều gì đó liên tục">sustained</span> a wide variety of negative criticism throughout his life. It was like a complete reversal of <span class="vocab-word" data-en="Polarity" data-vi="Sự phân cực" data-pron="/pəˈlærɪti/" data-context="Trạng thái hoàn toàn trái ngược nhau">polarity</span>—from highly positive to slightly less positive to clearly negative; after being highly praised as a great writer, he became an example of an author with corrupt ethics and lack of morals. <span id="loc_p3_q28" class="highlight-target">Many literary critics passed his works off as children’s stories or horror stories, and thought to have little social value in an educational setting. Stevenson’s works were often excluded from the literature curriculum because of its controversial nature. These debates remain, and many critics still assert that despite his skill, his literary works still lack moral value.</span></p>
+
+                        <p class="mb-4">One of the main reasons why Stevenson’s literary works attracted so much criticism was due to the genre of his writing. Stevenson mainly wrote adventure stories, which was part of a popular and entertaining writing <span class="vocab-word" data-en="Fad" data-vi="Trào lưu, mốt" data-pron="/fæd/" data-context="Sự ưa chuộng mãnh liệt nhưng chỉ kéo dài trong thời gian ngắn">fad</span> at the time. <span id="loc_p3_q29" class="highlight-target">Many of us believe adventure stories are exciting, offer engaging characters, action, and mystery but ultimately can’t teach moral principles.</span> The plot points are <span class="vocab-word" data-en="One-dimensional" data-vi="Một chiều, hời hợt" data-pron="/ˌwʌndɪˈmɛnʃənl/" data-context="Thiếu chiều sâu hoặc sự phức tạp">one-dimensional</span> and rarely offer a deeper moral meaning, instead focusing on exciting and shocking plot twists and thrilling events. His works were even criticised by fellow authors. <span id="loc_p3_q32" class="highlight-target">Though Stevenson’s works have deeply influenced Oscar Wilde, Wilde often joked that Stevenson would have written better works if he wasn’t born in Scotland.</span> <span id="loc_p3_q34" class="highlight-target">Other authors came to Stevenson’s defence, including Galsworthy who claimed that Stevenson is a greater writer than Thomas Hardy.</span></p>
+
+                        <p class="mb-4">Despite Wilde’s criticism, Stevenson’s Scottish identity was an <span class="vocab-word" data-en="Integral" data-vi="Thiết yếu, không thể thiếu" data-pron="/ˈɪntɪɡrəl/" data-context="Một phần cốt lõi và cần thiết để tạo nên tổng thể">integral</span> part of his written works. Although Stevenson’s works were not popular in Scotland when he was alive, many modern Scottish literary critics claim that Sir Walter Scott and Robert Louis Stevenson are the most influential writers in the history of Scotland. <span id="loc_p3_q36_40" class="highlight-target">While many critics <span class="vocab-word" data-en="Exalt" data-vi="Tán dương, đề cao" data-pron="/ɪɡˈzɔːlt/" data-context="Ca ngợi và đặt ai đó lên một vị trí rất cao">exalt</span> Sir Walter Scott as a literary genius because of his technical ability, others argue that Stevenson deserves the same recognition for his natural ability to capture stories and characters in words. Many of Scott’s works were taken more seriously as literature for their depth due to their tragic themes, but fans of Stevenson praise his unique style of story-telling and capture of human nature.</span> <span id="loc_p3_q30" class="highlight-target">Stevenson’s works, unlike other British authors, captured the unique day to day life of average Scottish people.</span> Many literary critics point to this as a flaw of his works. According to the critics, truly important literature should <span class="vocab-word" data-en="Transcend" data-vi="Vượt qua, siêu việt" data-pron="/trænˈsɛnd/" data-context="Vượt lên trên những giới hạn hoặc tiêu chuẩn thông thường">transcend</span> local culture and stories. However, many critics praise the local taste of his literature. To this day, Stevenson’s works provide valuable insight to life in Scotland during the 19th century.</p>
+
+                        <p class="mb-4"><span id="loc_p3_q35" class="highlight-target">Despite much debate of Stevenson’s writing topics, his writing was not the only source of attention for critics. Stevenson’s personal life often attracted a lot of attention from his fans and critics alike.</span> Some even argue that his personal life eventually <span class="vocab-word" data-en="Outshone" data-vi="Làm lu mờ" data-pron="/aʊtˈʃɒn/" data-context="Trở nên nổi bật hoặc thu hút nhiều sự chú ý hơn một thứ khác">outshone</span> his writing. Stevenson had been <span class="vocab-word" data-en="Plagued" data-vi="Dày vò, quấy rầy" data-pron="/pleɪɡd/" data-context="Liên tục bị gây rắc rối hoặc chịu đựng đau khổ">plagued</span> with health problems his whole life, and often had to live in much warmer climates than the cold, <span class="vocab-word" data-en="Dreary" data-vi="Ảm đạm, tồi tàn" data-pron="/ˈdrɪəri/" data-context="Buồn tẻ, thiếu sức sống và u ám">dreary</span> weather of Scotland in order to recover. So he took his family to a south pacific island Samoa, which was a controversial decision at that time. However, Stevenson did not regret the decision. The sea air and thrill of adventure complimented the themes of his writing, and for a time restored his health. From there, Stevenson gained a love of travelling, and for nearly three years he wandered the eastern and central Pacific. Much of his works reflected this love of travel and adventure that Stevenson experienced in the Pacific islands. <span id="loc_p3_q31" class="highlight-target">It was as a result of this biographical attention that the feeling grew that interest in Stevenson’s life had taken the place of interest in his works.</span> Whether critics focus on his writing subjects, his religious beliefs, or his <span class="vocab-word" data-en="Eccentric" data-vi="Kỳ quặc, lập dị" data-pron="/ɪkˈsɛntrɪk/" data-context="Hành động khác biệt so với tiêu chuẩn xã hội thông thường">eccentric</span> lifestyle of travel and adventure, people from the past and present have different opinions about Stevenson as an author. Today, he remains a controversial yet widely popular figure in Western literature.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_31_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–31</h3>
+                                    <p class="text-gray-700">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q27',
+                            displayType: 'radio',
+                            text: 'Stevenson’s biographers KF and CP',
+                            options: [
+                                { id: 'a', text: 'A. Underestimated the role of family played in Stevenson’s life.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. Overestimated the writer’s works in literature history.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. Exaggerated Stevenson’s religious belief in his works.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. Elevated Stevenson’s role as a writer.', isCorrect: true, explanation: 'Paragraph 1: "Instead, they focused on his writing, and gave high praise to his writing style and skill." Giving high praise and focusing on his writing elevates his role as a writer.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q28',
+                            displayType: 'radio',
+                            text: 'The main point of the second paragraph is',
+                            options: [
+                                { id: 'a', text: 'A. The public gives a more fair criticism to Stevenson’s works.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. Recent criticism has been justified.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. The style of Stevenson’s works overweigh his faults in his life.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. Stevenson’s works’ drawback is lack of ethical nature.', isCorrect: true, explanation: 'Paragraph 2 focuses heavily on the negative criticism surrounding his morals and ethics: "he became an example of an author with corrupt ethics and lack of morals... many critics still assert that despite his skill, his literary works still lack moral value."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q29',
+                            displayType: 'radio',
+                            text: 'According to the author, adventure stories',
+                            options: [
+                                { id: 'a', text: 'A. Do not provide plot twists well.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. Cannot be used by writers to show moral values.', isCorrect: true, explanation: 'Paragraph 3 states: "Many of us believe adventure stories are exciting... but ultimately can’t teach moral principles."' },
+                                { id: 'c', text: 'C. Are more fashionable art forms.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. Can be found in other’s works but not in Stevenson’s', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q30',
+                            displayType: 'radio',
+                            text: 'What does the author say about Stevenson’s works?',
+                            options: [
+                                { id: 'a', text: 'A. They describe the life of people in Scotland.', isCorrect: true, explanation: 'Paragraph 4 notes: "Stevenson’s works, unlike other British authors, captured the unique day to day life of average Scottish people."' },
+                                { id: 'b', text: 'B. They are commonly regarded as real literature.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. They were popular during Stevenson’s life.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'd', text: 'D. They transcend the local culture and stories.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q31',
+                            displayType: 'radio',
+                            text: 'The lifestyle of Stevenson',
+                            options: [
+                                { id: 'a', text: 'A. Made his family envy him so much.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'b', text: 'B. Should be responsible for his death.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'c', text: 'C. Gained more attention from the public than his works.', isCorrect: true, explanation: 'Paragraph 5 states: "It was as a result of this biographical attention that the feeling grew that interest in Stevenson’s life had taken the place of interest in his works." (His personal life outshone his writing).' },
+                                { id: 'd', text: 'D. Didn’t prepare well for his life in Samoa.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q32_35_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 32–35</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the Reading Passage?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q32',
+                            displayType: 'radio',
+                            text: 'Although Oscar Wilde admired Robert Louis Stevenson very much, he believed Stevenson could have written greater works.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 3: "Though Stevenson’s works have deeply influenced Oscar Wilde [admired], Wilde often joked that Stevenson would have written better works if he wasn’t born in Scotland [could have written greater works]."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q33',
+                            displayType: 'radio',
+                            text: 'Robert Louis Stevenson encouraged Oscar Wilde to start writing at first.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph 3 mentions Stevenson deeply influenced Wilde, but it does NOT mention whether he encouraged Wilde to start writing at first.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q34',
+                            displayType: 'radio',
+                            text: 'Galsworthy thought Hardy is a greater writer than Stevenson is.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 3: "...including Galsworthy who claimed that Stevenson is a greater writer than Thomas Hardy." This is the exact opposite of the statement.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q35',
+                            displayType: 'radio',
+                            text: 'Critics only paid attention to Robert Louis Stevenson’s writing topics',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 5 starts with: "Despite much debate of Stevenson’s writing topics, his writing was not the only source of attention for critics. Stevenson’s personal life often attracted a lot of attention..."' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q36_40_instr',
+                            displayType: 'inline_blanks',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 36–40</h3>
+                                    <p class="text-gray-700 mb-4">Complete the notes using the list of words, <strong>A-I</strong>, below. Write the correct letter in the blanks.</p>
+                                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm mb-6 grid grid-cols-2 md:grid-cols-3 gap-2 text-gray-700 font-medium">
+                                        <div>A. Natural ability</div><div>B. Romance</div><div>C. Colorful language</div>
+                                        <div>D. Critical acclaim</div><div>E. Humor</div><div>F. Technical control</div>
+                                        <div>G. Storytelling</div><div>H. Depth</div><div>I. Human nature</div>
+                                    </div>
+                                </div>
+                            `,
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                    <strong class="block mb-2 text-indigo-900 text-lg text-center pb-2 border-b border-indigo-100">Sir Walter Scott and Robert Louis Stevenson</strong>
+                                    A lot of people believe that Sir Walter Scott and Robert Louis Stevenson are the most influential writers in the history of Scotland, but Sir Walter Scott is more proficient in <strong>36</strong> <input type="text" data-qid="p3_q36" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase shadow-sm rounded-t-md" placeholder="A-I" maxlength="1">, while Stevenson has better <strong>37</strong> <input type="text" data-qid="p3_q37" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase shadow-sm rounded-t-md" placeholder="A-I" maxlength="1">. Scott’s books illustrate <strong>38</strong> <input type="text" data-qid="p3_q38" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase shadow-sm rounded-t-md" placeholder="A-I" maxlength="1">, especially in terms of tragedy, but a lot of readers prefer Stevenson’s <strong>39</strong> <input type="text" data-qid="p3_q39" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase shadow-sm rounded-t-md" placeholder="A-I" maxlength="1">. What’s more, Stevenson’s understanding of <strong>40</strong> <input type="text" data-qid="p3_q40" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase shadow-sm rounded-t-md" placeholder="A-I" maxlength="1"> made his works have the most unique expression of Scottish people.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p3_q36', correct: 'F', explanation: 'Paragraph 4 notes that critics exalt Sir Walter Scott "because of his technical ability" (F. Technical control).' },
+                                { id: 'p3_q37', correct: 'A', explanation: 'Paragraph 4 states that Stevenson deserves recognition for "his natural ability to capture stories and characters in words" (A. Natural ability).' },
+                                { id: 'p3_q38', correct: 'H', explanation: 'Paragraph 4 mentions: "Many of Scott’s works were taken more seriously as literature for their depth due to their tragic themes" (H. Depth).' },
+                                { id: 'p3_q39', correct: 'G', explanation: 'Paragraph 4 notes that fans of Stevenson "praise his unique style of story-telling" (G. Storytelling).' },
+                                { id: 'p3_q40', correct: 'I', explanation: 'Paragraph 4 also praises Stevenson for his "capture of human nature" (I. Human nature).' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. ENGINE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            questionsList: [], 
+            activeDragItem: null,
+            _lastLoadedPart: -1,
+            _preventScrollReset: false
+        };
+
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), time: document.getElementById('time-taken-display') },
+            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), content: document.getElementById('passage-content'), questions: document.getElementById('questions-content'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') }
+        };
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                    }
+                });
+            });
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
+            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+
+            document.addEventListener('click', (e) => {
+                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
+                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                    state.activeDragItem = null;
+                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                }
+            });
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            renderTabs(); loadPart(0); updateNavigator();
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) { finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderTabs() {
+            DOM.navigator.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${idx + 1}`;
+                btn.onclick = () => loadPart(idx);
+                DOM.navigator.tabs.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; 
+            DOM.tooltip.pron.textContent = d.pron; 
+            DOM.tooltip.vi.textContent = d.vi; 
+            DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
+            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function loadPart(idx) {
+            const isNew = state._lastLoadedPart !== idx;
+            state.currentPart = idx;
+            state._lastLoadedPart = idx;
+            const data = TEST_DATA.parts[idx];
+            renderTabs();
+            DOM.panes.title.textContent = data.title;
+            DOM.panes.content.innerHTML = data.passage;
+            
+            DOM.panes.content.querySelectorAll('.vocab-word').forEach(word => {
+                if (state.mode === 'RESULT') {
+                    word.classList.add('mode-result');
+                    word.onclick = handleVocabClick;
+                }
+            });
+
+            DOM.panes.questions.innerHTML = '';
+            
+            if (data.questions.length === 0) {
+                DOM.panes.questions.innerHTML = '<div class="text-center text-gray-400 italic py-10">Questions will appear here.</div>';
+            }
+
+            data.questions.forEach((q, qIdx) => {
+                const div = document.createElement('div');
+                div.id = `container_${q.id}`;
+                div.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                if (q.instructionBox) {
+                    const instr = document.createElement('div');
+                    instr.innerHTML = q.instructionBox;
+                    div.appendChild(instr);
+                }
+
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                    
+                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+
+                    q.pool.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        const isUsed = !q.isReusable && used.includes(item.id);
+                        itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
+                        itemDiv.textContent = item.text;
+                        
+                        if (state.mode === 'TEST' && !isUsed) {
+                            itemDiv.setAttribute('draggable', 'true');
+                            itemDiv.ondragstart = (e) => {
+                                e.dataTransfer.setData('text/plain', item.id);
+                                state.activeDragItem = item.id;
+                            };
+                            itemDiv.onclick = () => {
+                                document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                state.activeDragItem = item.id;
+                                itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                            };
+                        }
+                        poolGrid.appendChild(itemDiv);
+                    });
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+
+                    const qList = document.createElement('div');
+                    qList.className = 'space-y-4';
+                    q.questions.forEach(subQ => {
+                        const row = document.createElement('div');
+                        row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                        const label = document.createElement('span');
+                        label.className = 'text-sm font-semibold text-gray-700';
+                        label.textContent = subQ.text;
+                        
+                        const drop = document.createElement('div');
+                        const currentAnsId = state.answers[subQ.id];
+                        const currentAns = q.pool.find(p => p.id === currentAnsId);
+                        
+                        drop.className = `drop-zone w-full min-h-[44px] border-2 border-dashed rounded-xl flex items-center justify-center text-xs transition-all ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
+                        
+                        if (currentAns) {
+                            drop.classList.remove('border-dashed');
+                            drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
+                            drop.textContent = currentAns.id.length < 3 ? currentAns.id : currentAns.text;
+                            if (state.mode === 'TEST') {
+                                drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; handleRefresh(idx); };
+                            }
+                        } else {
+                            drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                            if (state.mode === 'TEST') {
+                                drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; handleRefresh(idx); } };
+                            }
+                        }
+
+                        if (state.mode === 'TEST') {
+                            drop.ondragover = (e) => {
+                                e.preventDefault();
+                                drop.classList.add('bg-pink-50', 'border-pink-400');
+                            };
+                            drop.ondragleave = (e) => {
+                                drop.classList.remove('bg-pink-50', 'border-pink-400');
+                            };
+                            drop.ondrop = (e) => {
+                                e.preventDefault();
+                                drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                    state.answers[subQ.id] = draggedId;
+                                    state.activeDragItem = null;
+                                    handleRefresh(idx);
+                                }
+                            };
+                        }
+
+                        if (state.mode === 'RESULT') {
+                            drop.classList.remove('text-pink-600', 'border-pink-200');
+                            const isCorrect = currentAnsId === subQ.correct;
+                            if (isCorrect) {
+                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50');
+                            } else {
+                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50');
+                            }
+                            
+                            const exp = document.createElement('div');
+                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100';
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem.text.length > 2 ? '' : ''}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            row.appendChild(label); row.appendChild(drop); row.appendChild(exp);
+                        } else {
+                            row.appendChild(label); row.appendChild(drop);
+                        }
+                        qList.appendChild(row);
+                    });
+                    wrapper.appendChild(qList); div.appendChild(wrapper);
+
+                } else if (q.displayType === 'inline_blanks') {
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = q.html;
+                    wrapper.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        input.value = state.answers[qid] || '';
+                        if (state.mode === 'RESULT') {
+                            input.disabled = true;
+                            if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
+                                input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                            } else {
+                                input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                                const corr = document.createElement('span');
+                                corr.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                corr.textContent = info.correct;
+                                input.after(corr);
+                            }
+                        } else {
+                            input.oninput = (e) => { state.answers[qid] = e.target.value; updateNavigator(); };
+                        }
+                    });
+                    div.appendChild(wrapper);
+
+                    if (state.mode === 'RESULT') {
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-8 space-y-3';
+                        q.blanks.forEach(b => {
+                            const exp = document.createElement('div');
+                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                            const absNum = state.questionsList.find(x => x.qId === b.id)?.absNum || '';
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${b.parentId || b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            expContainer.appendChild(exp);
+                        });
+                        div.appendChild(expContainer);
+                    }
+                } else if (q.displayType === 'radio') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                    const qMeta = state.questionsList.find(x => x.qId === q.id);
+                    const qNum = qMeta ? qMeta.absNum : (qIdx + 1);
+                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qNum}</span> ${q.text}`;
+                    div.appendChild(header);
+
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        const isSelected = state.answers[q.id] === opt.id;
+                        
+                        let classes = 'flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 ';
+                        if (state.mode === 'TEST') {
+                            classes += isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-100';
+                        } else {
+                            classes += 'cursor-default ';
+                            if (opt.isCorrect) classes += 'border-green-500 bg-green-50';
+                            else if (isSelected) classes += 'border-red-500 bg-red-50';
+                            else classes += 'border-gray-100 opacity-60';
+                        }
+
+                        label.className = classes;
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0" ${isSelected ? 'checked' : ''} ${state.mode === 'RESULT' ? 'disabled' : ''}>
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium ${state.mode === 'RESULT' && opt.isCorrect ? 'text-green-800' : 'text-gray-700'}">${opt.text}</span>
+                                ${state.mode === 'RESULT' && (isSelected || opt.isCorrect) ? `
+                                    <div class="mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                        <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                        ${opt.explanation}
+                                        <div class="mt-2 text-right">
+                                            <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                Locate in Passage
+                                            </button>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+
+                        if (state.mode === 'TEST') {
+                            label.onclick = () => { state.answers[q.id] = opt.id; updateNavigator(); handleRefresh(idx); };
+                        }
+                        div.appendChild(label);
+                    });
+                }
+                
+                DOM.panes.questions.appendChild(div);
+            });
+
+            if (isNew && !state._preventScrollReset) {
+                document.getElementById('pane-passage').scrollTop = 0;
+                document.getElementById('pane-questions-container').scrollTop = 0;
+            }
+        }
+
+        function handleRefresh(idx) {
+            state._preventScrollReset = true;
+            const scroll = document.getElementById('pane-questions-container').scrollTop;
+            loadPart(idx);
+            document.getElementById('pane-questions-container').scrollTop = scroll;
+            state._preventScrollReset = false;
+            updateNavigator();
+        }
+
+        function showSubmitModal() {
+            const answered = state.questionsList.filter(q => {
+                const ans = state.answers[q.qId];
+                return ans && ans.toString().trim() !== '';
+            }).length;
+            DOM.modal.message.innerHTML = `You have answered <strong>${answered}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            state.mode = 'RESULT';
+            clearInterval(state.timerInterval);
+            DOM.modal.container.classList.add('hidden');
+            DOM.header.actions.classList.add('hidden');
+            DOM.result.banner.classList.remove('hidden');
+            DOM.result.banner.classList.add('flex');
+
+            let score = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (q.displayType === 'inline_blank') {
+                    if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++;
+                } else {
+                    if (ans === q.isCorrect) score++;
+                }
+            });
+
+            // Handle edge case if questionsList is empty (e.g. before content is appended)
+            const totalQuestions = state.questionsList.length || 40;
+            DOM.result.score.textContent = `${score}/${totalQuestions}`;
+            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            updateNavigator();
+            loadPart(state.currentPart);
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            
+            // If no questions exist yet, just clear the navigator
+            if(state.questionsList.length === 0) {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+                return;
+            }
+
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                let bg = '';
+                
+                if (state.mode === 'TEST') {
+                    const isAnswered = ans && ans.toString().trim() !== '';
+                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
+                } else {
+                    const corr = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
+                    bg = corr ? 'bg-green-500 text-white border-green-500' : ans ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors flex-shrink-0 ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { 
+                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
+                    setTimeout(() => document.getElementById('container_' + (q.parentId || q.qId))?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); 
+                };
+                DOM.navigator.grid.appendChild(btn);
+            });
+
+            // Show floating submit button only if there are questions
+            if(state.mode === 'TEST') {
+                DOM.panes.floatingSubmit.classList.remove('hidden');
+            } else {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+            }
+        }
+
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+
+        window.locateInPassage = function(targetId) {
+            document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+            
+            // Map individual blanks to grouped targets and combine multi-part answers
+            const mappings = {
+                'loc_p1_q1': ['loc_p1_q1'],
+                'loc_p1_q2': ['loc_p1_q2'],
+                'loc_p1_q3': ['loc_p1_q3'],
+                'loc_p1_q4': ['loc_p1_q4'],
+                'loc_p1_q5': ['loc_p1_q5'],
+                'loc_p1_q6': ['loc_p1_q6'],
+                'loc_p2_q14': ['loc_p2_q14'],
+                'loc_p2_q15': ['loc_p2_q15'],
+                'loc_p2_q16': ['loc_p2_q16'],
+                'loc_p2_q17': ['loc_p2_q17'],
+                'loc_p2_q18': ['loc_p2_q18'],
+                'loc_p2_q19': ['loc_p2_q19'],
+                'loc_p2_q20': ['loc_p2_q20'],
+                'loc_p2_q21': ['loc_p2_q21'],
+                'loc_p2_q22': ['loc_p2_q22'],
+                'loc_p2_q23': ['loc_p2_q23'],
+                'loc_p2_q24': ['loc_p2_q24'],
+                'loc_p2_q25': ['loc_p2_q25'],
+                'loc_p2_q26': ['loc_p2_q26'],
+                'loc_p3_q27': ['loc_p3_q27'],
+                'loc_p3_q28': ['loc_p3_q28'],
+                'loc_p3_q29': ['loc_p3_q29'],
+                'loc_p3_q30': ['loc_p3_q30'],
+                'loc_p3_q31': ['loc_p3_q31'],
+                'loc_p3_q32': ['loc_p3_q32'],
+                'loc_p3_q34': ['loc_p3_q34'],
+                'loc_p3_q35': ['loc_p3_q35'],
+                'loc_p3_q36': ['loc_p3_q36_40'],
+                'loc_p3_q37': ['loc_p3_q36_40'],
+                'loc_p3_q38': ['loc_p3_q36_40'],
+                'loc_p3_q39': ['loc_p3_q36_40'],
+                'loc_p3_q40': ['loc_p3_q36_40']
+            };
+
+            const targetIds = mappings[targetId] || [targetId];
+            let found = false;
+
+            targetIds.forEach(id => {
+                const targetEl = document.getElementById(id);
+                if (targetEl) {
+                    if (!found) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found = true;
+                    }
+                    targetEl.classList.add('highlight-active');
+                    setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+                }
+            });
+
+            if (!found) {
+                console.warn('Passage location target not found for:', targetId);
+                const pane = document.getElementById('pane-passage');
+                if (pane) pane.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
