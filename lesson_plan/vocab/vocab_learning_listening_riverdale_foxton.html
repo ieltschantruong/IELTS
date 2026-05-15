@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening Practice | Riverdale Pre-School & Foxton Bay</title>
+    <style>
+        :root {
+            --primary: #0284c7; /* Ocean Blue */
+            --primary-light: #e0f2fe;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #0369a1;
+            --border: #bae6fd;
+            --badge-bg: #bae6fd;
+            --badge-text: #075985;
+            --success: #15803d; /* Green for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        .phonetic { font-size: 0.95rem; color: var(--text-muted); font-style: italic; }
+        .word-form { background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+        .usage-note { font-size: 0.9rem; margin-bottom: 1rem; color: #475569; background: #f1f5f9; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid #94a3b8; flex-grow: 1; }
+        .usage-note strong { color: var(--text-main); font-style: normal; font-weight: 600; }
+        .usage-vi { color: #64748b; font-style: italic; display: block; margin-top: 0.25rem; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 480px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 3rem; margin-bottom: 1rem; color: var(--primary); text-transform: capitalize;}
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .phonetic { font-size: 1.2rem; color: var(--text-muted); }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .usage-note { width: 100%; font-size: 0.95rem; padding: 0.5rem; margin-bottom: 1rem; }
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 520px; } 
+            .flashcard-front .word { font-size: 2.2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>Listening Practice | Riverdale Pre-School & Foxton Bay</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Words</button>
+        <button class="filter-btn" onclick="filterTopic('Education & Preschool')">Education & Preschool</button>
+        <button class="filter-btn" onclick="filterTopic('Holiday & Accommodation')">Holiday & Accommodation</button>
+        <button class="filter-btn" onclick="filterTopic('Services & Dining')">Services & Dining</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="word-form" id="fc-form">Verb</span>
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div class="usage-note" id="fc-usage"><strong>Usage:</strong> Usage goes here.</div>
+                    <div class="example-box">
+                        <span>Listening Context</span>
+                        <div id="fc-example">"Example sentence goes here."</div>
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 22</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (Riverdale & Foxton Bay)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // Education & Preschool
+        { topic: "Education & Preschool", word: "Enroll", form: "Verb", phonetic: "/ɪnˈrəʊl/", def: "To officially register as a member of an institution or a student on a course.", translation: "Đăng ký nhập học", usage: "Used when joining a school, course, or program.<span class='usage-vi'>(Dùng khi tham gia một trường học, khóa học hoặc chương trình.)</span>", example: "We would certainly make use of that system if we enroll." },
+        { topic: "Education & Preschool", word: "Reasonable", form: "Adjective", phonetic: "/ˈriː.zən.ə.bəl/", def: "Fair and sensible; not too expensive.", translation: "Hợp lý, phải chăng", usage: "Commonly used to describe prices, fees, or expectations.<span class='usage-vi'>(Thường dùng để miêu tả giá cả, phí hoặc kỳ vọng.)</span>", example: "And I think the fees are still quite reasonable." },
+        { topic: "Education & Preschool", word: "Vary", form: "Verb", phonetic: "/ˈveə.ri/", def: "To change or cause something to change in amount or level, especially from one occasion to another.", translation: "Thay đổi, biến đổi", usage: "Used to express that routines or options are kept diverse.<span class='usage-vi'>(Dùng để diễn tả việc thay đổi các thói quen hoặc lựa chọn cho đa dạng.)</span>", example: "We did that last year, but we'll be going to a farm this year instead. We vary it." },
+        { topic: "Education & Preschool", word: "Make use of", form: "Phrase", phonetic: "/meɪk juːs əv/", def: "To use something that is available in order to achieve something or get a benefit.", translation: "Tận dụng, sử dụng", usage: "Often applied to systems, facilities, or opportunities.<span class='usage-vi'>(Thường áp dụng cho các hệ thống, cơ sở vật chất hoặc cơ hội.)</span>", example: "We would certainly make use of that system if we enroll." },
+        { topic: "Education & Preschool", word: "Look around", form: "Phrasal Verb", phonetic: "/lʊk əˈraʊnd/", def: "To walk through a building or place to inspect it.", translation: "Tham quan, đi dạo quanh để xem", usage: "Used when visiting a new school, house, or town.<span class='usage-vi'>(Dùng khi đến thăm một trường học, ngôi nhà hoặc thị trấn mới.)</span>", example: "So what should I do if I want to come and look around the school during the day..." },
+        { topic: "Education & Preschool", word: "Attend", form: "Verb", phonetic: "/əˈtend/", def: "To go to an event, place, etc. regularly.", translation: "Tham dự, đi học", usage: "Used for classes, meetings, or school.<span class='usage-vi'>(Dùng cho các lớp học, cuộc họp hoặc trường học.)</span>", example: "Now I know the children attend for two or three days a week." },
+
+        // Holiday & Accommodation
+        { topic: "Holiday & Accommodation", word: "Recommendation", form: "Noun", phonetic: "/ˌrek.ə.menˈdeɪ.ʃən/", def: "A suggestion that something is good or suitable for a particular purpose or job.", translation: "Lời giới thiệu, sự tiến cử", usage: "Often asked for when looking for advice on travel or restaurants.<span class='usage-vi'>(Thường được yêu cầu khi tìm kiếm lời khuyên về du lịch hoặc nhà hàng.)</span>", example: "Hello, I'm looking to book a holiday for my family. Do you have any recommendations?" },
+        { topic: "Holiday & Accommodation", word: "Resort", form: "Noun", phonetic: "/rɪˈzɔːt/", def: "A place where many people go for rest, sport, or another stated purpose.", translation: "Khu nghỉ dưỡng", usage: "Used to describe holiday villages or large hotel complexes.<span class='usage-vi'>(Dùng để miêu tả các làng nghỉ mát hoặc khu phức hợp khách sạn lớn.)</span>", example: "We have a wonderful holiday resort, called Foxton Bay..." },
+        { topic: "Holiday & Accommodation", word: "Peace of mind", form: "Idiom", phonetic: "/piːs əv maɪnd/", def: "A feeling of calm and not being worried.", translation: "Sự an tâm", usage: "Used to describe the comfort provided by safety measures or guarantees.<span class='usage-vi'>(Dùng để miêu tả sự thoải mái được cung cấp bởi các biện pháp an toàn hoặc sự đảm bảo.)</span>", example: "They have professional lifeguards who provide peace of mind for visitors." },
+        { topic: "Holiday & Accommodation", word: "Facilities", form: "Noun", phonetic: "/fəˈsɪl.ə.tiz/", def: "Buildings, equipment, or services that are provided for a particular purpose.", translation: "Cơ sở vật chất, tiện ích", usage: "Commonly used in contexts of hotels, schools, or sports centers.<span class='usage-vi'>(Thường dùng trong bối cảnh khách sạn, trường học hoặc trung tâm thể thao.)</span>", example: "What other facilities does the resort offer?" },
+        { topic: "Holiday & Accommodation", word: "Scenery", form: "Noun", phonetic: "/ˈsiː.nər.i/", def: "The general appearance of the natural environment, especially when it is beautiful.", translation: "Phong cảnh, cảnh vật", usage: "Used when describing tourist destinations or nature.<span class='usage-vi'>(Dùng khi miêu tả các điểm du lịch hoặc thiên nhiên.)</span>", example: "...where you can take in the beautiful scenery." },
+        { topic: "Holiday & Accommodation", word: "Accommodation", form: "Noun", phonetic: "/əˌkɒm.əˈdeɪ.ʃən/", def: "A room, group of rooms, or building in which someone may live or stay.", translation: "Chỗ ở", usage: "An essential travel and tourism vocabulary word.<span class='usage-vi'>(Một từ vựng thiết yếu về du lịch và lữ hành.)</span>", example: "What are the accommodation options like?" },
+        { topic: "Holiday & Accommodation", word: "Self-catering", form: "Adjective", phonetic: "/ˌselfˈkeɪ.tər.ɪŋ/", def: "Offering facilities for people to cook their own meals.", translation: "Tự phục vụ (ăn uống)", usage: "Describes apartments or cottages where food is not provided.<span class='usage-vi'>(Miêu tả các căn hộ hoặc nhà tranh không cung cấp thức ăn.)</span>", example: "We offer self-catering cottages, with two bedrooms..." },
+        { topic: "Holiday & Accommodation", word: "Equipped", form: "Adjective", phonetic: "/ɪˈkwɪpt/", def: "Provided with the things that are needed for a particular purpose.", translation: "Được trang bị", usage: "Often followed by 'with' (e.g., equipped with a kitchen).<span class='usage-vi'>(Thường đi theo sau bởi từ 'with' - ví dụ: được trang bị bếp.)</span>", example: "...each equipped with a fully equipped kitchen, including a microwave." },
+        { topic: "Holiday & Accommodation", word: "Amenities", form: "Noun", phonetic: "/əˈmiː.nə.tiz/", def: "Things considered to be essential to make life easier or more pleasant.", translation: "Tiện nghi", usage: "A synonym for facilities, commonly used in hospitality.<span class='usage-vi'>(Một từ đồng nghĩa với cơ sở vật chất, thường dùng trong ngành nhà hàng khách sạn.)</span>", example: "Are there any other amenities available?" },
+
+        // Services & Dining
+        { topic: "Services & Dining", word: "Cater to", form: "Phrasal Verb", phonetic: "/ˈkeɪ.tər tuː/", def: "To provide what is wanted or needed by someone or something.", translation: "Phục vụ cho, đáp ứng nhu cầu", usage: "Used to show that a service fits a specific audience.<span class='usage-vi'>(Dùng để cho thấy một dịch vụ phù hợp với một đối tượng cụ thể.)</span>", example: "Additionally, we provide a selection of family games that cater to different ages." },
+        { topic: "Services & Dining", word: "Provisions", form: "Noun", phonetic: "/prəˈvɪʒ.ənz/", def: "Supplies of food and other necessary things.", translation: "Đồ dự trữ, thực phẩm cung cấp", usage: "Often used in the context of camping or arriving at self-catering stays.<span class='usage-vi'>(Thường dùng trong bối cảnh cắm trại hoặc khi đến chỗ ở tự phục vụ.)</span>", example: "Will there be any provisions when we arrive?" },
+        { topic: "Services & Dining", word: "Beverage", form: "Noun", phonetic: "/ˈbev.ər.ɪdʒ/", def: "A drink of any type.", translation: "Đồ uống, thức uống", usage: "A formal word for 'drink', commonly used in hotels and restaurants.<span class='usage-vi'>(Một từ trang trọng cho 'thức uống', thường dùng trong khách sạn và nhà hàng.)</span>", example: "When you arrive, we'll greet you with a welcome pack of beverages..." },
+        { topic: "Services & Dining", word: "Accessible", form: "Adjective", phonetic: "/əkˈses.ə.bəl/", def: "Easy to find, reach, enter, or use.", translation: "Có thể tiếp cận, dễ dàng đi lại", usage: "Great for describing locations or features of a building.<span class='usage-vi'>(Tuyệt vời để miêu tả vị trí hoặc các đặc điểm của một tòa nhà.)</span>", example: "The closest town is just a 40 minutes drive away, making it easily accessible." },
+        { topic: "Services & Dining", word: "Situated", form: "Adjective", phonetic: "/ˈsɪtʃ.u.eɪ.tɪd/", def: "In a particular place or position.", translation: "Nằm ở, tọa lạc", usage: "A high-level alternative to 'located'.<span class='usage-vi'>(Một từ thay thế cấp độ cao cho 'located'.)</span>", example: "The nearest town has a fantastic selection of restaurants, situated by the harbor." },
+        { topic: "Services & Dining", word: "Cuisine", form: "Noun", phonetic: "/kwɪˈziːn/", def: "A style of cooking, especially characteristic of a particular country or region.", translation: "Ẩm thực, phong cách nấu ăn", usage: "Essential for discussing food and dining options.<span class='usage-vi'>(Rất thiết yếu khi thảo luận về thức ăn và các lựa chọn ăn uống.)</span>", example: "You'll find a variety of cuisines, to choose from..." },
+        { topic: "Services & Dining", word: "Proceed", form: "Verb", phonetic: "/prəˈsiːd/", def: "To move forward or do something after you have done something else.", translation: "Tiến hành, tiếp tục", usage: "Formal language often used for transactions or steps in a process.<span class='usage-vi'>(Ngôn ngữ trang trọng thường dùng cho các giao dịch hoặc các bước trong một quy trình.)</span>", example: "How do we proceed with the booking?" }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="word-form">${item.form}</span>
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                <div class="usage-note"><strong>Usage:</strong> ${item.usage}</div>
+                <div class="example-box"><span>Listening Context</span>"${item.example}"</div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter === 'Education & Preschool') topicName = 'Education & Preschool';
+            if (activeFilter === 'Holiday & Accommodation') topicName = 'Holiday & Accommodation';
+            if (activeFilter === 'Services & Dining') topicName = 'Services & Dining';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-form').textContent = data.form;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            document.getElementById('fc-usage').innerHTML = `<strong>Usage:</strong> ${data.usage}`;
+            document.getElementById('fc-example').textContent = data.example;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>

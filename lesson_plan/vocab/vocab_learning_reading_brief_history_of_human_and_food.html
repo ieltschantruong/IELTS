@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Passage | A Brief History of Humans and Food</title>
+    <style>
+        :root {
+            --primary: #b45309; /* Earthy Amber/Brown */
+            --primary-light: #fef3c7;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #92400e;
+            --border: #fde68a;
+            --badge-bg: #fef08a;
+            --badge-text: #713f12;
+            --success: #0369a1; /* Contrasting blue for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        .phonetic { font-size: 0.95rem; color: var(--text-muted); font-style: italic; }
+        .word-form { background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+        .usage-note { font-size: 0.9rem; margin-bottom: 1rem; color: #475569; background: #f1f5f9; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid #94a3b8; flex-grow: 1; }
+        .usage-note strong { color: var(--text-main); font-style: normal; font-weight: 600; }
+        .usage-vi { color: #64748b; font-style: italic; display: block; margin-top: 0.25rem; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 480px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 3rem; margin-bottom: 1rem; color: var(--primary); text-transform: capitalize;}
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .phonetic { font-size: 1.2rem; color: var(--text-muted); }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .usage-note { width: 100%; font-size: 0.95rem; padding: 0.5rem; margin-bottom: 1rem; }
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 520px; } 
+            .flashcard-front .word { font-size: 2.2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>Reading Passage | A Brief History of Humans and Food</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Words</button>
+        <button class="filter-btn" onclick="filterTopic('Human History & Society')">Human History & Society</button>
+        <button class="filter-btn" onclick="filterTopic('Food & Biology')">Food & Biology</button>
+        <button class="filter-btn" onclick="filterTopic('Processes & Characteristics')">Processes & Characteristics</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="word-form" id="fc-form">Verb</span>
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div class="usage-note" id="fc-usage"><strong>Usage:</strong> Usage goes here.</div>
+                    <div class="example-box">
+                        <span>Reading Context</span>
+                        <div id="fc-example">"Example sentence goes here."</div>
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 30</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (A Brief History of Humans and Food)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // Human History & Society
+        { topic: "Human History & Society", word: "Hunter-gatherer", form: "Noun", phonetic: "/ˈhʌn.tərˌɡæð.ər.ər/", def: "A member of a society that lives by hunting and collecting wild food, rather than by farming.", translation: "Người săn bắt hái lượm", usage: "Used in history and anthropology to describe early human societies.<span class='usage-vi'>(Dùng trong lịch sử và nhân chủng học để miêu tả xã hội loài người thời sơ khai.)</span>", example: "During the journey from our hunter-gatherer ancestors to the present day..." },
+        { topic: "Human History & Society", word: "Seismic", form: "Adjective", phonetic: "/ˈsaɪz.mɪk/", def: "Having a very great, important, or severe impact.", translation: "Mang tính bước ngoặt, chấn động", usage: "Often used to describe massive shifts or changes in history.<span class='usage-vi'>(Thường dùng để miêu tả những sự thay đổi hoặc chuyển dịch khổng lồ trong lịch sử.)</span>", example: "...there have been three seismic changes that have impacted the food we eat..." },
+        { topic: "Human History & Society", word: "Emergence", form: "Noun", phonetic: "/ɪˈmɜː.dʒəns/", def: "The process of starting to exist or becoming known.", translation: "Sự xuất hiện, sự nổi lên", usage: "Used when referring to the beginning of a new era, technology, or concept.<span class='usage-vi'>(Dùng khi đề cập đến sự khởi đầu của một kỷ nguyên, công nghệ, hoặc khái niệm mới.)</span>", example: "...the discovery of cooking, the emergence of agriculture, and the invention of methods..." },
+        { topic: "Human History & Society", word: "Advent", form: "Noun", phonetic: "/ˈæd.vent/", def: "The arrival or beginning of a notable person, thing, or event.", translation: "Sự ra đời, sự xuất hiện", usage: "Similar to 'emergence', often used with major historical milestones.<span class='usage-vi'>(Tương tự như 'emergence', thường dùng với các cột mốc lịch sử lớn.)</span>", example: "This all began to change around 10,500 years ago with the advent of farming..." },
+        { topic: "Human History & Society", word: "Specialization", form: "Noun", phonetic: "/ˌspeʃ.əl.aɪˈzeɪ.ʃən/", def: "The process of concentrating on and becoming expert in a particular subject or skill.", translation: "Sự chuyên môn hóa", usage: "Crucial for discussing the development of human labor and society.<span class='usage-vi'>(Rất quan trọng khi thảo luận về sự phát triển của lao động và xã hội loài người.)</span>", example: "These changes led to the possibility of specialization of different tasks within society." },
+        { topic: "Human History & Society", word: "Sophisticated", form: "Adjective", phonetic: "/səˈfɪs.tɪ.keɪ.tɪd/", def: "Advanced, complex, or highly developed.", translation: "Phức tạp, tinh vi, phát triển cao", usage: "Describes technology, systems, writing, or machines.<span class='usage-vi'>(Miêu tả công nghệ, hệ thống, chữ viết hoặc máy móc.)</span>", example: "Around this time, writing became more sophisticated and allowed people to maintain records..." },
+        { topic: "Human History & Society", word: "Formalized", form: "Adjective", phonetic: "/ˈfɔː.mə.laɪzd/", def: "Given a definite structure or official shape.", translation: "Được chính thức hóa, có hệ thống", usage: "Used to describe rules, governments, or educational systems.<span class='usage-vi'>(Dùng để miêu tả các quy tắc, chính phủ hoặc hệ thống giáo dục.)</span>", example: "Eventually, formalized structures of government were established..." },
+        { topic: "Human History & Society", word: "Settle", form: "Verb", phonetic: "/ˈset.əl/", def: "To establish a permanent residence in a place.", translation: "Định cư", usage: "A key vocabulary word when discussing human migration and history.<span class='usage-vi'>(Một từ vựng chính khi thảo luận về di cư và lịch sử loài người.)</span>", example: "...structures of government were established as people settled in one area." },
+        { topic: "Human History & Society", word: "Dominance", form: "Noun", phonetic: "/ˈdɒm.ɪ.nəns/", def: "Power, influence, and control over others.", translation: "Sự thống trị, ưu thế", usage: "Used when one method, group, or species is the most common or powerful.<span class='usage-vi'>(Dùng khi một phương pháp, nhóm hoặc giống loài là phổ biến hoặc mạnh mẽ nhất.)</span>", example: "In the 21st century, the dominance of canning as a method of food preservation has been overtaken..." },
+        { topic: "Human History & Society", word: "Overtake", form: "Verb", phonetic: "/ˌəʊ.vəˈteɪk/", def: "To become greater or more successful than someone or something else.", translation: "Vượt qua, bắt kịp", usage: "Often used in business, technology, or trends.<span class='usage-vi'>(Thường dùng trong kinh doanh, công nghệ, hoặc các xu hướng.)</span>", example: "...the dominance of canning as a method of food preservation has been overtaken by freezing." },
+
+        // Food & Biology
+        { topic: "Food & Biology", word: "Consume", form: "Verb", phonetic: "/kənˈsjuːm/", def: "To eat or drink; or to use up a resource.", translation: "Tiêu thụ, ăn uống", usage: "A formal and academic alternative to the word 'eat'.<span class='usage-vi'>(Một từ thay thế trang trọng và học thuật cho từ 'ăn'.)</span>", example: "...but the great majority of food we consume is cooked." },
+        { topic: "Food & Biology", word: "Inedible", form: "Adjective", phonetic: "/ɪˈned.ə.bəl/", def: "Not fit or suitable for eating.", translation: "Không ăn được", usage: "Describes plants, raw meats, or spoiled food.<span class='usage-vi'>(Miêu tả thực vật, thịt sống, hoặc thức ăn bị hỏng.)</span>", example: "Cooking can turn plants that are inedible into edible food..." },
+        { topic: "Food & Biology", word: "Toxic", form: "Adjective", phonetic: "/ˈtɒk.sɪk/", def: "Poisonous; harmful to life.", translation: "Độc hại, có độc", usage: "Used to describe chemicals, plants, or bad environments.<span class='usage-vi'>(Dùng để miêu tả hóa chất, thực vật, hoặc môi trường tồi tệ.)</span>", example: "...by destroying toxic chemicals that plants often manufacture to protect themselves..." },
+        { topic: "Food & Biology", word: "Herbivorous", form: "Adjective", phonetic: "/hɜːˈbɪv.ər.əs/", def: "Feeding mainly on plants.", translation: "Ăn cỏ, ăn thực vật", usage: "A biological term classifying animal diets.<span class='usage-vi'>(Một thuật ngữ sinh học phân loại chế độ ăn của động vật.)</span>", example: "...protect themselves against attack by insects or other herbivorous animals." },
+        { topic: "Food & Biology", word: "Digestible", form: "Adjective", phonetic: "/daɪˈdʒes.tə.bəl/", def: "Easy to digest (break down in the stomach).", translation: "Dễ tiêu hóa", usage: "Often used when discussing the benefits of cooking or specific diets.<span class='usage-vi'>(Thường dùng khi thảo luận về lợi ích của việc nấu ăn hoặc các chế độ ăn cụ thể.)</span>", example: "Cooked food is often more digestible because heat breaks down tough cellulose..." },
+        { topic: "Food & Biology", word: "Expend", form: "Verb", phonetic: "/ɪkˈspend/", def: "To spend or use up a resource such as energy, time, or money.", translation: "Tiêu hao, tiêu tốn", usage: "Common in biology when discussing energy, or in business for money.<span class='usage-vi'>(Phổ biến trong sinh học khi nói về năng lượng, hoặc trong kinh doanh đối với tiền bạc.)</span>", example: "The energy expended in chewing to break down the tough material is replaced..." },
+        { topic: "Food & Biology", word: "Equivalent", form: "Noun / Adjective", phonetic: "/ɪˈkwɪv.əl.ənt/", def: "A thing that is equal to or corresponds with another in value or function.", translation: "Vật tương đương, sự tương đương", usage: "Used to compare two things that have the same effect.<span class='usage-vi'>(Dùng để so sánh hai thứ có cùng hiệu quả.)</span>", example: "...or a raw leg of lamb is much harder work than eating the cooked equivalent." },
+        { topic: "Food & Biology", word: "Ratio", form: "Noun", phonetic: "/ˈreɪ.ʃi.əʊ/", def: "The relationship between two amounts showing how much bigger one is than the other.", translation: "Tỷ lệ", usage: "A mathematical and scientific term useful for IELTS Task 1 & Reading.<span class='usage-vi'>(Một thuật ngữ toán học và khoa học hữu ích cho IELTS Task 1 & Reading.)</span>", example: "...so the ratio of energy gained to energy expended by the body is greater..." },
+        { topic: "Food & Biology", word: "Spoil", form: "Verb", phonetic: "/spɔɪl/", def: "(Of food) to become unfit for eating; to go bad.", translation: "Hư hỏng, ôi thiu", usage: "Used to describe what happens to fresh food if not preserved.<span class='usage-vi'>(Dùng để miêu tả điều gì xảy ra với thực phẩm tươi sống nếu không được bảo quản.)</span>", example: "...make the food a more hostile environment for bacteria that can cause it to spoil." },
+        { topic: "Food & Biology", word: "Decay", form: "Noun / Verb", phonetic: "/dɪˈkeɪ/", def: "The process of rotting or decomposing through the action of bacteria.", translation: "Sự phân hủy, thối rữa", usage: "A scientific synonym for rotting.<span class='usage-vi'>(Một từ đồng nghĩa khoa học cho sự mục nát.)</span>", example: "They also tend to slow down natural chemical reactions in the food that would cause decay." },
+
+        // Processes & Characteristics
+        { topic: "Processes & Characteristics", word: "Preserve", form: "Verb", phonetic: "/prɪˈzɜːv/", def: "To treat food or materials so that they can be kept for a long time without decaying.", translation: "Bảo quản, giữ gìn", usage: "A core vocabulary word for reading passages about food or history.<span class='usage-vi'>(Một từ vựng cốt lõi cho các bài đọc về thực phẩm hoặc lịch sử.)</span>", example: "...led them to discover methods of preserving food: smoking, drying..." },
+        { topic: "Processes & Characteristics", word: "Seasonality", form: "Noun", phonetic: "/ˌsiː.zənˈæl.ə.ti/", def: "The characteristic of a product or event being available only during certain seasons.", translation: "Tính thời vụ", usage: "Often used in agriculture, tourism, and business.<span class='usage-vi'>(Thường dùng trong nông nghiệp, du lịch và kinh doanh.)</span>", example: "This, combined with the seasonality of production, led them to discover methods..." },
+        { topic: "Processes & Characteristics", word: "Fermentation", form: "Noun", phonetic: "/ˌfɜː.menˈteɪ.ʃən/", def: "A chemical change in which sugar is turned into alcohol or acid by bacteria/yeast.", translation: "Sự lên men", usage: "Describes the process for making yogurt, cheese, beer, or preserved vegetables.<span class='usage-vi'>(Miêu tả quá trình làm sữa chua, phô mai, bia hoặc rau củ muối.)</span>", example: "...discover methods of preserving food: smoking, drying, adding acid by fermentation..." },
+        { topic: "Processes & Characteristics", word: "Hostile", form: "Adjective", phonetic: "/ˈhɒs.taɪl/", def: "Unfriendly; making it difficult for something to survive or grow.", translation: "Khắc nghiệt, thù địch", usage: "Used to describe extreme environments or angry people.<span class='usage-vi'>(Dùng để miêu tả môi trường khắc nghiệt hoặc những người tức giận.)</span>", example: "...they make the food a more hostile environment for bacteria..." },
+        { topic: "Processes & Characteristics", word: "Fabricate", form: "Verb", phonetic: "/ˈfæb.rɪ.keɪt/", def: "To invent or produce something, often an industrial product from raw materials.", translation: "Chế tạo, sản xuất", usage: "A formal synonym for 'make' or 'build'.<span class='usage-vi'>(Một từ đồng nghĩa trang trọng cho 'make' hoặc 'build'.)</span>", example: "He sealed food in bottles fabricated from glass and then heated them..." },
+        { topic: "Processes & Characteristics", word: "Texture", form: "Noun", phonetic: "/ˈteks.tʃər/", def: "The way that something feels when you touch or eat it.", translation: "Kết cấu (độ mềm, cứng, mịn...)", usage: "Crucial for describing food, fabrics, or materials.<span class='usage-vi'>(Rất quan trọng để miêu tả thức ăn, vải vóc, hoặc vật liệu.)</span>", example: "...and the flavor and texture were similar to freshly cooked products." },
+        { topic: "Processes & Characteristics", word: "Resistant", form: "Adjective", phonetic: "/rɪˈzɪs.tənt/", def: "Not easily harmed or affected by something.", translation: "Có sức đề kháng, chống chịu", usage: "Often combined with 'to' (e.g., resistant to damage, water-resistant).<span class='usage-vi'>(Thường kết hợp với 'to' - ví dụ: chống lại tổn hại, chống nước.)</span>", example: "...Durand produced the first ones which were lightweight and resistant to damage." },
+        { topic: "Processes & Characteristics", word: "Rapid", form: "Adjective", phonetic: "/ˈræp.ɪd/", def: "Happening in a short amount of time or at a fast pace.", translation: "Nhanh chóng", usage: "A high-level alternative to 'fast' or 'quick'.<span class='usage-vi'>(Một từ thay thế cấp độ cao cho 'fast' hoặc 'quick'.)</span>", example: "...Birdseye observed that rapid freezing creates smaller ice crystals..." },
+        { topic: "Processes & Characteristics", word: "Identical", form: "Adjective", phonetic: "/aɪˈden.tɪ.kəl/", def: "Similar in every detail; exactly alike.", translation: "Giống hệt nhau", usage: "Used to emphasize that there is absolutely no difference.<span class='usage-vi'>(Dùng để nhấn mạnh rằng hoàn toàn không có sự khác biệt.)</span>", example: "...include the fact that the flavor and consistency are often identical to the fresh product..." },
+        { topic: "Processes & Characteristics", word: "Consistency", form: "Noun", phonetic: "/kənˈsɪs.tən.si/", def: "The physical state of a liquid or substance (how thick, smooth, or firm it is).", translation: "Độ đặc, sự nhất quán", usage: "Can mean the thickness of food OR the quality of always behaving the same way.<span class='usage-vi'>(Có thể có nghĩa là độ đặc của thức ăn HOẶC phẩm chất luôn hành xử theo cùng một cách.)</span>", example: "...include the fact that the flavor and consistency are often identical to the fresh product..." }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="word-form">${item.form}</span>
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                <div class="usage-note"><strong>Usage:</strong> ${item.usage}</div>
+                <div class="example-box"><span>Reading Context</span>"${item.example}"</div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter === 'Human History & Society') topicName = 'Human History & Society';
+            if (activeFilter === 'Food & Biology') topicName = 'Food & Biology';
+            if (activeFilter === 'Processes & Characteristics') topicName = 'Processes & Characteristics';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-form').textContent = data.form;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            document.getElementById('fc-usage').innerHTML = `<strong>Usage:</strong> ${data.usage}`;
+            document.getElementById('fc-example').textContent = data.example;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
