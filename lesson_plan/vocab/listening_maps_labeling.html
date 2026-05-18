@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening | Map Labeling - Vocabulary & Expressions</title>
+    <style>
+        :root {
+            --primary: #4338ca; /* Indigo */
+            --primary-light: #e0e7ff;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #3730a3;
+            --border: #a5b4fc;
+            --badge-bg: #c7d2fe;
+            --badge-text: #312e81;
+            --success: #0f766e; /* Contrasting teal for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(67, 56, 202, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        .phonetic { font-size: 0.95rem; color: var(--text-muted); font-style: italic; }
+        .word-form { background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+        .usage-note { font-size: 0.9rem; margin-bottom: 1rem; color: #475569; background: #f1f5f9; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid #94a3b8; flex-grow: 1; }
+        .usage-note strong { color: var(--text-main); font-style: normal; font-weight: 600; }
+        .usage-vi { color: #64748b; font-style: italic; display: block; margin-top: 0.25rem; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 520px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(67, 56, 202, 0.1); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.2rem; margin-bottom: 1rem; color: var(--primary); }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .phonetic { font-size: 1.2rem; color: var(--text-muted); }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .usage-note { width: 100%; font-size: 0.95rem; padding: 0.5rem; margin-bottom: 1rem; }
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 550px; } 
+            .flashcard-front .word { font-size: 1.8rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>Listening | Map Labeling</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
+        <button class="filter-btn" onclick="filterTopic('Prepositions & Positioning')">Prepositions & Positioning</button>
+        <button class="filter-btn" onclick="filterTopic('Navigation & Movement')">Navigation & Movement</button>
+        <button class="filter-btn" onclick="filterTopic('Features & Layout')">Features & Layout</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="word-form" id="fc-form">Verb</span>
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div class="usage-note" id="fc-usage"><strong>Usage:</strong> Usage goes here.</div>
+                    <div class="example-box">
+                        <span>Map Transcript Example</span>
+                        <div id="fc-example">"Example sentence goes here."</div>
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 42</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (IELTS Listening - Map Labeling)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- CATEGORY 1: Prepositions & Positioning ---
+        { topic: "Prepositions & Positioning", word: "Adjacent", form: "Adjective", phonetic: "/əˈdʒeɪ.sənt/", def: "Next to or adjoining something else.", translation: "Kề vách, liền kề", usage: "A formal way to say 'next to', commonly heard in Section 2 map descriptions.<span class='usage-vi'>(Cách nói trang trọng của 'next to', thường gặp trong miêu tả bản đồ.)</span>", example: "The new sports hall is adjacent to the main reception area." },
+        { topic: "Prepositions & Positioning", word: "Adjoining", form: "Adjective", phonetic: "/əˈdʒɔɪ.nɪŋ/", def: "Joined to or sharing a wall with a building or room.", translation: "Nối liền, tiếp giáp", usage: "Used specifically for rooms or buildings that connect to each other.<span class='usage-vi'>(Dùng riêng cho các phòng hoặc tòa nhà nối với nhau.)</span>", example: "You will find the locker rooms inside the adjoining building." },
+        { topic: "Prepositions & Positioning", word: "Opposite", form: "Prep / Adjective", phonetic: "/ˈɒp.ə.zɪt/", def: "In a position facing someone or something but on the other side.", translation: "Đối diện", usage: "A crucial preposition; listen for 'opposite the [landmark]'.<span class='usage-vi'>(Giới từ quan trọng; hãy lắng nghe 'opposite the [tên địa danh]'.)</span>", example: "The ticket office is exactly opposite the main entrance." },
+        { topic: "Prepositions & Positioning", word: "Parallel", form: "Adjective", phonetic: "/ˈpær.ə.lel/", def: "Side by side and having the same distance continuously between them.", translation: "Song song", usage: "Often used when describing paths or roads running alongside a river or building.<span class='usage-vi'>(Thường dùng khi miêu tả đường đi chạy dọc theo con sông hoặc tòa nhà.)</span>", example: "The path runs parallel to the river, so you won't get lost." },
+        { topic: "Prepositions & Positioning", word: "Perpendicular", form: "Adjective", phonetic: "/ˌpɜː.pənˈdɪk.jə.lər/", def: "At an angle of 90° to a given line, plane, or surface.", translation: "Vuông góc", usage: "High-level vocabulary used when paths form a T-shape or cross.<span class='usage-vi'>(Từ vựng cấp cao khi các con đường tạo thành hình chữ T hoặc cắt nhau vuông góc.)</span>", example: "The new street is drawn perpendicular to the main avenue." },
+        { topic: "Prepositions & Positioning", word: "Proximity", form: "Noun", phonetic: "/prɒkˈsɪm.ə.ti/", def: "Nearness in space, time, or relationship.", translation: "Sự gần gũi, khoảng cách gần", usage: "Usually heard in the phrase 'in close proximity to'.<span class='usage-vi'>(Thường nghe thấy trong cụm từ 'in close proximity to'.)</span>", example: "The hotel was chosen for its close proximity to the conference center." },
+        { topic: "Prepositions & Positioning", word: "Vicinity", form: "Noun", phonetic: "/vɪˈsɪn.ə.ti/", def: "The area near or surrounding a particular place.", translation: "Vùng lân cận", usage: "Usually heard in the phrase 'in the vicinity of'.<span class='usage-vi'>(Thường nghe thấy trong cụm từ 'in the vicinity of'.)</span>", example: "There are several good restaurants in the vicinity of the station." },
+        { topic: "Prepositions & Positioning", word: "Directly opposite the...", form: "Phrase", phonetic: "/daɪˈrekt.li ˈɒp.ə.zɪt ðə/", def: "Exactly facing the mentioned place.", translation: "Ngay đối diện...", usage: "Used to pinpoint an exact location across a path or room.<span class='usage-vi'>(Dùng để xác định chính xác một vị trí ở phía bên kia lối đi/phòng.)</span>", example: "The gift shop is located directly opposite the main gate." },
+        { topic: "Prepositions & Positioning", word: "Diagonally across from...", form: "Phrase", phonetic: "/daɪˈæɡ.ən.əl.i əˈkrɒs frɒm/", def: "On the opposite corner of a square or rectangular space.", translation: "Nằm chéo góc với...", usage: "A tricky direction that requires you to look corner-to-corner.<span class='usage-vi'>(Hướng đi dễ gây nhầm lẫn, yêu cầu bạn nhìn từ góc này sang góc kia.)</span>", example: "The café is situated diagonally across from the library." },
+        { topic: "Prepositions & Positioning", word: "In close proximity to...", form: "Phrase", phonetic: "/ɪn kləʊs prɒkˈsɪm.ə.ti tuː/", def: "Very near to a specific location.", translation: "Rất gần với...", usage: "A formal expression meaning 'right next to' or 'very near'.<span class='usage-vi'>(Cụm từ trang trọng có nghĩa là 'ngay cạnh' hoặc 'rất gần'.)</span>", example: "The residential blocks are built in close proximity to the university campus." },
+        { topic: "Prepositions & Positioning", word: "Just past the...", form: "Phrase", phonetic: "/dʒʌst pɑːst ðə/", def: "Slightly further along the path than the mentioned landmark.", translation: "Vừa qua khỏi...", usage: "Indicates you need to walk beyond a specific point to find the answer.<span class='usage-vi'>(Chỉ ra rằng bạn cần đi qua một điểm cụ thể để tìm câu trả lời.)</span>", example: "You will find the restrooms just past the ticket counter." },
+        { topic: "Prepositions & Positioning", word: "Tucked away in...", form: "Phrase", phonetic: "/tʌkt əˈweɪ ɪn/", def: "Hidden or located in a quiet, hard-to-spot place.", translation: "Nằm khuất trong...", usage: "Describes a location that is hidden in a corner or behind something.<span class='usage-vi'>(Miêu tả một vị trí bị khuất trong một góc hoặc phía sau thứ gì đó.)</span>", example: "The small botanical garden is tucked away in the top right corner." },
+        { topic: "Prepositions & Positioning", word: "At the far end of...", form: "Phrase", phonetic: "/ət ðə fɑːr end əv/", def: "The furthest point of a room, corridor, or road.", translation: "Ở tận cùng của...", usage: "Tells you to follow a path all the way to its stopping point.<span class='usage-vi'>(Bảo bạn phải đi theo một con đường cho đến tận điểm dừng.)</span>", example: "The manager's office is at the far end of the corridor." },
+        { topic: "Prepositions & Positioning", word: "A stone's throw from...", form: "Idiom", phonetic: "/ə stəʊnz θrəʊ frɒm/", def: "A very short distance away.", translation: "Rất gần (chỉ cách một tầm ném đá)", usage: "An idiom frequently used in informal map tours (Section 2).<span class='usage-vi'>(Thành ngữ thường dùng trong các bài giới thiệu bản đồ không trang trọng.)</span>", example: "The new parking lot is only a stone's throw from the theater." },
+
+        // --- CATEGORY 2: Navigation & Movement ---
+        { topic: "Navigation & Movement", word: "Intersection", form: "Noun", phonetic: "/ˌɪn.təˈsek.ʃən/", def: "A point where two or more roads or lines cross.", translation: "Giao lộ, ngã tư", usage: "A key landmark point on a map.<span class='usage-vi'>(Một điểm mốc quan trọng trên bản đồ.)</span>", example: "There is a traffic light at the intersection of High Street and Station Road." },
+        { topic: "Navigation & Movement", word: "Junction", form: "Noun", phonetic: "/ˈdʒʌŋk.ʃən/", def: "A place where two or more roads or railway lines meet.", translation: "Giao điểm, ngã rẽ", usage: "Similar to intersection, but often used for T-junctions or forks.<span class='usage-vi'>(Tương tự intersection, nhưng thường dùng cho ngã ba hoặc chạc cây.)</span>", example: "When you reach the junction, take the road on the left." },
+        { topic: "Navigation & Movement", word: "Roundabout", form: "Noun", phonetic: "/ˈraʊnd.ə.baʊt/", def: "A road junction at which traffic moves in one direction around a central island.", translation: "Vòng xuyến, bùng binh", usage: "Listen carefully for which 'exit' you need to take.<span class='usage-vi'>(Lắng nghe cẩn thận xem bạn cần rẽ vào 'lối ra' nào.)</span>", example: "Take the second exit at the roundabout to stay on the main road." },
+        { topic: "Navigation & Movement", word: "Pedestrianized", form: "Adjective", phonetic: "/pəˈdes.tri.ə.naɪzd/", def: "Made into an area that is only for people walking, not for vehicles.", translation: "Dành riêng cho người đi bộ", usage: "Often mentioned when explaining why you cannot drive somewhere.<span class='usage-vi'>(Thường được nhắc đến khi giải thích tại sao bạn không thể lái xe đến đâu đó.)</span>", example: "The entire city center has been pedestrianized, so no cars are allowed." },
+        { topic: "Navigation & Movement", word: "Orientation", form: "Noun", phonetic: "/ˌɔː.ri.enˈteɪ.ʃən/", def: "The position of something in relation to its surroundings (often N/S/E/W).", translation: "Sự định hướng", usage: "Used when the speaker sets up the map using a compass rose.<span class='usage-vi'>(Dùng khi người nói thiết lập bản đồ sử dụng la bàn.)</span>", example: "Let's look at the orientation of the map; North is at the top." },
+        { topic: "Navigation & Movement", word: "Branch off to the right", form: "Phrase", phonetic: "/brɑːntʃ ɒf tuː ðə raɪt/", def: "To leave a main route and take a minor one extending to the right.", translation: "Rẽ nhánh sang phải", usage: "Describes a path splitting into two.<span class='usage-vi'>(Miêu tả một con đường chia làm hai ngã.)</span>", example: "Follow the main trail until you see a smaller path branch off to the right." },
+        { topic: "Navigation & Movement", word: "Bear left at the junction", form: "Phrase", phonetic: "/beər left ət ðə ˈdʒʌŋk.ʃən/", def: "To slightly turn or continuously stay on the left side of a split path.", translation: "Chếch sang trái tại ngã rẽ", usage: "A common directional instruction meaning 'stay left'.<span class='usage-vi'>(Một hướng dẫn đi lại phổ biến có nghĩa là 'giữ bên trái'.)</span>", example: "To get to the lake, you need to bear left at the junction." },
+        { topic: "Navigation & Movement", word: "Walk parallel to the...", form: "Phrase", phonetic: "/wɔːk ˈpær.ə.lel tuː ðə/", def: "To move in the same direction as a boundary or road without intersecting it.", translation: "Đi song song với...", usage: "Used when navigating alongside a river, fence, or major road.<span class='usage-vi'>(Dùng khi đi men theo sông, hàng rào, hoặc đường lớn.)</span>", example: "If you walk parallel to the river, you will eventually reach the bridge." },
+        { topic: "Navigation & Movement", word: "Right at the intersection of...", form: "Phrase", phonetic: "/raɪt ət ði ˌɪn.təˈsek.ʃən əv/", def: "Exactly where two roads cross.", translation: "Ngay tại giao lộ của...", usage: "Pinpoints a location squarely on a corner.<span class='usage-vi'>(Xác định một vị trí nằm ngay ngắn trên một góc đường.)</span>", example: "The monument is located right at the intersection of Pine and Elm streets." },
+        { topic: "Navigation & Movement", word: "On the bend of the road", form: "Phrase", phonetic: "/ɒn ðə bend əv ðə rəʊd/", def: "Located where the road curves.", translation: "Nằm ở khúc cua của con đường", usage: "Look for a curve or corner on the map when you hear this.<span class='usage-vi'>(Hãy tìm một khúc cua trên bản đồ khi bạn nghe cụm từ này.)</span>", example: "You'll see a large oak tree right on the bend of the road." },
+        { topic: "Navigation & Movement", word: "Wind its way through...", form: "Phrase", phonetic: "/waɪnd ɪts weɪ θruː/", def: "To move in a twisting or curving course through an area.", translation: "Uốn lượn xuyên qua...", usage: "Describes a path, river, or road that is not straight.<span class='usage-vi'>(Miêu tả một con đường, con sông không thẳng.)</span>", example: "The river will wind its way through the forest before reaching the sea." },
+        { topic: "Navigation & Movement", word: "Intersect with...", form: "Phrase", phonetic: "/ˌɪn.təˈsekt wɪð/", def: "To cross or cut across another path or road.", translation: "Cắt ngang / giao với...", usage: "Identifies a crossing point between two lines on the map.<span class='usage-vi'>(Nhận dạng một điểm giao cắt giữa hai đường trên bản đồ.)</span>", example: "The railway line will intersect with the main highway here." },
+        { topic: "Navigation & Movement", word: "Head towards the...", form: "Phrase", phonetic: "/hed təˈwɔːdz ðə/", def: "To move in the direction of a specific landmark.", translation: "Đi về hướng...", usage: "Tells you which direction to face or walk.<span class='usage-vi'>(Bảo bạn phải quay mặt hoặc đi về hướng nào.)</span>", example: "From the entrance, you should head towards the main hall." },
+        { topic: "Navigation & Movement", word: "Immediately to your right", form: "Phrase", phonetic: "/ɪˈmiː.di.ət.li tuː jɔːr raɪt/", def: "The very first thing on your right-hand side.", translation: "Ngay phía bên phải bạn", usage: "Used right after passing a door or entrance.<span class='usage-vi'>(Dùng ngay sau khi bước qua cửa hoặc lối vào.)</span>", example: "As you enter the building, the reception desk is immediately to your right." },
+
+        // --- CATEGORY 3: Features & Layout ---
+        { topic: "Features & Layout", word: "Layout", form: "Noun", phonetic: "/ˈleɪ.aʊt/", def: "The way in which the parts of something are arranged or laid out.", translation: "Sự bố trí, sơ đồ", usage: "The speaker will often say 'Let's look at the layout of the...' to begin.<span class='usage-vi'>(Người nói thường mở đầu bằng 'Hãy nhìn vào sơ đồ của...'.)</span>", example: "We have completely changed the layout of the ground floor." },
+        { topic: "Features & Layout", word: "Foyer", form: "Noun", phonetic: "/ˈfɔɪ.eɪ/", def: "An entrance hall or other open area in a building used by the public.", translation: "Tiền sảnh", usage: "Often the starting point of an indoor map.<span class='usage-vi'>(Thường là điểm xuất phát của một bản đồ trong nhà.)</span>", example: "Guests are requested to wait in the foyer before the tour begins." },
+        { topic: "Features & Layout", word: "Courtyard", form: "Noun", phonetic: "/ˈkɔːt.jɑːd/", def: "An unroofed area that is completely or mostly enclosed by the walls of a large building.", translation: "Sân trong", usage: "A central outdoor feature surrounded by buildings.<span class='usage-vi'>(Một khu vực ngoài trời trung tâm được bao quanh bởi các tòa nhà.)</span>", example: "There is a beautiful fountain in the center of the courtyard." },
+        { topic: "Features & Layout", word: "Corridor", form: "Noun", phonetic: "/ˈkɒr.ɪ.dɔːr/", def: "A long passage in a building from which doors lead into rooms.", translation: "Hành lang", usage: "A key word for navigating indoor plans (e.g., hospitals, schools).<span class='usage-vi'>(Từ khóa quan trọng để xem sơ đồ trong nhà.)</span>", example: "Walk down this corridor and it's the last door on the left." },
+        { topic: "Features & Layout", word: "Boundary", form: "Noun", phonetic: "/ˈbaʊn.dər.i/", def: "A line that marks the limits of an area; a dividing line.", translation: "Ranh giới", usage: "Look for fences, walls, or dotted lines on the map edge.<span class='usage-vi'>(Hãy tìm hàng rào, bức tường hoặc đường chấm đứt ở rìa bản đồ.)</span>", example: "The ancient wall marks the northern boundary of the property." },
+        { topic: "Features & Layout", word: "Annex", form: "Noun", phonetic: "/ˈæn.eks/", def: "A building joined to or associated with a main building, providing additional space.", translation: "Khu nhà phụ, khu mở rộng", usage: "Also spelled 'Annexe'. Usually a smaller block attached to a big one.<span class='usage-vi'>(Thường là một khối nhà nhỏ gắn liền với khối nhà lớn.)</span>", example: "The overflow of students will be housed in the new annex." },
+        { topic: "Features & Layout", word: "Precinct", form: "Noun", phonetic: "/ˈpriː.sɪŋkt/", def: "An area in a town designated for specific or restricted use, especially shopping.", translation: "Khu vực dành riêng, phân khu", usage: "Often heard as 'shopping precinct' or 'pedestrian precinct'.<span class='usage-vi'>(Thường được nghe như 'khu mua sắm' hoặc 'khu đi bộ'.)</span>", example: "No vehicles are permitted inside the shopping precinct." },
+        { topic: "Features & Layout", word: "Outskirts", form: "Noun", phonetic: "/ˈaʊt.skɜːts/", def: "The outer parts of a town or city.", translation: "Vùng ngoại ô", usage: "Indicates a location at the very edge of the given map.<span class='usage-vi'>(Chỉ một vị trí ở ngay rìa của bản đồ đã cho.)</span>", example: "The factory was built on the outskirts of the city to reduce noise." },
+        { topic: "Features & Layout", word: "Extension", form: "Noun", phonetic: "/ɪkˈsten.ʃən/", def: "A part that is added to a building to increase its size.", translation: "Phần mở rộng", usage: "Similar to an annex, indicating a new part of a structure.<span class='usage-vi'>(Tương tự như annex, chỉ một phần mới của cấu trúc.)</span>", example: "They are building a massive extension to the hospital." },
+        { topic: "Features & Layout", word: "Boulevard", form: "Noun", phonetic: "/ˈbuː.lə.vɑːd/", def: "A wide street in a town or city, typically one lined with trees.", translation: "Đại lộ", usage: "Look for a very wide, major road on a town map.<span class='usage-vi'>(Hãy tìm một con đường chính rất rộng trên bản đồ thị trấn.)</span>", example: "The parade will march down the wide boulevard." },
+        { topic: "Features & Layout", word: "Situated on the outskirts of...", form: "Phrase", phonetic: "/ˈsɪtʃ.u.eɪ.tɪd ɒn ði ˈaʊt.skɜːts əv/", def: "Located in the outer edge of a town or city.", translation: "Nằm ở vùng ngoại ô của...", usage: "Directs your attention to the borders of the town map.<span class='usage-vi'>(Hướng sự chú ý của bạn đến biên giới của bản đồ thị trấn.)</span>", example: "The new housing estate is situated on the outskirts of town." },
+        { topic: "Features & Layout", word: "Adjoining the main building", form: "Phrase", phonetic: "/əˈdʒɔɪn.ɪŋ ðə meɪn ˈbɪl.dɪŋ/", def: "Connected to or sharing a wall with the primary structure.", translation: "Nối liền với tòa nhà chính", usage: "Look for a shape that physically touches the largest building.<span class='usage-vi'>(Hãy tìm một hình dạng chạm vật lý vào tòa nhà lớn nhất.)</span>", example: "The cafeteria is in a new block adjoining the main building." },
+        { topic: "Features & Layout", word: "Across the courtyard from...", form: "Phrase", phonetic: "/əˈkrɒs ðə ˈkɔːt.jɑːd frɒm/", def: "On the opposite side of the open enclosed area.", translation: "Bên kia sân trong so với...", usage: "Draw a straight line from the starting point through the open middle space.<span class='usage-vi'>(Vẽ một đường thẳng từ điểm xuất phát xuyên qua không gian trống ở giữa.)</span>", example: "The science lab is directly across the courtyard from the library." },
+        { topic: "Features & Layout", word: "Beyond the boundary", form: "Phrase", phonetic: "/bɪˈjɒnd ðə ˈbaʊn.dər.i/", def: "Outside the designated limits of an area.", translation: "Vượt ra ngoài ranh giới", usage: "Indicates an area outside the marked map perimeter.<span class='usage-vi'>(Chỉ một khu vực nằm ngoài chu vi bản đồ được đánh dấu.)</span>", example: "You are not allowed to hike beyond the boundary of the national park." }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="word-form">${item.form}</span>
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                <div class="usage-note"><strong>Map Labeling Tip:</strong> ${item.usage}</div>
+                <div class="example-box"><span>Audio Transcript Example</span>"${item.example}"</div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter === 'Prepositions & Positioning') topicName = 'Prepositions & Positioning';
+            if (activeFilter === 'Navigation & Movement') topicName = 'Navigation & Movement';
+            if (activeFilter === 'Features & Layout') topicName = 'Features & Layout';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-form').textContent = data.form;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            document.getElementById('fc-usage').innerHTML = `<strong>Map Tip:</strong> ${data.usage}`;
+            document.getElementById('fc-example').textContent = data.example;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
