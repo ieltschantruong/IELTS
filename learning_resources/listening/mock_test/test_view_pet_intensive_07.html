@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong | PET Intensive 07</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap');
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #fdf2f8; /* Pastel pink background */
+            color: #333;
+            overflow: hidden; /* Prevent body scroll, handle in main container */
+        }
+
+        /* IELTS Specific Styles */
+        .ielts-header {
+            background-color: #fce7f3;
+            border-bottom: 2px solid #fbcfe8;
+        }
+        
+        .ielts-footer {
+            background-color: #fce7f3;
+            border-top: 2px solid #fbcfe8;
+        }
+
+        .q-nav-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #999;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .q-nav-btn:hover {
+            background: #fbcfe8;
+        }
+
+        .q-nav-btn.answered {
+            border-bottom: 4px solid #333; /* The classic IELTS answered indicator */
+        }
+        
+        .q-nav-btn.active {
+            background-color: #be185d;
+            color: white;
+            border-color: #be185d;
+        }
+
+        .ielts-input {
+            border: 1px solid #777;
+            padding: 4px 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .ielts-input:focus {
+            border-color: #be185d;
+            box-shadow: 0 0 3px rgba(190, 24, 93, 0.5);
+        }
+
+        .ielts-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px;
+            border: 1px solid transparent;
+        }
+
+        .ielts-radio-label:hover {
+            background-color: #fdf2f8;
+            border-color: #fbcfe8;
+            border-radius: 4px;
+        }
+
+        .ielts-radio-label input[type="radio"],
+        .ielts-radio-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #be185d;
+            cursor: pointer;
+        }
+
+        /* Lists */
+        .list-circle {
+            list-style-type: circle;
+        }
+
+        /* Drag and Drop Styles */
+        .draggable-item {
+            background-color: white;
+            border: 2px solid #be185d;
+            padding: 8px 12px;
+            cursor: grab;
+            user-select: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+        
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .dropzone {
+            min-width: 180px;
+            min-height: 42px;
+            border: 2px dashed #999;
+            background-color: #f9f9f9;
+            display: inline-flex;
+            align-items: center;
+            padding: 2px;
+            vertical-align: middle;
+        }
+        
+        .dropzone.drag-over {
+            background-color: #fdf2f8;
+            border-color: #be185d;
+        }
+
+        /* Custom Scrollbar for Main Area */
+        #main-scroll-area::-webkit-scrollbar {
+            width: 10px;
+        }
+        #main-scroll-area::-webkit-scrollbar-track {
+            background: #fdf2f8; 
+        }
+        #main-scroll-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 5px;
+        }
+        #main-scroll-area::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Custom Scrollbar for Footer Navigation */
+        .footer-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .footer-scroll::-webkit-scrollbar-track {
+            background: #fce7f3; 
+        }
+        .footer-scroll::-webkit-scrollbar-thumb {
+            background: #fbcfe8; 
+            border-radius: 3px;
+        }
+        .footer-scroll::-webkit-scrollbar-thumb:hover {
+            background: #f472b6; 
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Start Overlay -->
+    <div id="start-overlay" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-6">
+        <h1 class="text-4xl font-bold mb-6 text-[#be185d]">IELTS Chan Truong | PET Intensive 07</h1>
+        <p class="mb-10 text-xl text-gray-700 max-w-2xl text-center leading-relaxed">
+            Welcome to the computer-delivered IELTS Listening test simulation. <br><br>
+            Please ensure your volume is turned up. Once you click "Start Test", the timer will begin, the audio will play automatically, and you will not be able to pause it.
+        </p>
+        <button onclick="startTest()" class="bg-[#be185d] hover:bg-pink-800 text-white font-bold py-4 px-10 rounded text-xl shadow-lg transition-colors">
+            Start Test
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="ielts-header h-16 flex items-center justify-between px-6 shrink-0 z-10">
+        <div class="flex items-center gap-4">
+            <div class="font-bold text-xl tracking-wider text-[#be185d]">IELTS Chan Truong</div>
+            <div class="text-sm border-l-2 border-pink-300 pl-4 font-semibold text-pink-800">PET Intensive 07 | Listening Mock Test</div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 bg-white px-3 py-1 border border-pink-200 rounded shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#be185d]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer" class="font-bold text-lg text-[#be185d]">40:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-scroll-area" class="flex-1 overflow-y-auto bg-[#fdf2f8] p-4 md:p-8 relative scroll-smooth pb-32">
+        
+        <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 shadow-sm border border-gray-200 rounded-sm">
+            
+            <!-- SECTION 1 -->
+            <section id="part-1" class="mb-16 border-b border-gray-300 pb-12">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 1: Questions 1-10</h2>
+                
+                <!-- Questions 1-5 -->
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm mb-8">
+                    <p class="font-bold mb-2">Questions 1–5</p>
+                    <p class="mb-6 font-bold uppercase text-red-600">Write ONE WORD ONLY for each answer.</p>
+                    
+                    <h3 class="font-bold text-xl mb-2 text-gray-800">Poppy Reserve</h3>
+                    <p class="mb-6 text-gray-700 italic">Almond Valley Poppy Reserve is a nature reserve.</p>
+                    
+                    <div class="space-y-4 text-lg pl-2 lg:pl-6" id="part-1-content-a">
+                        <ul class="list-disc list-outside ml-6 space-y-5 text-gray-800">
+                            <li class="pl-1">
+                                The poppies will be at their best at the end of the 
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold ml-1 mr-1 text-black">1</span>
+                                    <input type="text" name="q1" class="ielts-input w-36" oninput="saveAnswer(1, this.value)">
+                                </span>.
+                            </li>
+                            <li class="pl-1">
+                                The poppies on the hills are 
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold ml-1 mr-1 text-black">2</span>
+                                    <input type="text" name="q2" class="ielts-input w-36" oninput="saveAnswer(2, this.value)">
+                                </span>
+                                in colour.
+                            </li>
+                            <li class="pl-1">
+                                The reserve is located to the 
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold ml-1 mr-1 text-black">3</span>
+                                    <input type="text" name="q3" class="ielts-input w-36" oninput="saveAnswer(3, this.value)">
+                                </span>
+                                of Lakeside.
+                            </li>
+                            <li class="pl-1">
+                                The best time for photography is mid-afternoon.
+                            </li>
+                            <li class="pl-1">
+                                Wear 
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold ml-1 mr-1 text-black">4</span>
+                                    <input type="text" name="q4" class="ielts-input w-36" oninput="saveAnswer(4, this.value)">
+                                </span>
+                                because of rattlesnakes.
+                            </li>
+                            <li class="pl-1">
+                                The reserve is a 
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold ml-1 mr-1 text-black">5</span>
+                                    <input type="text" name="q5" class="ielts-input w-36" oninput="saveAnswer(5, this.value)">
+                                </span>
+                                park.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Questions 6-10 -->
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <p class="font-bold mb-2">Questions 6–10</p>
+                    <p class="mb-6 font-bold uppercase text-red-600">Write ONE WORD AND/OR A NUMBER for each answer.</p>
+                    
+                    <div class="w-full" id="part-1-content-b">
+                        <table class="w-full text-left border-collapse border border-gray-400 bg-white text-base">
+                            <thead>
+                                <tr class="bg-pink-100">
+                                    <th class="border border-gray-400 p-2 font-bold text-gray-800">Tour</th>
+                                    <th class="border border-gray-400 p-2 font-bold text-gray-800">Start time</th>
+                                    <th class="border border-gray-400 p-2 font-bold text-gray-800">Duration</th>
+                                    <th class="border border-gray-400 p-2 font-bold text-gray-800">Highlights</th>
+                                    <th class="border border-gray-400 p-2 font-bold text-gray-800">Photography</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-800">
+                                <tr>
+                                    <td class="border border-gray-400 p-2 align-middle">
+                                        The <span class="inline-block whitespace-nowrap"><span class="font-bold mx-1">6</span><input type="text" name="q6" class="ielts-input w-24" oninput="saveAnswer(6, this.value)"></span> tour
+                                    </td>
+                                    <td class="border border-gray-400 p-2">every hour from 7:30 a.m.</td>
+                                    <td class="border border-gray-400 p-2">30 minutes</td>
+                                    <td class="border border-gray-400 p-2 align-middle">
+                                        viewpoints, film, and the <span class="inline-block whitespace-nowrap"><span class="font-bold mx-1">7</span><input type="text" name="q7" class="ielts-input w-24" oninput="saveAnswer(7, this.value)"></span>
+                                    </td>
+                                    <td class="border border-gray-400 p-2">panoramic pictures</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-400 p-2">The Wildflower tour</td>
+                                    <td class="border border-gray-400 p-2">every two hours from 8:00 a.m.</td>
+                                    <td class="border border-gray-400 p-2 align-middle">
+                                        <span class="inline-block whitespace-nowrap"><span class="font-bold mx-1">8</span><input type="text" name="q8" class="ielts-input w-24" oninput="saveAnswer(8, this.value)"></span>
+                                    </td>
+                                    <td class="border border-gray-400 p-2">poppy, cream cup, and sage</td>
+                                    <td class="border border-gray-400 p-2">close-up tips</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-400 p-2">The Wildlife tour</td>
+                                    <td class="border border-gray-400 p-2 align-middle">
+                                        <span class="inline-block whitespace-nowrap"><span class="font-bold mx-1">9</span><input type="text" name="q9" class="ielts-input w-16" oninput="saveAnswer(9, this.value)"> a.m.</span> or 7:00 p.m.
+                                    </td>
+                                    <td class="border border-gray-400 p-2">1.5 hours</td>
+                                    <td class="border border-gray-400 p-2">coyote, quail, roadrunners</td>
+                                    <td class="border border-gray-400 p-2 align-middle">
+                                        bring tripod and a <span class="inline-block whitespace-nowrap"><span class="font-bold mx-1">10</span><input type="text" name="q10" class="ielts-input w-24" oninput="saveAnswer(10, this.value)"></span> lens
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2 -->
+            <section id="part-2" class="mb-16 border-b border-gray-300 pb-12">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 2: Questions 11-20</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <h3 class="text-center font-bold text-xl mb-8 tracking-wide">Stanley Island</h3>
+                    
+                    <!-- Question 11 -->
+                    <div class="mb-10">
+                        <p class="font-bold mb-4">Question 11</p>
+                        <p class="mb-4 text-gray-700">Choose the correct letter, <span class="font-bold">A, B or C</span>.</p>
+                        
+                        <div class="pl-2 lg:pl-6 space-y-3 text-lg">
+                            <p class="font-bold mb-3"><span class="mr-2">11.</span> At the present time, Stanley Island can be reached by</p>
+                            <label class="ielts-radio-label">
+                                <input type="radio" name="q11" value="A" onchange="saveAnswer(11, this.value)">
+                                <span class="font-bold mr-2">A</span> hovercraft.
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="radio" name="q11" value="B" onchange="saveAnswer(11, this.value)">
+                                <span class="font-bold mr-2">B</span> plane.
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="radio" name="q11" value="C" onchange="saveAnswer(11, this.value)">
+                                <span class="font-bold mr-2">C</span> ferry.
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Questions 12-15 -->
+                    <div class="mb-10">
+                        <p class="font-bold mb-2">Questions 12–15</p>
+                        <p class="mb-6 text-gray-700">Where can the following facilities and attractions be found?<br>Write the correct letter, <span class="font-bold">A, B or C</span>, next to questions 12–15.</p>
+                        
+                        <div id="bank-part-2" class="bg-white border border-gray-300 p-5 rounded mb-6 w-max shadow-sm flex flex-col gap-3">
+                            <div class="flex items-center gap-3">
+                                <div id="drag-A" class="draggable-item w-10 text-center" draggable="true" ondragstart="drag(event)" data-value="A" data-bank="bank-part-2" data-reusable="true">A</div>
+                                <span>The North Coast</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div id="drag-B" class="draggable-item w-10 text-center" draggable="true" ondragstart="drag(event)" data-value="B" data-bank="bank-part-2" data-reusable="true">B</div>
+                                <span>The South Coast</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div id="drag-C" class="draggable-item w-10 text-center" draggable="true" ondragstart="drag(event)" data-value="C" data-bank="bank-part-2" data-reusable="true">C</div>
+                                <span>The East Coast</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pl-2 lg:pl-6 space-y-4 text-lg">
+                            <div class="flex items-center gap-4">
+                                <span class="font-bold w-6 text-right">12</span>
+                                <span class="w-44">golf courses</span>
+                                <div class="dropzone w-16" style="min-width: 64px; justify-content: center;" data-q="12" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event)"></div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="font-bold w-6 text-right">13</span>
+                                <span class="w-44">family hotels</span>
+                                <div class="dropzone w-16" style="min-width: 64px; justify-content: center;" data-q="13" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event)"></div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="font-bold w-6 text-right">14</span>
+                                <span class="w-44">self-catering flats</span>
+                                <div class="dropzone w-16" style="min-width: 64px; justify-content: center;" data-q="14" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event)"></div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="font-bold w-6 text-right">15</span>
+                                <span class="w-44">nature walks</span>
+                                <div class="dropzone w-16" style="min-width: 64px; justify-content: center;" data-q="15" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions 16-20 -->
+                    <div>
+                        <p class="font-bold mb-2">Questions 16–20</p>
+                        <p class="mb-6 font-bold uppercase text-red-600">Write NO MORE THAN TWO WORDS for each answer.</p>
+                        
+                        <h4 class="font-bold text-lg mb-4 text-gray-800">Advice to Visitors</h4>
+                        
+                        <ul class="list-disc list-outside ml-6 space-y-5 text-lg text-gray-800 pl-2 lg:pl-6">
+                            <li class="pl-1">
+                                Bring your own
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold mx-1 text-black">16</span>
+                                    <input type="text" name="q16" class="ielts-input w-40" oninput="saveAnswer(16, this.value)">
+                                </span>
+                                and insect spray
+                            </li>
+                            <li class="pl-1">
+                                It may not be possible to use your
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold mx-1 text-black">17</span>
+                                    <input type="text" name="q17" class="ielts-input w-40" oninput="saveAnswer(17, this.value)">
+                                </span>
+                                in the western area
+                            </li>
+                            <li class="pl-1">
+                                Don't drink water from
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold mx-1 text-black">18</span>
+                                    <input type="text" name="q18" class="ielts-input w-40" oninput="saveAnswer(18, this.value)">
+                                </span>
+                            </li>
+                            <li class="pl-1">
+                                Be careful of the
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold mx-1 text-black">19</span>
+                                    <input type="text" name="q19" class="ielts-input w-40" oninput="saveAnswer(19, this.value)">
+                                </span>
+                                as they bite
+                            </li>
+                            <li class="pl-1">
+                                Try the local
+                                <span class="inline-block whitespace-nowrap">
+                                    <span class="font-bold mx-1 text-black">20</span>
+                                    <input type="text" name="q20" class="ielts-input w-40" oninput="saveAnswer(20, this.value)">
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3 -->
+            <section id="part-3" class="mb-16 border-b border-gray-300 pb-12">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 3: Questions 21-30</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    
+                    <!-- Questions 21-24 -->
+                    <div class="mb-12">
+                        <p class="font-bold mb-2">Questions 21–24</p>
+                        <p class="mb-6 text-gray-700">Choose the correct letter, <span class="font-bold">A, B or C</span>.</p>
+                        
+                        <h3 class="font-bold text-xl mb-6 text-gray-800">Research on absence from work</h3>
+                        
+                        <div class="pl-2 lg:pl-6 space-y-8 text-lg">
+                            <!-- Q21 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">21.</span> Laura chose Burdock Engineering for her research because</p>
+                                <div class="space-y-2">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q21" value="A" onchange="saveAnswer(21, this.value)">
+                                        <span class="font-bold mr-2">A</span> she was contacted by the managing director.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q21" value="B" onchange="saveAnswer(21, this.value)">
+                                        <span class="font-bold mr-2">B</span> she knew several people who worked there.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q21" value="C" onchange="saveAnswer(21, this.value)">
+                                        <span class="font-bold mr-2">C</span> she had already done a work placement there.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Q22 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">22.</span> What does Laura agree to do regarding the central theme of her research?</p>
+                                <div class="space-y-2">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q22" value="A" onchange="saveAnswer(22, this.value)">
+                                        <span class="font-bold mr-2">A</span> check it is relevant
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q22" value="B" onchange="saveAnswer(22, this.value)">
+                                        <span class="font-bold mr-2">B</span> broaden the focus
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q22" value="C" onchange="saveAnswer(22, this.value)">
+                                        <span class="font-bold mr-2">C</span> be more specific in her aims
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q23 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">23.</span> What does Laura expect to find from her research?</p>
+                                <div class="space-y-2">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q23" value="A" onchange="saveAnswer(23, this.value)">
+                                        <span class="font-bold mr-2">A</span> Absence rates are related to the type of work done.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q23" value="B" onchange="saveAnswer(23, this.value)">
+                                        <span class="font-bold mr-2">B</span> A lot of worker absence is actually unnecessary.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q23" value="C" onchange="saveAnswer(23, this.value)">
+                                        <span class="font-bold mr-2">C</span> Employee absence rates are increasing.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q24 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">24.</span> What employee information does the tutor think Laura will be able to obtain from company records?</p>
+                                <div class="space-y-2">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q24" value="A" onchange="saveAnswer(24, this.value)">
+                                        <span class="font-bold mr-2">A</span> dates of birth
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q24" value="B" onchange="saveAnswer(24, this.value)">
+                                        <span class="font-bold mr-2">B</span> details of employment
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q24" value="C" onchange="saveAnswer(24, this.value)">
+                                        <span class="font-bold mr-2">C</span> individual records of absence
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions 25-26 -->
+                    <div class="mb-12 border-t border-gray-300 pt-8" data-q="25 26">
+                        <p class="font-bold mb-2">Questions 25 and 26</p>
+                        <p class="mb-4 text-gray-700">Choose <span class="font-bold">TWO</span> letters, <span class="font-bold">A–E</span>.</p>
+                        
+                        <p class="mb-6 text-lg text-gray-800">Which <span class="font-bold">TWO</span> recommendations does the tutor make about Laura’s questionnaire?</p>
+                        
+                        <div class="space-y-3 text-lg pl-2 lg:pl-6">
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q25_26" data-q1="25" data-q2="26" value="A" onchange="handleMultiChoice(this, 25, 26)">
+                                <span class="font-bold mr-2">A</span> Leave a space for contact details.
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q25_26" data-q1="25" data-q2="26" value="B" onchange="handleMultiChoice(this, 25, 26)">
+                                <span class="font-bold mr-2">B</span> Specify a completion date.
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q25_26" data-q1="25" data-q2="26" value="C" onchange="handleMultiChoice(this, 25, 26)">
+                                <span class="font-bold mr-2">C</span> Provide a mixture of question types.
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q25_26" data-q1="25" data-q2="26" value="D" onchange="handleMultiChoice(this, 25, 26)">
+                                <span class="font-bold mr-2">D</span> Keep the length to a minimum.
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q25_26" data-q1="25" data-q2="26" value="E" onchange="handleMultiChoice(this, 25, 26)">
+                                <span class="font-bold mr-2">E</span> Trial it on someone before finalising it.
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Questions 27-28 -->
+                    <div class="mb-12 border-t border-gray-300 pt-8" data-q="27 28">
+                        <p class="font-bold mb-2">Questions 27 and 28</p>
+                        <p class="mb-4 text-gray-700">Choose <span class="font-bold">TWO</span> letters, <span class="font-bold">A–E</span>.</p>
+                        
+                        <p class="mb-6 text-lg text-gray-800">Which <span class="font-bold">TWO</span> things will Laura explain in her covering letter to participants?</p>
+                        
+                        <div class="space-y-3 text-lg pl-2 lg:pl-6">
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="A" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">A</span> when the questionnaire should be completed
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="B" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">B</span> the fact that participation in the survey is voluntary
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="C" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">C</span> how long the questionnaire is likely to take
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="D" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">D</span> the purpose of the survey
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="E" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">E</span> the benefits of participation in the survey
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Questions 29-30 -->
+                    <div class="border-t border-gray-300 pt-8" data-q="29 30">
+                        <p class="font-bold mb-2">Questions 29 and 30</p>
+                        <p class="mb-4 text-gray-700">Choose <span class="font-bold">TWO</span> letters, <span class="font-bold">A–E</span>.</p>
+                        
+                        <p class="mb-6 text-lg text-gray-800">Which <span class="font-bold">TWO</span> activities does Laura already have definite dates for?</p>
+                        
+                        <div class="space-y-3 text-lg pl-2 lg:pl-6">
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="A" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">A</span> completion of her finished assignment
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="B" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">B</span> questionnaire distribution
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="C" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">C</span> collection of completed questionnaires
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="D" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">D</span> the next meeting with her tutor
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="E" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">E</span> analysis of figures from the company’s database
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SECTION 4 -->
+            <section id="part-4" class="mb-16">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 4: Questions 31-40</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <!-- Placeholder for Part 4 Instructions -->
+                    <p class="font-bold mb-2">Complete the notes below.</p>
+                    <p class="mb-6 font-bold uppercase text-red-600">Write ONE WORD ONLY for each answer.</p>
+                    
+                    <h3 class="text-center font-bold text-2xl mb-8 uppercase tracking-wide text-gray-800">Nanotechnology and Its Applications</h3>
+                    
+                    <div class="space-y-10 text-lg pl-2 lg:pl-8" id="part-4-content">
+                        
+                        <!-- About Nanotechnology -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">About Nanotechnology</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1">It is a study on the scale of nanometre.</li>
+                                <li class="pl-1">
+                                    The development in nanotechnology is the result of a new type of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">31</span>
+                                        <input type="text" name="q31" class="ielts-input w-40" oninput="saveAnswer(31, this.value)">
+                                    </span>.
+                                </li>
+                                <li class="pl-1">
+                                    People are worried that nanotech products are
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">32</span>
+                                        <input type="text" name="q32" class="ielts-input w-40" oninput="saveAnswer(32, this.value)">
+                                    </span>.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Food and household -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Food and household</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1">
+                                    The availability of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">33</span>
+                                        <input type="text" name="q33" class="ielts-input w-40" oninput="saveAnswer(33, this.value)">
+                                    </span>
+                                    in our diet (e.g. in potatoes) is greatly improved.
+                                </li>
+                                <li class="pl-1">
+                                    The packaging cost, particularly
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">34</span>
+                                        <input type="text" name="q34" class="ielts-input w-40" oninput="saveAnswer(34, this.value)">
+                                    </span>, is reduced.
+                                </li>
+                                <li class="pl-1">
+                                    Nanotechnology can increase the
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">35</span>
+                                        <input type="text" name="q35" class="ielts-input w-40" oninput="saveAnswer(35, this.value)">
+                                    </span>
+                                    of food.
+                                </li>
+                                <li class="pl-1">Nanotechnology can be used to make new types of furniture.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Agriculture -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Agriculture</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1">
+                                    The efficiency of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">36</span>
+                                        <input type="text" name="q36" class="ielts-input w-40" oninput="saveAnswer(36, this.value)">
+                                    </span>
+                                    is increased.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Health and medicine -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Health and medicine</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1">
+                                    Nanotubes allow more
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">37</span>
+                                        <input type="text" name="q37" class="ielts-input w-40" oninput="saveAnswer(37, this.value)">
+                                    </span>
+                                    to enter veins.
+                                </li>
+                                <li class="pl-1">
+                                    As the most popular material,
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">38</span>
+                                        <input type="text" name="q38" class="ielts-input w-40" oninput="saveAnswer(38, this.value)">
+                                    </span>
+                                    is used to kill bacteria.
+                                </li>
+                                <li class="pl-1">
+                                    Nanotechnology is also helpful in
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">39</span>
+                                        <input type="text" name="q39" class="ielts-input w-40" oninput="saveAnswer(39, this.value)">
+                                    </span>
+                                    loss program.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Cosmetic -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Cosmetic</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1">
+                                    Nanoparticles protect skin from the
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">40</span>
+                                        <input type="text" name="q40" class="ielts-input w-40" oninput="saveAnswer(40, this.value)">
+                                    </span>
+                                    and help to improve the ability against aging.
+                                </li>
+                                <li class="pl-1">Nanotechnology helps to deliver effective elements to the skin.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="ielts-footer shrink-0 flex flex-col z-10">
+        <div class="w-full overflow-x-auto footer-scroll bg-white py-2 flex justify-start lg:justify-center border-b border-pink-200">
+            <div id="pagination-grid" class="flex flex-nowrap items-center gap-3 px-4 w-max">
+                <!-- Javascript will populate 40 buttons grouped by sections here -->
+            </div>
+        </div>
+        <div class="h-12 bg-pink-50 flex justify-between items-center px-6 border-t border-pink-200">
+            <button class="flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg> Review
+            </button>
+            
+            <button onclick="submitTest()" class="bg-[#be185d] hover:bg-pink-800 text-white font-bold py-1 px-8 rounded shadow transition-colors">
+                Submit Test
+            </button>
+
+            <div class="flex gap-2">
+                <button onclick="scrollMain('up')" class="bg-white border border-gray-400 p-1 hover:bg-pink-100 rounded focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button onclick="scrollMain('down')" class="bg-white border border-gray-400 p-1 hover:bg-pink-100 rounded focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global State
+        const STORAGE_KEY = 'ieltsMockAnswers_pet_07'; // Updated for 07
+        const totalQuestions = 40;
+        let answers = {};
+        let timerSeconds = 40 * 60; // 40 minutes for listening
+        let timerInterval;
+        
+        // Initialize Audio (Assuming standard URL format for 07)
+        const bgAudio = new Audio('https://ieltschantruong.github.io/IELTS/src/listening_audios/pet_intensive_07.mp3');
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('pagination-grid');
+            grid.innerHTML = ''; // Clear fallback
+            
+            const sections = [
+                { name: "Part 1", start: 1, end: 10 },
+                { name: "Part 2", start: 11, end: 20 },
+                { name: "Part 3", start: 21, end: 30 },
+                { name: "Part 4", start: 31, end: 40 }
+            ];
+
+            sections.forEach(sec => {
+                const sectionGroup = document.createElement('div');
+                sectionGroup.className = 'flex items-center bg-gray-50 border border-pink-200 rounded px-2 py-1 shadow-sm shrink-0';
+                
+                const sectionLabel = document.createElement('span');
+                sectionLabel.className = 'text-[11px] font-bold text-gray-500 mr-2 uppercase tracking-wider whitespace-nowrap';
+                sectionLabel.innerText = sec.name;
+                sectionGroup.appendChild(sectionLabel);
+                
+                const btnRow = document.createElement('div');
+                btnRow.className = 'flex flex-nowrap items-center gap-1'; 
+                
+                for (let i = sec.start; i <= sec.end; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'q-nav-btn';
+                    btn.id = `nav-btn-${i}`;
+                    btn.innerText = i;
+                    btn.onclick = () => scrollToQuestion(i);
+                    btnRow.appendChild(btn);
+                }
+                
+                sectionGroup.appendChild(btnRow);
+                grid.appendChild(sectionGroup);
+            });
+
+            loadSavedAnswers();
+        });
+
+        function startTest() {
+            document.getElementById('start-overlay').style.display = 'none';
+            bgAudio.play().catch(error => console.log("Autoplay prevented.", error));
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                submitTest();
+                return;
+            }
+            timerSeconds--;
+            const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+            const secs = (timerSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${mins}:${secs}`;
+        }
+
+        function loadSavedAnswers() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+                for (let i = 1; i <= 40; i++) answers[i] = "";
+                return;
+            }
+            
+            try {
+                answers = JSON.parse(stored);
+                for (let i = 1; i <= 40; i++) {
+                    const val = answers[i] || "";
+                    if (val) {
+                        const navBtn = document.getElementById(`nav-btn-${i}`);
+                        if (navBtn) navBtn.classList.add('answered');
+
+                        // Fill text inputs
+                        const textInput = document.querySelector(`input[name="q${i}"]`);
+                        if (textInput && textInput.type === 'text') {
+                            textInput.value = val;
+                        }
+
+                        // Check radio/checkboxes 
+                        let choiceInput = document.querySelector(`input[name="q${i}"][value="${val}"]`);
+                        if (!choiceInput) {
+                            // Check grouped multi-choice Checkboxes (like Q25-26)
+                            choiceInput = document.querySelector(`input[data-q1="${i}"][value="${val}"], input[data-q2="${i}"][value="${val}"]`);
+                        }
+                        
+                        if (choiceInput && (choiceInput.type === 'radio' || choiceInput.type === 'checkbox')) {
+                            choiceInput.checked = true;
+                        }
+
+                        // Restore Drag & Drop
+                        const dropzone = document.querySelector(`.dropzone[data-q="${i}"]`);
+                        if (dropzone) {
+                            const draggable = document.querySelector(`.draggable-item[data-value="${val}"]`);
+                            if (draggable) {
+                                let draggableToAppend = draggable;
+                                if (draggable.hasAttribute('data-reusable')) {
+                                    draggableToAppend = draggable.cloneNode(true);
+                                    draggableToAppend.id = draggable.id + '-restored-' + i;
+                                    draggableToAppend.removeAttribute('data-reusable');
+                                }
+                                styleDraggedItem(draggableToAppend);
+                                dropzone.appendChild(draggableToAppend);
+                            }
+                        }
+                    }
+                }
+            } catch(e) {
+                for (let i = 1; i <= 40; i++) answers[i] = "";
+            }
+        }
+
+        function saveAnswer(qNum, value) {
+            answers[qNum] = value.trim();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+            
+            const navBtn = document.getElementById(`nav-btn-${qNum}`);
+            if (answers[qNum] !== "") {
+                navBtn.classList.add('answered');
+            } else {
+                navBtn.classList.remove('answered');
+            }
+        }
+        
+        function handleMultiChoice(el, startQ, endQ) {
+            const groupName = el.name;
+            const checkboxes = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+            const maxAllowed = endQ - startQ + 1;
+            
+            if (checkboxes.length > maxAllowed) {
+                el.checked = false; // Prevent checking more than allowed
+                return;
+            }
+            
+            // Clear current answers for this question range
+            for (let i = startQ; i <= endQ; i++) {
+                saveAnswer(i, "");
+            }
+            
+            // Save newly checked answers sequentially
+            checkboxes.forEach((cb, index) => {
+                saveAnswer(startQ + index, cb.value);
+            });
+        }
+
+        function scrollToQuestion(qNum) {
+            let el = document.querySelector(`[data-q~="${qNum}"]`);
+            if (!el) el = document.querySelector(`input[name="q${qNum}"]`);
+            
+            if (el) {
+                document.querySelectorAll('.q-nav-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`nav-btn-${qNum}`).classList.add('active');
+
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                if (el.tagName === 'INPUT' && el.type === 'text') {
+                    setTimeout(() => el.focus(), 500);
+                }
+            }
+        }
+
+        function scrollMain(dir) {
+            const main = document.getElementById('main-scroll-area');
+            const amount = window.innerHeight * 0.6;
+            main.scrollBy({ top: dir === 'down' ? amount : -amount, behavior: 'smooth' });
+        }
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            bgAudio.pause();
+            
+            for (let i = 1; i <= 40; i++) {
+                if (answers[i] === undefined) answers[i] = "";
+            }
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+            window.location.href = 'result_view_pet_intensive_07.html'; // Updated target for 07
+        }
+
+        // --- Drag and Drop Logic ---
+        function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add('drag-over'); }
+        function dragLeave(ev) { ev.target.classList.remove('drag-over'); }
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.dataTransfer.setData("value", ev.target.getAttribute('data-value'));
+        }
+        
+        function styleDraggedItem(el) {
+            el.style.padding = '0px 8px';
+            el.style.border = 'none';
+            el.style.backgroundColor = 'transparent';
+            el.style.color = '#be185d';
+        }
+
+        function resetDraggedItem(el) {
+            el.style.padding = '8px 12px';
+            el.style.border = '2px solid #be185d';
+            el.style.backgroundColor = 'white';
+            el.style.color = 'black';
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            ev.target.classList.remove('drag-over');
+            
+            let dropzone = ev.target;
+            if (!dropzone.classList.contains('dropzone')) {
+                dropzone = dropzone.closest('.dropzone');
+            }
+            
+            if (dropzone) {
+                const dataId = ev.dataTransfer.getData("text");
+                const answerValue = ev.dataTransfer.getData("value");
+                let draggedElement = document.getElementById(dataId);
+                
+                // Handle reusable items from the bank
+                if (draggedElement && draggedElement.hasAttribute('data-reusable')) {
+                    draggedElement = draggedElement.cloneNode(true);
+                    draggedElement.id = dataId + '-clone-' + Date.now();
+                    draggedElement.removeAttribute('data-reusable');
+                }
+                
+                // If dropzone already has an item, return it to its original bank
+                if (dropzone.children.length > 0) {
+                    const existingChild = dropzone.children[0];
+                    const existingBankId = existingChild.getAttribute('data-bank');
+                    const existingBank = document.getElementById(existingBankId);
+                    if (existingBank && !existingChild.id.includes('-clone-') && !existingChild.id.includes('-restored-')) {
+                        resetDraggedItem(existingChild);
+                        existingBank.appendChild(existingChild);
+                    } else {
+                        // It was a clone, just remove it
+                        existingChild.remove();
+                    }
+                }
+                
+                // Append the new dragged element and update styles
+                styleDraggedItem(draggedElement);
+                dropzone.appendChild(draggedElement);
+                
+                // Save Answer
+                const qNum = dropzone.getAttribute('data-q');
+                saveAnswer(qNum, answerValue);
+            }
+        }
+        
+        // Double click to remove from dropzone back to bank
+        document.addEventListener('dblclick', function(e) {
+            const target = e.target;
+            if (target.classList.contains('draggable-item') && target.parentElement.classList.contains('dropzone')) {
+                const dropzone = target.parentElement;
+                const qNum = dropzone.getAttribute('data-q');
+                
+                // If it's a clone, just delete it
+                if (target.id.includes('-clone-') || target.id.includes('-restored-')) {
+                    target.remove();
+                } else {
+                    const bankId = target.getAttribute('data-bank');
+                    const bank = document.getElementById(bankId);
+                    
+                    if (bank) {
+                        resetDraggedItem(target);
+                        bank.appendChild(target);
+                    }
+                }
+                saveAnswer(qNum, ""); // Clear the answer
+            }
+        });
+    </script>
+</body>
+</html>
