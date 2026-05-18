@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Passage | E-Training - Vocabulary</title>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --primary-light: #e0e7ff;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #3730a3;
+            --border: #a5b4fc;
+            --badge-bg: #c7d2fe;
+            --badge-text: #312e81;
+            --success: #059669; /* Green for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(79, 70, 229, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        .phonetic { font-size: 0.95rem; color: var(--text-muted); font-style: italic; }
+        .word-form { background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+        .usage-note { font-size: 0.9rem; margin-bottom: 1rem; color: #475569; background: #f1f5f9; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid #94a3b8; flex-grow: 1; }
+        .usage-note strong { color: var(--text-main); font-style: normal; font-weight: 600; }
+        .usage-vi { color: #64748b; font-style: italic; display: block; margin-top: 0.25rem; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 520px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.1); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.2rem; margin-bottom: 1rem; color: var(--primary); }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .phonetic { font-size: 1.2rem; color: var(--text-muted); }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .usage-note { width: 100%; font-size: 0.95rem; padding: 0.5rem; margin-bottom: 1rem; }
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 550px; } 
+            .flashcard-front .word { font-size: 1.8rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>Reading Passage | E-Training</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
+        <button class="filter-btn" onclick="filterTopic('Business & Economics')">Business & Economics</button>
+        <button class="filter-btn" onclick="filterTopic('Learning & Methodology')">Learning & Methodology</button>
+        <button class="filter-btn" onclick="filterTopic('Implementation & Evaluation')">Implementation & Evaluation</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="word-form" id="fc-form">Verb</span>
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div class="usage-note" id="fc-usage"><strong>Usage:</strong> Usage goes here.</div>
+                    <div class="example-box">
+                        <span>Reading Context</span>
+                        <div id="fc-example">"Example sentence goes here."</div>
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 32</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (Reading Passage | E-Training)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- CATEGORY 1: Business & Economics ---
+        { topic: "Business & Economics", word: "The lion's share", form: "Idiom", phonetic: "/ðə ˈlaɪ.ənz ʃeər/", def: "The largest part or majority of something.", translation: "Phần lớn nhất, phần đáng kể nhất", usage: "Used to emphasize that one component takes up most of a total amount.<span class='usage-vi'>(Nhấn mạnh một thành phần chiếm phần lớn trong tổng số.)</span>", example: "Cutting the travel expenses... accounts for the lion's share of the savings." },
+        { topic: "Business & Economics", word: "Scalability", form: "Noun", phonetic: "/ˌskeɪ.ləˈbɪl.ə.ti/", def: "The capacity to be changed in size or scale, especially to handle growth.", translation: "Khả năng mở rộng quy mô", usage: "Very common in tech and business to describe systems that can grow easily.<span class='usage-vi'>(Rất phổ biến trong kinh doanh và công nghệ để chỉ hệ thống dễ phát triển.)</span>", example: "Ernst and Young reduced training costs... while improving consistency and scalability." },
+        { topic: "Business & Economics", word: "Pay for itself", form: "Phrase", phonetic: "/peɪ fɔːr ɪtˈself/", def: "To save as much money as it originally cost to buy or implement.", translation: "Hoàn vốn, sinh lời đủ bù chi phí", usage: "Used to justify an expensive initial investment.<span class='usage-vi'>(Dùng để biện minh cho một khoản đầu tư ban đầu đắt đỏ.)</span>", example: "For those companies that have a large enough staff, the e-training concept pays for itself." },
+        { topic: "Business & Economics", word: "Outsource", form: "Verb", phonetic: "/ˈaʊt.sɔːs/", def: "To obtain goods or services from an outside or foreign supplier.", translation: "Thuê ngoài, gia công phần mềm", usage: "A core business term for hiring external companies to do specific jobs.<span class='usage-vi'>(Thuật ngữ kinh doanh cốt lõi chỉ việc thuê các công ty bên ngoài làm việc.)</span>", example: "This technology platform... can either be installed onsite or outsourced." },
+        { topic: "Business & Economics", word: "Infrastructure", form: "Noun", phonetic: "/ˈɪn.frəˌstrʌk.tʃər/", def: "The basic physical and organizational structures and facilities needed for operation.", translation: "Cơ sở hạ tầng", usage: "Can refer to physical things (roads, buildings) or digital (servers, networks).<span class='usage-vi'>(Có thể chỉ những thứ vật chất như đường sá hoặc kỹ thuật số như máy chủ.)</span>", example: "For the LMS infrastructure and a dozen or so online courses, costs can top $500,000..." },
+        { topic: "Business & Economics", word: "High priority", form: "Noun Phrase", phonetic: "/haɪ praɪˈɒr.ə.ti/", def: "A thing that is regarded as more important than others and needs to be dealt with first.", translation: "Ưu tiên hàng đầu", usage: "Used when a company or person focuses heavily on a specific goal.<span class='usage-vi'>(Dùng khi một công ty hoặc cá nhân tập trung cao độ vào một mục tiêu.)</span>", example: "...have made e-learning a high priority for many corporations." },
+        { topic: "Business & Economics", word: "In the range of", form: "Phrase", phonetic: "/ɪn ðə reɪndʒ əv/", def: "Approximately a specified amount or within certain limits.", translation: "Trong khoảng, xấp xỉ", usage: "A formal alternative to saying 'around' or 'about' when quoting numbers.<span class='usage-vi'>(Từ thay thế trang trọng cho 'around' khi trích dẫn các con số.)</span>", example: "...saved the company in the range of $200 million in 1999." },
+
+        // --- CATEGORY 2: Learning & Methodology ---
+        { topic: "Learning & Methodology", word: "Standardized delivery", form: "Noun Phrase", phonetic: "/ˈstæn.də.daɪzd dɪˈlɪv.ər.i/", def: "Providing education or training in a uniform, consistent manner to everyone.", translation: "Phân phối/Giảng dạy theo tiêu chuẩn", usage: "Describes courses where every student receives the exact same material.<span class='usage-vi'>(Miêu tả các khóa học mà mọi học sinh đều nhận được tài liệu giống hệt nhau.)</span>", example: "...other advantages such as convenience, standardized delivery..." },
+        { topic: "Learning & Methodology", word: "Self-paced learning", form: "Noun Phrase", phonetic: "/self-peɪst ˈlɜː.nɪŋ/", def: "Learning that moves at a speed set by the learner rather than an instructor.", translation: "Học theo nhịp độ cá nhân", usage: "A major benefit of online education.<span class='usage-vi'>(Một lợi ích lớn của giáo dục trực tuyến.)</span>", example: "...standardized delivery, self-paced learning, and variety of available content..." },
+        { topic: "Learning & Methodology", word: "Blended approach", form: "Noun Phrase", phonetic: "/ˈblen.dɪd əˈprəʊtʃ/", def: "An education style combining online and traditional in-person teaching.", translation: "Phương pháp kết hợp (trực tuyến và trực tiếp)", usage: "Highly relevant in modern education discussions.<span class='usage-vi'>(Rất phù hợp trong các cuộc thảo luận về giáo dục hiện đại.)</span>", example: "...training experts recommend a 'blended' approach that combines both..." },
+        { topic: "Learning & Methodology", word: "Engage with", form: "Phrasal Verb", phonetic: "/ɪnˈɡeɪdʒ wɪð/", def: "To interact with, become involved with, or pay attention to something.", translation: "Tương tác với, tiếp xúc với", usage: "A high-level way to say 'interact' or 'use'.<span class='usage-vi'>(Cách nói cấp cao của 'interact' hoặc 'use'.)</span>", example: "Many people can engage with rich learning materials..." },
+        { topic: "Learning & Methodology", word: "Computer literacy", form: "Noun Phrase", phonetic: "/kəmˈpjuː.tər ˈlɪt.ər.ə.si/", def: "The ability to use computers and related technology efficiently.", translation: "Kiến thức/kỹ năng tin học", usage: "A key prerequisite for participating in e-learning.<span class='usage-vi'>(Điều kiện tiên quyết để tham gia học trực tuyến.)</span>", example: "Finally, teaching materials require computer literacy and access to equipment." },
+        { topic: "Learning & Methodology", word: "Outperform", form: "Verb", phonetic: "/ˌaʊt.pəˈfɔːm/", def: "To perform better than someone or something else.", translation: "Làm tốt hơn, vượt trội hơn", usage: "Used when comparing results, grades, or business metrics.<span class='usage-vi'>(Dùng khi so sánh kết quả, điểm số hoặc số liệu kinh doanh.)</span>", example: "...where the distance learners outperformed the traditional learners." },
+        { topic: "Learning & Methodology", word: "Impart", form: "Verb", phonetic: "/ɪmˈpɑːt/", def: "To make (information or values) known; to communicate.", translation: "Truyền đạt", usage: "A formal verb often collocated with 'knowledge' or 'values'.<span class='usage-vi'>(Động từ trang trọng thường đi với 'kiến thức' hoặc 'giá trị'.)</span>", example: "For instance, it's rather ineffective imparting cultural values or building teams." },
+        { topic: "Learning & Methodology", word: "Convey", form: "Verb", phonetic: "/kənˈveɪ/", def: "To make an idea, impression, or feeling known or understandable to someone.", translation: "Truyền tải", usage: "Similar to 'impart' but often used for ideas, meanings, or culture.<span class='usage-vi'>(Tương tự như 'impart' nhưng thường dùng cho ý tưởng, ý nghĩa hoặc văn hóa.)</span>", example: "...it would be difficult to convey that to first time employees through a computer monitor." },
+        { topic: "Learning & Methodology", word: "Go-between", form: "Adjective / Noun", phonetic: "/ˈɡəʊ.bɪˌtwiːn/", def: "Acting as an intermediate step, style, or mediator.", translation: "Đóng vai trò trung gian, cầu nối", usage: "In this context, it describes a hybrid style of learning.<span class='usage-vi'>(Trong ngữ cảnh này, nó miêu tả một phong cách học tập lai/trung gian.)</span>", example: "Nowadays, a go-between style of the Blended learning... is gaining popularity." },
+        { topic: "Learning & Methodology", word: "Unifying term", form: "Noun Phrase", phonetic: "/ˈjuː.nɪ.faɪ.ɪŋ tɜːm/", def: "A word or phrase that brings together multiple related concepts under one name.", translation: "Thuật ngữ chung / hợp nhất", usage: "Used when defining a broad category.<span class='usage-vi'>(Dùng khi định nghĩa một danh mục rộng lớn.)</span>", example: "E-learning is the unifying term to describe the fields of online learning..." },
+
+        // --- CATEGORY 3: Implementation & Evaluation ---
+        { topic: "Implementation & Evaluation", word: "End-all solution", form: "Noun Phrase", phonetic: "/end-ɔːl səˈluː.ʃən/", def: "A complete and final answer that fixes every aspect of a problem.", translation: "Giải pháp toàn diện / tối hậu", usage: "Often used in the negative to say something is helpful, but not perfect.<span class='usage-vi'>(Thường dùng ở dạng phủ định để nói rằng điều gì đó có ích, nhưng không hoàn hảo.)</span>", example: "E-learning is not an end-all solution." },
+        { topic: "Implementation & Evaluation", word: "Circumvent", form: "Verb", phonetic: "/ˌsɜː.kəmˈvent/", def: "To find a way around an obstacle; to overcome a problem cleverly.", translation: "Lách qua, tránh khỏi", usage: "A high-level word indicating avoiding rules or typical problems.<span class='usage-vi'>(Từ cấp cao chỉ việc né tránh các quy tắc hoặc vấn đề điển hình.)</span>", example: "It now looks as if there is a way to circumvent these traditional training drawbacks." },
+        { topic: "Implementation & Evaluation", word: "Drawback", form: "Noun", phonetic: "/ˈdrɔː.bæk/", def: "A feature that renders something less acceptable; a disadvantage.", translation: "Hạn chế, nhược điểm", usage: "A common alternative to 'disadvantage' in IELTS essays.<span class='usage-vi'>(Một từ thay thế phổ biến cho 'disadvantage' trong các bài luận IELTS.)</span>", example: "...circumvent these traditional training drawbacks." },
+        { topic: "Implementation & Evaluation", word: "Limitation", form: "Noun", phonetic: "/ˌlɪm.ɪˈteɪ.ʃən/", def: "A limiting rule or circumstance; a restriction.", translation: "Sự giới hạn", usage: "Often refers to physical or technological bounds.<span class='usage-vi'>(Thường đề cập đến giới hạn vật lý hoặc công nghệ.)</span>", example: "For one thing, bandwidth limitations are still an issue..." },
+        { topic: "Implementation & Evaluation", word: "Run the risk of", form: "Phrase", phonetic: "/rʌn ðə rɪsk əv/", def: "To do something that could result in a negative outcome.", translation: "Chịu rủi ro, có nguy cơ", usage: "Used to highlight potential negative consequences.<span class='usage-vi'>(Dùng để làm nổi bật những hậu quả tiêu cực tiềm ẩn.)</span>", example: "...the traditional route of classroom instruction runs the risk of being expensive..." },
+        { topic: "Implementation & Evaluation", word: "Hold great promise", form: "Phrase", phonetic: "/həʊld ɡreɪt ˈprɒm.ɪs/", def: "To show potential for future success or excellence.", translation: "Đầy hứa hẹn", usage: "A positive phrase indicating strong potential.<span class='usage-vi'>(Một cụm từ tích cực chỉ tiềm năng mạnh mẽ.)</span>", example: "For teaching specific information and skills, e-training holds great promise." },
+        { topic: "Implementation & Evaluation", word: "Institution", form: "Noun", phonetic: "/ˌɪn.stɪˈtjuː.ʃən/", def: "The action of establishing or introducing a system, practice, or program.", translation: "Sự thiết lập, sự thực thi", usage: "Not just a building; here it means the 'creation' or 'roll-out' of a program.<span class='usage-vi'>(Không chỉ là tòa nhà; ở đây nó có nghĩa là việc 'tạo ra' hoặc 'triển khai' một chương trình.)</span>", example: "...claims that the institution of its e-training program, Basic Blue..." },
+        { topic: "Implementation & Evaluation", word: "Implement", form: "Verb", phonetic: "/ˈɪm.plɪ.ment/", def: "To put a decision, plan, or agreement into effect.", translation: "Thực thi, triển khai", usage: "A crucial academic verb for putting ideas into practice.<span class='usage-vi'>(Một động từ học thuật quan trọng để đưa ý tưởng vào thực tế.)</span>", example: "Much of the discussion about implementing e-learning has focused on the technology..." },
+        { topic: "Implementation & Evaluation", word: "Address", form: "Verb", phonetic: "/əˈdres/", def: "To think about and begin to deal with an issue or problem.", translation: "Giải quyết, đối phó", usage: "Often paired with 'issue', 'problem', or 'topic'.<span class='usage-vi'>(Thường đi cùng với 'issue', 'problem' hoặc 'topic'.)</span>", example: "E-learning also seems to effectively address topics such as sexual harassment education..." },
+        { topic: "Implementation & Evaluation", word: "Integrate", form: "Verb", phonetic: "/ˈɪn.tɪ.ɡreɪt/", def: "To combine one thing with another so that they become a whole.", translation: "Tích hợp", usage: "Key word in technology and education.<span class='usage-vi'>(Từ khóa trong công nghệ và giáo dục.)</span>", example: "E-training promises... by integrating audio, video, animation..." },
+        { topic: "Implementation & Evaluation", word: "Acquire", form: "Verb", phonetic: "/əˈkwaɪər/", def: "To learn or develop a skill, habit, or quality.", translation: "Tiếp thu, có được", usage: "A formal alternative to 'get' or 'learn'.<span class='usage-vi'>(Sự thay thế trang trọng cho 'get' hoặc 'learn'.)</span>", example: "...systematic research is needed to confirm that learners are actually acquiring and using the skills..." },
+        { topic: "Implementation & Evaluation", word: "Debate", form: "Verb", phonetic: "/dɪˈbeɪt/", def: "To argue about a subject, especially in a formal manner.", translation: "Tranh luận", usage: "Used here as a verb to mean 'question' or 'argue against'.<span class='usage-vi'>(Dùng ở đây như một động từ có nghĩa là 'đặt câu hỏi' hoặc 'tranh cãi chống lại'.)</span>", example: "While few people debate the obvious advantages of e-learning..." },
+        { topic: "Implementation & Evaluation", word: "Systematic research", form: "Noun Phrase", phonetic: "/ˌsɪs.təˈmæt.ɪk rɪˈsɜːtʃ/", def: "Structured, planned, and objective study to establish facts.", translation: "Nghiên cứu có hệ thống", usage: "An academic phrase highlighting the need for hard evidence.<span class='usage-vi'>(Một cụm từ học thuật nhấn mạnh sự cần thiết của bằng chứng vững chắc.)</span>", example: "...systematic research is needed to confirm that learners are actually acquiring..." },
+        { topic: "Implementation & Evaluation", word: "Proponent", form: "Noun", phonetic: "/prəˈpəʊ.nənt/", def: "A person who advocates for a theory, proposal, or project.", translation: "Người ủng hộ", usage: "Opposite of 'opponent'. Good for essay writing.<span class='usage-vi'>(Trái nghĩa với 'opponent'. Tốt cho việc viết luận.)</span>", example: "According to its proponents, the strategy creates a more integrated approach..." },
+        { topic: "Implementation & Evaluation", word: "Currency", form: "Noun", phonetic: "/ˈkʌr.ən.si/", def: "The state of being up-to-date or currently relevant.", translation: "Tính cập nhật, thời sự", usage: "Not just money! Here it means keeping course material fresh and relevant.<span class='usage-vi'>(Không chỉ là tiền bạc! Ở đây nó có nghĩa là giữ cho tài liệu khóa học mới mẻ và phù hợp.)</span>", example: "...to keep the course at the appropriate level of currency and usefulness." }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="word-form">${item.form}</span>
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                <div class="usage-note"><strong>Usage:</strong> ${item.usage}</div>
+                <div class="example-box"><span>Reading Context</span>"${item.example}"</div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter.includes('Business')) topicName = 'Business & Economics';
+            if (activeFilter.includes('Learning')) topicName = 'Learning & Methodology';
+            if (activeFilter.includes('Implementation')) topicName = 'Implementation & Evaluation';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-form').textContent = data.form;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            document.getElementById('fc-usage').innerHTML = `<strong>Usage:</strong> ${data.usage}`;
+            document.getElementById('fc-example').textContent = data.example;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
