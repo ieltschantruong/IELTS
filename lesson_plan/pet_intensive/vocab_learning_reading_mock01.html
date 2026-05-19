@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Reading Mock Test 1 - Vocabulary</title>
+    <style>
+        :root {
+            --primary: #0284c7; /* Sky Blue */
+            --primary-light: #e0f2fe;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #0369a1;
+            --border: #bae6fd;
+            --badge-bg: #bae6fd;
+            --badge-text: #075985;
+            --success: #16a34a; /* Contrasting green for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(2, 132, 199, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        .phonetic { font-size: 0.95rem; color: var(--text-muted); font-style: italic; }
+        .word-form { background-color: var(--badge-bg); color: var(--badge-text); font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+        
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+        .usage-note { font-size: 0.9rem; margin-bottom: 1rem; color: #475569; background: #f1f5f9; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid #94a3b8; flex-grow: 1; }
+        .usage-note strong { color: var(--text-main); font-style: normal; font-weight: 600; }
+        .usage-vi { color: #64748b; font-style: italic; display: block; margin-top: 0.25rem; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+
+        .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
+        .extra-example span { color: #475569; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 580px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.1); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.2rem; margin-bottom: 1rem; color: var(--primary); }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .phonetic { font-size: 1.2rem; color: var(--text-muted); }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .usage-note { width: 100%; font-size: 0.95rem; padding: 0.5rem; margin-bottom: 1rem; }
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2.2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>PET Reading Mock Test 1 - Vocabulary</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
+        <button class="filter-btn" onclick="filterTopic('Health & Communities')">Health & Communities</button>
+        <button class="filter-btn" onclick="filterTopic('Organisational Management')">Organisational Management</button>
+        <button class="filter-btn" onclick="filterTopic('History & Sociology')">History & Sociology</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="word-form" id="fc-form">Verb</span>
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div class="usage-note" id="fc-usage"><strong>Usage:</strong> Usage goes here.</div>
+                    <div id="fc-example-container" style="width: 100%;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 30</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Reading Mock Test 1)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- CATEGORY 1: Health & Communities (Passage 1) ---
+        { topic: "Health & Communities", word: "Remote", form: "Adjective", phonetic: "/rɪˈməʊt/", def: "Situated far from the main centres of population; distant.", translation: "Hẻo lánh, xa xôi", usage: "Describes locations or communities far from cities.<span class='usage-vi'>(Miêu tả các địa điểm hoặc cộng đồng cách xa thành phố.)</span>", example: "Australians living or traveling in rural and remote areas can face particular difficulties...", extraExample: "The documentary featured a remote mountain village that had no internet access." },
+        { topic: "Health & Communities", word: "Disparate", form: "Adjective", phonetic: "/ˈdɪspərət/", def: "Fundamentally different or distinct in quality or kind.", translation: "Khác biệt, đa dạng", usage: "A high-level word replacing 'different' or 'diverse'.<span class='usage-vi'>(Từ vựng cấp cao thay thế cho 'different' hoặc 'diverse'.)</span>", example: "These include providing care to disparate communities with no established dental facilities...", extraExample: "The meeting brought together disparate groups with completely different political views." },
+        { topic: "Health & Communities", word: "Incidence", form: "Noun", phonetic: "/ˈɪnsɪdəns/", def: "The occurrence, rate, or frequency of a disease, crime, or undesirable thing.", translation: "Tỷ lệ mắc phải, sự phát sinh", usage: "Common in medical and scientific texts.<span class='usage-vi'>(Phổ biến trong các văn bản y tế và khoa học.)</span>", example: "...and dealing with higher incidences of other diseases which are linked to... poor dental health.", extraExample: "There has been a noticeable decrease in the incidence of flu this winter." },
+        { topic: "Health & Communities", word: "Deterioration", form: "Noun", phonetic: "/dɪˌtɪəriəˈreɪʃn/", def: "The process of becoming progressively worse.", translation: "Sự suy giảm, sự xuống cấp", usage: "Used to describe declining health, weather, or structures.<span class='usage-vi'>(Dùng để miêu tả sức khỏe, thời tiết, hoặc cấu trúc đang suy yếu.)</span>", example: "...consequently, people in remote areas are more likely to have tooth decay (the blackening and deterioration of teeth)...", extraExample: "The sudden deterioration of the weather forced us to cancel the picnic." },
+        { topic: "Health & Communities", word: "Counterpart", form: "Noun", phonetic: "/ˈkaʊntəpɑːt/", def: "A person or thing holding a position or performing a function that corresponds to another.", translation: "Bản sao, đối tác, người đồng cấp", usage: "Used to compare two similar groups in different places.<span class='usage-vi'>(Dùng để so sánh hai nhóm tương tự ở các khu vực khác nhau.)</span>", example: "...receive less education about good dental hygiene than their city counterparts do.", extraExample: "The CEO of the American company met with her European counterpart to discuss the merger." },
+        { topic: "Health & Communities", word: "Take for granted", form: "Phrase", phonetic: "/teɪk fɔː ˈɡrɑːntɪd/", def: "To fail to properly appreciate someone or something, often because it is very familiar.", translation: "Coi là điều hiển nhiên", usage: "Describes something you don't appreciate until it's gone.<span class='usage-vi'>(Miêu tả điều gì đó bạn không trân trọng cho đến khi mất đi.)</span>", example: "Australians in very remote communities might not be aware of things that people in cities take for granted...", extraExample: "We often take our health for granted until we get sick." },
+        { topic: "Health & Communities", word: "Initiative", form: "Noun", phonetic: "/ɪˈnɪʃətɪv/", def: "An act or strategy intended to resolve a difficulty or improve a situation.", translation: "Sáng kiến, chương trình hành động", usage: "Often refers to government or health programs.<span class='usage-vi'>(Thường đề cập đến các chương trình của chính phủ hoặc y tế.)</span>", example: "Its presence... supports important oral hygiene and health initiatives.", extraExample: "The local government launched a new recycling initiative to reduce plastic waste." },
+        { topic: "Health & Communities", word: "All-rounder", form: "Noun", phonetic: "/ˌɔːlˈraʊndə/", def: "A person who has many different skills and abilities.", translation: "Người toàn diện (giỏi nhiều thứ)", usage: "Describes someone who doesn't specialize in just one thing.<span class='usage-vi'>(Miêu tả người không chỉ chuyên về một thứ duy nhất.)</span>", example: "While dentists in town or city centres can specialise... RFDS dentists need to be 'all-rounders'.", extraExample: "She is a true all-rounder, excelling in both academics and sports." },
+
+        // --- CATEGORY 2: Organisational Management (Passage 2) ---
+        { topic: "Organisational Management", word: "Hierarchical", form: "Adjective", phonetic: "/ˌhaɪəˈrɑːkɪkl/", def: "Arranged in order of rank or authority.", translation: "Phân cấp, có thứ bậc", usage: "Crucial for describing traditional company structures.<span class='usage-vi'>(Rất quan trọng để miêu tả cấu trúc công ty truyền thống.)</span>", example: "They believed that the most efficient organisations had a legalised, formal and hierarchical structure...", extraExample: "The military is a classic example of a hierarchical organization." },
+        { topic: "Organisational Management", word: "Bureaucracy", form: "Noun", phonetic: "/bjʊəˈrɒkrəsi/", def: "A system of administration in which most important decisions are taken by officials.", translation: "Chế độ quan liêu, bộ máy hành chính", usage: "Often has negative connotations today, meaning too many rules.<span class='usage-vi'>(Ngày nay thường có ý nghĩa tiêu cực, ám chỉ quá nhiều quy tắc.)</span>", example: "...a legalised, formal and hierarchical structure called a 'bureaucracy'.", extraExample: "Many citizens complain about the bureaucracy involved in getting a simple building permit." },
+        { topic: "Organisational Management", word: "Connotation", form: "Noun", phonetic: "/ˌkɒnəˈteɪʃn/", def: "An idea or feeling that a word invokes in addition to its literal meaning.", translation: "Hàm ý, ý nghĩa liên tưởng", usage: "Used when discussing the hidden feelings behind words.<span class='usage-vi'>(Dùng khi thảo luận về những cảm xúc ẩn giấu đằng sau từ ngữ.)</span>", example: "Today the word 'bureaucracy' sometimes has negative connotations.", extraExample: "The word 'bossy' often has a negative connotation compared to 'assertive'." },
+        { topic: "Organisational Management", word: "Commend", form: "Verb", phonetic: "/kəˈmend/", def: "To praise formally or officially.", translation: "Tán dương, ca ngợi", usage: "A formal alternative to 'praise'.<span class='usage-vi'>(Một từ thay thế trang trọng cho 'praise'.)</span>", example: "Early management writers, however, commended bureaucracy as an organisational design...", extraExample: "The firefighter was officially commended for his bravery during the rescue." },
+        { topic: "Organisational Management", word: "Favouritism", form: "Noun", phonetic: "/ˈfeɪvərɪtɪzəm/", def: "The practice of giving unfair preferential treatment to one person or group.", translation: "Sự thiên vị", usage: "Often discussed as a negative trait in management.<span class='usage-vi'>(Thường được thảo luận như một đặc điểm tiêu cực trong quản lý.)</span>", example: "...promotion of people based on ability and experience, rather than favouritism or whim.", extraExample: "The manager was accused of favouritism after promoting his nephew to team leader." },
+        { topic: "Organisational Management", word: "Dogmatically", form: "Adverb", phonetic: "/dɒɡˈmætɪkli/", def: "In a rigid or arrogant manner that does not allow for discussion.", translation: "Một cách giáo điều, rập khuôn", usage: "Describes applying rules without thinking about context.<span class='usage-vi'>(Miêu tả việc áp dụng luật lệ mà không suy nghĩ đến ngữ cảnh.)</span>", example: "...some of the major advantages... could become disadvantages if the theory were applied dogmatically.", extraExample: "He dogmatically defended his beliefs, refusing to listen to any other perspectives." },
+        { topic: "Organisational Management", word: "Adhere to", form: "Phrasal Verb", phonetic: "/ədˈhɪə tuː/", def: "To stick firmly to a rule, belief, or physical surface.", translation: "Tuân thủ chặt chẽ", usage: "A high-level alternative to 'follow' or 'obey'.<span class='usage-vi'>(Một từ thay thế cấp cao cho 'follow' hoặc 'obey'.)</span>", example: "...the safeguards against favouritism could be rigidly imposed by adhering excessively to rules...", extraExample: "All staff members must strictly adhere to the company's safety guidelines." },
+        { topic: "Organisational Management", word: "Inadequacy", form: "Noun", phonetic: "/ɪnˈædɪkwəsi/", def: "The state of lacking the quality or quantity required.", translation: "Sự thiếu sót, sự không tương xứng", usage: "Used when a system or person is not good enough.<span class='usage-vi'>(Dùng khi một hệ thống hoặc con người không đủ tốt.)</span>", example: "...attempted to deal with the major inadequacy of the classical bureaucratic model: neglect of the human element.", extraExample: "The report highlighted the inadequacy of the current public transport system." },
+        { topic: "Organisational Management", word: "Subordinate", form: "Noun", phonetic: "/səˈbɔːdɪnət/", def: "A person under the authority or control of another within an organisation.", translation: "Cấp dưới", usage: "Opposite of 'manager' or 'superior'.<span class='usage-vi'>(Trái nghĩa với 'manager' hoặc 'superior'.)</span>", example: "The rigid formal hierarchy is designed to maintain managers' power over subordinates.", extraExample: "A good leader listens to the ideas and concerns of their subordinates." },
+        { topic: "Organisational Management", word: "Domination", form: "Noun", phonetic: "/ˌdɒmɪˈneɪʃn/", def: "The exercise of control or influence over someone or something.", translation: "Sự thống trị, sự chi phối", usage: "A strong word for absolute control.<span class='usage-vi'>(Một từ mạnh mẽ chỉ sự kiểm soát tuyệt đối.)</span>", example: "He argued that managerial domination makes subordinates passive and dependent...", extraExample: "The team's domination of the championship has lasted for three consecutive years." },
+        { topic: "Organisational Management", word: "Authoritarian", form: "Adjective", phonetic: "/ɔːˌθɒrɪˈteəriən/", def: "Favouring or enforcing strict obedience to authority at the expense of personal freedom.", translation: "Độc đoán, độc tài", usage: "Describes strict leaders or governments.<span class='usage-vi'>(Miêu tả các nhà lãnh đạo hoặc chính phủ nghiêm khắc.)</span>", example: "...managers who encouraged their subordinates could motivate them more than traditional authoritarian managers.", extraExample: "The authoritarian teacher did not allow students to ask questions during the lecture." },
+        { topic: "Organisational Management", word: "Compensate for", form: "Phrasal Verb", phonetic: "/ˈkɒmpenseɪt fɔː/", def: "To make up for a weakness, loss, or lack of something.", translation: "Bù đắp cho", usage: "Used when providing something good to balance something bad.<span class='usage-vi'>(Dùng khi cung cấp một điều tốt để cân bằng lại một điều xấu.)</span>", example: "The neoclassical approach to organisational design compensates for limitations in the traditional classical model...", extraExample: "She practiced extra hard to compensate for her lack of natural musical talent." },
+
+        // --- CATEGORY 3: History & Sociology (Passage 3) ---
+        { topic: "History & Sociology", word: "Endurance", form: "Noun", phonetic: "/ɪnˈdjʊərəns/", def: "The ability to withstand an unpleasant or difficult process without giving way.", translation: "Sức chịu đựng, sự nhẫn nại", usage: "Often refers to physical stamina or mental toughness.<span class='usage-vi'>(Thường chỉ thể lực hoặc sự dẻo dai về tinh thần.)</span>", example: "Games promoted endurance, self-discipline and team spirit...", extraExample: "Running a marathon requires incredible physical and mental endurance." },
+        { topic: "History & Sociology", word: "Controversial", form: "Adjective", phonetic: "/ˌkɒntrəˈvɜːʃl/", def: "Giving rise or likely to give rise to public disagreement.", translation: "Gây tranh cãi", usage: "A core IELTS word for topics that people argue about.<span class='usage-vi'>(Một từ cốt lõi trong IELTS cho các chủ đề mà mọi người hay tranh luận.)</span>", example: "...and cast light on what has recently become a controversial issue.", extraExample: "The new tax policy was highly controversial and sparked protests across the country." },
+        { topic: "History & Sociology", word: "Dispute", form: "Verb", phonetic: "/dɪˈspjuːt/", def: "To argue about something; to question whether a statement is true.", translation: "Bác bỏ, tranh cãi", usage: "A formal alternative to 'argue' or 'disagree'.<span class='usage-vi'>(Một từ thay thế trang trọng cho 'argue' hoặc 'disagree'.)</span>", example: "More recent historians have disputed this, pointing to plentiful signs of parental affection...", extraExample: "The two neighbors disputed the exact location of the property line." },
+        { topic: "History & Sociology", word: "Contemporary", form: "Adjective", phonetic: "/kənˈtemprəri/", def: "Belonging to or occurring in the present; OR living/occurring at the same time.", translation: "Đương thời, cùng thời", usage: "Can mean 'modern' OR 'existing at that time in history'.<span class='usage-vi'>(Có thể có nghĩa là 'hiện đại' HOẶC 'tồn tại vào thời điểm đó trong lịch sử'.)</span>", example: "...pictures of children's activities in contemporary manuscripts and literary sources...", extraExample: "I enjoy visiting art galleries to see works by contemporary artists." },
+        { topic: "History & Sociology", word: "Recreational", form: "Adjective", phonetic: "/ˌrekriˈeɪʃənl/", def: "Relating to or denoting activity done for enjoyment when one is not working.", translation: "Thuộc về giải trí", usage: "Often paired with 'activities' or 'facilities'.<span class='usage-vi'>(Thường đi chung với 'activities' hoặc 'facilities'.)</span>", example: "Did they see it as recreational (by providing toys, for example) or as educational?", extraExample: "The park offers various recreational activities, such as tennis and boating." },
+        { topic: "History & Sociology", word: "Congregate", form: "Verb", phonetic: "/ˈkɒŋɡrɪɡeɪt/", def: "To gather into a crowd or mass.", translation: "Tụ tập, tập hợp lại", usage: "Used to describe people gathering in a specific place.<span class='usage-vi'>(Dùng để miêu tả việc mọi người tụ tập tại một địa điểm cụ thể.)</span>", example: "Adam of Usk tells us they congregated 'in thousands ... and made war upon each other'.", extraExample: "Hundreds of fans congregated outside the hotel to catch a glimpse of the singer." },
+        { topic: "History & Sociology", word: "Overthrow", form: "Verb", phonetic: "/ˌəʊvəˈθrəʊ/", def: "To remove forcibly from power.", translation: "Lật đổ", usage: "Used primarily in political and historical contexts.<span class='usage-vi'>(Chủ yếu dùng trong bối cảnh chính trị và lịch sử.)</span>", example: "...six months after King Richard II had been overthrown by Henry IV...", extraExample: "The rebels successfully plotted to overthrow the corrupt government." },
+        { topic: "History & Sociology", word: "Indulgent", form: "Adjective", phonetic: "/ɪnˈdʌldʒənt/", def: "Having or indicating a tendency to be overly generous to or lenient with someone.", translation: "Nuông chiều, bao dung", usage: "Often used to describe parents or grandparents.<span class='usage-vi'>(Thường dùng để miêu tả cha mẹ hoặc ông bà.)</span>", example: "Parents took an indulgent interest in their children, providing them with toys...", extraExample: "His indulgent grandmother bought him every toy he asked for." },
+        { topic: "History & Sociology", word: "Gravitate towards", form: "Phrasal Verb", phonetic: "/ˈɡrævɪteɪt təˈwɔːdz/", def: "To move towards or be attracted to a place, person, or thing.", translation: "Bị thu hút về phía, hướng về", usage: "Describes a natural pull or attraction.<span class='usage-vi'>(Miêu tả một lực kéo hoặc sự thu hút tự nhiên.)</span>", example: "...but children gravitated to one another and formed a culture of their own.", extraExample: "During the party, most guests naturally gravitated towards the kitchen." },
+        { topic: "History & Sociology", word: "Resounding", form: "Adjective", phonetic: "/rɪˈzaʊndɪŋ/", def: "Unmistakable; emphatic (often used with success, victory, or 'no').", translation: "Vang dội, dứt khoát", usage: "Used to emphasize a strong answer or result.<span class='usage-vi'>(Dùng để nhấn mạnh một câu trả lời hoặc kết quả mạnh mẽ.)</span>", example: "We can answer Aries's thesis, then, with a resounding 'No!'.", extraExample: "The campaign was a resounding success, raising double the target amount." }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="word-form">${item.form}</span>
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                <div class="usage-note"><strong>Usage:</strong> ${item.usage}</div>
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter === 'Health & Communities') topicName = 'Health & Communities';
+            if (activeFilter === 'Organisational Management') topicName = 'Organisational Management';
+            if (activeFilter === 'History & Sociology') topicName = 'History & Sociology';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-form').textContent = data.form;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            document.getElementById('fc-usage').innerHTML = `<strong>Usage:</strong> ${data.usage}`;
+            
+            // Injecting both examples into the container
+            const examplesHTML = `
+                <div class="example-box" style="margin-bottom: 0.5rem;">
+                    <span>Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
