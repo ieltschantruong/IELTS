@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong | PET Intensive 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap');
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #fdf2f8; /* Pastel pink background */
+            color: #333;
+            overflow: hidden; /* Prevent body scroll, handle in main container */
+        }
+
+        /* IELTS Specific Styles */
+        .ielts-header {
+            background-color: #fce7f3;
+            border-bottom: 2px solid #fbcfe8;
+        }
+        
+        .ielts-footer {
+            background-color: #fce7f3;
+            border-top: 2px solid #fbcfe8;
+        }
+
+        .q-nav-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #999;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            flex-shrink: 0;
+            border-radius: 2px;
+        }
+
+        .q-nav-btn:hover {
+            background: #fbcfe8;
+        }
+
+        .q-nav-btn.answered {
+            border-bottom: 4px solid #333; /* The classic IELTS answered indicator */
+        }
+        
+        .q-nav-btn.active {
+            background-color: #be185d;
+            color: white;
+            border-color: #be185d;
+            border-bottom: 4px solid #be185d;
+        }
+
+        .ielts-input {
+            border: 1px solid #777;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .ielts-input:focus {
+            border-color: #be185d;
+            box-shadow: 0 0 3px rgba(190, 24, 93, 0.5);
+        }
+
+        .ielts-radio-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .ielts-radio-label:hover {
+            background-color: #fdf2f8;
+            border-color: #fbcfe8;
+            border-radius: 4px;
+        }
+
+        .ielts-radio-label input[type="radio"],
+        .ielts-radio-label input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            accent-color: #be185d;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Drag and Drop Styles */
+        .draggable-item {
+            background-color: white;
+            border: 2px solid #be185d;
+            padding: 4px 12px;
+            cursor: grab;
+            user-select: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: transform 0.1s;
+            border-radius: 4px;
+        }
+        
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .dropzone {
+            min-width: 60px;
+            min-height: 38px;
+            border: 2px dashed #94a3b8;
+            background-color: #f8fafc;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+            vertical-align: middle;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .dropzone.drag-over {
+            background-color: #fce7f3;
+            border-color: #be185d;
+            border-style: solid;
+        }
+
+        /* Style when item is inside dropzone */
+        .dropzone .draggable-item {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            color: #be185d;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Custom Scrollbar for Main Area */
+        #main-scroll-area::-webkit-scrollbar {
+            width: 10px;
+        }
+        #main-scroll-area::-webkit-scrollbar-track {
+            background: #fdf2f8; 
+        }
+        #main-scroll-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 5px;
+        }
+        #main-scroll-area::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Custom Scrollbar for Footer Navigation */
+        .footer-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .footer-scroll::-webkit-scrollbar-track {
+            background: #fce7f3; 
+        }
+        .footer-scroll::-webkit-scrollbar-thumb {
+            background: #fbcfe8; 
+            border-radius: 3px;
+        }
+        .footer-scroll::-webkit-scrollbar-thumb:hover {
+            background: #f472b6; 
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Start Overlay -->
+    <div id="start-overlay" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-6">
+        <h1 class="text-4xl font-bold mb-6 text-[#be185d]">IELTS Chan Truong | PET Intensive 10</h1>
+        <p class="mb-10 text-xl text-gray-700 max-w-2xl text-center leading-relaxed">
+            Welcome to the computer-delivered IELTS Listening test simulation. <br><br>
+            Please ensure your volume is turned up. Once you click "Start Test", the timer will begin, the audio will play automatically, and you will not be able to pause it.
+        </p>
+        <button onclick="startTest()" class="bg-[#be185d] hover:bg-pink-800 text-white font-bold py-4 px-10 rounded text-xl shadow-lg transition-colors">
+            Start Test
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="ielts-header h-16 flex items-center justify-between px-6 shrink-0 z-10">
+        <div class="flex items-center gap-4">
+            <div class="font-bold text-xl tracking-wider text-[#be185d]">IELTS Chan Truong</div>
+            <div class="text-sm border-l-2 border-pink-300 pl-4 font-semibold text-pink-800">PET Intensive 10 | Listening Mock Test</div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2 bg-white px-3 py-1 rounded shadow-sm border border-pink-200 hidden" id="audio-controls">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#be185d]" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                </svg>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" class="w-24 accent-[#be185d]">
+            </div>
+
+            <div class="flex items-center gap-2 bg-white px-3 py-1 border border-pink-200 rounded shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#be185d]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer" class="font-bold text-lg text-[#be185d]">40:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-scroll-area" class="flex-1 overflow-y-auto bg-[#fdf2f8] p-4 md:p-8 relative scroll-smooth pb-32">
+        <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 shadow-sm border border-gray-200 rounded-sm">
+            
+            <!-- SECTION 1 -->
+            <section id="part-1" class="mb-16 border-b border-gray-300 pb-12">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 1: Questions 1-10</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <p class="font-bold mb-2">Complete the notes below.</p>
+                    <p class="mb-8 font-bold uppercase text-red-600">Write ONE WORD AND/OR A NUMBER for each answer.</p>
+                    
+                    <h3 class="text-center font-bold text-2xl mb-8 uppercase tracking-wide text-gray-800">Wedding arrangements - Clarence House Hotel</h3>
+                    
+                    <div class="space-y-8 text-lg pl-2 lg:pl-8">
+                        <p class="font-semibold text-gray-800">Available date: 1st June</p>
+                        
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">The Oxford Suite has:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">
+                                    a dining room with a good view of the
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">1</span>
+                                        <input type="text" name="q1" class="ielts-input w-40" oninput="saveAnswer(1, this.value)">
+                                    </span>
+                                </li>
+                                <li class="pl-1 leading-relaxed">
+                                    a private garden for
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">2</span>
+                                        <input type="text" name="q2" class="ielts-input w-40" oninput="saveAnswer(2, this.value)">
+                                    </span>
+                                    and for the wedding ceremony
+                                </li>
+                                <li class="pl-1 leading-relaxed">an area suitable for dancing</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">The wedding package includes:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">use of the Oxford Suite</li>
+                                <li class="pl-1 leading-relaxed">a three-course meal</li>
+                                <li class="pl-1 leading-relaxed">
+                                    room arranged with
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">3</span>
+                                        <input type="text" name="q3" class="ielts-input w-40" oninput="saveAnswer(3, this.value)">
+                                    </span>
+                                    tables
+                                </li>
+                                <li class="pl-1 leading-relaxed">
+                                    table
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">4</span>
+                                        <input type="text" name="q4" class="ielts-input w-40" oninput="saveAnswer(4, this.value)">
+                                    </span>
+                                    included
+                                </li>
+                                <li class="pl-1 leading-relaxed">white tablecloths and chairs</li>
+                                <li class="pl-1 leading-relaxed">
+                                    personalized printed
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">5</span>
+                                        <input type="text" name="q5" class="ielts-input w-40" oninput="saveAnswer(5, this.value)">
+                                    </span>
+                                </li>
+                                <li class="pl-1 leading-relaxed">
+                                    a late-evening buffet with a choice of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">6</span>
+                                        <input type="text" name="q6" class="ielts-input w-40" oninput="saveAnswer(6, this.value)">
+                                    </span>
+                                    and hot drinks
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-8">
+                            <ul class="space-y-4 text-gray-800">
+                                <li class="leading-relaxed">
+                                    <span class="font-bold">Music:</span> hotel will organize a band (not included in price)
+                                </li>
+                                <li class="leading-relaxed">
+                                    <span class="font-bold">Total cost of package:</span> £
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">7</span>
+                                        <input type="text" name="q7" class="ielts-input w-40" oninput="saveAnswer(7, this.value)">
+                                    </span>
+                                </li>
+                                <li class="leading-relaxed">
+                                    Can also recommend a
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">8</span>
+                                        <input type="text" name="q8" class="ielts-input w-40" oninput="saveAnswer(8, this.value)">
+                                    </span>
+                                    supplier (new company)
+                                </li>
+                                <li class="leading-relaxed">
+                                    Wedding coordinator Sarah
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">9</span>
+                                        <input type="text" name="q9" class="ielts-input w-40" oninput="saveAnswer(9, this.value)">
+                                    </span>
+                                </li>
+                                <li class="leading-relaxed">
+                                    Date arranged for visit:
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">10</span>
+                                        <input type="text" name="q10" class="ielts-input w-40" oninput="saveAnswer(10, this.value)">
+                                    </span>
+                                    at 11.30 a.m.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2 -->
+            <section id="part-2" class="mb-16 border-b border-gray-300 pb-12">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 2: Questions 11-20</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <h3 class="font-bold text-xl mb-6 text-gray-800 text-center">International Week Celebration</h3>
+                    
+                    <!-- Questions 11-16 -->
+                    <div class="mb-12">
+                        <p class="font-bold mb-2">Questions 11-16</p>
+                        <p class="mb-6 font-bold">Choose the correct letter, <span class="font-bold">A, B or C</span>.</p>
+                        
+                        <div class="space-y-8 text-base">
+                            <!-- Q11 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">11.</span> The businessmen think it is a good idea to hold the international week in</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q11" value="A" onchange="saveAnswer(11, this.value)">
+                                        <span class="font-bold mr-2">A</span> February
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q11" value="B" onchange="saveAnswer(11, this.value)">
+                                        <span class="font-bold mr-2">B</span> August
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q11" value="C" onchange="saveAnswer(11, this.value)">
+                                        <span class="font-bold mr-2">C</span> September
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q12 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">12.</span> Why did they change the celebration from one day to a week?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q12" value="A" onchange="saveAnswer(12, this.value)">
+                                        <span class="font-bold mr-2">A</span> it was reported by the media.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q12" value="B" onchange="saveAnswer(12, this.value)">
+                                        <span class="font-bold mr-2">B</span> they want to raise additional money.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q12" value="C" onchange="saveAnswer(12, this.value)">
+                                        <span class="font-bold mr-2">C</span> people would like to show off their countries.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q13 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">13.</span> In bad weather, where did they hold the activity last time?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q13" value="A" onchange="saveAnswer(13, this.value)">
+                                        <span class="font-bold mr-2">A</span> school gym
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q13" value="B" onchange="saveAnswer(13, this.value)">
+                                        <span class="font-bold mr-2">B</span> radio station
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q13" value="C" onchange="saveAnswer(13, this.value)">
+                                        <span class="font-bold mr-2">C</span> town hall
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q14 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">14.</span> In order to apply for the celebration, people should</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q14" value="A" onchange="saveAnswer(14, this.value)">
+                                        <span class="font-bold mr-2">A</span> provide a good proposal.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q14" value="B" onchange="saveAnswer(14, this.value)">
+                                        <span class="font-bold mr-2">B</span> be a member of a country association.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q14" value="C" onchange="saveAnswer(14, this.value)">
+                                        <span class="font-bold mr-2">C</span> pay a small application fee.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q15 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">15.</span> Where do they hold big outdoor activities?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q15" value="A" onchange="saveAnswer(15, this.value)">
+                                        <span class="font-bold mr-2">A</span> community center
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q15" value="B" onchange="saveAnswer(15, this.value)">
+                                        <span class="font-bold mr-2">B</span> local stadium
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q15" value="C" onchange="saveAnswer(15, this.value)">
+                                        <span class="font-bold mr-2">C</span> parking lot
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q16 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">16.</span> What do the businessmen provide to the international week?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q16" value="A" onchange="saveAnswer(16, this.value)">
+                                        <span class="font-bold mr-2">A</span> pay for the cost of the administration
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q16" value="B" onchange="saveAnswer(16, this.value)">
+                                        <span class="font-bold mr-2">B</span> furniture and equipment
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q16" value="C" onchange="saveAnswer(16, this.value)">
+                                        <span class="font-bold mr-2">C</span> books of different countries
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-300 my-8">
+
+                    <!-- Questions 17-20 -->
+                    <div>
+                        <p class="font-bold mb-2">Questions 17-20</p>
+                        <p class="mb-4">What features do the following countries have?</p>
+                        <p class="mb-6 font-bold">Choose the correct letter from <span class="font-bold">A-G</span> next to questions 17-20.</p>
+                        
+                        <!-- Drag Bank -->
+                        <div class="bg-white p-5 border border-gray-300 rounded mb-8 w-full max-w-2xl shadow-sm mx-auto" id="bank-part2">
+                            <p class="font-bold mb-4 text-center border-b pb-2">Features</p>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-gray-800 text-base">
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17A" data-value="A" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">A</div> 
+                                    <span class="font-semibold text-sm">music</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17B" data-value="B" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">B</div> 
+                                    <span class="font-semibold text-sm">dance</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17C" data-value="C" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">C</div> 
+                                    <span class="font-semibold text-sm">wood carving</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17D" data-value="D" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">D</div> 
+                                    <span class="font-semibold text-sm">sports</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17E" data-value="E" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">E</div> 
+                                    <span class="font-semibold text-sm">cookery</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17F" data-value="F" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">F</div> 
+                                    <span class="font-semibold text-sm">costumes</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="draggable-item text-center w-8" draggable="true" id="drag-17G" data-value="G" data-bank="bank-part2" data-reusable="true" ondragstart="drag(event)">G</div> 
+                                    <span class="font-semibold text-sm">photos</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <p class="font-bold mb-4 text-lg">Countries</p>
+                        <div class="space-y-4 text-base pl-2 max-w-xl">
+                            <div class="flex items-center gap-4 bg-white p-3 rounded border border-gray-200 shadow-sm">
+                                <span class="font-bold w-6 text-right text-gray-500">17</span>
+                                <div class="dropzone" data-q="17" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+                                <span class="flex-1 font-semibold">Mexico</span>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-3 rounded border border-gray-200 shadow-sm">
+                                <span class="font-bold w-6 text-right text-gray-500">18</span>
+                                <div class="dropzone" data-q="18" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+                                <span class="flex-1 font-semibold">South Africa</span>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-3 rounded border border-gray-200 shadow-sm">
+                                <span class="font-bold w-6 text-right text-gray-500">19</span>
+                                <div class="dropzone" data-q="19" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+                                <span class="flex-1 font-semibold">Indonesia</span>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white p-3 rounded border border-gray-200 shadow-sm">
+                                <span class="font-bold w-6 text-right text-gray-500">20</span>
+                                <div class="dropzone" data-q="20" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+                                <span class="flex-1 font-semibold">Canada</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3 -->
+            <section id="part-3" class="mb-16 border-b border-gray-300 pb-12">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 3: Questions 21-30</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <h3 class="font-bold text-xl mb-6 text-gray-800 text-center">Foot Injuries</h3>
+                    
+                    <!-- Questions 21-26 -->
+                    <div class="mb-12">
+                        <p class="font-bold mb-2">Questions 21-26</p>
+                        <p class="mb-6 font-bold">Choose the correct letter, <span class="font-bold">A, B or C</span>.</p>
+                        
+                        <div class="space-y-8 text-base">
+                            <!-- Q21 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">21.</span> John and Cath’s presentation plans are different in</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q21" value="A" onchange="saveAnswer(21, this.value)">
+                                        <span class="font-bold mr-2">A</span> the examples used.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q21" value="B" onchange="saveAnswer(21, this.value)">
+                                        <span class="font-bold mr-2">B</span> the order of information.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q21" value="C" onchange="saveAnswer(21, this.value)">
+                                        <span class="font-bold mr-2">C</span> the main points made.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q22 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">22.</span> What do the students agree about the anatomy section of their presentation?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q22" value="A" onchange="saveAnswer(22, this.value)">
+                                        <span class="font-bold mr-2">A</span> It would be better if Cath spoke about it.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q22" value="B" onchange="saveAnswer(22, this.value)">
+                                        <span class="font-bold mr-2">B</span> It should be kept quite short.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q22" value="C" onchange="saveAnswer(22, this.value)">
+                                        <span class="font-bold mr-2">C</span> It should be based on information from the internet.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q23 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">23.</span> What do the students agree to include in the last section?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q23" value="A" onchange="saveAnswer(23, this.value)">
+                                        <span class="font-bold mr-2">A</span> visuals of injuries
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q23" value="B" onchange="saveAnswer(23, this.value)">
+                                        <span class="font-bold mr-2">B</span> demonstrations of treatment
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q23" value="C" onchange="saveAnswer(23, this.value)">
+                                        <span class="font-bold mr-2">C</span> interviews with patients
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q24 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">24.</span> What is said about the different types of heel injury?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q24" value="A" onchange="saveAnswer(24, this.value)">
+                                        <span class="font-bold mr-2">A</span> Diagnosis is straightforward.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q24" value="B" onchange="saveAnswer(24, this.value)">
+                                        <span class="font-bold mr-2">B</span> They are expensive to treat.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q24" value="C" onchange="saveAnswer(24, this.value)">
+                                        <span class="font-bold mr-2">C</span> Some are more serious than others.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q25 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">25.</span> On the subject of causes of heel injuries, the students agree to</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q25" value="A" onchange="saveAnswer(25, this.value)">
+                                        <span class="font-bold mr-2">A</span> focus on a single reason.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q25" value="B" onchange="saveAnswer(25, this.value)">
+                                        <span class="font-bold mr-2">B</span> reject certain approaches.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q25" value="C" onchange="saveAnswer(25, this.value)">
+                                        <span class="font-bold mr-2">C</span> use a source written by their professor.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Q26 -->
+                            <div>
+                                <p class="font-bold mb-3"><span class="mr-2">26.</span> What does Cath say about stretching as a treatment?</p>
+                                <div class="space-y-2 pl-6">
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q26" value="A" onchange="saveAnswer(26, this.value)">
+                                        <span class="font-bold mr-2">A</span> It is potentially risky.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q26" value="B" onchange="saveAnswer(26, this.value)">
+                                        <span class="font-bold mr-2">B</span> It is commonly confused with strengthening.
+                                    </label>
+                                    <label class="ielts-radio-label">
+                                        <input type="radio" name="q26" value="C" onchange="saveAnswer(26, this.value)">
+                                        <span class="font-bold mr-2">C</span> It is the least effective part of treatment.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-300 my-8">
+
+                    <!-- Questions 27 and 28 -->
+                    <div class="mb-12 border-t border-gray-300 pt-8" data-q="27 28">
+                        <p class="font-bold mb-2">Questions 27 and 28</p>
+                        <p class="mb-4 text-gray-700">Choose <span class="font-bold">TWO</span> letters, <span class="font-bold">A–E</span>.</p>
+                        
+                        <p class="mb-6 text-lg text-gray-800">Which <span class="font-bold">TWO</span> treatment techniques did the female runner find useful for her swollen heel?</p>
+                        
+                        <div class="space-y-3 text-lg pl-2 lg:pl-6">
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="A" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">A</span> massage
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="B" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">B</span> ultrasound
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="C" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">C</span> rest
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="D" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">D</span> balancing exercises
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q27_28" data-q1="27" data-q2="28" value="E" onchange="handleMultiChoice(this, 27, 28)">
+                                <span class="font-bold mr-2">E</span> ice
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Questions 29 and 30 -->
+                    <div class="border-t border-gray-300 pt-8" data-q="29 30">
+                        <p class="font-bold mb-2">Questions 29 and 30</p>
+                        <p class="mb-4 text-gray-700">Choose <span class="font-bold">TWO</span> letters, <span class="font-bold">A–E</span>.</p>
+                        
+                        <p class="mb-6 text-lg text-gray-800">Which <span class="font-bold">TWO</span> sports did the male sprinter find most effective during his rehabilitation programme?</p>
+                        
+                        <div class="space-y-3 text-lg pl-2 lg:pl-6">
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="A" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">A</span> swimming
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="B" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">B</span> weight-training
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="C" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">C</span> running on grass
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="D" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">D</span> cycling
+                            </label>
+                            <label class="ielts-radio-label">
+                                <input type="checkbox" name="q29_30" data-q1="29" data-q2="30" value="E" onchange="handleMultiChoice(this, 29, 30)">
+                                <span class="font-bold mr-2">E</span> jumping
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4 -->
+            <section id="part-4" class="mb-16">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">PART 4: Questions 31-40</h2>
+                
+                <div class="bg-gray-50 border border-gray-300 p-8 rounded-lg shadow-sm">
+                    <p class="font-bold mb-2">Complete the notes below.</p>
+                    <p class="mb-8 font-bold uppercase text-red-600">Write ONE WORD ONLY for each answer.</p>
+                    
+                    <h3 class="text-center font-bold text-2xl mb-8 uppercase tracking-wide text-gray-800">The world’s oldest mechanical computer: the Antikythera mechanism</h3>
+                    
+                    <div class="space-y-10 text-lg pl-2 lg:pl-8">
+                        
+                        <!-- Discovery -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Discovery:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">
+                                    The Antikythera mechanism was discovered as part of a ship’s
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">31</span>
+                                        <input type="text" name="q31" class="ielts-input w-40" oninput="saveAnswer(31, this.value)">
+                                    </span>
+                                    in the sea near Antikythera, Greece.
+                                </li>
+                                <li class="pl-1 leading-relaxed">
+                                    Initially, it was mistakenly thought to be a piece of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">32</span>
+                                        <input type="text" name="q32" class="ielts-input w-40" oninput="saveAnswer(32, this.value)">
+                                    </span>, but it was later found to be a mechanism that had broken into pieces.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Equipment used for analysis of the mechanism -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Equipment used for analysis of the mechanism:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">
+                                    For its analysis, various equipment was used: the “Dome” produced photographs that made the
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">33</span>
+                                        <input type="text" name="q33" class="ielts-input w-40" oninput="saveAnswer(33, this.value)">
+                                    </span>
+                                    clearer, and the “Blade-Runner” produced X-rays, originally used to identify
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">34</span>
+                                        <input type="text" name="q34" class="ielts-input w-40" oninput="saveAnswer(34, this.value)">
+                                    </span>
+                                    in engines.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Description:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">
+                                    The mechanism consisted of over 30 gear wheels made of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">35</span>
+                                        <input type="text" name="q35" class="ielts-input w-40" oninput="saveAnswer(35, this.value)">
+                                    </span>, models of the sun, moon, and planets, and a framework made of
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">36</span>
+                                        <input type="text" name="q36" class="ielts-input w-40" oninput="saveAnswer(36, this.value)">
+                                    </span>.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- How the mechanism was used -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">How the mechanism was used:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">
+                                    The operator turned a
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">37</span>
+                                        <input type="text" name="q37" class="ielts-input w-40" oninput="saveAnswer(37, this.value)">
+                                    </span>
+                                    to move the gear wheels, allowing the sun, moon, and planets to be positioned correctly for any given date.
+                                </li>
+                                <li class="pl-1 leading-relaxed">
+                                    Most surprisingly, the mechanism could calculate when an
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">38</span>
+                                        <input type="text" name="q38" class="ielts-input w-40" oninput="saveAnswer(38, this.value)">
+                                    </span>
+                                    would occur and may have been used as a
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">39</span>
+                                        <input type="text" name="q39" class="ielts-input w-40" oninput="saveAnswer(39, this.value)">
+                                    </span>
+                                    for planning festivals.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Later use of similar technology -->
+                        <div>
+                            <h4 class="font-bold text-xl mb-4 text-gray-800 underline">Later use of similar technology:</h4>
+                            <ul class="list-disc list-outside ml-6 space-y-4 text-gray-800">
+                                <li class="pl-1 leading-relaxed">
+                                    Later, similar technology was used in the 13th and 14th centuries for making
+                                    <span class="inline-block whitespace-nowrap">
+                                        <span class="font-bold ml-1 mr-1 text-black">40</span>
+                                        <input type="text" name="q40" class="ielts-input w-40" oninput="saveAnswer(40, this.value)">
+                                    </span>
+                                    in Western Europe.
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="ielts-footer shrink-0 flex flex-col z-10">
+        <div class="w-full overflow-x-auto footer-scroll bg-white py-2 flex justify-start lg:justify-center border-b border-pink-200">
+            <div id="pagination-grid" class="flex flex-nowrap items-center gap-3 px-4 w-max">
+                <!-- Javascript will populate 40 buttons grouped by sections here -->
+            </div>
+        </div>
+        <div class="h-12 bg-pink-50 flex justify-between items-center px-6 border-t border-pink-200">
+            <button class="flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-black invisible">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg> Review
+            </button>
+            
+            <button onclick="submitTest()" class="bg-[#be185d] hover:bg-pink-800 text-white font-bold py-1 px-8 rounded shadow transition-colors">
+                Submit Test
+            </button>
+
+            <div class="flex gap-2">
+                <button onclick="scrollMain('up')" class="bg-white border border-gray-400 p-1 hover:bg-pink-100 rounded focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button onclick="scrollMain('down')" class="bg-white border border-gray-400 p-1 hover:bg-pink-100 rounded focus:outline-none focus:ring-2 focus:ring-pink-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global State
+        const STORAGE_KEY = 'ieltsMockAnswers_pet_10';
+        const totalQuestions = 40;
+        let answers = {};
+        let timerSeconds = 40 * 60; // 40 minutes for listening
+        let timerInterval;
+        
+        // Initialize Audio
+        const bgAudio = new Audio('https://ieltschantruong.github.io/IELTS/src/listening_audios/pet_intensive_10.mp3');
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            // Audio Controls
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                bgAudio.volume = volumeSlider.value;
+                volumeSlider.addEventListener('input', (e) => {
+                    bgAudio.volume = e.target.value;
+                });
+            }
+
+            // Prevent closing window accidentally
+            window.addEventListener('beforeunload', function (e) {
+                if (timerInterval) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+
+            // Setup Navigation Grid dynamically
+            const grid = document.getElementById('pagination-grid');
+            grid.innerHTML = ''; 
+            
+            const sections = [
+                { name: "Part 1", start: 1, end: 10 },
+                { name: "Part 2", start: 11, end: 20 },
+                { name: "Part 3", start: 21, end: 30 },
+                { name: "Part 4", start: 31, end: 40 }
+            ];
+
+            sections.forEach(sec => {
+                const sectionGroup = document.createElement('div');
+                sectionGroup.className = 'flex items-center bg-gray-50 border border-pink-200 rounded px-2 py-1 shadow-sm shrink-0';
+                
+                const sectionLabel = document.createElement('span');
+                sectionLabel.className = 'text-[11px] font-bold text-gray-500 mr-2 uppercase tracking-wider whitespace-nowrap';
+                sectionLabel.innerText = sec.name;
+                sectionGroup.appendChild(sectionLabel);
+                
+                const btnRow = document.createElement('div');
+                btnRow.className = 'flex flex-nowrap items-center gap-1'; 
+                
+                for (let i = sec.start; i <= sec.end; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'q-nav-btn';
+                    btn.id = `nav-btn-${i}`;
+                    btn.innerText = i;
+                    btn.onclick = () => scrollToQuestion(i);
+                    btnRow.appendChild(btn);
+                }
+                
+                sectionGroup.appendChild(btnRow);
+                grid.appendChild(sectionGroup);
+            });
+
+            loadSavedAnswers();
+        });
+
+        function startTest() {
+            document.getElementById('start-overlay').style.display = 'none';
+            document.getElementById('audio-controls').classList.remove('hidden');
+            
+            bgAudio.play().catch(e => {
+                console.log("Autoplay prevented by browser, waiting for user interaction.", e);
+            });
+            
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                
+                if (timerSeconds <= 0) {
+                    submitTest();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timerSeconds / 60);
+            const s = timerSeconds % 60;
+            document.getElementById('timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            
+            if (timerSeconds < 300) { 
+                document.getElementById('timer').classList.add('text-red-600', 'animate-pulse');
+            }
+        }
+
+        function loadSavedAnswers() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+                for (let i = 1; i <= 40; i++) answers[i] = "";
+                return;
+            }
+            
+            try {
+                answers = JSON.parse(stored);
+                for (let i = 1; i <= 40; i++) {
+                    const val = answers[i] || "";
+                    if (val) {
+                        const navBtn = document.getElementById(`nav-btn-${i}`);
+                        if (navBtn) navBtn.classList.add('answered');
+
+                        // Fill text inputs
+                        const textInput = document.querySelector(`input[name="q${i}"]`);
+                        if (textInput && textInput.type === 'text') {
+                            textInput.value = val;
+                        }
+
+                        // Check radio/checkboxes 
+                        let choiceInput = document.querySelector(`input[name="q${i}"][value="${val}"]`);
+                        if (!choiceInput) {
+                            // Check grouped multi-choice Checkboxes
+                            choiceInput = document.querySelector(`input[data-q1="${i}"][value="${val}"], input[data-q2="${i}"][value="${val}"]`);
+                        }
+                        
+                        if (choiceInput && (choiceInput.type === 'radio' || choiceInput.type === 'checkbox')) {
+                            choiceInput.checked = true;
+                        }
+
+                        // Restore Drag & Drop
+                        const dropzone = document.querySelector(`.dropzone[data-q="${i}"]`);
+                        if (dropzone) {
+                            const draggable = document.querySelector(`.draggable-item[data-value="${val}"]`);
+                            if (draggable) {
+                                let draggableToAppend = draggable;
+                                if (draggable.hasAttribute('data-reusable')) {
+                                    draggableToAppend = draggable.cloneNode(true);
+                                    draggableToAppend.id = draggable.id + '-restored-' + i;
+                                    draggableToAppend.removeAttribute('data-reusable');
+                                }
+                                styleDraggedItem(draggableToAppend);
+                                dropzone.appendChild(draggableToAppend);
+                            }
+                        }
+                    }
+                }
+            } catch(e) {
+                for (let i = 1; i <= 40; i++) answers[i] = "";
+            }
+        }
+
+        function saveAnswer(qNum, value) {
+            answers[qNum] = value.trim();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+            
+            const navBtn = document.getElementById(`nav-btn-${qNum}`);
+            if (navBtn) {
+                if (answers[qNum] !== "") {
+                    navBtn.classList.add('answered');
+                } else {
+                    navBtn.classList.remove('answered');
+                }
+            }
+        }
+
+        function handleMultiChoice(el, startQ, endQ) {
+            const groupName = el.name;
+            const checkboxes = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+            const maxAllowed = endQ - startQ + 1;
+            
+            if (checkboxes.length > maxAllowed) {
+                el.checked = false; // Prevent checking more than allowed
+                return;
+            }
+            
+            // Clear current answers for this question range
+            for (let i = startQ; i <= endQ; i++) {
+                saveAnswer(i, "");
+            }
+            
+            // Save newly checked answers sequentially
+            checkboxes.forEach((cb, index) => {
+                saveAnswer(startQ + index, cb.value);
+            });
+        }
+
+        function scrollToQuestion(qNum) {
+            let el = document.querySelector(`input[name="q${qNum}"]`) || document.querySelector(`[data-q="${qNum}"]`);
+            if(!el) {
+                el = document.querySelector(`input[data-q1="${qNum}"], input[data-q2="${qNum}"]`);
+            }
+            if (el) {
+                document.querySelectorAll('.q-nav-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`nav-btn-${qNum}`).classList.add('active');
+
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                const wrapper = el.closest('.space-y-8') || el.closest('.mb-12') || el.closest('tr') || el.closest('div');
+                if (wrapper) {
+                    const originalBg = wrapper.style.backgroundColor;
+                    wrapper.style.transition = 'background-color 0.5s';
+                    wrapper.style.backgroundColor = '#fbcfe8';
+                    setTimeout(() => {
+                        wrapper.style.backgroundColor = originalBg;
+                    }, 1500);
+                }
+
+                if (el.tagName === 'INPUT' && el.type === 'text') {
+                    setTimeout(() => el.focus(), 500);
+                }
+            }
+        }
+
+        function scrollMain(dir) {
+            const main = document.getElementById('main-scroll-area');
+            const amount = window.innerHeight * 0.6;
+            main.scrollBy({ top: dir === 'down' ? amount : -amount, behavior: 'smooth' });
+        }
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            bgAudio.pause();
+            
+            for (let i = 1; i <= 40; i++) {
+                if (answers[i] === undefined) answers[i] = "";
+            }
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+            window.location.href = 'result_view_pet_intensive_10.html';
+        }
+
+        // --- Drag and Drop Logic ---
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.target.closest('.dropzone')?.classList.add('drag-over');
+        }
+
+        function dragLeave(ev) {
+            ev.target.closest('.dropzone')?.classList.remove('drag-over');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.dataTransfer.setData("value", ev.target.getAttribute("data-value"));
+        }
+        
+        function styleDraggedItem(el) {
+            el.style.border = 'none';
+            el.style.backgroundColor = 'transparent';
+            el.style.color = '#be185d';
+        }
+
+        function resetDraggedItem(el) {
+            el.style.border = '2px solid #be185d';
+            el.style.backgroundColor = 'white';
+            el.style.color = '#333';
+        }
+
+        function performDrop(draggedElement, dropzone) {
+            if (!draggedElement || !dropzone) return;
+
+            const dataId = draggedElement.id;
+            const answerValue = draggedElement.getAttribute("data-value");
+
+            if (draggedElement.hasAttribute('data-reusable')) {
+                draggedElement = draggedElement.cloneNode(true);
+                draggedElement.id = dataId + '-clone-' + Date.now();
+                draggedElement.removeAttribute('data-reusable');
+            }
+
+            if (dropzone.children.length > 0) {
+                const existingChild = dropzone.children[0];
+                const existingBankId = existingChild.getAttribute('data-bank');
+                const existingBank = document.getElementById(existingBankId);
+                if (existingBank && !existingChild.id.includes('-clone-') && !existingChild.id.includes('-restored-')) {
+                    resetDraggedItem(existingChild);
+                    existingBank.appendChild(existingChild);
+                } else {
+                    existingChild.remove(); 
+                }
+            }
+
+            styleDraggedItem(draggedElement);
+            dropzone.appendChild(draggedElement);
+
+            const qNum = dropzone.getAttribute('data-q');
+            saveAnswer(qNum, answerValue);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            let dropzone = ev.target.closest('.dropzone');
+            if(dropzone) dropzone.classList.remove('drag-over');
+
+            if (dropzone) {
+                const dataId = ev.dataTransfer.getData("text");
+                const draggedElement = document.getElementById(dataId);
+                performDrop(draggedElement, dropzone);
+            }
+        }
+
+        // --- Touch Support ---
+        let touchDraggedEl = null;
+        let touchGhostEl = null;
+        let lastDropzone = null;
+        let touchMoved = false;
+
+        document.addEventListener('touchstart', function(e) {
+            const target = e.target.closest('.draggable-item');
+            if (!target) return;
+
+            touchDraggedEl = target;
+            touchMoved = false;
+
+            touchGhostEl = target.cloneNode(true);
+            touchGhostEl.style.position = 'fixed';
+            touchGhostEl.style.zIndex = '9999';
+            touchGhostEl.style.pointerEvents = 'none'; 
+            touchGhostEl.style.opacity = '0.8';
+            touchGhostEl.style.margin = '0';
+            touchGhostEl.style.display = 'none'; 
+
+            document.body.appendChild(touchGhostEl);
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(e) {
+            if (!touchDraggedEl || !touchGhostEl) return;
+            e.preventDefault();
+            touchMoved = true;
+            touchGhostEl.style.display = 'block';
+
+            const touch = e.touches[0];
+            const rect = touchDraggedEl.getBoundingClientRect();
+            
+            touchGhostEl.style.left = (touch.clientX - rect.width / 2) + 'px';
+            touchGhostEl.style.top = (touch.clientY - rect.height / 2) + 'px';
+
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropzone = elemBelow ? elemBelow.closest('.dropzone') : null;
+
+            if (lastDropzone && lastDropzone !== dropzone) {
+                lastDropzone.classList.remove('drag-over');
+            }
+            if (dropzone) {
+                dropzone.classList.add('drag-over');
+            }
+            lastDropzone = dropzone;
+        }, { passive: false });
+
+        document.addEventListener('touchend', function(e) {
+            if (!touchDraggedEl) return;
+
+            if (touchGhostEl) {
+                touchGhostEl.remove();
+                touchGhostEl = null;
+            }
+
+            if (touchMoved && lastDropzone) {
+                lastDropzone.classList.remove('drag-over');
+                performDrop(touchDraggedEl, lastDropzone);
+            }
+
+            touchDraggedEl = null;
+            lastDropzone = null;
+        });
+
+        // --- Removal Logic ---
+        let lastTapTime = 0;
+
+        function handleRemoveFromDropzone(target) {
+            const dropzone = target.closest('.dropzone');
+            if (!dropzone) return;
+
+            const qNum = dropzone.getAttribute('data-q');
+
+            if (target.id.includes('-clone-') || target.id.includes('-restored-')) {
+                target.remove();
+            } else {
+                const bankId = target.getAttribute('data-bank');
+                const bank = document.getElementById(bankId);
+                if (bank) {
+                    resetDraggedItem(target);
+                    bank.appendChild(target);
+                }
+            }
+            saveAnswer(qNum, ""); 
+        }
+
+        document.addEventListener('dblclick', function(e) {
+            const target = e.target.closest('.draggable-item');
+            if (target && target.parentElement.classList.contains('dropzone')) {
+                handleRemoveFromDropzone(target);
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            const target = e.target.closest('.draggable-item');
+            if (target && target.parentElement.classList.contains('dropzone')) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTapTime;
+                if (tapLength < 500 && tapLength > 0) {
+                    handleRemoveFromDropzone(target);
+                    e.preventDefault(); 
+                }
+                lastTapTime = currentTime;
+            }
+        });
+    </script>
+</body>
+</html>
