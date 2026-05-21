@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Reading Mock Test 7 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Deep Teal / Forest Green */
+            --primary: #0f766e; 
+            --primary-light: #ccfbf1;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #115e59;
+            --border: #99f6e4;
+            --badge-bg: #a7f3d0;
+            --badge-text: #064e3b;
+            --success: #0284c7; /* Blue for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(15, 118, 110, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+        .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
+        .extra-example span { color: #475569; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary); text-transform: capitalize;}
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>PET Reading Mock Test 7 - Vocabulary</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
+        <button class="filter-btn" onclick="filterTopic('Psychology of Music')">Psychology of Music</button>
+        <button class="filter-btn" onclick="filterTopic('Architecture & Environment')">Architecture & Environment</button>
+        <button class="filter-btn" onclick="filterTopic('Risk & Society')">Risk & Society</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 32</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Reading Mock Test 7)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- CATEGORY 1: Psychology of Music ---
+        { topic: "Psychology of Music", word: "Involuntary", phonetic: "/ɪnˈvɒləntri/", form: "Adjective", forms: "N/A", def: "Done without will or conscious control.", translation: "Tự động, không tự chủ", example: "Scientists call them 'involuntary musical images', or 'earworms'...", extraExample: "Breathing is an involuntary reflex of the human body." },
+        { topic: "Psychology of Music", word: "Unpredictably", phonetic: "/ˌʌnprɪˈdɪktəbli/", form: "Adverb", forms: "Adj: Unpredictable | V: Predict", def: "In a way that cannot be foreseen or known beforehand.", translation: "Một cách không thể đoán trước", example: "Researchers haven't been able to watch what happens... because they happen unpredictably.", extraExample: "The weather in the mountains can change unpredictably." },
+        { topic: "Psychology of Music", word: "Intrusive", phonetic: "/ɪnˈtruːsɪv/", form: "Adjective", forms: "V: Intrude | N: Intrusion", def: "Causing disruption or annoyance through being unwelcome.", translation: "Xâm nhập, gây khó chịu", example: "...people who report hearing earworms often, and find them most intrusive, have slightly different brain structures...", extraExample: "The paparazzi's constant questions became highly intrusive." },
+        { topic: "Psychology of Music", word: "Fixate on", phonetic: "/fɪkˈseɪt ɒn/", form: "Phrasal Verb", forms: "N: Fixation", def: "Acquire an obsessive attachment to someone or something.", translation: "Tập trung ám ảnh vào", example: "Songs the brain fixates on are usually those it has been exposed to recently...", extraExample: "He tends to fixate on small mistakes rather than his overall success." },
+        { topic: "Psychology of Music", word: "Entrenched", phonetic: "/ɪnˈtrentʃt/", form: "Adjective", forms: "V: Entrench | N: Entrenchment", def: "(Of an attitude, habit, or belief) firmly established and difficult or unlikely to change.", translation: "Bám rễ sâu, cố hữu", example: "That could make an earworm even more entrenched, Dr Hyman says.", extraExample: "Sexism is still deeply entrenched in some corporate cultures." },
+        { topic: "Psychology of Music", word: "Yield", phonetic: "/jiːld/", form: "Verb", forms: "N/A", def: "Produce or provide (a natural, agricultural, or industrial product, or a result).", translation: "Mang lại, sinh ra (kết quả)", example: "...although experiments exposing students to interrupted songs have yielded mixed results.", extraExample: "The new farming methods yielded a much larger harvest this year." },
+        { topic: "Psychology of Music", word: "Deliberately", phonetic: "/dɪˈlɪbərətli/", form: "Adverb", forms: "Adj: Deliberate | N: Deliberation", def: "Consciously and intentionally; on purpose.", translation: "Một cách có chủ ý, cố tình", example: "...deliberately imagining music and actually listening to music activate many of the same neurological networks.", extraExample: "I believe he deliberately ignored my email." },
+        { topic: "Psychology of Music", word: "Anticipation", phonetic: "/ænˌtɪsɪˈpeɪʃn/", form: "Noun", forms: "V: Anticipate | Adj: Anticipatory", def: "The action of anticipating something; expectation or prediction.", translation: "Sự mong đợi, sự dự đoán", example: "'Repetition leads to familiarity which leads to anticipation, which is satisfied by hearing the song...'", extraExample: "The crowd waited in eager anticipation for the band to appear." },
+        { topic: "Psychology of Music", word: "Assess", phonetic: "/əˈses/", form: "Verb", forms: "N: Assessment", def: "Evaluate or estimate the nature, ability, or quality of.", translation: "Đánh giá, định giá", example: "The researchers are comparing the melodic structure... to assess the difference.", extraExample: "The consultant was hired to assess the company's financial health." },
+        { topic: "Psychology of Music", word: "Recruit", phonetic: "/rɪˈkruːt/", form: "Verb", forms: "N: Recruitment", def: "Enlist (someone) in the armed forces or a company/study.", translation: "Tuyển dụng, chiêu mộ", example: "Drs Stewart and Halper are now working together to recruit survey participants...", extraExample: "The tech firm plans to recruit 50 new engineers this year." },
+
+        // --- CATEGORY 2: Architecture & Environment ---
+        { topic: "Architecture & Environment", word: "Ventilation", phonetic: "/ˌventɪˈleɪʃn/", form: "Noun", forms: "V: Ventilate", def: "The provision of fresh air to a room, building, etc.", translation: "Sự thông gió", example: "Built on stilts and with steep roofs, they have year-round ventilation.", extraExample: "Proper ventilation is crucial in a busy commercial kitchen." },
+        { topic: "Architecture & Environment", word: "Sophistication", phonetic: "/səˌfɪstɪˈkeɪʃn/", form: "Noun", forms: "Adj: Sophisticated", def: "The quality of being advanced, complex, or refined.", translation: "Sự tinh vi, sự phức tạp", example: "This story of ancient architectural sophistication and modern insanity is repeated around the world.", extraExample: "The new smartphone offers a high level of technological sophistication." },
+        { topic: "Architecture & Environment", word: "Emission", phonetic: "/ɪˈmɪʃn/", form: "Noun", forms: "V: Emit", def: "The production and discharge of something, especially gas or radiation.", translation: "Sự phát thải, khí thải", example: "Much is made of the contribution of transportation to global warming, through its emissions of greenhouse gases.", extraExample: "The government has promised to cut carbon emissions by 20%." },
+        { topic: "Architecture & Environment", word: "Exception", phonetic: "/ɪkˈsepʃn/", form: "Noun", forms: "Adj: Exceptional", def: "A person or thing that is excluded from a general statement or does not follow a rule.", translation: "Ngoại lệ", example: "Throughout the Middle East today, wind towers are often little more than museum pieces. But there are exceptions.", extraExample: "Usually I don't work on weekends, but I'll make an exception this time." },
+        { topic: "Architecture & Environment", word: "Conserve", phonetic: "/kənˈsɜːv/", form: "Verb", forms: "N: Conservation", def: "Protect (something, especially an environmentally or culturally important place or thing) from harm or destruction.", translation: "Bảo tồn, tiết kiệm", example: "...a village on the shores of the Red Sea, which is designed to conserve energy.", extraExample: "We need to conserve water during the dry season." },
+        { topic: "Architecture & Environment", word: "Insulation", phonetic: "/ˌɪnsjuˈleɪʃn/", form: "Noun", forms: "V: Insulate | N: Insulator", def: "Material used to insulate something, especially a building.", translation: "Sự cách nhiệt, vật liệu cách nhiệt", example: "...combines the ventilation system... with up-to-date heating and floor insulation...", extraExample: "Adding better insulation to the roof can significantly reduce your heating bills." },
+        { topic: "Architecture & Environment", word: "Revive", phonetic: "/rɪˈvaɪv/", form: "Verb", forms: "N: Revival", def: "Restore to life or consciousness; give new strength or energy to.", translation: "Hồi sinh, phục hồi", example: "But although traditional methods and materials can be revived in appropriate settings...", extraExample: "The government is trying to revive the failing economy." },
+        { topic: "Architecture & Environment", word: "Optimum", phonetic: "/ˈɒptɪməm/", form: "Adjective", forms: "N: Optima", def: "Most conducive to a favorable outcome; best.", translation: "Tối ưu, tốt nhất", example: "Buildings with large expanses of window... can be designed to achieve optimum temperatures.", extraExample: "This plant requires optimum conditions of moisture and sunlight to thrive." },
+        { topic: "Architecture & Environment", word: "Renewable", phonetic: "/rɪˈnjuːəbl/", form: "Adjective", forms: "V: Renew | N: Renewal", def: "(Of a natural resource or source of energy) not depleted when used.", translation: "Có thể tái tạo", example: "As well as more efficient use of energy, the world also needs new sources of renewable power.", extraExample: "Wind and solar power are forms of renewable energy." },
+        { topic: "Architecture & Environment", word: "Commence", phonetic: "/kəˈmens/", form: "Verb", forms: "N: Commencement", def: "Begin; start.", translation: "Bắt đầu, khởi đầu", example: "...where a project commenced to install solar panels for 400,000 people in 150 villages.", extraExample: "The graduation ceremony will commence at exactly 10:00 AM." },
+        { topic: "Architecture & Environment", word: "Adopt", phonetic: "/əˈdɒpt/", form: "Verb", forms: "N: Adoption", def: "Choose to take up, follow, or use.", translation: "Áp dụng, tiếp nhận", example: "...people have thrown away architecture... and adopted house designs originating from cold, northern environments...", extraExample: "The school has decided to adopt a new teaching methodology." },
+
+        // --- CATEGORY 3: Risk & Society ---
+        { topic: "Risk & Society", word: "Collectively", phonetic: "/kəˈlektɪvli/", form: "Adverb", forms: "Adj: Collective | N: Collection", def: "As a group; as a whole.", translation: "Cùng nhau, tập thể", example: "Acting collectively, we make similar trade-offs.", extraExample: "The employees decided collectively to ask for a pay raise." },
+        { topic: "Risk & Society", word: "Minuscule", phonetic: "/ˈmɪnəskjuːl/", form: "Adjective", forms: "N/A", def: "Extremely small; tiny.", translation: "Cực kỳ nhỏ, nhỏ bé", example: "...recognizing the minuscule likelihood of becoming ill from a flu shot...", extraExample: "The chance of winning the lottery is minuscule." },
+        { topic: "Risk & Society", word: "Irrationally", phonetic: "/ɪˈræʃənəli/", form: "Adverb", forms: "Adj: Irrational | N: Irrationality", def: "In an illogical or unreasonable manner.", translation: "Một cách phi lý, thiếu lý trí", example: "But some, fearfully but irrationally, go to the extreme and stay at home...", extraExample: "He acted irrationally out of fear during the crisis." },
+        { topic: "Risk & Society", word: "Unfulfilling", phonetic: "/ˌʌnfʊlˈfɪlɪŋ/", form: "Adjective", forms: "V: Fulfill | N: Fulfillment", def: "Not causing someone to feel satisfied or happy.", translation: "Không làm thỏa mãn, nhàm chán", example: "...many people won't even risk pursuing an exciting job, if the current job, though unfulfilling, remains comfortable.", extraExample: "She quit her unfulfilling corporate job to start her own bakery." },
+        { topic: "Risk & Society", word: "Status quo", phonetic: "/ˌsteɪtəs ˈkwəʊ/", form: "Noun", forms: "N/A", def: "The existing state of affairs, especially regarding social or political issues.", translation: "Hiện trạng", example: "That psychological mechanism, a desire to maintain the status quo, helps explain...", extraExample: "People who are comfortable with the status quo rarely seek out change." },
+        { topic: "Risk & Society", word: "Perceptive", phonetic: "/pəˈseptɪv/", form: "Adjective", forms: "N: Perception | V: Perceive", def: "Having or showing sensitive insight.", translation: "Sâu sắc, nhạy bén", example: "...Andrew S. Grove gives a perceptive account of a crisis that took place...", extraExample: "It was a very perceptive comment that got straight to the heart of the issue." },
+        { topic: "Risk & Society", word: "Deterioration", phonetic: "/dɪˌtɪəriəˈreɪʃn/", form: "Noun", forms: "V: Deteriorate", def: "The process of becoming progressively worse.", translation: "Sự suy giảm, sự tồi tệ đi", example: "...will be willing to risk the resources needed to prevent further deterioration.", extraExample: "The doctor noticed a rapid deterioration in the patient's health." },
+        { topic: "Risk & Society", word: "Oblivious", phonetic: "/əˈblɪviəs/", form: "Adjective", forms: "N: Oblivion", def: "Not aware of or not concerned about what is happening around one.", translation: "Lơ đãng, không nhận thức được", example: "Some governmental leaders are oblivious to the risks posed by social underinvestment...", extraExample: "She was so engrossed in her book that she was completely oblivious to the noise." },
+        { topic: "Risk & Society", word: "Precedence", phonetic: "/ˈpresɪdəns/", form: "Noun", forms: "V: Precede", def: "The condition of being considered more important than someone or something else; priority.", translation: "Sự ưu tiên, quyền ưu tiên", example: "...because the urgent needs of the present take precedence over actions that would give rise to even more substantial gains...", extraExample: "Safety must always take precedence over speed in this factory." },
+        { topic: "Risk & Society", word: "Temperament", phonetic: "/ˈtemprəmənt/", form: "Noun", forms: "Adj: Temperamental", def: "A person's or animal's nature, especially as it permanently affects their behavior.", translation: "Khí chất, tính khí", example: "Whether one's temperament is optimistic or pessimistic...", extraExample: "He has a calm temperament, which makes him a great teacher." },
+        { topic: "Risk & Society", word: "Modify", phonetic: "/ˈmɒdɪfaɪ/", form: "Verb", forms: "N: Modification", def: "Make partial or minor changes to (something), typically so as to improve it.", translation: "Điều chỉnh, sửa đổi", example: "Furthermore, too few people pay full attention to the best evidence, much less modify their behaviors as a result.", extraExample: "You may need to modify your diet to include more vegetables." },
+        { topic: "Risk & Society", word: "Disregard", phonetic: "/ˌdɪsrɪˈɡɑːd/", form: "Verb", forms: "N: Disregard", def: "Pay no attention to; ignore.", translation: "Phớt lờ, không để ý đến", example: "...precisely because it is so easy for executives to try to disregard it or misinterpret the mounting evidence...", extraExample: "He chose to disregard the warning signs and drove into the storm." }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter.includes('Music')) topicName = 'Psychology of Music';
+            if (activeFilter.includes('Architecture')) topicName = 'Architecture & Environment';
+            if (activeFilter.includes('Risk')) topicName = 'Risk & Society';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #115e59;">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: #ccfbf1; padding: 1rem; border-left: 4px solid #115e59; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #115e59; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>

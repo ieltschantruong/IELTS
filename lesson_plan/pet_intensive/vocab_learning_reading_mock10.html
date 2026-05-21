@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Reading Mock Test 10 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Deep Teal/Emerald reflecting Science, Environment, and Literature */
+            --primary: #0f766e; 
+            --primary-light: #ccfbf1;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #115e59;
+            --border: #99f6e4;
+            --badge-bg: #a7f3d0;
+            --badge-text: #064e3b;
+            --success: #0284c7; /* Blue for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(15, 118, 110, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+        .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
+        .extra-example span { color: #475569; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary); text-transform: capitalize;}
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>PET Reading Mock Test 10 - Vocabulary</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
+        <button class="filter-btn" onclick="filterTopic('Biography & History')">Biography & History</button>
+        <button class="filter-btn" onclick="filterTopic('Environment & Business')">Environment & Business</button>
+        <button class="filter-btn" onclick="filterTopic('Literature & Psychology')">Literature & Psychology</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <div class="meta-row">
+                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 32</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Reading Mock Test 10)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- CATEGORY 1: Biography & History ---
+        { topic: "Biography & History", word: "Polymath", phonetic: "/ˈpɒlɪmæθ/", form: "Noun", forms: "N/A", def: "A person of wide-ranging knowledge or learning.", translation: "Người thông thái, học giả uyên bác", example: "Was someone who could write authoritatively about so many subjects a polymath, a genius or a dilettante?", extraExample: "Leonardo da Vinci is widely considered the ultimate polymath of the Renaissance." },
+        { topic: "Biography & History", word: "Dilettante", phonetic: "/ˌdɪlɪˈtænti/", form: "Noun", forms: "Adj: Dilettantish", def: "A person who cultivates an area of interest, such as the arts, without real commitment or knowledge.", translation: "Kẻ tài tử, người không chuyên sâu", example: "...others will see him as some historians have — as a dilettante.", extraExample: "He was merely a dilettante in the art world, dabbling in painting without taking it seriously." },
+        { topic: "Biography & History", word: "Hypothesise", phonetic: "/haɪˈpɒθəsaɪz/", form: "Verb", forms: "N: Hypothesis", def: "To give a possible but not yet proved explanation for something.", translation: "Giả thuyết, đưa ra giả thuyết", example: "Young hypothesised that this was achieved by changes in the shape of the lens.", extraExample: "Scientists hypothesise that the universe is continually expanding." },
+        { topic: "Biography & History", word: "Instrumental", phonetic: "/ˌɪnstrəˈmentl/", form: "Adjective", forms: "N: Instrument", def: "Serving as a crucial means, agent, or tool.", translation: "Góp phần quan trọng, là công cụ", example: "Young was instrumental in cracking the code that unlocked the unknown script...", extraExample: "Her networking skills were instrumental in securing the funding for the project." },
+        { topic: "Biography & History", word: "Prodigy", phonetic: "/ˈprɒdɪdʒi/", form: "Noun", forms: "Adj: Prodigious", def: "A young person with exceptional qualities or abilities.", translation: "Thần đồng", example: "These are the landmark achievements of a man who was a child prodigy...", extraExample: "Mozart was a musical prodigy who composed his first symphony at age eight." },
+        { topic: "Biography & History", word: "Oblivion", phonetic: "/əˈblɪviən/", form: "Noun", forms: "Adj: Oblivious", def: "The state of being unaware or forgotten, especially by the public.", translation: "Sự lãng quên", example: "...who, unlike many remarkable children, did not disappear into oblivion as an adult.", extraExample: "Many former pop stars quickly fade into oblivion after a few years." },
+        { topic: "Biography & History", word: "Devour", phonetic: "/dɪˈvaʊə(r)/", form: "Verb", forms: "N/A", def: "To read quickly and eagerly, or to eat hungrily.", translation: "Đọc ngấu nghiến, ăn ngấu nghiến", example: "He had devoured books from the age of two...", extraExample: "She devoured the entire novel in just one afternoon." },
+        { topic: "Biography & History", word: "Daunting", phonetic: "/ˈdɔːntɪŋ/", form: "Adjective", forms: "V: Daunt", def: "Seeming difficult to deal with in prospect; intimidating.", translation: "Làm nản chí, làm chùn bước", example: "Young is a perfect subject for a biography — perfect, but daunting.", extraExample: "Starting a new business can be a daunting prospect for many people." },
+        { topic: "Biography & History", word: "Exposition", phonetic: "/ˌekspəˈzɪʃn/", form: "Noun", forms: "V: Expose", def: "A comprehensive description and explanation of an idea or theory.", translation: "Sự trình bày, sự giải thích", example: "He succeeds, providing clear expositions of the technical material...", extraExample: "The professor gave a brilliant exposition of the new economic theory." },
+        { topic: "Biography & History", word: "Rancorous", phonetic: "/ˈræŋkərəs/", form: "Adjective", forms: "N: Rancour", def: "Characterized by bitterness or resentment.", translation: "Đầy thù oán, cay độc", example: "...she sustained her husband through some rancorous disputes about optics...", extraExample: "The divorce proceedings were incredibly rancorous and lasted for years." },
+
+        // --- CATEGORY 2: Environment & Business ---
+        { topic: "Environment & Business", word: "Incineration", phonetic: "/ɪnˌsɪnəˈreɪʃn/", form: "Noun", forms: "V: Incinerate | N: Incinerator", def: "The destruction of something, especially waste material, by burning.", translation: "Sự thiêu rụi, sự đốt rác", example: "For many years, burning rubbish has been portrayed as the lazy option... only then should we consider incineration...", extraExample: "The city is planning to build a new plant for the incineration of medical waste." },
+        { topic: "Environment & Business", word: "Minuscule", phonetic: "/ˈmɪnəskjuːl/", form: "Adjective", forms: "N/A", def: "Extremely small; tiny.", translation: "Cực kỳ nhỏ bé", example: "...and the output from these facilities is now minuscule.", extraExample: "The chances of winning the lottery are minuscule." },
+        { topic: "Environment & Business", word: "Advocate", phonetic: "/ˈædvəkət/", form: "Noun", forms: "V: Advocate", def: "A person who publicly supports or recommends a particular cause or policy.", translation: "Người ủng hộ, người biện hộ", example: "Advocates see incineration as a practical way to deal swiftly with an immediate problem.", extraExample: "She is a passionate advocate for children's rights." },
+        { topic: "Environment & Business", word: "Comprehensive", phonetic: "/ˌkɒmprɪˈhensɪv/", form: "Adjective", forms: "N: Comprehension", def: "Complete; including all or nearly all elements or aspects of something.", translation: "Toàn diện, đầy đủ", example: "...and an even more comprehensive concept known as 'zero waste'.", extraExample: "The school offers a comprehensive training program for new teachers." },
+        { topic: "Environment & Business", word: "Inception", phonetic: "/ɪnˈsepʃn/", form: "Noun", forms: "N/A", def: "The establishment or starting point of an institution or activity.", translation: "Sự khởi đầu, sự thành lập", example: "Dealing with the problem of waste disposal involves tracing the whole process that took the material from its inception to landfill.", extraExample: "Since its inception in 1990, the charity has helped millions of people." },
+        { topic: "Environment & Business", word: "Clear-cut", phonetic: "/ˌklɪəˈkʌt/", form: "Adjective", forms: "N/A", def: "Sharply defined; easy to perceive or understand.", translation: "Rõ ràng, dứt khoát", example: "...so it's not always clear-cut.", extraExample: "There is no clear-cut answer to this complicated philosophical question." },
+        { topic: "Environment & Business", word: "Align", phonetic: "/əˈlaɪn/", form: "Verb", forms: "N: Alignment", def: "To place or arrange in a straight line, or to put in agreement.", translation: "Căn chỉnh, điều chỉnh cho phù hợp", example: "'Perhaps we can align the environmental message to these deep-seated values,' he says.", extraExample: "We need to align our business strategy with our long-term goals." },
+        { topic: "Environment & Business", word: "Deep-seated", phonetic: "/ˌdiːpˈsiːtɪd/", form: "Adjective", forms: "N/A", def: "Firmly established at a deep or profound level.", translation: "Bám rễ sâu, ăn sâu", example: "'Perhaps we can align the environmental message to these deep-seated values,' he says.", extraExample: "The country's economic problems are caused by deep-seated corruption." },
+        { topic: "Environment & Business", word: "Pursuit", phonetic: "/pəˈsjuːt/", form: "Noun", forms: "V: Pursue", def: "The action of following or pursuing someone or something.", translation: "Sự theo đuổi", example: "...countries such as the UK seem to be stepping away from the environment in pursuit of short-term economic goals.", extraExample: "He left his hometown in pursuit of a career in acting." },
+
+        // --- CATEGORY 3: Literature & Psychology ---
+        { topic: "Literature & Psychology", word: "Confounding", phonetic: "/kənˈfaʊndɪŋ/", form: "Adjective", forms: "V: Confound", def: "Causing surprise or confusion, especially by not acting with expectations.", translation: "Gây nhầm lẫn, làm bối rối", example: "...because of the many confounding factors which exist in this field.", extraExample: "The experiment yielded some confounding results that the team could not explain." },
+        { topic: "Literature & Psychology", word: "Contentious", phonetic: "/kənˈtenʃəs/", form: "Adjective", forms: "N: Contention", def: "Causing or likely to cause an argument; controversial.", translation: "Gây tranh cãi", example: "The issue of how a teacher can use a children’s book is often contentious...", extraExample: "Gun control remains a highly contentious issue in many countries." },
+        { topic: "Literature & Psychology", word: "Didactic", phonetic: "/daɪˈdæktɪk/", form: "Adjective", forms: "N: Didacticism", def: "Intended to teach, particularly in having moral instruction as an ulterior motive.", translation: "Giáo khoa, mang tính răn dạy", example: "...but even outside the classroom, much material for children is still didactic.", extraExample: "The novel's tone was overly didactic, feeling more like a lecture than a story." },
+        { topic: "Literature & Psychology", word: "Negligibly", phonetic: "/ˈneɡlɪdʒəbli/", form: "Adverb", forms: "Adj: Negligible", def: "So small or unimportant as to be not worth considering.", translation: "Một cách không đáng kể", example: "...recruited with a message that is negligibly literary and significantly oriented to ideas of consumption.", extraExample: "The price difference between the two brands is negligibly small." },
+        { topic: "Literature & Psychology", word: "Continuum", phonetic: "/kənˈtɪnjuəm/", form: "Noun", forms: "Adj: Continuous", def: "A continuous sequence in which adjacent elements are not perceptibly different from each other.", translation: "Chuỗi liên tục", example: "...since children themselves undoubtedly perceive their print literature as part of a broader continuum?", extraExample: "Mental health is not black and white; it exists on a continuum." },
+        { topic: "Literature & Psychology", word: "Fragment", phonetic: "/fræɡˈment/", form: "Verb", forms: "N: Fragment | Adj: Fragmented", def: "To break or cause to break into pieces.", translation: "Làm vỡ, phân mảnh", example: "...at least three disciplinary frameworks... fragment the focus of scholarly study of children's literature.", extraExample: "The political party began to fragment into several smaller factions." },
+        { topic: "Literature & Psychology", word: "Welter", phonetic: "/ˈweltə(r)/", form: "Noun", forms: "N/A", def: "A large number of items in no order; a confused mass.", translation: "Mớ hỗn độn", example: "...honored among such a welter of conflicting interests?", extraExample: "She had to sort through a welter of paperwork on her desk." },
+        { topic: "Literature & Psychology", word: "Perceptive", phonetic: "/pəˈseptɪv/", form: "Adjective", forms: "N: Perception | Adv: Perceptively", def: "Having or showing sensitive insight.", translation: "Sâu sắc, nhạy bén", example: "As David Lewis (2001) has perceptively noted...", extraExample: "It was a very perceptive comment that got straight to the heart of the issue." },
+        { topic: "Literature & Psychology", word: "Prerequisite", phonetic: "/ˌpriːˈrekwəzɪt/", form: "Noun", forms: "Adj: Prerequisite", def: "A thing that is required as a prior condition for something else to happen or exist.", translation: "Điều kiện tiên quyết", example: "...a better understanding of how children read... is a prerequisite to improved approaches to teaching.", extraExample: "Passing the introductory course is a prerequisite for enrolling in the advanced class." },
+        { topic: "Literature & Psychology", word: "Subliminal", phonetic: "/sʌbˈlɪmɪnl/", form: "Adjective", forms: "Adv: Subliminally", def: "Below the threshold of sensation or consciousness; perceived by or affecting someone's mind without their being aware of it.", translation: "Thuộc tiềm thức, ngầm", example: "Some readers respond to the patterns of the words, 'hearing' them inaudibly like a subliminal radio program.", extraExample: "The advertisement used subliminal messaging to make people crave fast food." },
+        { topic: "Literature & Psychology", word: "Alienate", phonetic: "/ˈeɪliəneɪt/", form: "Verb", forms: "N: Alienation", def: "To cause someone to feel isolated or estranged.", translation: "Làm xa lánh", example: "Pupils frequently become alienated from the cultures of both home and school...", extraExample: "His aggressive behavior alienated all of his friends." },
+        { topic: "Literature & Psychology", word: "Solipsism", phonetic: "/ˈsɒlɪpsɪzəm/", form: "Noun", forms: "Adj: Solipsistic", def: "The view or theory that the self is all that can be known to exist.", translation: "Thuyết duy ngã", example: "All descriptions of reading run the risk of solipsism: i.e. this is how I read so this is what reading is for everyone.", extraExample: "His essay argued that the rise of social media encourages cultural solipsism." },
+        { topic: "Literature & Psychology", word: "Evoke", phonetic: "/ɪˈvəʊk/", form: "Verb", forms: "N: Evocation", def: "To bring or recall to the conscious mind.", translation: "Gợi lên", example: "...I may judge books by their capacity to evoke a vivid visual response.", extraExample: "The old photographs evoked a lot of happy childhood memories." }
+    ];
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- Topic Filtering ---
+    function filterTopic(topicName) {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid(topicName);
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            const activeFilter = document.querySelector('.filter-btn.active').textContent;
+            let topicName = 'all';
+            if (activeFilter.includes('Biography')) topicName = 'Biography & History';
+            if (activeFilter.includes('Environment')) topicName = 'Environment & Business';
+            if (activeFilter.includes('Literature')) topicName = 'Literature & Psychology';
+            
+            extractDataFromGrid(topicName);
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid(topicName = 'all') {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            if (topicName === 'all' || item.topic === topicName) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) return;
+        const data = flashcardData[currentCardIndex];
+        
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-phonetic').textContent = data.phonetic;
+            document.getElementById('fc-topic').textContent = data.topic;
+            
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #115e59;">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: #ccfbf1; padding: 1rem; border-left: 4px solid #115e59; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #115e59; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
