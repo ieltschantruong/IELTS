@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PET Reading Mock Test 2 - Vocabulary</title>
+    <title>PET Reading Mock Test 2 - Vocabulary Learning</title>
     <style>
         :root {
             /* Theme: Deep Maroon/Red reflecting History, Law, and Art */
@@ -17,7 +17,7 @@
             --border: #fecdd3;
             --badge-bg: #fda4af;
             --badge-text: #4c0519;
-            --success: #0369a1; /* Blue for translation */
+            --success: #0369a1; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -30,14 +30,19 @@
         header { text-align: center; margin-bottom: 2rem; }
         h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
 
-        /* Topic Filter Controls */
-        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
         .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .filter-btn:hover:not(.active) { background: var(--primary-light); }
 
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
         /* View Toggles */
-        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
         .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
         .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
@@ -48,7 +53,7 @@
         .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(159, 18, 57, 0.15); border-color: var(--border); }
         .vocab-card.hidden { display: none; }
         .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
-        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
         .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
         .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
         .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
@@ -116,10 +121,18 @@
 
     <!-- Topic Filter -->
     <div class="filter-controls" id="topic-filters">
-        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
-        <button class="filter-btn" onclick="filterTopic('Culture & History')">Culture & History</button>
-        <button class="filter-btn" onclick="filterTopic('Law & Society')">Law & Society</button>
-        <button class="filter-btn" onclick="filterTopic('Art & Architecture')">Art & Architecture</button>
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Culture & History')">Tea (Culture & History)</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Law & Society')">Law (Law & Society)</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Art & Architecture')">MONA (Art & Architecture)</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
     </div>
 
     <div class="view-controls">
@@ -133,6 +146,7 @@
             <div class="flashcard-inner">
                 <div class="flashcard-face flashcard-front">
                     <h2 class="word" id="fc-word">Word</h2>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
                     <div class="meta-row">
                         <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
                     </div>
@@ -169,45 +183,126 @@
 
 <script>
     // ---------------------------------------------------------
-    // Vocabulary Bank (PET Reading Mock Test 1)
+    // Vocabulary Bank (PET Reading Mock Test 2)
     // ---------------------------------------------------------
     const vocabBank = [
         // --- CATEGORY 1: Culture & History (Passage 1: Tea) ---
-        { topic: "Culture & History", word: "Hygienic", phonetic: "/haɪˈdʒiːnɪk/", form: "Adjective", forms: "N: Hygiene", def: "Clean and free of bacteria and therefore unlikely to spread disease.", translation: "Hợp vệ sinh, sạch sẽ", example: "His far-sighted edicts required... that all drinking water be boiled as a hygienic precaution.", extraExample: "Food must be prepared in strictly hygienic conditions." },
-        { topic: "Culture & History", word: "Precaution", phonetic: "/prɪˈkɔːʃn/", form: "Noun", forms: "Adj: Precautionary", def: "A measure taken in advance to prevent something dangerous or unpleasant from happening.", translation: "Sự phòng ngừa, biện pháp phòng ngừa", example: "...that all drinking water be boiled as a hygienic precaution.", extraExample: "They took the precaution of locking all the doors before leaving." },
-        { topic: "Culture & History", word: "Intrigue", phonetic: "/ɪnˈtriːɡ/", form: "Verb", forms: "Adj: Intriguing", def: "Arouse the curiosity or interest of; fascinate.", translation: "Gây tò mò, hấp dẫn", example: "As a scientist, the Emperor was intrigued by the new liquid...", extraExample: "The strange plot of the novel completely intrigued the readers." },
-        { topic: "Culture & History", word: "Enhance", phonetic: "/ɪnˈhɑːns/", form: "Verb", forms: "N: Enhancement", def: "Intensify, increase, or further improve the quality, value, or extent of something.", translation: "Nâng cao, củng cố", example: "...who had seen the value of tea in enhancing meditation in China.", extraExample: "Adding fresh herbs will greatly enhance the flavor of the soup." },
-        { topic: "Culture & History", word: "Monastery", phonetic: "/ˈmɒnəstri/", form: "Noun", forms: "Adj: Monastic", def: "A building or buildings occupied by a community of monks living under religious vows.", translation: "Tu viện", example: "...and spread rapidly from the royal court and monasteries to other sections of society.", extraExample: "The old monastery was situated high up in the isolated mountains." },
-        { topic: "Culture & History", word: "Embellish", phonetic: "/ɪmˈbelɪʃ/", form: "Verb", forms: "N: Embellishment", def: "Make something more attractive by the addition of decorative details or features.", translation: "Trang trí, làm đẹp thêm", example: "...and for a period the tea ceremony became corrupted, boisterous and highly embellished.", extraExample: "She embellished her dress with colorful beads and lace." },
-        { topic: "Culture & History", word: "Beverage", phonetic: "/ˈbevərɪdʒ/", form: "Noun", forms: "N/A", def: "A drink, especially one other than water.", translation: "Thức uống, đồ uống", example: "...information concerning the then-unknown beverage began to filter back to Europe.", extraExample: "We offer a wide selection of hot and cold beverages." },
-        { topic: "Culture & History", word: "Domain", phonetic: "/dəˈmeɪn/", form: "Noun", forms: "N/A", def: "An area of territory owned or controlled by a ruler or government; a specified sphere of activity.", translation: "Lãnh địa, phạm vi", example: "...which immediately made it the domain of the wealthy.", extraExample: "Physics used to be the domain of a few specialized scientists." },
-        { topic: "Culture & History", word: "Controversy", phonetic: "/ˈkɒntrəvɜːsi/", form: "Noun", forms: "Adj: Controversial", def: "Prolonged public disagreement or heated discussion.", translation: "Sự tranh cãi, cuộc tranh luận", example: "...though the controversy lasted from 1635 to roughly 1657.", extraExample: "The new tax law caused widespread controversy across the country." },
-        { topic: "Culture & History", word: "Furnish", phonetic: "/ˈfɜːnɪʃ/", form: "Verb", forms: "Adj: Furnished | N: Furnishings", def: "Supply someone with something; give something to someone.", translation: "Cung cấp, trang bị", example: "Innkeepers would furnish guests with a portable tea set...", extraExample: "The hotel will furnish all guests with fresh towels every morning." },
+        // B2
+        { topic: "Culture & History", level: "B2", word: "Legend", form: "Noun", phonetic: "/ˈledʒənd/", forms: "Adj: Legendary", def: "A traditional story from the past.", translation: "Truyền thuyết", example: "According to legend, tea was discovered accidentally.", extraExample: "The legend of King Arthur is known globally." },
+        { topic: "Culture & History", level: "B2", word: "Refreshing", form: "Adjective", phonetic: "/rɪˈfreʃɪŋ/", forms: "V: Refresh", def: "Making you feel less tired or hot.", translation: "Sảng khoái", example: "The emperor found the drink refreshing.", extraExample: "A cool breeze is very refreshing on a hot day." },
+        { topic: "Culture & History", level: "B2", word: "Ceremony", form: "Noun", phonetic: "/ˈserəməni/", forms: "Adj: Ceremonial", def: "A formal event or ritual.", translation: "Nghi lễ", example: "The tea ceremony became an art form in Japan.", extraExample: "The opening ceremony of the Olympics was grand." },
+        { topic: "Culture & History", level: "B2", word: "Wealthy", form: "Adjective", phonetic: "/ˈwelθi/", forms: "N: Wealth", def: "Rich.", translation: "Giàu có", example: "Tea was first popular among wealthy people.", extraExample: "Only wealthy individuals could afford the luxury items." },
+        { topic: "Culture & History", level: "B2", word: "Controversy", form: "Noun", phonetic: "/ˈkɒntrəvɜːsi/", forms: "Adj: Controversial", def: "Disagreement or public debate.", translation: "Cuộc tranh cãi", example: "There was controversy about tea’s health effects.", extraExample: "The new rules caused widespread controversy." },
+        { topic: "Culture & History", level: "B2", word: "Importation", form: "Noun", phonetic: "/ˌɪmpɔːˈteɪʃn/", forms: "V: Import", def: "The act of bringing goods into a country.", translation: "Sự nhập khẩu", example: "Tea importation rose sharply in England.", extraExample: "The government banned the importation of exotic animals." },
+        { topic: "Culture & History", level: "B2", word: "Caravan", form: "Noun", phonetic: "/ˈkærəvæn/", forms: "N/A", def: "A group of camels or vehicles travelling together.", translation: "Đoàn lữ hành", example: "Tea was transported by camel caravans.", extraExample: "The merchants travelled in a large caravan." },
+        { topic: "Culture & History", level: "B2", word: "Embassy", form: "Noun", phonetic: "/ˈembəsi/", forms: "N: Ambassador", def: "A group representing a government abroad.", translation: "Đại sứ quán", example: "The Chinese embassy brought tea to Russia.", extraExample: "We applied for our visas at the local embassy." },
+        // C1
+        { topic: "Culture & History", level: "C1", word: "Hygienic", form: "Adjective", phonetic: "/haɪˈdʒiːnɪk/", forms: "N: Hygiene", def: "Clean and safe for health.", translation: "Hợp vệ sinh", example: "Water was boiled as a hygienic precaution.", extraExample: "Food must be prepared in hygienic conditions." },
+        { topic: "Culture & History", level: "C1", word: "Intrigue", form: "Verb", phonetic: "/ɪnˈtriːɡ/", forms: "Adj: Intrigued", def: "Arouse the curiosity or interest of; fascinate.", translation: "Gây tò mò / thu hút", example: "The new drink began to intrigue the emperor.", extraExample: "The strange novel completely intrigued me." },
+        { topic: "Culture & History", level: "C1", word: "Infuse", form: "Verb", phonetic: "/ɪnˈfjuːz/", forms: "N: Infusion", def: "Soak to extract flavor.", translation: "Ngâm / hãm", example: "He let the tea leaves infuse in hot water.", extraExample: "Allow the herbs to infuse in the oil." },
+        { topic: "Culture & History", level: "C1", word: "Meditation", form: "Noun", phonetic: "/ˌmedɪˈteɪʃn/", forms: "V: Meditate", def: "Deep mental concentration.", translation: "Thiền định", example: "Tea helped Buddhist priests during meditation.", extraExample: "Yoga and meditation are great for stress." },
+        { topic: "Culture & History", level: "C1", word: "Graceful", form: "Adjective", phonetic: "/ˈɡreɪsfl/", forms: "N: Grace", def: "Elegant and attractive.", translation: "Duyên dáng", example: "Tea was served in a graceful manner.", extraExample: "The dancer's movements were incredibly graceful." },
+        { topic: "Culture & History", level: "C1", word: "Embellish", form: "Verb", phonetic: "/ɪmˈbelɪʃ/", forms: "N: Embellishment", def: "Decorate.", translation: "Trang trí cầu kỳ", example: "They decided to embellish the walls with paintings.", extraExample: "He tends to embellish his stories to make them exciting." },
+        { topic: "Culture & History", level: "C1", word: "Definitive", form: "Adjective", phonetic: "/dɪˈfɪnətɪv/", forms: "Adv: Definitively", def: "Considered most important or complete.", translation: "Mang tính chuẩn mực", example: "The first definitive book on tea was written in China.", extraExample: "We need a definitive answer by tomorrow." },
+        { topic: "Culture & History", level: "C1", word: "Domain", form: "Noun", phonetic: "/dəˈmeɪn/", forms: "N/A", def: "An area controlled by a group.", translation: "Lĩnh vực / phạm vi", example: "Tea became the domain of the wealthy.", extraExample: "Physics used to be the domain of a few scientists." },
+        { topic: "Culture & History", level: "C1", word: "Scholarly", form: "Adjective", phonetic: "/ˈskɒləli/", forms: "N: Scholar", def: "Related to academic study.", translation: "Mang tính học thuật", example: "There was scholarly debate regarding tea's effects.", extraExample: "She wrote a scholarly article on ancient history." },
+        { topic: "Culture & History", level: "C1", word: "Treaty", form: "Noun", phonetic: "/ˈtriːti/", forms: "N/A", def: "A formal agreement between countries.", translation: "Hiệp ước", example: "Russia signed a trade treaty with China.", extraExample: "The peace treaty ended the long war." },
+        // C2
+        { topic: "Culture & History", level: "C2", word: "Patron", form: "Noun", phonetic: "/ˈpeɪtrən/", forms: "N: Patronage", def: "A supporter of arts or culture.", translation: "Người bảo trợ", example: "The emperor was a patron of the arts.", extraExample: "The museum relies on wealthy patrons." },
+        { topic: "Culture & History", level: "C2", word: "Edict", form: "Noun", phonetic: "/ˈiːdɪkt/", forms: "N/A", def: "An official order.", translation: "Sắc lệnh", example: "His edict required water to be boiled.", extraExample: "The king issued an edict banning all gatherings." },
+        { topic: "Culture & History", level: "C2", word: "Far-sighted", form: "Adjective", phonetic: "/ˌfɑː ˈsaɪtɪd/", forms: "N: Far-sightedness", def: "Planning wisely for the future.", translation: "Nhìn xa trông rộng", example: "The emperor’s far-sighted policies improved health.", extraExample: "Buying that land was a far-sighted decision." },
+        { topic: "Culture & History", level: "C2", word: "Supreme", form: "Adjective", phonetic: "/suˈpriːm/", forms: "N: Supremacy", def: "Highest in importance.", translation: "Tối cao", example: "Supreme importance was given to tea preparation.", extraExample: "The general is the supreme commander." },
+        { topic: "Culture & History", level: "C2", word: "Corruption", form: "Noun", phonetic: "/kəˈrʌpʃn/", forms: "V: Corrupt", def: "Loss of original purity.", translation: "Sự tha hóa", example: "The tea ceremony suffered corruption over time.", extraExample: "The journalist exposed widespread corruption." },
+        { topic: "Culture & History", level: "C2", word: "Boisterous", form: "Adjective", phonetic: "/ˈbɔɪstərəs/", forms: "N: Boisterousness", def: "Noisy and energetic.", translation: "Ồn ào náo nhiệt", example: "The tea ceremony became boisterous.", extraExample: "The children were very boisterous." },
+        { topic: "Culture & History", level: "C2", word: "Orientalist", form: "Adjective", phonetic: "/ˌɔːriˈentəlɪst/", forms: "N: Orientalism", def: "Connected with Eastern culture.", translation: "Thuộc phương Đông", example: "Europe became fascinated with orientalist culture.", extraExample: "He collected orientalist paintings." },
+        { topic: "Culture & History", level: "C2", word: "Filter back", form: "Phrasal Verb", phonetic: "/ˈfɪltə bæk/", forms: "N/A", def: "Gradually become known.", translation: "Được truyền về", example: "News about tea began to filter back to Europe.", extraExample: "Information slowly began to filter back to the press." },
 
         // --- CATEGORY 2: Law & Society (Passage 2: Law) ---
-        { topic: "Law & Society", word: "Permeate", phonetic: "/ˈpɜːmieɪt/", form: "Verb", forms: "N: Permeation", def: "Spread throughout (something); pervade.", translation: "Thấm vào, lan tỏa khắp", example: "...is the way in which the idea of law has permeated all parts of social life.", extraExample: "The smell of freshly baked bread permeated the entire house." },
-        { topic: "Law & Society", word: "Illiterate", phonetic: "/ɪˈlɪtərət/", form: "Adjective", forms: "N: Illiteracy", def: "Unable to read or write.", translation: "Mù chữ, không biết chữ", example: "In earlier times, most people were illiterate.", extraExample: "The charity works to provide education in heavily illiterate communities." },
-        { topic: "Law & Society", word: "Versatile", phonetic: "/ˈvɜːsətaɪl/", form: "Adjective", forms: "N: Versatility", def: "Able to adapt or be adapted to many different functions or activities.", translation: "Đa năng, linh hoạt", example: "However, law is a versatile instrument that can be used equally well for the improvement...", extraExample: "Eggs are one of the most versatile ingredients in cooking." },
-        { topic: "Law & Society", word: "Seize up", phonetic: "/siːz ʌp/", form: "Phrasal Verb", forms: "N/A", def: "Stop moving or working in the normal way.", translation: "Ngừng hoạt động, kẹt cứng", example: "Without their knowledge, many parts of commercial and social life today would seize up in minutes.", extraExample: "The engine seized up because it completely ran out of oil." },
-        { topic: "Law & Society", word: "Legislative", phonetic: "/ˈledʒɪslətɪv/", form: "Adjective", forms: "N: Legislature, Legislation | V: Legislate", def: "Having the power to make laws.", translation: "Thuộc về lập pháp", example: "The legislative output of the British Parliament has more than doubled...", extraExample: "The country's legislative body voted to pass the new environmental bill." },
-        { topic: "Law & Society", word: "Vindicate", phonetic: "/ˈvɪndɪkeɪt/", form: "Verb", forms: "N: Vindication", def: "Clear someone of blame or suspicion; show or prove to be right, reasonable, or justified.", translation: "Minh oan, bảo vệ (quyền lợi)", example: "...lawyers do a great deal not just to vindicate the rights of citizens...", extraExample: "New DNA evidence eventually vindicated the man who was wrongly imprisoned." },
-        { topic: "Law & Society", word: "Revere", phonetic: "/rɪˈvɪə/", form: "Verb", forms: "N: Reverence | Adj: Reverent", def: "Feel deep respect or admiration for something.", translation: "Tôn kính, sùng kính", example: "...it is worth remembering that there are and have been many heroic and revered lawyers...", extraExample: "Nelson Mandela is revered globally for his peaceful fight for human rights." },
-        { topic: "Law & Society", word: "Misfortune", phonetic: "/ˌmɪsˈfɔːtʃuːn/", form: "Noun", forms: "N/A", def: "Bad luck; an unfortunate condition or event.", translation: "Sự bất hạnh, điều rủi ro", example: "...professionals whose concerns put personal reward above truth, or who gain financially from misfortune.", extraExample: "She faced great misfortune when she lost her job and her home in the same week." },
-        { topic: "Law & Society", word: "Lavishly", phonetic: "/ˈlævɪʃli/", form: "Adverb", forms: "Adj: Lavish", def: "In a sumptuously rich, elaborate, or luxurious manner.", translation: "Một cách hào phóng, xa hoa", example: "Such work is not lavishly remunerated and the quality of the service...", extraExample: "The dining hall was lavishly decorated with gold and crystal for the wedding." },
-        { topic: "Law & Society", word: "Remunerate", phonetic: "/rɪˈmjuːnəreɪt/", form: "Verb", forms: "N: Remuneration", def: "Pay someone for services rendered or work done.", translation: "Trả công, trả thù lao", example: "Such work is not lavishly remunerated...", extraExample: "Employees should be fairly remunerated for the extra hours they work." },
+        // B2
+        { topic: "Law & Society", level: "B2", word: "Property", form: "Noun", phonetic: "/ˈprɒpəti/", forms: "N/A", def: "Things owned by someone.", translation: "Tài sản", example: "Law protects private property.", extraExample: "The stolen property was recovered." },
+        { topic: "Law & Society", level: "B2", word: "Dissolve", form: "Verb", phonetic: "/dɪˈzɒlv/", forms: "N: Dissolution", def: "Officially end something.", translation: "Giải thể", example: "Companies have the right to legally dissolve.", extraExample: "The monarch can dissolve parliament." },
+        { topic: "Law & Society", level: "B2", word: "Rights", form: "Noun", phonetic: "/raɪts/", forms: "N: Right", def: "Freedoms protected by law.", translation: "Quyền lợi", example: "Lawyers defend citizens’ rights.", extraExample: "Everyone has the right to a fair trial." },
+        { topic: "Law & Society", level: "B2", word: "Argument", form: "Noun", phonetic: "/ˈɑːɡjumənt/", forms: "V: Argue", def: "Reasoning supporting an opinion.", translation: "Lập luận", example: "Judges consider legal arguments carefully.", extraExample: "Her argument was highly logical." },
+        { topic: "Law & Society", level: "B2", word: "Profession", form: "Noun", phonetic: "/prəˈfeʃn/", forms: "Adj: Professional", def: "A job requiring expertise.", translation: "Nghề nghiệp chuyên môn", example: "Law is a highly respected profession.", extraExample: "She entered the medical profession." },
+        { topic: "Law & Society", level: "B2", word: "Criticism", form: "Noun", phonetic: "/ˈkrɪtɪsɪzəm/", forms: "V: Criticize", def: "Negative judgment.", translation: "Sự chỉ trích", example: "Lawyers often face harsh criticism.", extraExample: "He handled the criticism of his film well." },
+        // C1
+        { topic: "Law & Society", level: "C1", word: "Permeate", form: "Verb", phonetic: "/ˈpɜːmieɪt/", forms: "N: Permeation", def: "Spread through something completely.", translation: "Thấm nhuần / lan tỏa", example: "Legal ideas permeate society today.", extraExample: "The smell of coffee permeated the room." },
+        { topic: "Law & Society", level: "C1", word: "Tolerate", form: "Verb", phonetic: "/ˈtɒləreɪt/", forms: "N: Tolerance", def: "To accept something annoying without complaining.", translation: "Chấp nhận", example: "I don't know how you tolerate that noise!", extraExample: "Our school will not tolerate bullying." },
+        { topic: "Law & Society", level: "C1", word: "Versatile", form: "Adjective", phonetic: "/ˈvɜːsətaɪl/", forms: "N: Versatility", def: "Able to be used in many ways.", translation: "Đa năng", example: "Law is a versatile instrument.", extraExample: "Eggs are a versatile cooking ingredient." },
+        { topic: "Law & Society", level: "C1", word: "Degradation", form: "Noun", phonetic: "/ˌdeɡrəˈdeɪʃn/", forms: "V: Degrade", def: "Decline to a worse condition.", translation: "Sự suy thoái", example: "Law can lead to social degradation.", extraExample: "Environmental degradation is a global issue." },
+        { topic: "Law & Society", level: "C1", word: "Seize up", form: "Phrasal Verb", phonetic: "/siːz ʌp/", forms: "N/A", def: "Stop functioning.", translation: "Đình trệ", example: "Society would seize up without experts.", extraExample: "The engine will seize up without oil." },
+        { topic: "Law & Society", level: "C1", word: "Legislative", form: "Adjective", phonetic: "/ˈledʒɪslətɪv/", forms: "N: Legislature", def: "Related to making laws.", translation: "Thuộc lập pháp", example: "Legislative output has increased greatly.", extraExample: "The legislative body voted on the bill." },
+        { topic: "Law & Society", level: "C1", word: "Binding", form: "Adjective", phonetic: "/ˈbaɪndɪŋ/", forms: "V: Bind", def: "Legally required.", translation: "Có tính ràng buộc pháp lý", example: "Statutory instruments are legally binding.", extraExample: "They signed a legally binding contract." },
+        { topic: "Law & Society", level: "C1", word: "Vindicate", form: "Verb", phonetic: "/ˈvɪndɪkeɪt/", forms: "N: Vindication", def: "Prove or defend rights.", translation: "Bảo vệ / minh oan", example: "Lawyers work hard to vindicate citizens’ rights.", extraExample: "DNA evidence vindicated the innocent man." },
+        { topic: "Law & Society", level: "C1", word: "Revere", form: "Verb", phonetic: "/rɪˈvɪə/", forms: "N: Reverence", def: "Greatly respect.", translation: "Kính trọng", example: "Many people continue to revere Gandhi.", extraExample: "He is revered globally for his peace efforts." },
+        { topic: "Law & Society", level: "C1", word: "Remunerate", form: "Verb", phonetic: "/rɪˈmjuːnəreɪt/", forms: "N: Remuneration", def: "To pay somebody for work.", translation: "Trả công", example: "It is important to fairly remunerate public law work.", extraExample: "Employees must be remunerated for extra hours." },
+        // C2
+        { topic: "Law & Society", level: "C2", word: "Embryo", form: "Noun", phonetic: "/ˈembriəʊ/", forms: "Adj: Embryonic", def: "Earliest stage of development.", translation: "Phôi thai", example: "Law affects humans from the embryo onwards.", extraExample: "The project is at the embryo stage." },
+        { topic: "Law & Society", level: "C2", word: "Universally", form: "Adverb", phonetic: "/ˌjuːnɪˈvɜːsəli/", forms: "Adj: Universal", def: "In all situations.", translation: "Một cách phổ quát", example: "Legal understanding is universally needed.", extraExample: "It is a universally acknowledged truth." },
+        { topic: "Law & Society", level: "C2", word: "Statutory", form: "Adjective", phonetic: "/ˈstætʃətri/", forms: "N: Statute", def: "Established by law.", translation: "Thuộc luật định", example: "Parliament passed many statutory instruments.", extraExample: "The company fulfilled its statutory obligations." },
+        { topic: "Law & Society", level: "C2", word: "Accusation", form: "Noun", phonetic: "/ˌækjuˈzeɪʃn/", forms: "V: Accuse", def: "Claim that someone did wrong.", translation: "Lời buộc tội", example: "Lawyers often face an accusation of greed.", extraExample: "He denied the accusation of theft." },
+        { topic: "Law & Society", level: "C2", word: "Lavish", form: "Adjective", phonetic: "/ˈlævɪʃ/", forms: "Adv: Lavishly", def: "Extravagant.", translation: "Xa hoa", example: "They lived a very lavish lifestyle.", extraExample: "The hall featured lavish decorations." },
+        { topic: "Law & Society", level: "C2", word: "Dedication", form: "Noun", phonetic: "/ˌdedɪˈkeɪʃn/", forms: "V: Dedicate", def: "Strong commitment.", translation: "Sự tận tụy", example: "Public lawyers show great dedication.", extraExample: "Her dedication to studies paid off." },
+        { topic: "Law & Society", level: "C2", word: "Civil liberties", form: "Noun Phrase", phonetic: "/ˈsɪvl ˈlɪbətiz/", forms: "N/A", def: "Basic rights and freedoms.", translation: "Quyền tự do dân sự", example: "Lawyers defend civil liberties.", extraExample: "The law violated basic civil liberties." },
+        { topic: "Law & Society", level: "C2", word: "Degradation of humanity", form: "Noun Phrase", phonetic: "/ˌdeɡrəˈdeɪʃn əv hjuːˈmænəti/", forms: "N/A", def: "Moral decline of people.", translation: "Sự tha hóa của nhân loại", example: "Bad laws may contribute to the degradation of humanity.", extraExample: "Some warn against the degradation of humanity in the digital age." },
 
         // --- CATEGORY 3: Art & Architecture (Passage 3: MONA) ---
-        { topic: "Art & Architecture", word: "Ramification", phonetic: "/ˌræmɪfɪˈkeɪʃn/", form: "Noun", forms: "V: Ramify", def: "A consequence of an action or event, especially when complex or unwelcome.", translation: "Hệ quả, hậu quả", example: "However, MONA's effect on Hobart has broader ramifications for Tasmania's tourism industry.", extraExample: "The economic ramifications of the new trade agreement will be felt for years." },
-        { topic: "Art & Architecture", word: "Entice", phonetic: "/ɪnˈtaɪs/", form: "Verb", forms: "N: Enticement", def: "Attract or tempt by offering pleasure or advantage.", translation: "Dụ dỗ, thu hút", example: "The next challenge for the state is how to entice holiday-makers to stay longer...", extraExample: "The store used massive discount signs to entice customers inside." },
-        { topic: "Art & Architecture", word: "Nondescript", phonetic: "/ˈnɒndɪskrɪpt/", form: "Adjective", forms: "N/A", def: "Lacking distinctive or interesting features or characteristics.", translation: "Bình thường, không có gì nổi bật", example: "Although large, the building is rather nondescript, sitting heavily on the edge of the Derwent River.", extraExample: "The spy managed to blend in by wearing a completely nondescript grey suit." },
-        { topic: "Art & Architecture", word: "Notoriety", phonetic: "/ˌnəʊtəˈraɪəti/", form: "Noun", forms: "Adj: Notorious", def: "The state of being famous or well known for some bad quality or deed.", translation: "Sự tai tiếng, tiếng tăm (thường là xấu)", example: "MONA's 'wow factor' comes from the notoriety of David Walsh, the museum's millionaire founder...", extraExample: "The hacker gained international notoriety for breaking into government databases." },
-        { topic: "Art & Architecture", word: "Eccentric", phonetic: "/ɪkˈsentrɪk/", form: "Adjective", forms: "N: Eccentricity", def: "Unconventional and slightly strange.", translation: "Kỳ dị, lập dị", example: "The dark, moody labyrinth of gallery spaces could be likened to the mind of the eccentric founder himself.", extraExample: "The eccentric billionaire filled his mansion with bizarre modern art." },
-        { topic: "Art & Architecture", word: "Labyrinth", phonetic: "/ˈlæbərɪnθ/", form: "Noun", forms: "Adj: Labyrinthine", def: "A complicated irregular network of passages or paths in which it is difficult to find one's way; a maze.", translation: "Mê cung", example: "The dark, moody labyrinth of gallery spaces could be likened to the mind of the eccentric founder...", extraExample: "The old city is a labyrinth of narrow streets and tiny alleys." },
-        { topic: "Art & Architecture", word: "Uninhibited", phonetic: "/ˌʌnɪnˈhɪbɪtɪd/", form: "Adjective", forms: "V: Inhibit | N: Inhibition", def: "Expressing one's feelings or thoughts unselfconsciously and without restraint.", translation: "Không kiềm chế, không bị gò bó", example: "...there are uninhibited artistic descriptions of human relationships, death...", extraExample: "The children had uninhibited fun running wildly across the open field." },
-        { topic: "Art & Architecture", word: "Subterranean", phonetic: "/ˌsʌbtəˈreɪniən/", form: "Adjective", forms: "N/A", def: "Existing, occurring, or done under the earth's surface.", translation: "Dưới lòng đất", example: "People from all kinds of socioeconomic backgrounds are curious about what lies within the subterranean maze of MONA.", extraExample: "The explorers discovered a massive subterranean river inside the cave." },
-        { topic: "Art & Architecture", word: "Antiquity", phonetic: "/ænˈtɪkwəti/", form: "Noun", forms: "Adj/N: Antique", def: "The ancient past; an object, building, or work of art from the ancient past.", translation: "Cổ vật, thời cổ đại", example: "Walsh's antiquities collection is superb...", extraExample: "The museum houses a priceless collection of Roman and Greek antiquities." },
-        { topic: "Art & Architecture", word: "Abhor", phonetic: "/əbˈhɔː/", form: "Verb", forms: "N: Abhorrence | Adj: Abhorrent", def: "Regard with disgust and hatred.", translation: "Ghê tởm, căm ghét", example: "Walsh himself abhors descriptions of MONA as the Bilbao of the south...", extraExample: "I absolutely abhor the use of violence to solve political problems." }
+        // Mixed Levels (B2-C2 assigned systematically)
+        { topic: "Art & Architecture", level: "B2", word: "Landscape", form: "Noun", phonetic: "/ˈlændskeɪp/", forms: "N/A", def: "Overall appearance of an area.", translation: "Bức tranh tổng thể", example: "Tasmania’s cultural landscape changed.", extraExample: "The political landscape is shifting." },
+        { topic: "Art & Architecture", level: "C1", word: "Integral", form: "Adjective", phonetic: "/ˈɪntɪɡrəl/", forms: "N: Integration", def: "Essential or necessary.", translation: "Không thể thiếu", example: "Art became integral to the city.", extraExample: "Vegetables are an integral part of diet." },
+        { topic: "Art & Architecture", level: "C2", word: "Underpin", form: "Verb", phonetic: "/ˌʌndəˈpɪn/", forms: "N/A", def: "Support strongly.", translation: "Củng cố", example: "MONA continues to underpin tourism in Tasmania.", extraExample: "Research underpins our understanding." },
+        { topic: "Art & Architecture", level: "C2", word: "Ramification", form: "Noun", phonetic: "/ˌræmɪfɪˈkeɪʃn/", forms: "V: Ramify", def: "Consequences or effects.", translation: "Hệ quả", example: "MONA has broader ramifications for tourism.", extraExample: "The economic ramifications will be felt." },
+        { topic: "Art & Architecture", level: "C1", word: "Entice", form: "Verb", phonetic: "/ɪnˈtaɪs/", forms: "N: Enticement", def: "Attract or persuade.", translation: "Thu hút", example: "Tasmania hopes to entice visitors to stay longer.", extraExample: "Signs were used to entice customers." },
+        { topic: "Art & Architecture", level: "C2", word: "Nondescript", form: "Adjective", phonetic: "/ˈnɒndɪskrɪpt/", forms: "N/A", def: "Lacking interesting features.", translation: "Không nổi bật", example: "The exterior looks rather nondescript.", extraExample: "He wore a nondescript grey suit." },
+        { topic: "Art & Architecture", level: "C1", word: "Labyrinth", form: "Noun", phonetic: "/ˈlæbərɪnθ/", forms: "Adj: Labyrinthine", def: "Complicated maze-like place.", translation: "Mê cung", example: "Visitors wander through a labyrinth of galleries.", extraExample: "The old city is a labyrinth of streets." },
+        { topic: "Art & Architecture", level: "C2", word: "Subterranean", form: "Adjective", phonetic: "/ˌsʌbtəˈreɪniən/", forms: "N/A", def: "Underground.", translation: "Dưới lòng đất", example: "MONA is a subterranean gallery.", extraExample: "They discovered a subterranean river." },
+        { topic: "Art & Architecture", level: "C1", word: "Socioeconomic", form: "Adjective", phonetic: "/ˌsəʊsiəʊˌekəˈnɒmɪk/", forms: "N/A", def: "Related to society and economy.", translation: "Kinh tế-xã hội", example: "Visitors come from different socioeconomic backgrounds.", extraExample: "It helps lower socioeconomic groups." },
+        { topic: "Art & Architecture", level: "C1", word: "Notoriety", form: "Noun", phonetic: "/ˌnəʊtəˈraɪəti/", forms: "Adj: Notorious", def: "Fame for something unusual or bad.", translation: "Tai tiếng / sự nổi danh", example: "The museum gained notoriety quickly.", extraExample: "The hacker gained international notoriety." },
+        { topic: "Art & Architecture", level: "C2", word: "Materiality", form: "Noun", phonetic: "/məˌtɪəriˈæləti/", forms: "Adj: Material", def: "Physical qualities of materials.", translation: "Tính vật chất", example: "The architecture emphasizes dark materiality.", extraExample: "He studied the materiality of bronze." },
+        { topic: "Art & Architecture", level: "C1", word: "Eccentric", form: "Adjective", phonetic: "/ɪkˈsentrɪk/", forms: "N: Eccentricity", def: "Unusual or strange.", translation: "Lập dị", example: "Walsh is known as an eccentric founder.", extraExample: "The eccentric billionaire loved modern art." },
+        { topic: "Art & Architecture", level: "C2", word: "Uninhibited", form: "Adjective", phonetic: "/ˌʌnɪnˈhɪbɪtɪd/", forms: "V: Inhibit", def: "Expressing feelings freely.", translation: "Không kiềm chế", example: "The artworks contain uninhibited depictions.", extraExample: "The children had uninhibited fun." },
+        { topic: "Art & Architecture", level: "C1", word: "Antiquities", form: "Noun", phonetic: "/ænˈtɪkwətiz/", forms: "Adj: Antique", def: "Ancient objects.", translation: "Đồ cổ", example: "Walsh owns an impressive antiquities collection.", extraExample: "The museum houses Greek antiquities." },
+        { topic: "Art & Architecture", level: "C1", word: "Magnet", form: "Noun", phonetic: "/ˈmæɡnət/", forms: "Adj: Magnetic", def: "Something that strongly attracts.", translation: "Nam châm thu hút", example: "MONA became a magnet for tourists.", extraExample: "The city was a magnet for professionals." },
+        { topic: "Art & Architecture", level: "B2", word: "Phenomenon", form: "Noun", phonetic: "/fəˈnɒmɪnən/", forms: "Adj: Phenomenal", def: "Remarkable situation or event.", translation: "Hiện tượng", example: "The Bilbao Effect is a global phenomenon.", extraExample: "The eclipse was a spectacular phenomenon." },
+        { topic: "Art & Architecture", level: "C1", word: "Centrepiece", form: "Noun", phonetic: "/ˈsentəpiːs/", forms: "N/A", def: "The most important feature.", translation: "Điểm nhấn trung tâm", example: "Public architecture becomes a city’s centrepiece.", extraExample: "The chandelier was the centrepiece." }
     ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            if (matchTopic && matchLevel) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
 
     // --- DOM Injection ---
     function renderGrid() {
@@ -217,11 +312,13 @@
             const article = document.createElement('article');
             article.className = 'vocab-card';
             article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
             
             article.innerHTML = `
                 <div class="word-header">
                     <div class="word-main">
                         <span class="word">${item.word}</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
                         <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
                     </div>
                     <div class="meta-info">
@@ -266,28 +363,6 @@
         playAudio(word);
     }
 
-    // --- Topic Filtering ---
-    function filterTopic(topicName) {
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-
-        const allCards = document.querySelectorAll('.vocab-card');
-        allCards.forEach(card => {
-            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
-        });
-
-        if(document.getElementById('flashcard-view').style.display === 'flex') {
-             extractDataFromGrid(topicName);
-             currentCardIndex = 0;
-             updateFlashcardUI();
-        }
-    }
-
     // --- View Toggling ---
     function switchView(viewName) {
         const gridView = document.getElementById('grid-view');
@@ -306,13 +381,7 @@
             btnFlashcards.classList.add('active');
             btnGrid.classList.remove('active');
             
-            const activeFilter = document.querySelector('.filter-btn.active').textContent;
-            let topicName = 'all';
-            if (activeFilter.includes('Culture')) topicName = 'Culture & History';
-            if (activeFilter.includes('Law')) topicName = 'Law & Society';
-            if (activeFilter.includes('Art')) topicName = 'Art & Architecture';
-            
-            extractDataFromGrid(topicName);
+            extractDataFromGrid();
             currentCardIndex = 0;
             updateFlashcardUI();
         }
@@ -323,32 +392,48 @@
     let currentCardIndex = 0;
     const flashcardScene = document.getElementById('flashcard-scene');
 
-    function extractDataFromGrid(topicName = 'all') {
+    function extractDataFromGrid() {
         flashcardData = [];
         vocabBank.forEach(item => {
-            if (topicName === 'all' || item.topic === topicName) {
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            if (matchTopic && matchLevel) {
                 flashcardData.push(item);
             }
         });
     }
 
     function updateFlashcardUI() {
-        if (flashcardData.length === 0) return;
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
         const data = flashcardData[currentCardIndex];
-        
         flashcardScene.classList.remove('is-flipped');
         
         setTimeout(() => {
             document.getElementById('fc-word').textContent = data.word;
-            document.getElementById('fc-phonetic').textContent = data.phonetic;
-            document.getElementById('fc-topic').textContent = data.topic;
             
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
             document.getElementById('fc-definition').textContent = data.def;
             document.getElementById('fc-translation').textContent = data.translation;
             
             const examplesHTML = `
                 <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
-                    <strong style="color: #881337;">Word Forms:</strong> ${data.forms}
+                    <strong style="color: #881337;">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: #881337;">Word Forms:</strong> ${data.forms}
                 </div>
                 <div class="example-box" style="margin-bottom: 0.5rem; background-color: #ffe4e6; padding: 1rem; border-left: 4px solid #881337; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
                     <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #881337; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
