@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Listening Mock Test 3 - Vocabulary</title>
+    <style>
+        :root {
+            /* Theme: Deep Teal/Blue reflecting Audio, Focus, and Professionalism */
+            --primary: #0f766e; 
+            --primary-light: #ccfbf1;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #115e59;
+            --border: #99f6e4;
+            --badge-bg: #5eead4;
+            --badge-text: #134e4a;
+            --success: #0369a1; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(15, 118, 110, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+        .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
+        .extra-example span { color: #475569; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary); text-transform: capitalize;}
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>PET Listening Mock Test 3 - Vocabulary</h1>
+    </header>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Sections</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Airline Job')">Sec 1: Airline Job</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Wildlife Park')">Sec 2: Wildlife Park</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Plastic Architecture')">Sec 3: Plastic Architecture</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Modern Music')">Sec 4: Modern Music</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / 35</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Listening Mock Test 3)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- SECTION 1: Airline Job ---
+        { topic: "Airline Job", level: "C1", word: "Cabin crew", form: "Noun Phrase", phonetic: "/ˈkæbɪn kruː/", forms: "N/A", def: "The staff working on an aircraft whose job is to look after the passengers.", translation: "Phi hành đoàn (tiếp viên)", example: "I'm working as a cabin crew attendant.", extraExample: "The cabin crew will demonstrate the safety procedures.", contextSentence: "I'm working as a ________ attendant." },
+        { topic: "Airline Job", level: "B2", word: "Initial", form: "Adjective", phonetic: "/ɪˈnɪʃl/", forms: "Adv: Initially", def: "Occurring at the beginning; first.", translation: "Ban đầu, khởi đầu", example: "You might have to give them the initial safety demonstration before takeoff.", extraExample: "My initial reaction was to say no.", contextSentence: "You might have to give them the ________ safety demonstration before takeoff." },
+        { topic: "Airline Job", level: "C1", word: "Compartment", form: "Noun", phonetic: "/kəmˈpɑːtmənt/", forms: "N/A", def: "A separate section or part of a structure or container.", translation: "Ngăn để đồ, khoang", example: "That’s to make sure you can reach the high compartment in the plane.", extraExample: "Place your luggage in the overhead compartment.", contextSentence: "That’s to make sure you can reach the high ________ in the plane." },
+        { topic: "Airline Job", level: "B2", word: "Qualifications", form: "Noun", phonetic: "/ˌkwɒlɪfɪˈkeɪʃnz/", forms: "V: Qualify | Adj: Qualified", def: "A skill, personal quality, or type of experience that makes you suitable for a particular job.", translation: "Bằng cấp, trình độ chuyên môn", example: "What about qualifications? You need to show that you have a good level of English.", extraExample: "She has all the right qualifications for the job.", contextSentence: "What about ________? You need to show that you have a good level of English." },
+        { topic: "Airline Job", level: "B2", word: "Essential", form: "Adjective", phonetic: "/ɪˈsenʃl/", forms: "Adv: Essentially", def: "Absolutely necessary; extremely important.", translation: "Cần thiết, thiết yếu", example: "It's an advantage if you can speak another language, although for cabin crew, it's not essential.", extraExample: "Water is essential for living things.", contextSentence: "...although for cabin crew, it's not ________." },
+        { topic: "Airline Job", level: "C1", word: "Implications", form: "Noun", phonetic: "/ˌɪmplɪˈkeɪʃnz/", forms: "V: Implicate", def: "Possible effects or results of an action or a decision.", translation: "Tác động, hệ quả", example: "Becoming aware of the variety of cultures... and the implications of that.", extraExample: "We must consider the long-term implications of this policy.", contextSentence: "Becoming aware of the variety of cultures... and the ________ of that." },
+        { topic: "Airline Job", level: "B2", word: "Voluntary", form: "Adjective", phonetic: "/ˈvɒləntri/", forms: "N: Volunteer", def: "Done, given, or acting of one's own free will, without payment.", translation: "Tự nguyện", example: "Last year, I also did some voluntary work as part of a team.", extraExample: "He runs a voluntary organization for youth.", contextSentence: "Last year, I also did some ________ work as part of a team." },
+        { topic: "Airline Job", level: "C1", word: "Query", form: "Noun", phonetic: "/ˈkwɪəri/", forms: "Plural: Queries", def: "A question, especially one asking for information or expressing a doubt.", translation: "Câu hỏi, thắc mắc", example: "I was helping deal with queries from customers.", extraExample: "If you have any queries about your bill, please contact us.", contextSentence: "On the information desk, I was helping deal with ________ from customers." },
+
+        // --- SECTION 2: Wildlife Park ---
+        { topic: "Wildlife Park", level: "B2", word: "Updated", form: "Adjective", phonetic: "/ˌʌpˈdeɪtɪd/", forms: "V: Update", def: "Incorporating the latest developments and trends.", translation: "Cập nhật", example: "How oceanic island travelling keeps its tour group members updated.", extraExample: "Please keep me updated on your progress.", contextSentence: "How oceanic island travelling keeps its tour group members ________." },
+        { topic: "Wildlife Park", level: "B2", word: "Reception", form: "Noun", phonetic: "/rɪˈsepʃn/", forms: "N: Receptionist", def: "The place in a hotel or office where people go when they arrive.", translation: "Quầy lễ tân", example: "Please remember to check it at the reception area in the front of the visitor centre.", extraExample: "Leave your keys at the reception.", contextSentence: "Please remember to check it at the ________ area in the front." },
+        { topic: "Wildlife Park", level: "C1", word: "Notify", form: "Verb", phonetic: "/ˈnəʊtɪfaɪ/", forms: "N: Notification", def: "To formally or officially tell someone about something.", translation: "Thông báo", example: "We need to notify them of how many participants will be involved.", extraExample: "You will be notified of the decision by mail.", contextSentence: "We need to ________ them of how many participants will be involved." },
+        { topic: "Wildlife Park", level: "B2", word: "In advance", form: "Phrase", phonetic: "/ɪn ədˈvɑːns/", forms: "N/A", def: "Before a particular time, or before doing a particular thing.", translation: "Trước, sớm", example: "If you are interested to see a map of the Mystery Cave in advance of your trip...", extraExample: "You need to book your tickets well in advance.", contextSentence: "If you are interested to see a map of the Mystery Cave ________ of your trip..." },
+        { topic: "Wildlife Park", level: "C2", word: "Zoologist", form: "Noun", phonetic: "/zəʊˈɒlədʒɪst/", forms: "N: Zoology", def: "A scientist who studies animals and their behavior.", translation: "Nhà động vật học", example: "Although it does attract a lot of zoologists to do some research.", extraExample: "The zoologist spent months studying apes in the wild.", contextSentence: "Although it does attract a lot of ________s to do some research." },
+        { topic: "Wildlife Park", level: "B2", word: "Discounted", form: "Adjective", phonetic: "/ˈdɪskaʊntɪd/", forms: "N/V: Discount", def: "Reduced in price.", translation: "Được giảm giá", example: "Children aged 12 and under receive a discounted ticket price.", extraExample: "I bought these shoes at a highly discounted rate.", contextSentence: "Children aged 12 and under receive a ________ ticket price." },
+        { topic: "Wildlife Park", level: "C1", word: "Lifespan", form: "Noun", phonetic: "/ˈlaɪfspæn/", forms: "N/A", def: "The length of time that a person or animal lives or a thing functions.", translation: "Tuổi thọ", example: "These prehistoric animals have a lifespan of over 50 years.", extraExample: "The natural lifespan of a domestic cat is 12-15 years.", contextSentence: "These prehistoric animals have a ________ of over 50 years." },
+        { topic: "Wildlife Park", level: "B2", word: "Habitat", form: "Noun", phonetic: "/ˈhæbɪtæt/", forms: "N/A", def: "The natural home or environment of an animal, plant, or other organism.", translation: "Môi trường sống tự nhiên", example: "You will be able to view these animals from a distance in their natural habitats.", extraExample: "The panda's natural habitat is the bamboo forest.", contextSentence: "You will be able to view these animals from a distance in their natural ________s." },
+        { topic: "Wildlife Park", level: "C2", word: "Ordinance", form: "Noun", phonetic: "/ˈɔːdɪnəns/", forms: "N/A", def: "An authoritative order; a decree or local law.", translation: "Sắc lệnh, quy định (địa phương)", example: "The barbecue and the bonfire are now restricted by ordinance due to fire precautions.", extraExample: "A local ordinance forbids parking on this street.", contextSentence: "The bonfire is now restricted by ________ due to fire precautions." },
+        { topic: "Wildlife Park", level: "B2", word: "Temporarily", form: "Adverb", phonetic: "/ˈtemprərəli/", forms: "Adj: Temporary", def: "For a short time only; not permanently.", translation: "Tạm thời", example: "The EMU Farm is now temporarily closed for business.", extraExample: "The road is temporarily blocked due to an accident.", contextSentence: "The EMU Farm is now ________ closed for business." },
+        { topic: "Wildlife Park", level: "C1", word: "Orchard", form: "Noun", phonetic: "/ˈɔːtʃəd/", forms: "N/A", def: "A piece of land planted with fruit trees.", translation: "Vườn cây ăn quả", example: "You will be able to pick strawberries and apples in the farm's orchards.", extraExample: "We walked through the apple orchard.", contextSentence: "You will be able to pick apples in the farm's ________s." },
+
+        // --- SECTION 3: Plastic Architecture ---
+        { topic: "Plastic Architecture", level: "B2", word: "Alternative", form: "Adjective", phonetic: "/ɔːlˈtɜːnətɪv/", forms: "N: Alternative", def: "Available as another possibility; unconventional.", translation: "Thay thế, khác biệt", example: "We're here to talk over our first assignment on alternative building materials.", extraExample: "We had to find an alternative route due to traffic.", contextSentence: "We're here to talk over our assignment on ________ building materials." },
+        { topic: "Plastic Architecture", level: "C1", word: "Credentials", form: "Noun", phonetic: "/krɪˈdenʃlz/", forms: "N/A", def: "Achievements, training, or background that make a person or thing suitable for a purpose.", translation: "Tiêu chuẩn, chứng nhận năng lực", example: "It wasn't the materials in environmental credentials.", extraExample: "The candidate has excellent academic credentials.", contextSentence: "It wasn't the materials in environmental ________." },
+        { topic: "Plastic Architecture", level: "C1", word: "Futuristic", form: "Adjective", phonetic: "/ˌfjuːtʃəˈrɪstɪk/", forms: "N: Future", def: "Having or involving very modern technology or design.", translation: "Thuộc về tương lai, cực kỳ hiện đại", example: "The concept of plastic houses was just too futuristic.", extraExample: "The car has a sleek, futuristic design.", contextSentence: "The concept of plastic houses was just too ________." },
+        { topic: "Plastic Architecture", level: "C1", word: "Amend", form: "Verb", phonetic: "/əˈmend/", forms: "N: Amendment", def: "To make minor changes to make something fairer, more accurate, or better.", translation: "Sửa đổi, điều chỉnh", example: "They managed to fix that by amending the shape of the buildings.", extraExample: "The president agreed to amend the constitution.", contextSentence: "They managed to fix that by ________ing the shape of the buildings." },
+        { topic: "Plastic Architecture", level: "C2", word: "Deform", form: "Verb", phonetic: "/dɪˈfɔːm/", forms: "N: Deformation | Adj: Deformed", def: "To change or damage the usual or natural shape of something.", translation: "Làm biến dạng", example: "When rain got into these cracks, the plastic would deform and lose its strength.", extraExample: "The heat caused the metal to deform.", contextSentence: "When rain got into these cracks, the plastic would ________ and lose its strength." },
+        { topic: "Plastic Architecture", level: "B2", word: "Demolish", form: "Verb", phonetic: "/dɪˈmɒlɪʃ/", forms: "N: Demolition", def: "To pull or knock down a building.", translation: "Phá hủy, dỡ bỏ", example: "After that, they demolished it, but they had a hard time.", extraExample: "The old factory was demolished to make way for a new park.", contextSentence: "After that, they ________ed it, but they had a hard time." },
+        { topic: "Plastic Architecture", level: "C1", word: "Revolutionary", form: "Adjective", phonetic: "/ˌrevəˈluːʃənəri/", forms: "N: Revolution", def: "Involving or causing a complete or dramatic change.", translation: "Mang tính cách mạng", example: "That would still be pretty revolutionary today.", extraExample: "The discovery of penicillin was a revolutionary medical breakthrough.", contextSentence: "An ultrasonic dishwasher would still be pretty ________ today." },
+        { topic: "Plastic Architecture", level: "C1", word: "Innovative", form: "Adjective", phonetic: "/ˈɪnəvətɪv/", forms: "N: Innovation | V: Innovate", def: "Featuring new methods; advanced and original.", translation: "Có tính đổi mới, sáng tạo", example: "It was a really innovative idea for the time.", extraExample: "She was awarded for her innovative approach to teaching.", contextSentence: "It was a really ________ idea for the time." },
+        { topic: "Plastic Architecture", level: "B2", word: "Implement", form: "Verb", phonetic: "/ˈɪmplɪment/", forms: "N: Implementation", def: "To put a decision, plan, agreement, etc. into effect.", translation: "Thực thi, đưa vào áp dụng", example: "Noise only made a small model and the design wasn't implemented.", extraExample: "The changes to the national health system will be implemented next year.", contextSentence: "Noise only made a small model and the design wasn't ________ed." },
+        { topic: "Plastic Architecture", level: "C1", word: "Insulated", form: "Adjective", phonetic: "/ˈɪnsjʊleɪtɪd/", forms: "N: Insulation | V: Insulate", def: "Protected with a material that prevents the loss of heat or the intrusion of sound.", translation: "Cách nhiệt, cách âm", example: "They were very well insulated as well, so they saved energy.", extraExample: "The walls are heavily insulated to keep the house warm in winter.", contextSentence: "They were very well ________ as well, so they saved energy." },
+        { topic: "Plastic Architecture", level: "C1", word: "Inflate", form: "Verb", phonetic: "/ɪnˈfleɪt/", forms: "N: Inflation", def: "Fill a balloon, tire, or other expandable object with air or gas.", translation: "Bơm phồng, thổi phồng", example: "Take it to wherever you want it, then inflate it.", extraExample: "He used a pump to inflate the bicycle tires.", contextSentence: "Take it to wherever you want it, then ________ it." },
+
+        // --- SECTION 4: Modern Music ---
+        { topic: "Modern Music", level: "C1", word: "Biographical", form: "Adjective", phonetic: "/ˌbaɪəˈɡræfɪkl/", forms: "N: Biography", def: "Containing or consisting of facts about someone's life.", translation: "Thuộc về tiểu sử", example: "First, some biographical details. Salvatore Sciarrino was born in Palermo.", extraExample: "She is researching biographical information for her new book.", contextSentence: "First, some ________ details about the composer." },
+        { topic: "Modern Music", level: "B2", word: "Self-taught", form: "Adjective", phonetic: "/ˌself ˈtɔːt/", forms: "N/A", def: "Having acquired knowledge or skill on one's own initiative rather than through formal instruction.", translation: "Tự học", example: "He is mainly self-taught as a composer.", extraExample: "Most of the programmers in the early days were completely self-taught.", contextSentence: "He is mainly ________ as a composer." },
+        { topic: "Modern Music", level: "C1", word: "Prestigious", form: "Adjective", phonetic: "/preˈstɪdʒəs/", forms: "N: Prestige", def: "Inspiring respect and admiration; having high status.", translation: "Có uy tín, danh giá", example: "Throughout his career, he has won numerous prestigious awards.", extraExample: "Harvard is one of the most prestigious universities in the world.", contextSentence: "Throughout his career, he has won numerous ________ awards." },
+        { topic: "Modern Music", level: "B2", word: "Originality", form: "Noun", phonetic: "/əˌrɪdʒəˈnæləti/", forms: "Adj: Original", def: "The ability to think independently and creatively.", translation: "Sự độc đáo, tính nguyên bản", example: "A major prize in 2011, which recognized his musical originality.", extraExample: "The judges praised the originality of her design.", contextSentence: "A major prize in 2011 recognized his musical ________." },
+        { topic: "Modern Music", level: "B2", word: "Striking", form: "Adjective", phonetic: "/ˈstraɪkɪŋ/", forms: "V: Strike", def: "Attracting attention by reason of being unusual, extreme, or prominent.", translation: "Nổi bật, đáng chú ý", example: "What is also striking about his music is his preference for extremely soft sounds.", extraExample: "There is a striking resemblance between the two sisters.", contextSentence: "What is also ________ about his music is his preference for soft sounds." },
+        { topic: "Modern Music", level: "C1", word: "Unconventional", form: "Adjective", phonetic: "/ˌʌnkənˈvenʃənl/", forms: "N: Convention", def: "Not based on or conforming to what is generally done or believed.", translation: "Khác thường, không theo lẽ thường", example: "He frequently requires musicians to play their instruments in unconventional ways.", extraExample: "His teaching methods are highly unconventional but effective.", contextSentence: "He frequently requires musicians to play in ________ ways." },
+        { topic: "Modern Music", level: "C1", word: "Pioneer", form: "Noun", phonetic: "/ˌpaɪəˈnɪə/", forms: "Adj: Pioneering", def: "A person who is among the first to explore or develop a new area of knowledge.", translation: "Người tiên phong", example: "He's widely regarded as a pioneer in terms of creating new sounds.", extraExample: "Henry Ford was a pioneer of the automobile industry.", contextSentence: "He's widely regarded as a ________ in terms of creating new sounds." },
+        { topic: "Modern Music", level: "C2", word: "Formidable", form: "Adjective", phonetic: "/ˈfɔːmɪdəbl/", forms: "Adv: Formidably", def: "Inspiring fear or respect through being impressively large, powerful, intense, or capable.", translation: "Đáng nể, ghê gớm, khó nhằn", example: "It's technically formidable, and it's a very challenging piece for musicians to play.", extraExample: "They face a formidable challenge in the finals.", contextSentence: "It's technically ________, and a very challenging piece to play." },
+        { topic: "Modern Music", level: "C1", word: "Atmospheric", form: "Adjective", phonetic: "/ˌætməsˈferɪk/", forms: "N: Atmosphere", def: "Creating a distinctive mood, typically of romance, mystery, or nostalgia.", translation: "Tạo không khí / mang đậm bầu không khí", example: "I found it to be very haunting and atmospheric.", extraExample: "The lighting in the restaurant is very moody and atmospheric.", contextSentence: "I found the music to be very haunting and ________." },
+        { topic: "Modern Music", level: "C2", word: "Manipulate", form: "Verb", phonetic: "/məˈnɪpjuleɪt/", forms: "N: Manipulation", def: "To handle or control a tool, mechanism, or information in a skillful manner.", translation: "Thao tác, điều khiển", example: "Large vibrating sheets of metal, which are slowly manipulated by two percussionists.", extraExample: "The scientist manipulated the data to show a positive trend.", contextSentence: "Large metal sheets are slowly ________d by two percussionists." }
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            if (matchTopic && matchLevel) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Listening Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            if (matchTopic && matchLevel) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #99f6e4; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #115e59;">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: #115e59;">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: #ccfbf1; padding: 1rem; border-left: 4px solid #115e59; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #115e59; margin-bottom: 0.25rem; font-weight: bold;">Listening Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>

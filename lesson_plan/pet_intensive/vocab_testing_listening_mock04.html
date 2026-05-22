@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Listening Mock Test 4 - Vocabulary Test</title>
+    <style>
+        :root { 
+            --primary: #0f766e; 
+            --primary-hover: #115e59; 
+            --success: #0369a1; 
+            --danger: #ef4444; 
+            --bg-body: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --text-muted: #475569; 
+            --border: #cbd5e1; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 2rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        
+        .container { width: 100%; max-width: 800px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; margin: 0 1rem; }
+        
+        /* Header & Timer */
+        header { background-color: var(--primary); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .header-title h2 { font-size: 1.25rem; font-weight: 600; }
+        .header-title p { font-size: 0.875rem; opacity: 0.9; }
+        .timer-box { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 8px; font-weight: bold; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; transition: transform 0.1s ease;}
+        .timer-box.warning { background: var(--danger); }
+        
+        /* Progress Bar */
+        .progress-container { height: 6px; background: var(--border); width: 100%; }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+
+        /* Content Area */
+        .content { padding: 2rem; min-height: 350px; }
+        .question-number { color: var(--text-muted); font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .topic-context { display: inline-block; background: #ccfbf1; color: #115e59; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; margin-bottom: 1rem;}
+        
+        .badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; margin-left: 0.5rem; display: inline-block; vertical-align: middle; }
+        .badge-b2 { background-color: #10b981; }
+        .badge-c1 { background-color: #f59e0b; }
+        .badge-c2 { background-color: #8b5cf6; }
+
+        .question-text { font-size: 1.25rem; font-weight: 500; margin-bottom: 2rem; line-height: 1.5; }
+
+        /* Form Controls */
+        .options-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .option-label { display: flex; align-items: center; padding: 1rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; font-size: 1.1rem; }
+        .option-label:hover { background-color: #f0fdfa; }
+        .option-label input[type="radio"] { margin-right: 1rem; transform: scale(1.2); }
+        .option-label.selected { border-color: var(--primary); background-color: #ccfbf1; }
+        input[type="text"] { width: 100%; padding: 1rem; font-size: 1.1rem; border: 2px solid var(--border); border-radius: 8px; transition: border-color 0.2s ease; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        
+        /* Specialized Question Text Formatting */
+        .scramble-text { letter-spacing: 3px; font-size: 1.6rem; color: var(--primary); font-weight: 800; display: block; margin-top: 0.5rem; text-transform: uppercase;}
+        .missing-text { letter-spacing: 5px; font-size: 1.6rem; color: var(--primary); font-family: monospace; font-weight: 800; display: block; margin-top: 0.5rem; text-transform: uppercase;}
+        .context-sentence { font-style: italic; background: #f1f5f9; padding: 1rem; border-left: 4px solid var(--primary); border-radius: 4px; display: block; margin-top: 1rem; color: #334155;}
+
+        /* Question Navigation Grid */
+        .q-nav-container { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px dashed var(--border); }
+        .q-nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .q-nav-title { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
+        .q-nav-legend { display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted); }
+        .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+        .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
+        .legend-box.answered { background: var(--primary); border-color: var(--primary); }
+        .legend-box.unanswered { background: var(--card-bg); }
+        .q-nav-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .q-nav-btn { width: 36px; height: 36px; border-radius: 6px; border: 2px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .q-nav-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .q-nav-btn.answered { background: var(--primary); border-color: var(--primary); color: white; }
+        .q-nav-btn.current { transform: scale(1.1); border-color: var(--text-main); box-shadow: 0 0 0 2px var(--text-main); z-index: 1; color: var(--text-main); }
+        .q-nav-btn.answered.current { color: white; }
+
+        /* Footer Controls */
+        .footer { padding: 1.5rem 2rem; background-color: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        button { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
+        .btn-outline:hover:not(:disabled) { background: #e2e8f0; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-submit { background: var(--success); color: white; }
+        .btn-submit:hover { background: #0284c7; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Screens */
+        .screen { display: none; text-align: center; padding: 3rem 2rem; }
+        .screen.active { display: block; }
+        .screen-title { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+        .score-display { font-size: 4rem; font-weight: 700; color: var(--success); margin: 1rem 0; }
+        .results-list { text-align: left; margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .result-item { padding: 1.5rem; border-radius: 8px; border-left: 5px solid; background: #f8fafc; }
+        .result-item.correct { border-color: var(--success); }
+        .result-item.incorrect { border-color: var(--danger); }
+        .result-item-header { font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; }
+        .result-explanation { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+
+        /* Config specific styles */
+        .config-group { margin: 2rem 0; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .config-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        .config-select { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border); font-size: 1rem; background: var(--card-bg); }
+
+        @media (max-width: 600px) { header { flex-direction: column; gap: 1rem; text-align: center; } .footer { flex-direction: column; gap: 1rem; } .footer button { width: 100%; } }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header id="app-header-test" style="display: none;">
+        <div class="header-title">
+            <h2>Listening Vocabulary Test</h2>
+            <p>PET Mock 4 (B2-C2 Assessment)</p>
+        </div>
+        <div class="timer-box" id="timer-test">
+            ⏱️ 00:00
+        </div>
+    </header>
+    
+    <div class="progress-container" id="progress-container" style="display: none;">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Configuration Screen -->
+    <div id="config-screen" class="screen active">
+        <h1 class="screen-title">Vocabulary Assessment</h1>
+        <p style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted);">
+            Test your knowledge of the 38 advanced academic words (B2-C2) from the listening test sections.
+        </p>
+        
+        <div class="config-group">
+            <label for="num-questions">How many questions would you like to take?</label>
+            <select id="num-questions" class="config-select">
+                <option value="5">5 Questions (2:30)</option>
+                <option value="15" selected>15 Questions (7:30)</option>
+                <option value="25">25 Questions (12:30)</option>
+                <option value="All">All Combinations (Comprehensive)</option>
+            </select>
+        </div>
+        
+        <p style="font-size: 0.9rem; margin-bottom: 2rem; color: var(--text-muted);">
+            You have exactly <strong>30 seconds per question</strong>. Note: Long phrases are excluded from typing challenges to save time, but will appear in multiple choice.
+        </p>
+        <button class="btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;" onclick="startTest()">Start Test</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="test-screen" class="screen" style="padding: 0; text-align: left;">
+        <div class="content">
+            <div class="question-number" id="question-number">Question 1 of X</div>
+            <div class="topic-context" id="topic-context">Category: ...</div>
+            <div class="question-text" id="question-text">Question text goes here?</div>
+            <div id="options-container" class="options-grid"></div>
+            
+            <div class="q-nav-container">
+                <div class="q-nav-header">
+                    <span class="q-nav-title">Question Navigator</span>
+                    <div class="q-nav-legend">
+                        <div class="legend-item"><div class="legend-box answered"></div> Answered</div>
+                        <div class="legend-item"><div class="legend-box unanswered"></div> Unanswered</div>
+                    </div>
+                </div>
+                <div id="q-nav-grid" class="q-nav-grid"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button class="btn-outline" id="btn-prev" onclick="prevQuestion()">Previous</button>
+            <button class="btn-primary" id="btn-next" onclick="nextQuestion()">Next</button>
+            <button class="btn-submit" id="btn-submit" style="display: none;" onclick="submitTest()">Submit Test</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen">
+        <h1 class="screen-title" id="result-title">Test Complete!</h1>
+        <div class="score-display" id="score-display">0 / 0</div>
+        <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;" id="band-indicator">Indicator</p>
+        <div class="results-list" id="results-list"></div>
+        <button class="btn-primary" style="margin-top: 2rem;" onclick="restartTest()">Take Another Test</button>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Full Vocabulary Bank (PET Listening Mock Test 4)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // Section 1: Holiday Accommodation
+        { topic: "Holiday Accommodation", level: "B2", word: "Resort", form: "Noun", phonetic: "/rɪˈzɔːt/", forms: "N/A", def: "A place where many people go for rest, sport, or another stated purpose.", translation: "Khu nghỉ dưỡng", example: "We have a wonderful holiday resort called Foxton Bay.", extraExample: "They spent their honeymoon at a luxury beach resort.", contextSentence: "We have a wonderful holiday ________ called Foxton Bay." },
+        { topic: "Holiday Accommodation", level: "C1", word: "Peace of mind", form: "Noun Phrase", phonetic: "/piːs əv maɪnd/", forms: "N/A", def: "A feeling of being safe or protected.", translation: "Sự an tâm", example: "They have professional lifeguards who provide peace of mind for visitors.", extraExample: "Insurance provides peace of mind when traveling.", contextSentence: "Professional lifeguards provide ________ for visitors." },
+        { topic: "Holiday Accommodation", level: "B2", word: "Facilities", form: "Noun", phonetic: "/fəˈsɪlətiz/", forms: "N: Facility", def: "Buildings, equipment, or services that are provided for a particular purpose.", translation: "Cơ sở vật chất", example: "What other facilities does the resort offer?", extraExample: "The hotel has excellent sports facilities.", contextSentence: "What other ________ does the resort offer?" },
+        { topic: "Holiday Accommodation", level: "B2", word: "Scenery", form: "Noun", phonetic: "/ˈsiːnəri/", forms: "Adj: Scenic", def: "The natural features of a landscape considered in terms of their appearance.", translation: "Phong cảnh", example: "You can take in the beautiful scenery.", extraExample: "The breathtaking scenery of the mountains amazed us.", contextSentence: "You can cycle and take in the beautiful ________." },
+        { topic: "Holiday Accommodation", level: "B2", word: "Accommodation", form: "Noun", phonetic: "/əˌkɒməˈdeɪʃn/", forms: "V: Accommodate", def: "A room, group of rooms, or building in which someone may live or stay.", translation: "Chỗ ở", example: "What are the accommodation options like?", extraExample: "We couldn't find any cheap accommodation in the city.", contextSentence: "What are the ________ options like for large families?" },
+        { topic: "Holiday Accommodation", level: "C1", word: "Amenities", form: "Noun", phonetic: "/əˈmiːnətiz/", forms: "N/A", def: "A desirable or useful feature or facility of a building or place.", translation: "Tiện nghi", example: "Are there any other amenities available?", extraExample: "The property has many local amenities nearby.", contextSentence: "Are there any other ________ available in the room?" },
+        { topic: "Holiday Accommodation", level: "C1", word: "Provisions", form: "Noun", phonetic: "/prəˈvɪʒnz/", forms: "V: Provide", def: "Supplies of food, drink, or equipment, especially for a journey.", translation: "Đồ dự phòng, lương thực", example: "Will there be any provisions when we arrive?", extraExample: "They packed enough provisions for a two-week hike.", contextSentence: "Will there be any ________ provided when we arrive?" },
+        { topic: "Holiday Accommodation", level: "B2", word: "Accessible", form: "Adjective", phonetic: "/əkˈsesəbl/", forms: "N: Accessibility", def: "Able to be reached or entered.", translation: "Dễ tiếp cận", example: "The closest town is just a 40 minutes drive away, making it easily accessible.", extraExample: "The museum is fully accessible to wheelchair users.", contextSentence: "The closest town is easily ________ by car." },
+        { topic: "Holiday Accommodation", level: "B2", word: "Cuisine", form: "Noun", phonetic: "/kwɪˈziːn/", forms: "N/A", def: "A style or method of cooking, especially as characteristic of a particular country or region.", translation: "Ẩm thực", example: "You'll find a variety of cuisines to choose from.", extraExample: "Italian cuisine is famous for its pasta and pizza.", contextSentence: "You'll find a variety of ________s to choose from at the restaurants." },
+        { topic: "Holiday Accommodation", level: "B2", word: "Amusement park", form: "Noun Phrase", phonetic: "/əˈmjuːzmənt pɑːk/", forms: "N/A", def: "A large park equipped with rides, games, and other entertainments.", translation: "Công viên giải trí", example: "This town also has large amusement parks that are perfect for families.", extraExample: "We spent the whole day riding rollercoasters at the amusement park.", contextSentence: "This town also has a large ________ for families with children." },
+
+        // Section 2: Toy Factory
+        { topic: "Toy Factory", level: "C1", word: "Apprenticeship", form: "Noun", phonetic: "/əˈprentɪʃɪp/", forms: "N: Apprentice", def: "A period of time working as a trainee to learn a trade.", translation: "Thời gian học việc", example: "He got the idea of establishing his own company when he finished his apprenticeship.", extraExample: "He served a five-year apprenticeship as a mechanic.", contextSentence: "He started the company after finishing his ________." },
+        { topic: "Toy Factory", level: "C1", word: "Capital", form: "Noun", phonetic: "/ˈkæpɪtl/", forms: "Adj: Capitalist", def: "Wealth in the form of money or other assets owned by a person or organization.", translation: "Vốn", example: "He got enough startup capital and the company was set up.", extraExample: "They lacked the necessary capital to start a business.", contextSentence: "With his grandfather's help, he got enough startup ________." },
+        { topic: "Toy Factory", level: "C1", word: "Premises", form: "Noun", phonetic: "/ˈpremɪsɪz/", forms: "N/A", def: "A house or building, together with its land, occupied by a business.", translation: "Cơ sở, mặt bằng", example: "We've expanded the premises considerably over the past years.", extraExample: "Smoking is strictly forbidden on company premises.", contextSentence: "We've expanded the company ________ considerably." },
+        { topic: "Toy Factory", level: "C2", word: "Creep up", form: "Phrasal Verb", phonetic: "/kriːp ʌp/", forms: "N/A", def: "To slowly and quietly increase or approach.", translation: "Tăng lên từ từ", example: "We found the sales of our products creeping up very slowly.", extraExample: "House prices have been creeping up steadily this year.", contextSentence: "We found the sales of our products ________ slowly." },
+        { topic: "Toy Factory", level: "B2", word: "Boost", form: "Noun", phonetic: "/buːst/", forms: "V: Boost", def: "A source of help or encouragement leading to an increase.", translation: "Sự thúc đẩy", example: "We've decided to introduce new electronic toys to give that a boost.", extraExample: "The tax cut will give the economy a much-needed boost.", contextSentence: "We introduce new toys to give sales a ________." },
+        { topic: "Toy Factory", level: "B2", word: "Definite", form: "Adjective", phonetic: "/ˈdefɪnət/", forms: "Adv: Definitely", def: "Clearly stated or decided; not vague or doubtful.", translation: "Chắc chắn", example: "I can't give you a definite answer now.", extraExample: "We need a definite date for the meeting.", contextSentence: "I can't give you a ________ answer right now." },
+        { topic: "Toy Factory", level: "B2", word: "Vacancy", form: "Noun", phonetic: "/ˈveɪkənsi/", forms: "Adj: Vacant", def: "An unoccupied position or job.", translation: "Vị trí trống", example: "It'll depend on whether we have job vacancies then.", extraExample: "There is a vacancy for a shop assistant.", contextSentence: "It depends on whether we have any job ________ then." },
+        { topic: "Toy Factory", level: "B2", word: "Minority", form: "Noun", phonetic: "/maɪˈnɒrəti/", forms: "Adj: Minor", def: "The smaller number or part.", translation: "Thiểu số", example: "The minority of jobs are in the manufacturing line.", extraExample: "Only a small minority of students failed the exam.", contextSentence: "The ________ of jobs are actually in manufacturing." },
+        { topic: "Toy Factory", level: "C1", word: "Payroll", form: "Noun", phonetic: "/ˈpeɪrəʊl/", forms: "N/A", def: "A list of a company's employees and the amount of money they are to be paid.", translation: "Bảng lương", example: "The manager of the payroll department is on sick leave these days.", extraExample: "There are currently over 500 staff on the payroll.", contextSentence: "The manager of the ________ department is on sick leave." },
+        { topic: "Toy Factory", level: "B2", word: "Urgent", form: "Adjective", phonetic: "/ˈɜːdʒənt/", forms: "N: Urgency", def: "Requiring immediate action or attention.", translation: "Khẩn cấp", example: "We’re in urgent need of someone who can deal with the salary problem.", extraExample: "He has an urgent message for the director.", contextSentence: "We are in ________ need of someone to fix the problem." },
+
+        // Section 3: Shampoo Marketing
+        { topic: "Shampoo Marketing", level: "B2", word: "Economical", form: "Adjective", phonetic: "/ˌiːkəˈnɒmɪkl/", forms: "N: Economy", def: "Giving good value or service in relation to the money, time, or effort spent.", translation: "Tiết kiệm", example: "What was once sold as an economical way of getting your hair clean...", extraExample: "It is much more economical to buy groceries in bulk.", contextSentence: "It was once sold as an ________ way to clean hair." },
+        { topic: "Shampoo Marketing", level: "C1", word: "Evolve", form: "Verb", phonetic: "/ɪˈvɒlv/", forms: "N: Evolution", def: "Develop gradually, especially from a simple to a more complex form.", translation: "Phát triển, tiến hóa", example: "It has evolved into a beauty product.", extraExample: "The company has evolved into a major tech corporation.", contextSentence: "The basic product has slowly ________d into a beauty item." },
+        { topic: "Shampoo Marketing", level: "B2", word: "Publicise", form: "Verb", phonetic: "/ˈpʌblɪsaɪz/", forms: "N: Publicity", def: "Make (something) widely known.", translation: "Quảng bá, công khai", example: "The presence of the chemicals is rarely publicised.", extraExample: "The event was heavily publicised on social media.", contextSentence: "The presence of those harsh chemicals is rarely ________." },
+        { topic: "Shampoo Marketing", level: "C2", word: "Lukewarm", form: "Adjective", phonetic: "/ˌluːkˈwɔːm/", forms: "N/A", def: "Showing little enthusiasm.", translation: "Thờ ơ, lãnh đạm", example: "Manufacturers are lukewarm about this because it doesn't enhance the visual impact.", extraExample: "Her proposal received a lukewarm response.", contextSentence: "Manufacturers are ________ about this new printing method." },
+        { topic: "Shampoo Marketing", level: "C1", word: "Wary", form: "Adjective", phonetic: "/ˈweəri/", forms: "N: Wariness", def: "Feeling or showing caution about possible dangers or problems.", translation: "Cảnh giác", example: "I'm always wary of special offers.", extraExample: "Be wary of strangers asking for personal information.", contextSentence: "I'm always a bit ________ of so-called 'special offers'." },
+        { topic: "Shampoo Marketing", level: "C1", word: "Enviable", form: "Adjective", phonetic: "/ˈenviəbl/", forms: "N: Envy", def: "Arousing or likely to arouse envy or jealousy.", translation: "Đáng ghen tị", example: "Think, wow, if only my life was like that (an enviable lifestyle).", extraExample: "She is in the enviable position of not having to work for money.", contextSentence: "The advertisement presents a highly ________ lifestyle." },
+        { topic: "Shampoo Marketing", level: "B2", word: "Universal", form: "Adjective", phonetic: "/ˌjuːnɪˈvɜːsl/", forms: "N: Universe", def: "Relating to or done by all people or things in the world.", translation: "Phổ quát, chung", example: "That's very common in advertising. But not universal.", extraExample: "Music is often described as a universal language.", contextSentence: "That trick is common in advertising, but it's not ________." },
+        { topic: "Shampoo Marketing", level: "C1", word: "Informed decision", form: "Noun Phrase", phonetic: "/ɪnˈfɔːmd dɪˈsɪʒn/", forms: "V: Inform", def: "A decision based on facts or information.", translation: "Quyết định có cơ sở", example: "They're at least making an informed decision.", extraExample: "Provide the patients with facts so they can make an informed decision.", contextSentence: "They give details so customers make an ________." },
+        { topic: "Shampoo Marketing", level: "C1", word: "Imagery", form: "Noun", phonetic: "/ˈɪmɪdʒəri/", forms: "N: Image", def: "Visually descriptive or figurative language, especially in advertising.", translation: "Hình ảnh", example: "I suppose the effect is very calming with soft music and very peaceful imagery.", extraExample: "The poem uses a lot of dark imagery.", contextSentence: "The advert relies heavily on peaceful ________." },
+
+        // Section 4: Engineering Innovation
+        { topic: "Engineering Innovation", level: "B2", word: "Restore", form: "Verb", phonetic: "/rɪˈstɔː/", forms: "N: Restoration", def: "Bring back or return a building/structure to its former condition.", translation: "Phục hồi, tôn tạo", example: "An engineering project to restore two old waterways.", extraExample: "They spent years restoring the ancient castle.", contextSentence: "They wanted to ________ the two old waterways." },
+        { topic: "Engineering Innovation", level: "C1", word: "Vessel", form: "Noun", phonetic: "/ˈvesl/", forms: "N/A", def: "A ship or large boat.", translation: "Tàu thủy", example: "Together they enabled vessels to travel from west to east.", extraExample: "The harbor was filled with fishing vessels.", contextSentence: "The canals enabled ________s to cross the country." },
+        { topic: "Engineering Innovation", level: "B2", word: "Demolish", form: "Verb", phonetic: "/dɪˈmɒlɪʃ/", forms: "N: Demolition", def: "Pull or knock down (a building).", translation: "Phá dỡ", example: "In the 1930s the locks at Falkirk were demolished.", extraExample: "The unstable building had to be demolished safely.", contextSentence: "The old lock system was eventually ________ed." },
+        { topic: "Engineering Innovation", level: "C1", word: "Embark on", form: "Phrasal Verb", phonetic: "/ɪmˈbɑːk ɒn/", forms: "N/A", def: "Begin (a course of action, especially one that is important or demanding).", translation: "Bắt tay vào", example: "Scotland embarked on an ambitious new project.", extraExample: "She is about to embark on a new career in politics.", contextSentence: "The country ________ed an ambitious new infrastructure project." },
+        { topic: "Engineering Innovation", level: "C1", word: "Infrastructure", form: "Noun", phonetic: "/ˈɪnfrəstrʌktʃə/", forms: "N/A", def: "The basic physical and organizational structures and facilities.", translation: "Cơ sở hạ tầng", example: "The aim was to upgrade the country's infrastructure.", extraExample: "The government must invest heavily in national infrastructure.", contextSentence: "The aim was to upgrade the country's aging ________." },
+        { topic: "Engineering Innovation", level: "C1", word: "Stimulate", form: "Verb", phonetic: "/ˈstɪmjuleɪt/", forms: "N: Stimulation", def: "Encourage development of or increased activity in (a state or process).", translation: "Kích thích, thúc đẩy", example: "A long-term plan which had been developed to stimulate the national economy.", extraExample: "The new tax cuts are designed to stimulate economic growth.", contextSentence: "The goal of the project was to ________ the national economy." },
+        { topic: "Engineering Innovation", level: "C1", word: "Innovative", form: "Adjective", phonetic: "/ˈɪnəvətɪv/", forms: "N: Innovation", def: "Featuring new methods; advanced and original.", translation: "Đổi mới, sáng tạo", example: "It was felt that it should be really innovative and imaginative.", extraExample: "He won an award for his innovative software design.", contextSentence: "The solution needed to be highly ________ and imaginative." },
+        { topic: "Engineering Innovation", level: "B2", word: "Simultaneously", form: "Adverb", phonetic: "/ˌsɪmlˈteɪniəsli/", forms: "Adj: Simultaneous", def: "At the same time.", translation: "Đồng thời", example: "Another floating boat simultaneously enters the lower tank.", extraExample: "The two explosions happened almost simultaneously.", contextSentence: "Another boat ________ enters the lower tank." },
+        { topic: "Engineering Innovation", level: "B2", word: "Stunning", form: "Adjective", phonetic: "/ˈstʌnɪŋ/", forms: "Adv: Stunningly", def: "Extremely impressive or attractive.", translation: "Ấn tượng, lộng lẫy", example: "It's also visually stunning.", extraExample: "She looked absolutely stunning in that dress.", contextSentence: "The final engineering design is visually ________." }
+    ];
+
+    // Helper functions
+    function getDistractors(correctWord, count) {
+        let distractors = [];
+        let pool = vocabBank.filter(v => v.word !== correctWord);
+        pool.sort(() => 0.5 - Math.random());
+        for (let i = 0; i < count; i++) {
+            if (pool[i]) distractors.push(pool[i].word);
+        }
+        return distractors;
+    }
+    
+    function buildOptions(correct, distractors) {
+        let options = [correct, ...distractors];
+        options.sort(() => 0.5 - Math.random());
+        return {
+            options: options,
+            correctIndex: options.indexOf(correct)
+        };
+    }
+
+    function scrambleWord(word) {
+        return word.split(' ').map(w => {
+            let a = w.split('');
+            for(let i = a.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a.join('');
+        }).join(' ').toUpperCase();
+    }
+
+    function hideLetters(word) {
+        return word.split(' ').map(w => {
+            let arr = w.split('');
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === '-') continue;
+                if (Math.random() > 0.4) arr[i] = '_';
+            }
+            if (!arr.includes('_') && arr.length > 1) arr[1] = '_';
+            let allHidden = true;
+            for(let c of arr) if(c !== '_' && c !== '-') allHidden = false;
+            if(allHidden && arr.length > 1) arr[0] = w[0]; 
+            return arr.join(' ');
+        }).join(' &nbsp; '); 
+    }
+
+    // Generate Question Bank 
+    function generateAllQuestions() {
+        let generatedQuestions = [];
+        
+        vocabBank.forEach(entry => {
+            let wordCount = entry.word.split(' ').length;
+            let isLongPhrase = wordCount > 2 || entry.word.includes(' '); // Filter out spaces/phrases for spelling tests
+
+            // Type 1: MCQ Definition
+            let mcqDists = getDistractors(entry.word, 3);
+            let mcqOpts = buildOptions(entry.word, mcqDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'mcq',
+                text: `Which word or phrase best matches this definition: "${entry.def}"?`,
+                options: mcqOpts.options, correct: mcqOpts.correctIndex,
+                explanation: `The correct answer is "${entry.word}".`, vocabEntry: entry
+            });
+
+            // Type 2: Match Word to Definition
+            let defDists = [];
+            let defPool = vocabBank.filter(v => v.def !== entry.def).sort(() => 0.5 - Math.random());
+            for (let i = 0; i < 3; i++) if(defPool[i]) defDists.push(defPool[i].def);
+            let matchOpts = buildOptions(entry.def, defDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'match',
+                text: `What is the correct definition of: "${entry.word}"?`,
+                options: matchOpts.options, correct: matchOpts.correctIndex,
+                explanation: `"${entry.word}" means: ${entry.def}`, vocabEntry: entry
+            });
+            
+            // Type 7: Contextual Sentence
+            let ctxDists = getDistractors(entry.word, 3);
+            let ctxOpts = buildOptions(entry.word, ctxDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'context',
+                text: `Choose the correct vocabulary item to fill in the blank from the listening text:<span class="context-sentence">"${entry.contextSentence}"</span>`,
+                options: ctxOpts.options, correct: ctxOpts.correctIndex,
+                explanation: `The item that fits the context is "${entry.word}".`, vocabEntry: entry
+            });
+
+            // Type 8: True/False Definition
+            let isTrue = Math.random() > 0.5;
+            let displayedDef = entry.def;
+            if (!isTrue) {
+                let otherDefs = vocabBank.filter(v => v.def !== entry.def);
+                displayedDef = otherDefs[Math.floor(Math.random() * otherDefs.length)].def;
+            }
+            generatedQuestions.push({
+                topic: entry.topic, type: 'tf_def',
+                text: `<strong>True or False?</strong><br><br>The item <strong>"${entry.word}"</strong> is defined as:<br>"${displayedDef}"`,
+                options: ["True", "False"],
+                correct: isTrue ? 0 : 1,
+                explanation: isTrue ? `Correct! "${entry.word}" means: ${entry.def}` : `False! "${entry.word}" actually means: ${entry.def}`,
+                vocabEntry: entry
+            });
+
+            // --- Exclude phrases from typing tests ---
+            if (!isLongPhrase) {
+                // Type 3: Fill-in-the-blank 
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'fill',
+                    text: `Type the exact vocabulary term (${entry.form}) that matches this definition: "${entry.def}"`,
+                    correctStr: entry.word,
+                    explanation: `The correct term is "${entry.word}".`, vocabEntry: entry
+                });
+
+                // Type 5: Word Scramble
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'scramble',
+                    text: `Unscramble the letters to find the word matching this definition: "${entry.def}" <span class="scramble-text">${scrambleWord(entry.word)}</span>`,
+                    correctStr: entry.word,
+                    explanation: `The unscrambled word is "${entry.word}".`, vocabEntry: entry
+                });
+
+                // Type 6: Missing Letters
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'missing',
+                    text: `Fill in the missing letters for the word matching this definition: "${entry.def}" <span class="missing-text">${hideLetters(entry.word)}</span>`,
+                    correctStr: entry.word,
+                    explanation: `The complete word is "${entry.word}".`, vocabEntry: entry
+                });
+            }
+        });
+        
+        return generatedQuestions;
+    }
+
+    const allQuestions = generateAllQuestions();
+
+    // ---------------------------------------------------------
+    // App State
+    // ---------------------------------------------------------
+    let selectedQuestions = [];
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    // DOM Elements
+    const configScreen = document.getElementById('config-screen');
+    const testScreen = document.getElementById('test-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const appHeaderTest = document.getElementById('app-header-test');
+    const timerDisplayTest = document.getElementById('timer-test');
+    
+    function startTimer() {
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+            
+            if (timeRemaining <= 10) {
+                 timerDisplayTest.classList.add('warning');
+                 timerDisplayTest.style.transform = `scale(${1 + 0.05 * Math.sin(timeRemaining * Math.PI)})`;
+            } else {
+                 timerDisplayTest.style.transform = "scale(1)";
+            }
+            
+            if (timeRemaining <= 0) { 
+                clearInterval(timerInterval); 
+                submitTest(); 
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        timerDisplayTest.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTest() {
+        const numSelect = document.getElementById('num-questions').value;
+        const totalAvail = allQuestions.length;
+        let numToSelect = numSelect === 'All' ? totalAvail : parseInt(numSelect);
+        numToSelect = Math.min(numToSelect, totalAvail);
+        
+        // Shuffle and pick subset
+        let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        selectedQuestions = shuffled.slice(0, numToSelect);
+        
+        currentQuestion = 0;
+        userAnswers = new Array(selectedQuestions.length).fill(null);
+        timeRemaining = selectedQuestions.length * 30; // 30 seconds per question
+        
+        // UI resets
+        configScreen.classList.remove('active');
+        testScreen.classList.add('active');
+        appHeaderTest.style.display = 'flex';
+        progressContainer.style.display = 'block';
+        timerDisplayTest.classList.remove('warning');
+        timerDisplayTest.style.transform = "scale(1)";
+        
+        renderQuestion();
+        startTimer();
+    }
+
+    function renderQuestion() {
+        const q = selectedQuestions[currentQuestion];
+        
+        document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${selectedQuestions.length}`;
+        document.getElementById('topic-context').innerHTML = `Topic: ${q.topic} <span class="badge badge-${q.vocabEntry.level.toLowerCase()}">${q.vocabEntry.level}</span>`;
+        document.getElementById('question-text').innerHTML = q.text; 
+        progressBar.style.width = `${((currentQuestion) / selectedQuestions.length) * 100}%`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = ''; 
+
+        // MCQ style inputs
+        if (['mcq', 'match', 'context', 'tf_def'].includes(q.type)) {
+            q.options.forEach((opt, index) => {
+                const label = document.createElement('label');
+                label.className = `option-label ${userAnswers[currentQuestion] === index ? 'selected' : ''}`;
+                
+                const input = document.createElement('input');
+                input.type = 'radio'; 
+                input.name = `q${currentQuestion}`; 
+                input.value = index;
+                input.checked = userAnswers[currentQuestion] === index;
+                
+                input.addEventListener('change', (e) => {
+                    userAnswers[currentQuestion] = parseInt(e.target.value);
+                    renderQuestion(); 
+                });
+                
+                label.appendChild(input); 
+                label.appendChild(document.createTextNode(opt));
+                container.appendChild(label);
+            });
+        } 
+        // Text style inputs
+        else if (['fill', 'scramble', 'missing'].includes(q.type)) {
+            const input = document.createElement('input');
+            input.type = 'text'; 
+            input.placeholder = "Type your answer here...";
+            input.value = userAnswers[currentQuestion] || '';
+            
+            input.addEventListener('input', (e) => {
+                userAnswers[currentQuestion] = e.target.value;
+                renderNavGrid(); 
+            });
+            container.appendChild(input);
+        }
+
+        document.getElementById('btn-prev').disabled = currentQuestion === 0;
+        if (currentQuestion === selectedQuestions.length - 1) {
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-submit').style.display = 'block';
+        } else {
+            document.getElementById('btn-next').style.display = 'block';
+            document.getElementById('btn-submit').style.display = 'none';
+        }
+        renderNavGrid();
+    }
+
+    function renderNavGrid() {
+        const grid = document.getElementById('q-nav-grid');
+        grid.innerHTML = '';
+        
+        selectedQuestions.forEach((q, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'q-nav-btn'; 
+            btn.textContent = index + 1;
+            
+            let isAnswered = false;
+            if (['fill', 'scramble', 'missing'].includes(q.type)) {
+                 isAnswered = userAnswers[index] && userAnswers[index].trim() !== '';
+            } else {
+                 isAnswered = userAnswers[index] !== null;
+            }
+
+            if (isAnswered) btn.classList.add('answered');
+            if (index === currentQuestion) btn.classList.add('current');
+            
+            btn.onclick = () => { currentQuestion = index; renderQuestion(); };
+            grid.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() { if (currentQuestion < selectedQuestions.length - 1) { currentQuestion++; renderQuestion(); } }
+    function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; renderQuestion(); } }
+
+    function submitTest() {
+        clearInterval(timerInterval);
+        testScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+        progressBar.style.width = '100%';
+        appHeaderTest.style.display = 'none'; 
+        progressContainer.style.display = 'none';
+        
+        let score = 0;
+        const resultsList = document.getElementById('results-list');
+        resultsList.innerHTML = '';
+
+        selectedQuestions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            let isCorrect = false; 
+            let displayAnswer = "No answer provided"; 
+            let expectedAnswer = "";
+
+            if (['mcq', 'match', 'context', 'tf_def'].includes(q.type)) {
+                isCorrect = userAnswer === q.correct;
+                if (userAnswer !== null) displayAnswer = q.options[userAnswer];
+                expectedAnswer = q.options[q.correct];
+            } else if (['fill', 'scramble', 'missing'].includes(q.type)) {
+                // Ignore punctuation and case for string matching
+                const cleanUser = (userAnswer || '').replace(/[.,\/#!$%\^&\*;:{}=\-_`~()']/g,"").trim().toLowerCase();
+                const cleanCorrect = q.correctStr.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()']/g,"").trim().toLowerCase();
+                isCorrect = cleanUser === cleanCorrect;
+                
+                if (userAnswer && userAnswer.trim() !== '') displayAnswer = userAnswer;
+                expectedAnswer = q.correctStr;
+            }
+
+            if (isCorrect) score++;
+
+            const item = document.createElement('div');
+            item.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
+            
+            let html = `
+                <div class="result-item-header">Q${index + 1} [${q.topic} - ${q.vocabEntry.level}]: ${q.text}</div>
+                <div><strong>Your Answer:</strong> ${displayAnswer} ${isCorrect ? '✅' : '❌'}</div>
+                ${!isCorrect ? `<div><strong>Correct Answer:</strong> ${expectedAnswer}</div>` : ''}
+                <div class="result-explanation">${q.explanation}</div>
+            `;
+            
+            if (!isCorrect && q.vocabEntry) {
+                html += `
+                    <div style="margin-top: 10px; padding: 10px; background-color: #ffffff; border: 1px solid var(--border); border-radius: 6px;">
+                        <strong>Vocabulary Review:</strong><br/>
+                        <em>Item:</em> ${q.vocabEntry.word} <span class="badge badge-${q.vocabEntry.level.toLowerCase()}">${q.vocabEntry.level}</span> <span style="color:#475569;">${q.vocabEntry.phonetic}</span><br/>
+                        <em>Word Forms:</em> ${q.vocabEntry.forms || q.vocabEntry.form}<br/>
+                        <em>Definition:</em> ${q.vocabEntry.def}
+                    </div>
+                `;
+            }
+            
+            item.innerHTML = html;
+            resultsList.appendChild(item);
+        });
+
+        const percentage = Math.round((score / selectedQuestions.length) * 100);
+        document.getElementById('score-display').textContent = `${score} / ${selectedQuestions.length}`;
+        
+        let bandText = "";
+        let color = "";
+        if (percentage >= 80) {
+            bandText = `Outstanding! You are highly prepared for Band 7.0+ Listening Sections. (${percentage}%)`;
+            color = "var(--success)";
+        } else if (percentage >= 60) {
+            bandText = `Good effort! Keep reviewing the flashcards. (${percentage}%)`;
+            color = "var(--primary)"; 
+        } else {
+            bandText = `Keep studying! Review the Learning Tool to reach the target band. (${percentage}%)`;
+            color = "var(--danger)";
+        }
+        
+        const bandIndicator = document.getElementById('band-indicator');
+        bandIndicator.textContent = bandText;
+        bandIndicator.style.color = color;
+    }
+
+    function restartTest() {
+        resultsScreen.classList.remove('active');
+        configScreen.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
