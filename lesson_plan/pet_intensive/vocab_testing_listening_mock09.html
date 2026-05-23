@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Listening Mock Test 9 - Vocabulary Test</title>
+    <style>
+        :root { 
+            --primary: #0f766e; 
+            --primary-hover: #115e59; 
+            --success: #0369a1; 
+            --danger: #ef4444; 
+            --bg-body: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --text-muted: #475569; 
+            --border: #cbd5e1; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 2rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        
+        .container { width: 100%; max-width: 800px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; margin: 0 1rem; }
+        
+        /* Header & Timer */
+        header { background-color: var(--primary); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .header-title h2 { font-size: 1.25rem; font-weight: 600; }
+        .header-title p { font-size: 0.875rem; opacity: 0.9; }
+        .timer-box { background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 8px; font-weight: bold; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; transition: transform 0.1s ease;}
+        .timer-box.warning { background: var(--danger); }
+        
+        /* Progress Bar */
+        .progress-container { height: 6px; background: var(--border); width: 100%; }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+
+        /* Content Area */
+        .content { padding: 2rem; min-height: 350px; }
+        .question-number { color: var(--text-muted); font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .topic-context { display: inline-block; background: #ccfbf1; color: #115e59; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; margin-bottom: 1rem;}
+        
+        .badge { padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; margin-left: 0.5rem; display: inline-block; vertical-align: middle; }
+        .badge-b2 { background-color: #10b981; }
+        .badge-c1 { background-color: #f59e0b; }
+        .badge-c2 { background-color: #8b5cf6; }
+
+        .question-text { font-size: 1.25rem; font-weight: 500; margin-bottom: 2rem; line-height: 1.5; }
+
+        /* Form Controls */
+        .options-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .option-label { display: flex; align-items: center; padding: 1rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; font-size: 1.1rem; }
+        .option-label:hover { background-color: #f0fdfa; }
+        .option-label input[type="radio"] { margin-right: 1rem; transform: scale(1.2); }
+        .option-label.selected { border-color: var(--primary); background-color: #ccfbf1; }
+        input[type="text"] { width: 100%; padding: 1rem; font-size: 1.1rem; border: 2px solid var(--border); border-radius: 8px; transition: border-color 0.2s ease; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        
+        /* Specialized Question Text Formatting */
+        .scramble-text { letter-spacing: 3px; font-size: 1.6rem; color: var(--primary); font-weight: 800; display: block; margin-top: 0.5rem; text-transform: uppercase;}
+        .missing-text { letter-spacing: 5px; font-size: 1.6rem; color: var(--primary); font-family: monospace; font-weight: 800; display: block; margin-top: 0.5rem; text-transform: uppercase;}
+        .context-sentence { font-style: italic; background: #f1f5f9; padding: 1rem; border-left: 4px solid var(--primary); border-radius: 4px; display: block; margin-top: 1rem; color: #334155;}
+
+        /* Question Navigation Grid */
+        .q-nav-container { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px dashed var(--border); }
+        .q-nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .q-nav-title { font-size: 1rem; font-weight: 600; color: var(--text-muted); }
+        .q-nav-legend { display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted); }
+        .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+        .legend-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
+        .legend-box.answered { background: var(--primary); border-color: var(--primary); }
+        .legend-box.unanswered { background: var(--card-bg); }
+        .q-nav-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .q-nav-btn { width: 36px; height: 36px; border-radius: 6px; border: 2px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .q-nav-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .q-nav-btn.answered { background: var(--primary); border-color: var(--primary); color: white; }
+        .q-nav-btn.current { transform: scale(1.1); border-color: var(--text-main); box-shadow: 0 0 0 2px var(--text-main); z-index: 1; color: var(--text-main); }
+        .q-nav-btn.answered.current { color: white; }
+
+        /* Footer Controls */
+        .footer { padding: 1.5rem 2rem; background-color: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        button { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
+        .btn-outline:hover:not(:disabled) { background: #e2e8f0; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-submit { background: var(--success); color: white; }
+        .btn-submit:hover { background: #0284c7; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Screens */
+        .screen { display: none; text-align: center; padding: 3rem 2rem; }
+        .screen.active { display: block; }
+        .screen-title { font-size: 2rem; color: var(--primary); margin-bottom: 1rem; }
+        .score-display { font-size: 4rem; font-weight: 700; color: var(--success); margin: 1rem 0; }
+        .results-list { text-align: left; margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .result-item { padding: 1.5rem; border-radius: 8px; border-left: 5px solid; background: #f8fafc; }
+        .result-item.correct { border-color: var(--success); }
+        .result-item.incorrect { border-color: var(--danger); }
+        .result-item-header { font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; }
+        .result-explanation { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+
+        /* Config specific styles */
+        .config-group { margin: 2rem 0; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .config-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        .config-select { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border); font-size: 1rem; background: var(--card-bg); }
+
+        @media (max-width: 600px) { header { flex-direction: column; gap: 1rem; text-align: center; } .footer { flex-direction: column; gap: 1rem; } .footer button { width: 100%; } }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header id="app-header-test" style="display: none;">
+        <div class="header-title">
+            <h2>Listening Vocabulary Test</h2>
+            <p>PET Mock 9 (B2-C2 Assessment)</p>
+        </div>
+        <div class="timer-box" id="timer-test">
+            ⏱️ 00:00
+        </div>
+    </header>
+    
+    <div class="progress-container" id="progress-container" style="display: none;">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Configuration Screen -->
+    <div id="config-screen" class="screen active">
+        <h1 class="screen-title">Vocabulary Assessment</h1>
+        <p style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted);">
+            Test your knowledge of the 40 advanced academic words (B2-C2) from the listening test sections.
+        </p>
+        
+        <div class="config-group">
+            <label for="num-questions">How many questions would you like to take?</label>
+            <select id="num-questions" class="config-select">
+                <option value="5">5 Questions (2:30)</option>
+                <option value="15" selected>15 Questions (7:30)</option>
+                <option value="25">25 Questions (12:30)</option>
+                <option value="All">All Combinations (Comprehensive)</option>
+            </select>
+        </div>
+        
+        <p style="font-size: 0.9rem; margin-bottom: 2rem; color: var(--text-muted);">
+            You have exactly <strong>30 seconds per question</strong>. Note: Long phrases are excluded from typing challenges to save time, but will appear in multiple choice.
+        </p>
+        <button class="btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;" onclick="startTest()">Start Test</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="test-screen" class="screen" style="padding: 0; text-align: left;">
+        <div class="content">
+            <div class="question-number" id="question-number">Question 1 of X</div>
+            <div class="topic-context" id="topic-context">Category: ...</div>
+            <div class="question-text" id="question-text">Question text goes here?</div>
+            <div id="options-container" class="options-grid"></div>
+            
+            <div class="q-nav-container">
+                <div class="q-nav-header">
+                    <span class="q-nav-title">Question Navigator</span>
+                    <div class="q-nav-legend">
+                        <div class="legend-item"><div class="legend-box answered"></div> Answered</div>
+                        <div class="legend-item"><div class="legend-box unanswered"></div> Unanswered</div>
+                    </div>
+                </div>
+                <div id="q-nav-grid" class="q-nav-grid"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button class="btn-outline" id="btn-prev" onclick="prevQuestion()">Previous</button>
+            <button class="btn-primary" id="btn-next" onclick="nextQuestion()">Next</button>
+            <button class="btn-submit" id="btn-submit" style="display: none;" onclick="submitTest()">Submit Test</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen">
+        <h1 class="screen-title" id="result-title">Test Complete!</h1>
+        <div class="score-display" id="score-display">0 / 0</div>
+        <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;" id="band-indicator">Indicator</p>
+        <div class="results-list" id="results-list"></div>
+        <button class="btn-primary" style="margin-top: 2rem;" onclick="restartTest()">Take Another Test</button>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Full Vocabulary Bank (PET Listening Mock Test 9)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // Section 1: Warranty Issue
+        { topic: "Warranty Issue", level: "B2", word: "Warranty", form: "Noun", phonetic: "/ˈwɒrənti/", forms: "N/A", def: "A written guarantee promising to repair or replace it if necessary within a specified period.", translation: "Giấy/sự bảo hành", example: "The card here says this washing machine has a two-year warranty.", extraExample: "The laptop comes with a full one-year warranty.", contextSentence: "This washing machine has a two-year ________." },
+        { topic: "Warranty Issue", level: "B2", word: "Leak", form: "Verb", phonetic: "/liːk/", forms: "N: Leak", def: "Accidentally lose or admit contents through a hole or crack.", translation: "Rò rỉ", example: "After about 30 minutes when I came back to the house, I found it was leaking.", extraExample: "The roof was leaking during the heavy rain.", contextSentence: "When I came back to the house, I found it was ________ing." },
+        { topic: "Warranty Issue", level: "C1", word: "Soak", form: "Verb", phonetic: "/səʊk/", forms: "Adj: Soaked", def: "Make or allow something to become thoroughly wet.", translation: "Làm ướt sũng", example: "The water had soaked the entire floor.", extraExample: "I got caught in the rain and my clothes were soaked.", contextSentence: "The water had completely ________ed the entire floor." },
+        { topic: "Warranty Issue", level: "B2", word: "Out of control", form: "Phrase", phonetic: "/aʊt əv kənˈtrəʊl/", forms: "N/A", def: "No longer possible to manage or govern.", translation: "Mất kiểm soát", example: "At that moment the washing machine was totally out of control.", extraExample: "The car skidded on the ice and spun out of control.", contextSentence: "At that moment the washing machine was totally ________." },
+        { topic: "Warranty Issue", level: "B2", word: "Disaster", form: "Noun", phonetic: "/dɪˈzɑːstə/", forms: "Adj: Disastrous", def: "A sudden event causing great damage.", translation: "Thảm họa", example: "Oh, then I found my floor was nearly a disaster.", extraExample: "The party was a complete disaster from start to finish.", contextSentence: "I found my flooded floor was nearly a ________." },
+        { topic: "Warranty Issue", level: "B2", word: "Wipe up", form: "Phrasal Verb", phonetic: "/waɪp ʌp/", forms: "N/A", def: "To clean a spill or surface using a cloth.", translation: "Lau dọn", example: "So what I did in the next two hours was wiping up the water on the floor.", extraExample: "Could you wipe up the spilled milk?", contextSentence: "I spent two hours ________ the water on the floor." },
+        { topic: "Warranty Issue", level: "B2", word: "Occupied", form: "Adjective", phonetic: "/ˈɒkjəpaɪd/", forms: "V: Occupy", def: "Being used by someone; busy or unavailable.", translation: "Kín chỗ, bận rộn", example: "Oh, sorry, madam. Saturday has been occupied.", extraExample: "The bathroom is currently occupied.", contextSentence: "Sorry, the schedule for Saturday has been ________." },
+        { topic: "Warranty Issue", level: "B2", word: "Arrange", form: "Verb", phonetic: "/əˈreɪndʒ/", forms: "N: Arrangement", def: "Organize or make plans for.", translation: "Sắp xếp", example: "Could you arrange the repair work as soon as possible?", extraExample: "They arranged a meeting for the following Tuesday.", contextSentence: "Could you ________ the repair work as soon as possible?" },
+
+        // Section 2: Eye Charity
+        { topic: "Eye Charity", level: "C2", word: "Optometrist", form: "Noun", phonetic: "/ɒpˈtɒmətrɪst/", forms: "N: Optometry", def: "A person who practices testing eyes and prescribing lenses.", translation: "Bác sĩ đo thị lực", example: "Eyesaver was founded by retired optometrist Timothy Gaines.", extraExample: "The optometrist advised me to get new reading glasses.", contextSentence: "Eyesaver was founded by a retired ________." },
+        { topic: "Eye Charity", level: "C1", word: "Corporate", form: "Adjective", phonetic: "/ˈkɔːpərət/", forms: "N: Corporation", def: "Relating to a large company or group.", translation: "Thuộc về doanh nghiệp", example: "I started working for this organisation when I left a corporate position.", extraExample: "Corporate profits have increased this quarter.", contextSentence: "I left a high-paying ________ position to help people." },
+        { topic: "Eye Charity", level: "C2", word: "Benefactor", form: "Noun", phonetic: "/ˈbenɪfæktə/", forms: "N/A", def: "A person who gives money or other help to a cause.", translation: "Nhà hảo tâm", example: "We are planning to work to secure donations from wealthy benefactors.", extraExample: "An anonymous benefactor donated a million dollars.", contextSentence: "We hope to secure donations from wealthy ________s." },
+        { topic: "Eye Charity", level: "B2", word: "Passionate", form: "Adjective", phonetic: "/ˈpæʃənət/", forms: "N: Passion", def: "Having, showing, or caused by strong feelings or beliefs.", translation: "Đam mê, nhiệt huyết", example: "Many people are passionate about charity calls.", extraExample: "She is passionate about animal rights.", contextSentence: "Many people are deeply ________ about charity work." },
+        { topic: "Eye Charity", level: "C1", word: "Possession", form: "Noun", phonetic: "/pəˈzeʃn/", forms: "V: Possess", def: "The state of having, owning, or controlling something.", translation: "Sự sở hữu", example: "Many of you have multiple pairs of old glasses in your possession.", extraExample: "He lost all his possessions in the house fire.", contextSentence: "You may have old glasses currently in your ________." },
+        { topic: "Eye Charity", level: "C1", word: "Critical", form: "Adjective", phonetic: "/ˈkrɪtɪkl/", forms: "Adv: Critically", def: "Having a decisive or crucial importance.", translation: "Cực kỳ quan trọng", example: "This is why your eyeglass donations are so critical to our mission.", extraExample: "Timing is critical for this project to succeed.", contextSentence: "Eyeglass donations are absolutely ________ to our mission." },
+        { topic: "Eye Charity", level: "C1", word: "Turning point", form: "Noun Phrase", phonetic: "/ˈtɜːnɪŋ pɔɪnt/", forms: "N/A", def: "A time at which a decisive change occurs.", translation: "Bước ngoặt", example: "So your donation can be a turning point for them.", extraExample: "Winning that game was a major turning point in his career.", contextSentence: "Your donation can truly be a ________ for them." },
+        { topic: "Eye Charity", level: "C1", word: "Fatal", form: "Adjective", phonetic: "/ˈfeɪtl/", forms: "Adv: Fatally", def: "Causing death or disastrous consequences.", translation: "Gây tử vong, tai hại", example: "We are able to prevent many fatal eye problems.", extraExample: "He made a fatal mistake by trusting the wrong person.", contextSentence: "We are able to prevent many ________ eye problems." },
+        { topic: "Eye Charity", level: "B2", word: "Publicise", form: "Verb", phonetic: "/ˈpʌblɪsaɪz/", forms: "N: Publicity", def: "Make something widely known.", translation: "Quảng bá", example: "In order to publicise our charity program, we surely need to do some advertising.", extraExample: "The campaign was heavily publicised on television.", contextSentence: "In order to ________ our charity program, we need advertising." },
+        { topic: "Eye Charity", level: "C2", word: "Affiliation", form: "Noun", phonetic: "/əˌfɪliˈeɪʃn/", forms: "V: Affiliate", def: "The state of being affiliated with an organization.", translation: "Sự liên kết", example: "Our affiliation with the National Vision Funding Group has allowed us to gain fame.", extraExample: "The hospital has an affiliation with the university.", contextSentence: "Our ________ with the National Group allowed us to gain fame." },
+        { topic: "Eye Charity", level: "C2", word: "Stamp out", form: "Phrasal Verb", phonetic: "/stæmp aʊt/", forms: "N/A", def: "Put an end to something by taking decisive action.", translation: "Loại bỏ hoàn toàn", example: "As we try to stamp out eye problems, we will appreciate your donations.", extraExample: "The new laws aim to stamp out illegal dumping.", contextSentence: "We are working hard to ________ eye problems completely." },
+
+        // Section 3: Climate Change & Allergies
+        { topic: "Climate & Allergies", level: "C1", word: "Allergen", form: "Noun", phonetic: "/ˈælədʒən/", forms: "Adj: Allergenic", def: "A substance that causes an allergic reaction.", translation: "Chất gây dị ứng", example: "It's already the major allergen affecting millions of people in August.", extraExample: "Dust mites are common indoor allergens.", contextSentence: "Ragweed is a major ________ affecting millions of people." },
+        { topic: "Climate & Allergies", level: "C1", word: "Deficiency", form: "Noun", phonetic: "/dɪˈfɪʃnsi/", forms: "Adj: Deficient", def: "A lack or shortage.", translation: "Sự thiếu hụt", example: "Allergy sufferers being more likely to have a vitamin D deficiency.", extraExample: "Iron deficiency can lead to feelings of tiredness.", contextSentence: "Allergy sufferers might have a vitamin D ________." },
+        { topic: "Climate & Allergies", level: "C1", word: "Triple", form: "Verb", phonetic: "/ˈtrɪpl/", forms: "N/A", def: "Become three times as much or as many.", translation: "Tăng gấp ba", example: "The amount of pollen that's produced by the flowers on birch trees has tripled.", extraExample: "The company's profits have tripled over five years.", contextSentence: "The amount of pollen produced has ________d." },
+        { topic: "Climate & Allergies", level: "C1", word: "Quadruple", form: "Verb", phonetic: "/kwɒˈdruːpl/", forms: "N/A", def: "Increase or be multiplied by four.", translation: "Tăng gấp bốn", example: "Since then allergies have quadrupled in most European countries.", extraExample: "The city's population quadrupled in the 20th century.", contextSentence: "Allergies have actually ________d in most European countries." },
+        { topic: "Climate & Allergies", level: "C1", word: "Stimulate", form: "Verb", phonetic: "/ˈstɪmjuleɪt/", forms: "N: Stimulation", def: "Encourage development of or increased activity in.", translation: "Kích thích", example: "CO2 helps stimulate plant growth.", extraExample: "The government lowered rates to stimulate the economy.", contextSentence: "High levels of CO2 help ________ plant growth." },
+        { topic: "Climate & Allergies", level: "B2", word: "Severe", form: "Adjective", phonetic: "/sɪˈvɪə/", forms: "Adv: Severely", def: "Very great; intense (of something bad).", translation: "Nghiêm trọng", example: "So people might experience more severe allergic symptoms in future?", extraExample: "The storm caused severe damage to the towns.", contextSentence: "People might experience more ________ allergic symptoms." },
+        { topic: "Climate & Allergies", level: "B2", word: "Absorb", form: "Verb", phonetic: "/əbˈzɔːb/", forms: "N: Absorption", def: "Take in or soak up.", translation: "Hấp thụ", example: "There are so many hard surfaces around and the pollen doesn't get absorbed so much.", extraExample: "Plants absorb carbon dioxide from the air.", contextSentence: "In cities, the pollen doesn't get ________ed by the ground." },
+        { topic: "Climate & Allergies", level: "B2", word: "Extend", form: "Verb", phonetic: "/ɪkˈstend/", forms: "N: Extension", def: "Cause to cover a larger area; make longer.", translation: "Kéo dài", example: "Wet summers have extended the grass pollen season from five weeks to eight weeks.", extraExample: "The deadline for the project has been extended.", contextSentence: "Wet summers have ________ed the grass pollen season." },
+
+        // Section 4: Marine Archaeology
+        { topic: "Marine Archaeology", level: "C1", word: "Archaeological", form: "Adjective", phonetic: "/ˌɑːkiəˈlɒdʒɪkl/", forms: "N: Archaeology", def: "Relating to the study of human history through the excavation of sites.", translation: "Thuộc khảo cổ học", example: "Examining the role of underwater archaeological sites.", extraExample: "The archaeological dig revealed Roman pottery.", contextSentence: "We examine the role of underwater ________ sites." },
+        { topic: "Marine Archaeology", level: "C1", word: "Orally", form: "Adverb", phonetic: "/ˈɔːrəli/", forms: "Adj: Oral", def: "By means of speech; verbally.", translation: "Bằng lời nói, truyền miệng", example: "The Maoris whose history was passed down orally rather than through written documents.", extraExample: "The medication must be taken orally.", contextSentence: "Their history was passed down ________ rather than in writing." },
+        { topic: "Marine Archaeology", level: "C1", word: "Script", form: "Noun", phonetic: "/skrɪpt/", forms: "N/A", def: "Handwriting as distinct from print; written characters.", translation: "Chữ viết", example: "They lacked any form of written script.", extraExample: "Ancient Egyptian script is known as hieroglyphics.", contextSentence: "They lacked any form of formal written ________." },
+        { topic: "Marine Archaeology", level: "B2", word: "Fascinating", form: "Adjective", phonetic: "/ˈfæsɪneɪtɪŋ/", forms: "V: Fascinate", def: "Extremely interesting.", translation: "Hấp dẫn", example: "What's fascinating is how much we can learn about people's daily routines.", extraExample: "I found the book on astronomy absolutely fascinating.", contextSentence: "What's ________ is how much we can learn from these remains." },
+        { topic: "Marine Archaeology", level: "C1", word: "Invasive", form: "Adjective", phonetic: "/ɪnˈveɪsɪv/", forms: "N: Invasion", def: "Tending to spread prolifically or intrude disruptively.", translation: "Xâm lấn, xâm phạm", example: "This modern technology has made excavation more precise and far less invasive.", extraExample: "The doctor recommended a non-invasive surgical procedure.", contextSentence: "Modern technology has made excavation far less ________." },
+        { topic: "Marine Archaeology", level: "C1", word: "Warfare", form: "Noun", phonetic: "/ˈwɔːfeə/", forms: "N/A", def: "Engagement in or the activities involved in war or conflict.", translation: "Chiến tranh", example: "It's easy to imagine warfare or piracy as the cause of shipwrecks.", extraExample: "Modern warfare relies heavily on technology.", contextSentence: "It's easy to imagine ________ or piracy as the cause." },
+        { topic: "Marine Archaeology", level: "C2", word: "Withstand", form: "Verb", phonetic: "/wɪðˈstænd/", forms: "N/A", def: "Remain undamaged or unaffected by; resist.", translation: "Chịu đựng, chống chọi", example: "Exposure to a violent storm, which ships at the time were not well equipped to withstand.", extraExample: "The building was designed to withstand strong earthquakes.", contextSentence: "Ships at the time were not well equipped to ________ storms." },
+        { topic: "Marine Archaeology", level: "C1", word: "Immersive", form: "Adjective", phonetic: "/ɪˈmɜːsɪv/", forms: "V: Immerse", def: "Generating a three-dimensional image which appears to surround the user.", translation: "Đắm chìm, sống động", example: "Museums and film producers often collaborate to create immersive exhibitions.", extraExample: "The new video game offers a deeply immersive experience.", contextSentence: "Museums collaborate to create highly ________ exhibitions." },
+        { topic: "Marine Archaeology", level: "C1", word: "Narrate", form: "Verb", phonetic: "/nəˈreɪt/", forms: "N: Narrative", def: "Give a spoken or written account of.", translation: "Tường thuật", example: "A film gallery that visually narrated life on board a 17th-century trading vessel.", extraExample: "The documentary is narrated by a famous actor.", contextSentence: "The gallery visually ________d life on board the vessel." },
+        { topic: "Marine Archaeology", level: "C1", word: "Fragile", form: "Adjective", phonetic: "/ˈfrædʒaɪl/", forms: "N: Fragility", def: "Easily broken or damaged.", translation: "Mong manh, dễ vỡ", example: "In many locations, fragile ecosystems have severely restricted the research.", extraExample: "Be careful with that box; the contents are highly fragile.", contextSentence: "In many locations, ________ ecosystems have restricted the research." },
+        { topic: "Marine Archaeology", level: "C1", word: "Compelling", form: "Adjective", phonetic: "/kəmˈpelɪŋ/", forms: "V: Compel", def: "Evoking interest, attention, or admiration in a powerfully irresistible way.", translation: "Thuyết phục, hấp dẫn", example: "One particularly compelling case involved a ship equipped for combat.", extraExample: "The lawyer made a very compelling argument in court.", contextSentence: "One particularly ________ case involved a heavily armed ship." },
+        { topic: "Marine Archaeology", level: "C1", word: "Intact", form: "Adjective", phonetic: "/ɪnˈtækt/", forms: "N/A", def: "Not damaged or impaired in any way; complete.", translation: "Nguyên vẹn", example: "The discovery of a navigational map still partially intact.", extraExample: "Despite the crash, the delicate glass vase survived intact.", contextSentence: "They discovered a navigational map still partially ________." },
+        { topic: "Marine Archaeology", level: "C2", word: "Yield", form: "Verb", phonetic: "/jiːld/", forms: "N: Yield", def: "Produce or provide (a natural, agricultural, or industrial product).", translation: "Mang lại, sản sinh", example: "It's not unusual for wrecks to yield personal and luxury items.", extraExample: "The fertile land yields abundant crops every year.", contextSentence: "It's not unusual for these wrecks to ________ personal luxury items." }
+    ];
+
+    // Helper functions
+    function getDistractors(correctWord, count) {
+        let distractors = [];
+        let pool = vocabBank.filter(v => v.word !== correctWord);
+        pool.sort(() => 0.5 - Math.random());
+        for (let i = 0; i < count; i++) {
+            if (pool[i]) distractors.push(pool[i].word);
+        }
+        return distractors;
+    }
+    
+    function buildOptions(correct, distractors) {
+        let options = [correct, ...distractors];
+        options.sort(() => 0.5 - Math.random());
+        return {
+            options: options,
+            correctIndex: options.indexOf(correct)
+        };
+    }
+
+    function scrambleWord(word) {
+        return word.split(' ').map(w => {
+            let a = w.split('');
+            for(let i = a.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a.join('');
+        }).join(' ').toUpperCase();
+    }
+
+    function hideLetters(word) {
+        return word.split(' ').map(w => {
+            let arr = w.split('');
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === '-') continue;
+                if (Math.random() > 0.4) arr[i] = '_';
+            }
+            if (!arr.includes('_') && arr.length > 1) arr[1] = '_';
+            let allHidden = true;
+            for(let c of arr) if(c !== '_' && c !== '-') allHidden = false;
+            if(allHidden && arr.length > 1) arr[0] = w[0]; 
+            return arr.join(' ');
+        }).join(' &nbsp; '); 
+    }
+
+    // Generate Question Bank 
+    function generateAllQuestions() {
+        let generatedQuestions = [];
+        
+        vocabBank.forEach(entry => {
+            let wordCount = entry.word.split(' ').length;
+            let isLongPhrase = wordCount > 2 || entry.word.includes(' '); // Filter out spaces/phrases for spelling tests
+
+            // Type 1: MCQ Definition
+            let mcqDists = getDistractors(entry.word, 3);
+            let mcqOpts = buildOptions(entry.word, mcqDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'mcq',
+                text: `Which word or phrase best matches this definition: "${entry.def}"?`,
+                options: mcqOpts.options, correct: mcqOpts.correctIndex,
+                explanation: `The correct answer is "${entry.word}".`, vocabEntry: entry
+            });
+
+            // Type 2: Match Word to Definition
+            let defDists = [];
+            let defPool = vocabBank.filter(v => v.def !== entry.def).sort(() => 0.5 - Math.random());
+            for (let i = 0; i < 3; i++) if(defPool[i]) defDists.push(defPool[i].def);
+            let matchOpts = buildOptions(entry.def, defDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'match',
+                text: `What is the correct definition of: "${entry.word}"?`,
+                options: matchOpts.options, correct: matchOpts.correctIndex,
+                explanation: `"${entry.word}" means: ${entry.def}`, vocabEntry: entry
+            });
+            
+            // Type 7: Contextual Sentence
+            let ctxDists = getDistractors(entry.word, 3);
+            let ctxOpts = buildOptions(entry.word, ctxDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'context',
+                text: `Choose the correct vocabulary item to fill in the blank from the listening text:<span class="context-sentence">"${entry.contextSentence}"</span>`,
+                options: ctxOpts.options, correct: ctxOpts.correctIndex,
+                explanation: `The item that fits the context is "${entry.word}".`, vocabEntry: entry
+            });
+
+            // Type 8: True/False Definition
+            let isTrue = Math.random() > 0.5;
+            let displayedDef = entry.def;
+            if (!isTrue) {
+                let otherDefs = vocabBank.filter(v => v.def !== entry.def);
+                displayedDef = otherDefs[Math.floor(Math.random() * otherDefs.length)].def;
+            }
+            generatedQuestions.push({
+                topic: entry.topic, type: 'tf_def',
+                text: `<strong>True or False?</strong><br><br>The item <strong>"${entry.word}"</strong> is defined as:<br>"${displayedDef}"`,
+                options: ["True", "False"],
+                correct: isTrue ? 0 : 1,
+                explanation: isTrue ? `Correct! "${entry.word}" means: ${entry.def}` : `False! "${entry.word}" actually means: ${entry.def}`,
+                vocabEntry: entry
+            });
+
+            // --- Exclude phrases from typing tests ---
+            if (!isLongPhrase) {
+                // Type 3: Fill-in-the-blank 
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'fill',
+                    text: `Type the exact vocabulary term (${entry.form}) that matches this definition: "${entry.def}"`,
+                    correctStr: entry.word,
+                    explanation: `The correct term is "${entry.word}".`, vocabEntry: entry
+                });
+
+                // Type 5: Word Scramble
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'scramble',
+                    text: `Unscramble the letters to find the word matching this definition: "${entry.def}" <span class="scramble-text">${scrambleWord(entry.word)}</span>`,
+                    correctStr: entry.word,
+                    explanation: `The unscrambled word is "${entry.word}".`, vocabEntry: entry
+                });
+
+                // Type 6: Missing Letters
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'missing',
+                    text: `Fill in the missing letters for the word matching this definition: "${entry.def}" <span class="missing-text">${hideLetters(entry.word)}</span>`,
+                    correctStr: entry.word,
+                    explanation: `The complete word is "${entry.word}".`, vocabEntry: entry
+                });
+            }
+        });
+        
+        return generatedQuestions;
+    }
+
+    const allQuestions = generateAllQuestions();
+
+    // ---------------------------------------------------------
+    // App State
+    // ---------------------------------------------------------
+    let selectedQuestions = [];
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    // DOM Elements
+    const configScreen = document.getElementById('config-screen');
+    const testScreen = document.getElementById('test-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const appHeaderTest = document.getElementById('app-header-test');
+    const timerDisplayTest = document.getElementById('timer-test');
+    
+    function startTimer() {
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+            
+            if (timeRemaining <= 10) {
+                 timerDisplayTest.classList.add('warning');
+                 timerDisplayTest.style.transform = `scale(${1 + 0.05 * Math.sin(timeRemaining * Math.PI)})`;
+            } else {
+                 timerDisplayTest.style.transform = "scale(1)";
+            }
+            
+            if (timeRemaining <= 0) { 
+                clearInterval(timerInterval); 
+                submitTest(); 
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        timerDisplayTest.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTest() {
+        const numSelect = document.getElementById('num-questions').value;
+        const totalAvail = allQuestions.length;
+        let numToSelect = numSelect === 'All' ? totalAvail : parseInt(numSelect);
+        numToSelect = Math.min(numToSelect, totalAvail);
+        
+        // Shuffle and pick subset
+        let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        selectedQuestions = shuffled.slice(0, numToSelect);
+        
+        currentQuestion = 0;
+        userAnswers = new Array(selectedQuestions.length).fill(null);
+        timeRemaining = selectedQuestions.length * 30; // 30 seconds per question
+        
+        // UI resets
+        configScreen.classList.remove('active');
+        testScreen.classList.add('active');
+        appHeaderTest.style.display = 'flex';
+        progressContainer.style.display = 'block';
+        timerDisplayTest.classList.remove('warning');
+        timerDisplayTest.style.transform = "scale(1)";
+        
+        renderQuestion();
+        startTimer();
+    }
+
+    function renderQuestion() {
+        const q = selectedQuestions[currentQuestion];
+        
+        document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${selectedQuestions.length}`;
+        document.getElementById('topic-context').innerHTML = `Topic: ${q.topic} <span class="badge badge-${q.vocabEntry.level.toLowerCase()}">${q.vocabEntry.level}</span>`;
+        document.getElementById('question-text').innerHTML = q.text; 
+        progressBar.style.width = `${((currentQuestion) / selectedQuestions.length) * 100}%`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = ''; 
+
+        // MCQ style inputs
+        if (['mcq', 'match', 'context', 'tf_def'].includes(q.type)) {
+            q.options.forEach((opt, index) => {
+                const label = document.createElement('label');
+                label.className = `option-label ${userAnswers[currentQuestion] === index ? 'selected' : ''}`;
+                
+                const input = document.createElement('input');
+                input.type = 'radio'; 
+                input.name = `q${currentQuestion}`; 
+                input.value = index;
+                input.checked = userAnswers[currentQuestion] === index;
+                
+                input.addEventListener('change', (e) => {
+                    userAnswers[currentQuestion] = parseInt(e.target.value);
+                    renderQuestion(); 
+                });
+                
+                label.appendChild(input); 
+                label.appendChild(document.createTextNode(opt));
+                container.appendChild(label);
+            });
+        } 
+        // Text style inputs
+        else if (['fill', 'scramble', 'missing'].includes(q.type)) {
+            const input = document.createElement('input');
+            input.type = 'text'; 
+            input.placeholder = "Type your answer here...";
+            input.value = userAnswers[currentQuestion] || '';
+            
+            input.addEventListener('input', (e) => {
+                userAnswers[currentQuestion] = e.target.value;
+                renderNavGrid(); 
+            });
+            container.appendChild(input);
+        }
+
+        document.getElementById('btn-prev').disabled = currentQuestion === 0;
+        if (currentQuestion === selectedQuestions.length - 1) {
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-submit').style.display = 'block';
+        } else {
+            document.getElementById('btn-next').style.display = 'block';
+            document.getElementById('btn-submit').style.display = 'none';
+        }
+        renderNavGrid();
+    }
+
+    function renderNavGrid() {
+        const grid = document.getElementById('q-nav-grid');
+        grid.innerHTML = '';
+        
+        selectedQuestions.forEach((q, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'q-nav-btn'; 
+            btn.textContent = index + 1;
+            
+            let isAnswered = false;
+            if (['fill', 'scramble', 'missing'].includes(q.type)) {
+                 isAnswered = userAnswers[index] && userAnswers[index].trim() !== '';
+            } else {
+                 isAnswered = userAnswers[index] !== null;
+            }
+
+            if (isAnswered) btn.classList.add('answered');
+            if (index === currentQuestion) btn.classList.add('current');
+            
+            btn.onclick = () => { currentQuestion = index; renderQuestion(); };
+            grid.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() { if (currentQuestion < selectedQuestions.length - 1) { currentQuestion++; renderQuestion(); } }
+    function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; renderQuestion(); } }
+
+    function submitTest() {
+        clearInterval(timerInterval);
+        testScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+        progressBar.style.width = '100%';
+        appHeaderTest.style.display = 'none'; 
+        progressContainer.style.display = 'none';
+        
+        let score = 0;
+        const resultsList = document.getElementById('results-list');
+        resultsList.innerHTML = '';
+
+        selectedQuestions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            let isCorrect = false; 
+            let displayAnswer = "No answer provided"; 
+            let expectedAnswer = "";
+
+            if (['mcq', 'match', 'context', 'tf_def'].includes(q.type)) {
+                isCorrect = userAnswer === q.correct;
+                if (userAnswer !== null) displayAnswer = q.options[userAnswer];
+                expectedAnswer = q.options[q.correct];
+            } else if (['fill', 'scramble', 'missing'].includes(q.type)) {
+                // Ignore punctuation and case for string matching
+                const cleanUser = (userAnswer || '').replace(/[.,\/#!$%\^&\*;:{}=\-_`~()']/g,"").trim().toLowerCase();
+                const cleanCorrect = q.correctStr.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()']/g,"").trim().toLowerCase();
+                isCorrect = cleanUser === cleanCorrect;
+                
+                if (userAnswer && userAnswer.trim() !== '') displayAnswer = userAnswer;
+                expectedAnswer = q.correctStr;
+            }
+
+            if (isCorrect) score++;
+
+            const item = document.createElement('div');
+            item.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
+            
+            let html = `
+                <div class="result-item-header">Q${index + 1} [${q.topic} - ${q.vocabEntry.level}]: ${q.text}</div>
+                <div><strong>Your Answer:</strong> ${displayAnswer} ${isCorrect ? '✅' : '❌'}</div>
+                ${!isCorrect ? `<div><strong>Correct Answer:</strong> ${expectedAnswer}</div>` : ''}
+                <div class="result-explanation">${q.explanation}</div>
+            `;
+            
+            if (!isCorrect && q.vocabEntry) {
+                html += `
+                    <div style="margin-top: 10px; padding: 10px; background-color: #ffffff; border: 1px solid var(--border); border-radius: 6px;">
+                        <strong>Vocabulary Review:</strong><br/>
+                        <em>Item:</em> ${q.vocabEntry.word} <span class="badge badge-${q.vocabEntry.level.toLowerCase()}">${q.vocabEntry.level}</span> <span style="color:#475569;">${q.vocabEntry.phonetic}</span><br/>
+                        <em>Word Forms:</em> ${q.vocabEntry.forms || q.vocabEntry.form}<br/>
+                        <em>Definition:</em> ${q.vocabEntry.def}
+                    </div>
+                `;
+            }
+            
+            item.innerHTML = html;
+            resultsList.appendChild(item);
+        });
+
+        const percentage = Math.round((score / selectedQuestions.length) * 100);
+        document.getElementById('score-display').textContent = `${score} / ${selectedQuestions.length}`;
+        
+        let bandText = "";
+        let color = "";
+        if (percentage >= 80) {
+            bandText = `Outstanding! You are highly prepared for Band 7.0+ Listening Sections. (${percentage}%)`;
+            color = "var(--success)";
+        } else if (percentage >= 60) {
+            bandText = `Good effort! Keep reviewing the flashcards. (${percentage}%)`;
+            color = "var(--primary)"; 
+        } else {
+            bandText = `Keep studying! Review the Learning Tool to reach the target band. (${percentage}%)`;
+            color = "var(--danger)";
+        }
+        
+        const bandIndicator = document.getElementById('band-indicator');
+        bandIndicator.textContent = bandText;
+        bandIndicator.style.color = color;
+    }
+
+    function restartTest() {
+        resultsScreen.classList.remove('active');
+        configScreen.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
