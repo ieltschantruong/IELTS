@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Passage | An Ideal City - Vocabulary Test</title>
+    <style>
+        :root {
+            /* Theme: Minimalist Light Summer / Sweet Candy Purple & Pastel Pink */
+            --primary: #c084fc; 
+            --primary-hover: #a855f7;
+            --success: #f472b6; 
+            --danger: #ef4444; 
+            --bg-body: #faf5ff; 
+            --card-bg: #ffffff; 
+            --text-main: #334155; 
+            --text-muted: #64748b; 
+            --border: #e9d5ff; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 2rem; }
+        
+        .header-banner { background-color: var(--card-bg); color: var(--text-main); text-align: center; padding: 1rem; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.1em; width: 100%; border-bottom: 3px solid var(--primary); margin-bottom: 2rem; text-transform: uppercase; }
+        
+        .container { width: 100%; max-width: 800px; background: var(--card-bg); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); overflow: hidden; display: flex; flex-direction: column; margin: 0 1rem; border: 1px solid #fdf4ff;}
+        
+        /* Header & Timer */
+        header { background-color: var(--primary); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .header-title h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.05em; }
+        .header-title p { font-size: 0.9rem; opacity: 0.9; font-weight: 500; }
+        .timer-box { background: rgba(255,255,255,0.25); padding: 0.5rem 1rem; border-radius: 50px; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; transition: transform 0.1s ease;}
+        .timer-box.warning { background: var(--danger); color: white; }
+        
+        /* Progress Bar */
+        .progress-container { height: 6px; background: var(--border); width: 100%; }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+
+        /* Content Area */
+        .content { padding: 2.5rem; min-height: 380px; }
+        .question-number { color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+        .topic-context { display: inline-block; background: #fce7f3; color: #db2777; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: 0.05em;}
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 2rem; line-height: 1.5; color: var(--text-main); }
+
+        /* Form Controls */
+        .options-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .option-label { display: flex; align-items: center; padding: 1.2rem; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-size: 1.1rem; font-weight: 500;}
+        .option-label:hover { background-color: #faf5ff; border-color: var(--primary); }
+        .option-label input[type="radio"] { margin-right: 1rem; transform: scale(1.3); accent-color: var(--primary); }
+        .option-label.selected { border-color: var(--primary); background-color: #f3e8ff; box-shadow: 0 4px 6px rgba(192, 132, 252, 0.1); }
+        input[type="text"] { width: 100%; padding: 1.2rem; font-size: 1.1rem; border: 2px solid var(--border); border-radius: 12px; transition: all 0.2s ease; font-weight: 500; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px #f3e8ff; }
+        
+        /* Specialized Question Text Formatting */
+        .scramble-text { letter-spacing: 4px; font-size: 1.8rem; color: var(--accent); font-weight: 800; display: block; margin-top: 0.75rem; text-transform: uppercase;}
+        .missing-text { letter-spacing: 6px; font-size: 1.8rem; color: var(--accent); font-family: monospace; font-weight: 800; display: block; margin-top: 0.75rem; text-transform: uppercase;}
+        .context-sentence { font-style: italic; background: #f8fafc; padding: 1.2rem; border-left: 4px solid var(--primary); border-radius: 8px; display: block; margin-top: 1.5rem; color: #475569; font-weight: 400;}
+
+        /* Question Navigation Grid */
+        .q-nav-container { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px dashed var(--border); }
+        .q-nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .q-nav-title { font-size: 1rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .q-nav-legend { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
+        .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+        .legend-box { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--border); }
+        .legend-box.answered { background: var(--primary); border-color: var(--primary); }
+        .legend-box.unanswered { background: var(--card-bg); }
+        .q-nav-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .q-nav-btn { width: 38px; height: 38px; border-radius: 8px; border: 2px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .q-nav-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .q-nav-btn.answered { background: var(--primary); border-color: var(--primary); color: white; }
+        .q-nav-btn.current { transform: scale(1.15); border-color: var(--success); box-shadow: 0 0 0 2px var(--success); z-index: 1; color: var(--success); }
+        .q-nav-btn.answered.current { color: white; background: var(--success); }
+
+        /* Footer Controls */
+        .footer { padding: 1.5rem 2.5rem; background-color: #faf5ff; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        button { padding: 0.8rem 1.8rem; font-size: 1.05rem; font-weight: 700; border: none; border-radius: 50px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.05em;}
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover:not(:disabled) { background: var(--primary-light); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 6px rgba(192, 132, 252, 0.3); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-submit { background: var(--success); color: white; box-shadow: 0 4px 6px rgba(244, 114, 182, 0.3); }
+        .btn-submit:hover { background: #ec4899; transform: translateY(-2px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Screens */
+        .screen { display: none; text-align: center; padding: 3.5rem 2.5rem; }
+        .screen.active { display: block; }
+        .screen-title { font-size: 2.2rem; color: var(--accent); margin-bottom: 1rem; font-weight: 800; }
+        .score-display { font-size: 4.5rem; font-weight: 800; color: var(--success); margin: 1.5rem 0; text-shadow: 2px 2px 4px rgba(244, 114, 182, 0.2); }
+        .results-list { text-align: left; margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .result-item { padding: 1.5rem; border-radius: 12px; border-left: 6px solid; background: #faf5ff; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .result-item.correct { border-color: var(--success); }
+        .result-item.incorrect { border-color: var(--danger); }
+        .result-item-header { font-weight: 700; margin-bottom: 0.5rem; line-height: 1.5; font-size: 1.1rem; color: var(--text-main); }
+        .result-explanation { font-size: 0.95rem; color: var(--text-muted); margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border); }
+
+        /* Config specific styles */
+        .config-group { margin: 2rem 0; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .config-group label { display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--accent); }
+        .config-select { width: 100%; padding: 1rem; border-radius: 12px; border: 2px solid var(--border); font-size: 1.05rem; background: var(--card-bg); font-weight: 600; color: var(--text-main); outline: none; cursor: pointer;}
+        .config-select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px #f3e8ff; }
+
+        @media (max-width: 600px) { header { flex-direction: column; gap: 1rem; text-align: center; } .footer { flex-direction: column; gap: 1rem; } .footer button { width: 100%; } }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">Academic Training</div>
+
+<div class="container">
+    <header id="app-header-test" style="display: none;">
+        <div class="header-title">
+            <h2>Reading Vocabulary Test</h2>
+            <p>An Ideal City (Band 6.5-7.5+)</p>
+        </div>
+        <div class="timer-box" id="timer-test">
+            ⏱️ 00:00
+        </div>
+    </header>
+    
+    <div class="progress-container" id="progress-container" style="display: none;">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="config-screen" class="screen active">
+        <h1 class="screen-title">Vocabulary Assessment</h1>
+        <p style="font-size: 1.15rem; margin-bottom: 1rem; color: var(--text-muted); font-weight: 500;">
+            Test your knowledge of the 32 advanced academic words from the reading passage.
+        </p>
+        
+        <div class="config-group">
+            <label for="num-questions">How many questions would you like to take?</label>
+            <select id="num-questions" class="config-select">
+                <option value="5">5 Questions (2:30)</option>
+                <option value="10">10 Questions (5:00)</option>
+                <option value="15" selected>15 Questions (7:30)</option>
+                <option value="20">20 Questions (10:00)</option>
+                <option value="30">30 Questions (15:00)</option>
+                <option value="All">All Combinations (Comprehensive)</option>
+            </select>
+        </div>
+        
+        <p style="font-size: 0.95rem; margin-bottom: 2.5rem; color: var(--text-muted); background: #fdf2f8; padding: 1rem; border-radius: 8px; border: 1px dashed #fbcfe8;">
+            You have exactly <strong>30 seconds per question</strong>. Note: Long phrases are automatically excluded from typing challenges to save time, but will appear in multiple choice.
+        </p>
+        <button class="btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;" onclick="startTest()">Start Test</button>
+    </div>
+
+    <div id="test-screen" class="screen" style="padding: 0; text-align: left;">
+        <div class="content">
+            <div class="question-number" id="question-number">Question 1 of X</div>
+            <div class="topic-context" id="topic-context">Topic: ...</div>
+            <div class="question-text" id="question-text">Question text goes here?</div>
+            <div id="options-container" class="options-grid"></div>
+            
+            <div class="q-nav-container">
+                <div class="q-nav-header">
+                    <span class="q-nav-title">Question Navigator</span>
+                    <div class="q-nav-legend">
+                        <div class="legend-item"><div class="legend-box answered"></div> Answered</div>
+                        <div class="legend-item"><div class="legend-box unanswered"></div> Unanswered</div>
+                    </div>
+                </div>
+                <div id="q-nav-grid" class="q-nav-grid"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button class="btn-outline" id="btn-prev" onclick="prevQuestion()">Previous</button>
+            <button class="btn-primary" id="btn-next" onclick="nextQuestion()">Next</button>
+            <button class="btn-submit" id="btn-submit" style="display: none;" onclick="submitTest()">Submit Test</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="screen">
+        <h1 class="screen-title" id="result-title">Test Complete!</h1>
+        <div class="score-display" id="score-display">0 / 0</div>
+        <p style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1.5rem;" id="band-indicator">Indicator</p>
+        <div class="results-list" id="results-list"></div>
+        <button class="btn-primary" style="margin-top: 2rem;" onclick="restartTest()">Take Another Test</button>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (An Ideal City)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        { topic: "Urban Planning & Architecture", word: "Conception", form: "Noun", phonetic: "/kənˈsepʃn/", forms: "V: Conceive | Adj: Conceptual", def: "The forming or devising of a plan or idea.", contextSentence: "The rigour and method behind the conscious ________ of a city had been largely missing..." },
+        { topic: "Urban Planning & Architecture", word: "Reconfiguration", form: "Noun", phonetic: "/ˌriːkənˌfɪɡəˈreɪʃn/", forms: "V: Reconfigure", def: "An arrangement of parts or elements in a different form, figure, or combination.", contextSentence: "...such as the ________ of the town of Pienza and the expansion of the city of Ferrara." },
+        { topic: "Urban Planning & Architecture", word: "Winding", form: "Adjective", phonetic: "/ˈwaɪndɪŋ/", forms: "V: Wind", def: "Following a twisting or spiral course.", contextSentence: "...to rethink the design of medieval cities, with their ________ and overcrowded streets..." },
+        { topic: "Urban Planning & Architecture", word: "Overcrowded", form: "Adjective", phonetic: "/ˌəʊvəˈkraʊdɪd/", forms: "N: Overcrowding", def: "Filled beyond what is comfortable or safe.", contextSentence: "...with their winding and ________ streets and with houses piled against one another." },
+        { topic: "Urban Planning & Architecture", word: "Battlement", form: "Noun", phonetic: "/ˈbætlmənt/", forms: "N/A", def: "A parapet at the top of a wall, usually of a fort or castle, that has regularly spaced, squared openings.", contextSentence: "He recommended 'high, strong walls', with 'towers and ________s of all necessary and pleasant beauty'." },
+        { topic: "Urban Planning & Architecture", word: "Fusion", form: "Noun", phonetic: "/ˈfjuːʒn/", forms: "V: Fuse", def: "The process or result of joining two or more things together to form a single entity.", contextSentence: "But the true originality of Leonardo's vision was its ________ of architecture and engineering." },
+        { topic: "Urban Planning & Architecture", word: "Hydraulic", form: "Adjective", phonetic: "/haɪˈdrɒlɪk/", forms: "N: Hydraulics", def: "Denoting, relating to, or operated by a liquid moving in a confined space under pressure.", contextSentence: "Leonardo designed extensive ________ plants to create artificial canals..." },
+        { topic: "Urban Planning & Architecture", word: "Subdivision", form: "Noun", phonetic: "/ˌsʌbdɪˈvɪʒn/", forms: "V: Subdivide", def: "The act of dividing a part of something into smaller parts.", contextSentence: "For example, the ________ of the city by function... is an idea that can be found..." },
+        { topic: "Urban Planning & Architecture", word: "Infrastructure", form: "Noun", phonetic: "/ˈɪnfrəstrʌktʃə(r)/", forms: "N/A", def: "The basic physical and organizational structures and facilities needed for the operation of a society or enterprise.", contextSentence: "...with efficient transport ________, could help modem cities become more efficient..." },
+        { topic: "Urban Planning & Architecture", word: "Sustainable", form: "Adjective", phonetic: "/səˈsteɪnəbl/", forms: "N: Sustainability | V: Sustain", def: "Able to be maintained at a certain rate or level; conserving an ecological balance.", contextSentence: "...could help modem cities become more efficient and ________." },
+        { topic: "Urban Planning & Architecture", word: "Unsustainable", form: "Adjective", phonetic: "/ˌʌnsəˈsteɪnəbl/", forms: "N: Sustainability | V: Sustain", def: "Not able to be maintained at the current rate or level.", contextSentence: "Yet given that ________ urban models are a key cause of global climate change today..." },
+
+        { topic: "Crises & Solutions", word: "Catastrophe", form: "Noun", phonetic: "/kəˈtæstrəfi/", forms: "Adj: Catastrophic", def: "An event causing great and usually sudden damage or suffering; a disaster.", contextSentence: "...radical solutions were called for to revolutionise the way people lived and safeguard humanity against ________." },
+        { topic: "Crises & Solutions", word: "Safeguard", form: "Verb", phonetic: "/ˈseɪfɡɑːd/", forms: "N: Safeguard", def: "Protect from harm or damage with an appropriate measure.", contextSentence: "...and ________ humanity against catastrophe." },
+        { topic: "Crises & Solutions", word: "Pestilence", form: "Noun", phonetic: "/ˈpestɪləns/", forms: "N/A", def: "A fatal epidemic disease, especially bubonic plague.", contextSentence: "Around 1486 - after a ________ that killed half the population in Milan..." },
+        { topic: "Crises & Solutions", word: "On the cusp of", form: "Phrase", phonetic: "/ɒn ðə kʌsp əv/", forms: "N/A", def: "At the point when something is about to change to something else.", contextSentence: "Today, the world is ________ a climate crisis..." },
+        { topic: "Crises & Solutions", word: "Displacement", form: "Noun", phonetic: "/dɪsˈpleɪsmənt/", forms: "V: Displace", def: "The enforced departure of people from their homes, typically because of war, persecution, or natural disaster.", contextSentence: "...which is predicted to cause widespread ________, extinctions and death..." },
+        { topic: "Crises & Solutions", word: "Unaddressed", form: "Adjective", phonetic: "/ˌʌnəˈdrest/", forms: "V: Address", def: "Not dealt with or resolved.", contextSentence: "...cause widespread displacement, extinctions and death, if left ________." },
+        { topic: "Crises & Solutions", word: "Radical", form: "Adjective", phonetic: "/ˈrædɪkl/", forms: "Adv: Radically", def: "Relating to or affecting the fundamental nature of something; far-reaching or thorough.", contextSentence: "Then, as now, ________ solutions were called for to revolutionise the way people lived..." },
+        { topic: "Crises & Solutions", word: "Implement", form: "Verb", phonetic: "/ˈɪmplɪment/", forms: "N: Implementation", def: "Put (a decision, plan, agreement, etc.) into effect.", contextSentence: "...this idea of taking full advantage of the interior spaces wasn't ________ed until the 1920s..." },
+        { topic: "Crises & Solutions", word: "Thoroughly", form: "Adverb", phonetic: "/ˈθʌrəli/", forms: "Adj: Thorough", def: "In a careful and complete way.", contextSentence: "...compact modem city which was ________ technically conceived." },
+
+        { topic: "Ideas & Development", word: "Embody", form: "Verb", phonetic: "/ɪmˈbɒdi/", forms: "N: Embodiment", def: "To be an expression of or give a tangible or visible form to an idea or quality.", contextSentence: "A true Renaissance man, he ________ied scientific spirit, artistic talent and humanist sensibilities." },
+        { topic: "Ideas & Development", word: "Sensibility", form: "Noun", phonetic: "/ˌsensəˈbɪləti/", forms: "Adj: Sensible", def: "The ability to appreciate and respond to complex emotional or aesthetic influences.", contextSentence: "...he embodied scientific spirit, artistic talent and humanist ________ies." },
+        { topic: "Ideas & Development", word: "Insignificance", form: "Noun", phonetic: "/ˌɪnsɪɡˈnɪfɪkəns/", forms: "Adj: Insignificant", def: "The quality of being too small or unimportant to be worth consideration.", contextSentence: "Yet far from fading into ________, his thinking has carried down the centuries..." },
+        { topic: "Ideas & Development", word: "Unfulfilled", form: "Adjective", phonetic: "/ˌʌnfʊlˈfɪld/", forms: "V: Fulfill | N: Fulfillment", def: "Not carried out or brought to completion.", contextSentence: "...which - due to its excessive costs - would remain ________." },
+        { topic: "Ideas & Development", word: "Renowned", form: "Adjective", phonetic: "/rɪˈnaʊnd/", forms: "N: Renown", def: "Known or talked about by many people; famous.", contextSentence: "Although the Renaissance is ________ as an era of incredible progress in art..." },
+        { topic: "Ideas & Development", word: "Reconstruct", form: "Verb", phonetic: "/ˌriːkənˈstrʌkt/", forms: "N: Reconstruction", def: "Build or form (something) again after it has been damaged or destroyed.", contextSentence: "...a series of innovative thoughts can be ________ed regarding the foundation of a new city..." },
+        { topic: "Ideas & Development", word: "Rational", form: "Adjective", phonetic: "/ˈræʃnəl/", forms: "N: Rationality | Adv: Rationally", def: "Based on or in accordance with reason or logic.", contextSentence: "His plans for a modem and ‘________' city were consistent with Renaissance ideals." },
+        { topic: "Ideas & Development", word: "Consistent with", form: "Phrase", phonetic: "/kənˈsɪstənt wɪð/", forms: "N: Consistency", def: "In agreement with.", contextSentence: "His plans for a modem and ‘rational' city were ________ Renaissance ideals." },
+        { topic: "Ideas & Development", word: "Unconventional", form: "Adjective", phonetic: "/ˌʌnkənˈvenʃənl/", forms: "N: Convention", def: "Not based on or conforming to what is generally done or believed.", contextSentence: "This design can be seen in some of today's high-rise buildings but was ________ at the time." },
+        { topic: "Ideas & Development", word: "Undisturbed", form: "Adjective", phonetic: "/ˌʌndɪˈstɜːbd/", forms: "V: Disturb | N: Disturbance", def: "Not interfered with or interrupted.", contextSentence: "...people could walk ________ between elegant palaces and streets..." },
+        { topic: "Ideas & Development", word: "Integrate", form: "Verb", phonetic: "/ˈɪntɪɡreɪt/", forms: "N: Integration", def: "Combine (one thing) with another so that they become a whole.", contextSentence: "...________d with nature (especially water systems), with efficient transport infrastructure..." },
+        { topic: "Ideas & Development", word: "Align", form: "Verb", phonetic: "/əˈlaɪn/", forms: "N: Alignment", def: "Place or arrange in a straight line, or put in agreement.", contextSentence: "...why Leonardo was ________ed so closely with modem urban planning..." },
+        { topic: "Ideas & Development", word: "Ahead of its time", form: "Phrase", phonetic: "/əˈhed əv ɪts taɪm/", forms: "N/A", def: "Having ideas or creating things that are too advanced to be accepted or understood in the current era.", contextSentence: "Leonardo da Vinci's ideal city was centuries ________." }
+    ];
+
+    // Helper functions
+    function getDistractors(correctWord, count) {
+        let distractors = [];
+        let pool = vocabBank.filter(v => v.word !== correctWord);
+        pool.sort(() => 0.5 - Math.random());
+        for (let i = 0; i < count; i++) {
+            if (pool[i]) distractors.push(pool[i].word);
+        }
+        return distractors;
+    }
+    
+    function buildOptions(correct, distractors) {
+        let options = [correct, ...distractors];
+        options.sort(() => 0.5 - Math.random());
+        return {
+            options: options,
+            correctIndex: options.indexOf(correct)
+        };
+    }
+
+    function scrambleWord(word) {
+        return word.split(' ').map(w => {
+            let a = w.split('');
+            for(let i = a.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a.join('');
+        }).join(' ').toUpperCase();
+    }
+
+    function hideLetters(word) {
+        return word.split(' ').map(w => {
+            let arr = w.split('');
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === '-') continue;
+                if (Math.random() > 0.4) arr[i] = '_';
+            }
+            // Guarantee at least one hidden and one shown if length > 1
+            if (!arr.includes('_') && arr.length > 1) arr[1] = '_';
+            let allHidden = true;
+            for(let c of arr) if(c !== '_' && c !== '-') allHidden = false;
+            if(allHidden && arr.length > 1) arr[0] = w[0]; 
+            return arr.join(' ');
+        }).join(' &nbsp; '); 
+    }
+
+    // Generate Question Bank 
+    function generateAllQuestions() {
+        let generatedQuestions = [];
+        
+        vocabBank.forEach(entry => {
+            let wordCount = entry.word.split(' ').length;
+            let isLongPhrase = wordCount > 2; // Filter out long phrases for spelling tests
+
+            // Type 1: MCQ Definition (All)
+            let mcqDists = getDistractors(entry.word, 3);
+            let mcqOpts = buildOptions(entry.word, mcqDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'mcq',
+                text: `Which word or phrase best matches this definition: "${entry.def}"?`,
+                options: mcqOpts.options, correct: mcqOpts.correctIndex,
+                explanation: `The correct answer is "${entry.word}".`, vocabEntry: entry
+            });
+
+            // Type 2: Match Word to Definition (All)
+            let defDists = [];
+            let defPool = vocabBank.filter(v => v.def !== entry.def).sort(() => 0.5 - Math.random());
+            for (let i = 0; i < 3; i++) if(defPool[i]) defDists.push(defPool[i].def);
+            let matchOpts = buildOptions(entry.def, defDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'match',
+                text: `What is the correct definition of: "${entry.word}"?`,
+                options: matchOpts.options, correct: matchOpts.correctIndex,
+                explanation: `"${entry.word}" means: ${entry.def}`, vocabEntry: entry
+            });
+            
+            // Type 7: Contextual Sentence (All)
+            let ctxDists = getDistractors(entry.word, 3);
+            let ctxOpts = buildOptions(entry.word, ctxDists);
+            generatedQuestions.push({
+                topic: entry.topic, type: 'context',
+                text: `Choose the correct vocabulary item to fill in the blank from the reading passage:<span class="context-sentence">"${entry.contextSentence}"</span>`,
+                options: ctxOpts.options, correct: ctxOpts.correctIndex,
+                explanation: `The item that fits the context is "${entry.word}".`, vocabEntry: entry
+            });
+
+            // Type 8: True/False Definition (All)
+            let isTrue = Math.random() > 0.5;
+            let displayedDef = entry.def;
+            if (!isTrue) {
+                let otherDefs = vocabBank.filter(v => v.def !== entry.def);
+                displayedDef = otherDefs[Math.floor(Math.random() * otherDefs.length)].def;
+            }
+            generatedQuestions.push({
+                topic: entry.topic, type: 'tf_def',
+                text: `<strong>True or False?</strong><br><br>The item <strong>"${entry.word}"</strong> is defined as:<br>"${displayedDef}"`,
+                options: ["True", "False"],
+                correct: isTrue ? 0 : 1,
+                explanation: isTrue ? `Correct! "${entry.word}" means: ${entry.def}` : `False! "${entry.word}" actually means: ${entry.def}`,
+                vocabEntry: entry
+            });
+
+            // --- Exclude long phrases from typing tests to prevent frustration in 30 seconds ---
+            if (!isLongPhrase) {
+                // Type 3: Fill-in-the-blank 
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'fill',
+                    text: `Type the exact vocabulary term (${entry.form}) that matches this definition: "${entry.def}"`,
+                    correctStr: entry.word,
+                    explanation: `The correct term is "${entry.word}".`, vocabEntry: entry
+                });
+
+                // Type 5: Word Scramble
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'scramble',
+                    text: `Unscramble the letters to find the word matching this definition: "${entry.def}" <span class="scramble-text">${scrambleWord(entry.word)}</span>`,
+                    correctStr: entry.word,
+                    explanation: `The unscrambled word is "${entry.word}".`, vocabEntry: entry
+                });
+
+                // Type 6: Missing Letters
+                generatedQuestions.push({
+                    topic: entry.topic, type: 'missing',
+                    text: `Fill in the missing letters for the word matching this definition: "${entry.def}" <span class="missing-text">${hideLetters(entry.word)}</span>`,
+                    correctStr: entry.word,
+                    explanation: `The complete word is "${entry.word}".`, vocabEntry: entry
+                });
+            }
+        });
+        
+        return generatedQuestions;
+    }
+
+    const allQuestions = generateAllQuestions();
+
+    // ---------------------------------------------------------
+    // App State
+    // ---------------------------------------------------------
+    let selectedQuestions = [];
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let timeRemaining = 0;
+    let timerInterval = null;
+
+    // DOM Elements
+    const configScreen = document.getElementById('config-screen');
+    const testScreen = document.getElementById('test-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const appHeaderTest = document.getElementById('app-header-test');
+    const timerDisplayTest = document.getElementById('timer-test');
+    
+    function startTimer() {
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+            
+            if (timeRemaining <= 10) {
+                 timerDisplayTest.classList.add('warning');
+                 timerDisplayTest.style.transform = `scale(${1 + 0.05 * Math.sin(timeRemaining * Math.PI)})`;
+            } else {
+                 timerDisplayTest.style.transform = "scale(1)";
+            }
+            
+            if (timeRemaining <= 0) { 
+                clearInterval(timerInterval); 
+                submitTest(); 
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        timerDisplayTest.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTest() {
+        const numSelect = document.getElementById('num-questions').value;
+        const totalAvail = allQuestions.length;
+        let numToSelect = numSelect === 'All' ? totalAvail : parseInt(numSelect);
+        numToSelect = Math.min(numToSelect, totalAvail);
+        
+        // Shuffle and pick subset
+        let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        selectedQuestions = shuffled.slice(0, numToSelect);
+        
+        currentQuestion = 0;
+        userAnswers = new Array(selectedQuestions.length).fill(null);
+        timeRemaining = selectedQuestions.length * 30; // 30 seconds per question
+        
+        // UI resets
+        configScreen.classList.remove('active');
+        testScreen.classList.add('active');
+        appHeaderTest.style.display = 'flex';
+        progressContainer.style.display = 'block';
+        timerDisplayTest.classList.remove('warning');
+        timerDisplayTest.style.transform = "scale(1)";
+        
+        renderQuestion();
+        startTimer();
+    }
+
+    function renderQuestion() {
+        const q = selectedQuestions[currentQuestion];
+        
+        document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${selectedQuestions.length}`;
+        document.getElementById('topic-context').textContent = `Category: ${q.topic}`;
+        document.getElementById('question-text').innerHTML = q.text; 
+        progressBar.style.width = `${((currentQuestion) / selectedQuestions.length) * 100}%`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = ''; 
+
+        // MCQ style inputs
+        if (['mcq', 'match', 'context', 'tf_def'].includes(q.type)) {
+            q.options.forEach((opt, index) => {
+                const label = document.createElement('label');
+                label.className = `option-label ${userAnswers[currentQuestion] === index ? 'selected' : ''}`;
+                
+                const input = document.createElement('input');
+                input.type = 'radio'; 
+                input.name = `q${currentQuestion}`; 
+                input.value = index;
+                input.checked = userAnswers[currentQuestion] === index;
+                
+                input.addEventListener('change', (e) => {
+                    userAnswers[currentQuestion] = parseInt(e.target.value);
+                    renderQuestion(); 
+                });
+                
+                label.appendChild(input); 
+                label.appendChild(document.createTextNode(opt));
+                container.appendChild(label);
+            });
+        } 
+        // Text style inputs
+        else if (['fill', 'scramble', 'missing'].includes(q.type)) {
+            const input = document.createElement('input');
+            input.type = 'text'; 
+            input.placeholder = "Type your answer here...";
+            input.value = userAnswers[currentQuestion] || '';
+            
+            input.addEventListener('input', (e) => {
+                userAnswers[currentQuestion] = e.target.value;
+                renderNavGrid(); 
+            });
+            container.appendChild(input);
+        }
+
+        document.getElementById('btn-prev').disabled = currentQuestion === 0;
+        if (currentQuestion === selectedQuestions.length - 1) {
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-submit').style.display = 'block';
+        } else {
+            document.getElementById('btn-next').style.display = 'block';
+            document.getElementById('btn-submit').style.display = 'none';
+        }
+        renderNavGrid();
+    }
+
+    function renderNavGrid() {
+        const grid = document.getElementById('q-nav-grid');
+        grid.innerHTML = '';
+        
+        selectedQuestions.forEach((q, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'q-nav-btn'; 
+            btn.textContent = index + 1;
+            
+            let isAnswered = false;
+            if (['fill', 'scramble', 'missing'].includes(q.type)) {
+                 isAnswered = userAnswers[index] && userAnswers[index].trim() !== '';
+            } else {
+                 isAnswered = userAnswers[index] !== null;
+            }
+
+            if (isAnswered) btn.classList.add('answered');
+            if (index === currentQuestion) btn.classList.add('current');
+            
+            btn.onclick = () => { currentQuestion = index; renderQuestion(); };
+            grid.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() { if (currentQuestion < selectedQuestions.length - 1) { currentQuestion++; renderQuestion(); } }
+    function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; renderQuestion(); } }
+
+    function submitTest() {
+        clearInterval(timerInterval);
+        testScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+        progressBar.style.width = '100%';
+        appHeaderTest.style.display = 'none'; 
+        progressContainer.style.display = 'none';
+        
+        let score = 0;
+        const resultsList = document.getElementById('results-list');
+        resultsList.innerHTML = '';
+
+        selectedQuestions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            let isCorrect = false; 
+            let displayAnswer = "No answer provided"; 
+            let expectedAnswer = "";
+
+            if (['mcq', 'match', 'context', 'tf_def'].includes(q.type)) {
+                isCorrect = userAnswer === q.correct;
+                if (userAnswer !== null) displayAnswer = q.options[userAnswer];
+                expectedAnswer = q.options[q.correct];
+            } else if (['fill', 'scramble', 'missing'].includes(q.type)) {
+                // Ignore punctuation and case for string matching
+                const cleanUser = (userAnswer || '').replace(/[.,\/#!$%\^&\*;:{}=\-_`~()']/g,"").trim().toLowerCase();
+                const cleanCorrect = q.correctStr.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()']/g,"").trim().toLowerCase();
+                isCorrect = cleanUser === cleanCorrect;
+                
+                if (userAnswer && userAnswer.trim() !== '') displayAnswer = userAnswer;
+                expectedAnswer = q.correctStr;
+            }
+
+            if (isCorrect) score++;
+
+            const item = document.createElement('div');
+            item.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
+            
+            let html = `
+                <div class="result-item-header">Q${index + 1} [${q.topic}]: ${q.text}</div>
+                <div><strong>Your Answer:</strong> ${displayAnswer} ${isCorrect ? '✅' : '❌'}</div>
+                ${!isCorrect ? `<div><strong>Correct Answer:</strong> ${expectedAnswer}</div>` : ''}
+                <div class="result-explanation">${q.explanation}</div>
+            `;
+            
+            if (!isCorrect && q.vocabEntry) {
+                html += `
+                    <div style="margin-top: 10px; padding: 10px; background-color: #ffffff; border: 1px solid var(--border); border-radius: 8px;">
+                        <strong>Vocabulary Review:</strong><br/>
+                        <span style="color:var(--accent); font-weight: bold; font-size:1.1rem;">${q.vocabEntry.word}</span> <span style="color:#64748b;">${q.vocabEntry.phonetic}</span> (${q.vocabEntry.form})<br/>
+                        <em>Definition:</em> ${q.vocabEntry.def}
+                    </div>
+                `;
+            }
+            
+            item.innerHTML = html;
+            resultsList.appendChild(item);
+        });
+
+        const percentage = Math.round((score / selectedQuestions.length) * 100);
+        document.getElementById('score-display').textContent = `${score} / ${selectedQuestions.length}`;
+        
+        let bandText = "";
+        let color = "";
+        if (percentage >= 80) {
+            bandText = `Outstanding! You are highly prepared for Band 7.0+ Reading Passages. (${percentage}%)`;
+            color = "var(--success)";
+        } else if (percentage >= 60) {
+            bandText = `Good effort! Keep reviewing the flashcards. (${percentage}%)`;
+            color = "var(--primary)"; // Primary Purple
+        } else {
+            bandText = `Keep studying! Review the Learning Tool to reach the target band. (${percentage}%)`;
+            color = "var(--danger)";
+        }
+        
+        const bandIndicator = document.getElementById('band-indicator');
+        bandIndicator.textContent = bandText;
+        bandIndicator.style.color = color;
+    }
+
+    function restartTest() {
+        resultsScreen.classList.remove('active');
+        configScreen.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
