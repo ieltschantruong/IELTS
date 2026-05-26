@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Academic Reading: Topic & Vocabulary Analysis by IELTS Chan Truong</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdf2f8; /* Soft pink/fuchsia pastel background */
+            color: #3f3f46; /* Zinc-700 for softer readability */
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Smooth transitions for interactive elements */
+        .transition-all-ease {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Vocabulary Pill Styling */
+        .vocab-pill {
+            display: inline-flex;
+            align-items: center;
+            background-color: #fce7f3; /* pink-100 */
+            color: #be185d; /* pink-700 */
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.25rem;
+            border: 1px solid #fbcfe8; /* pink-200 */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        
+        .vocab-pill:hover {
+            background-color: #fbcfe8;
+            transform: translateY(-1px);
+        }
+
+        /* Vertical Navigation Item Styling */
+        .nav-item {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #e11d48; /* rose-600 */
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+            transform-origin: center;
+        }
+
+        .nav-item.active {
+            background-color: #fff1f2; /* rose-50 */
+            border-color: #fecdd3; /* rose-200 */
+            box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.05);
+        }
+        
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        /* Chart container adjustment - making it less prominent */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6 lg:p-8 min-h-screen">
+
+    <div class="max-w-7xl mx-auto space-y-8">
+        
+        <!-- Header Section -->
+        <header class="bg-white rounded-3xl shadow-sm border border-pink-100 p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <!-- Decorative background blob -->
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            
+            <div class="relative z-10 max-w-3xl">
+                <div class="inline-flex items-center space-x-2 bg-pink-50 border border-pink-200 rounded-full px-4 py-1.5 mb-5">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+                    </span>
+                    <p class="text-xs font-bold text-pink-700 tracking-wider uppercase">Official Resource Guide</p>
+                </div>
+                
+                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">IELTS Academic Reading Analyzer</h1>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    A comprehensive, evidence-based analysis of the most frequently recurring themes, essential vocabulary, and common linguistic structures found across recent IELTS Academic Reading examinations. This guide is designed to empower educators and students with targeted, high-impact study materials.
+                </p>
+            </div>
+
+            <!-- Prominent Branding Badge -->
+            <div class="relative z-10 flex flex-col items-center justify-center p-5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl shadow-lg border border-pink-400 min-w-[200px] text-center transform transition hover:scale-105 duration-300">
+                <p class="text-pink-100 text-xs font-semibold uppercase tracking-widest mb-1">Curated By</p>
+                <h2 class="text-2xl font-black text-white leading-tight">IELTS<br>Chan Truong</h2>
+                <div class="mt-3 w-12 h-1 bg-pink-300 rounded-full opacity-50 mx-auto"></div>
+            </div>
+        </header>
+
+        <!-- Main Explorer Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Sidebar: Vertical Navigation & Demoted Chart -->
+            <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-6">
+                
+                <!-- Vertical Topic Navigation -->
+                <div class="bg-white rounded-3xl shadow-sm border border-pink-100 p-5">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Topic Categories</h2>
+                    <div class="flex flex-col space-y-2" id="categoryNav">
+                        <!-- Navigation tabs injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Demoted Topic Frequency Chart -->
+                <div class="bg-white/60 rounded-3xl border border-pink-100 p-5 shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-500 mb-1 text-center">Frequency Distribution</h3>
+                    <p class="text-xs text-gray-400 text-center mb-4">Last 5 years of exam passages</p>
+                    <div class="chart-container">
+                        <canvas id="frequencyChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Content Area: Detailed Information -->
+            <div class="lg:col-span-8 xl:col-span-9 bg-white rounded-3xl shadow-md border border-pink-100 flex flex-col overflow-hidden min-h-[600px]">
+                
+                <!-- Dynamic Content Header -->
+                <div class="p-8 md:p-10 border-b border-gray-50 bg-gradient-to-r from-transparent to-pink-50/30">
+                    <div class="flex items-center justify-between mb-4">
+                        <span id="detailBadge" class="px-3 py-1 text-xs font-bold rounded-full bg-pink-100 text-pink-700"></span>
+                        <span id="detailFrequency" class="text-sm font-semibold text-gray-400 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span id="freqValue"></span>
+                        </span>
+                    </div>
+                    <h2 id="detailTitle" class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4"></h2>
+                    <p id="detailDescription" class="text-lg text-gray-600 leading-relaxed max-w-3xl"></p>
+                </div>
+
+                <!-- Dynamic Content Body -->
+                <div class="p-8 md:p-10 flex-grow grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Subtopics -->
+                    <div>
+                        <h4 class="flex items-center text-sm uppercase tracking-widest font-bold text-gray-400 mb-5">
+                            <div class="w-8 h-px bg-gray-200 mr-3"></div>
+                            Target Subtopics
+                        </h4>
+                        <ul id="detailSubtopics" class="space-y-4">
+                            <!-- Subtopics injected here -->
+                        </ul>
+                    </div>
+
+                    <!-- Placement & Style -->
+                    <div>
+                        <h4 class="flex items-center text-sm uppercase tracking-widest font-bold text-gray-400 mb-5">
+                            <div class="w-8 h-px bg-gray-200 mr-3"></div>
+                            Passage Placement
+                        </h4>
+                        <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                            <p id="detailPassageType" class="text-gray-700 font-medium"></p>
+                        </div>
+                    </div>
+
+                    <!-- Vocabulary Full Width -->
+                    <div class="md:col-span-2 mt-4">
+                        <h4 class="flex items-center text-sm uppercase tracking-widest font-bold text-gray-400 mb-5">
+                            <div class="w-8 h-px bg-gray-200 mr-3"></div>
+                            High-Frequency Core Vocabulary
+                        </h4>
+                        <div id="detailVocab" class="flex flex-wrap -m-1">
+                            <!-- Vocab injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action Button -->
+                <div class="p-8 md:p-10 bg-gray-50 border-t border-gray-100 mt-auto">
+                    <a id="detailLink" href="#" target="_blank" rel="noopener noreferrer" 
+                       class="group relative flex items-center justify-center w-full sm:w-auto overflow-hidden rounded-2xl bg-rose-500 px-8 py-4 font-bold text-white shadow-[0_8px_30px_rgb(225,29,72,0.3)] transition-all hover:scale-[1.02] hover:bg-rose-600 hover:shadow-[0_8px_40px_rgb(225,29,72,0.4)]">
+                        <span class="relative z-10 flex items-center text-lg">
+                            Open Detailed Vocab Resources
+                            <svg class="w-5 h-5 ml-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </span>
+                        <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Secondary Information Grid -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Linguistic Features -->
+            <div class="bg-white rounded-3xl shadow-sm border border-pink-100 p-8">
+                <div class="flex items-center mb-6">
+                    <div class="p-3 bg-pink-100 text-pink-600 rounded-xl mr-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Linguistic Features</h2>
+                        <p class="text-sm text-gray-500">Crucial grammatical structures.</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-pink-200 transition-colors">
+                        <h3 class="font-bold text-gray-800 mb-2">Complex Noun Phrases</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Used to condense information. <br><em class="text-xs text-gray-400 mt-2 block">"The rapid industrial expansion..."</em></p>
+                    </div>
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-pink-200 transition-colors">
+                        <h3 class="font-bold text-gray-800 mb-2">Passive Voice</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Emphasizes action over actor in science/history. <br><em class="text-xs text-gray-400 mt-2 block">"Specimens were subjected to..."</em></p>
+                    </div>
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-pink-200 transition-colors">
+                        <h3 class="font-bold text-gray-800 mb-2">Hedging & Modals</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Crucial for argumentative texts. <br><em class="text-xs text-gray-400 mt-2 block">"It could be argued that..."</em></p>
+                    </div>
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-pink-200 transition-colors">
+                        <h3 class="font-bold text-gray-800 mb-2">Signposting</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">Linking ideas across paragraphs. <br><em class="text-xs text-gray-400 mt-2 block">"Consequently, this phenomenon..."</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practical Notes -->
+            <div class="bg-gray-900 rounded-3xl shadow-xl border border-gray-800 p-8 text-white relative overflow-hidden">
+                <!-- Dark theme decorative elements -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-rose-500 rounded-full mix-blend-screen filter blur-[80px] opacity-30"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-pink-600 rounded-full mix-blend-screen filter blur-[80px] opacity-20"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center mb-8">
+                        <div class="p-3 bg-white/10 text-rose-300 rounded-xl mr-4 backdrop-blur-sm border border-white/5">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold">Strategy & Application</h2>
+                            <p class="text-sm text-gray-400">Development recommendations.</p>
+                        </div>
+                    </div>
+                    
+                    <ul class="space-y-6">
+                        <li class="flex items-start">
+                            <div class="mt-1 bg-rose-500/20 text-rose-400 rounded-full p-1 mr-4 border border-rose-500/30">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div>
+                                <strong class="block text-rose-50 text-lg mb-1">Prioritize High-Yield Topics</strong>
+                                <span class="text-sm text-gray-400 leading-relaxed">Focus strictly on Bio/Environment (~28%) first to yield the highest immediate ROI for test-takers.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="mt-1 bg-rose-500/20 text-rose-400 rounded-full p-1 mr-4 border border-rose-500/30">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div>
+                                <strong class="block text-rose-50 text-lg mb-1">Context is King</strong>
+                                <span class="text-sm text-gray-400 leading-relaxed">Avoid isolated flashcards. Embed target vocabulary directly into complex noun phrases typical of the exam.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center text-gray-400 text-sm py-8 border-t border-gray-200/60 mt-8">
+            &copy; Compiled and Curated by <strong class="text-gray-600">IELTS Chan Truong</strong>. 
+        </footer>
+    </div>
+
+    <script>
+        // Tailwinds custom animation configuration injected dynamically
+        tailwind.config = {
+            theme: {
+                extend: {
+                    keyframes: {
+                        shimmer: {
+                            '100%': { transform: 'translateX(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+
+        const ieltsData = {
+            science: {
+                id: 'science',
+                title: 'Biology & Environment',
+                frequency: 28,
+                color: '#f43f5e', // rose-500
+                chartColor: '#fb7185',
+                badgeText: 'Highest Frequency',
+                subtopics: ['Climate change adaptation strategies', 'Animal behavior and scientific observation', 'Agricultural innovations and food security', 'Ecosystem dynamics and conservation efforts'],
+                vocab: ['biodiversity', 'ecosystem', 'adaptation', 'mitigate', 'fauna', 'flora', 'habitat', 'sustainability', 'extinction', 'conservation', 'proliferation', 'resilience', 'indigenous'],
+                passageType: 'Passage 1 or 2 (Descriptive or Explanatory).',
+                description: 'This is the most dominant topic area in the reading exam. Passages consistently present factual information regarding natural processes, environmental challenges, scientific studies on animals, and ecological solutions.'
+            },
+            history: {
+                id: 'history',
+                title: 'History & Sociology',
+                frequency: 22,
+                color: '#ec4899', // pink-500
+                chartColor: '#f472b6',
+                badgeText: 'High Frequency',
+                subtopics: ['The rise and decline of ancient civilizations', 'The Industrial Revolution and urbanization', 'Evolution of transportation and architecture', 'Significant demographic and societal shifts'],
+                vocab: ['archaeological', 'excavation', 'civilization', 'industrialization', 'migration', 'demographic', 'heritage', 'unprecedented', 'chronological', 'antiquity', 'infrastructure', 'socioeconomic'],
+                passageType: 'Passage 1 (Descriptive/Chronological).',
+                description: 'These texts are frequently structured chronologically, detailing historical events, the development and expansion of cities, or the overarching progression of human societies and cultures over time.'
+            },
+            tech: {
+                id: 'tech',
+                title: 'Technology & Engineering',
+                frequency: 18,
+                color: '#d946ef', // fuchsia-500
+                chartColor: '#e879f9',
+                badgeText: 'Moderate Frequency',
+                subtopics: ['Artificial Intelligence and modern automation', 'Space exploration and astrophysics', 'The evolution of communication technology', 'Renewable energy mechanics and implementation'],
+                vocab: ['innovation', 'breakthrough', 'automation', 'algorithms', 'sophisticated', 'efficiency', 'telecommunications', 'implement', 'simulation', 'obsolete', 'integration', 'mechanization'],
+                passageType: 'Passage 2 (Explanatory).',
+                description: 'These passages focus on the underlying mechanics of new inventions, trace the history of specific technological advancements, or analyze the profound impact of technology on modern human life.'
+            },
+            psychology: {
+                id: 'psychology',
+                title: 'Psychology & Behavior',
+                frequency: 15,
+                color: '#8b5cf6', // violet-500
+                chartColor: '#a78bfa',
+                badgeText: 'Moderate Frequency',
+                subtopics: ['Cognitive development processes in children', 'The function of memory and sleep', 'Workplace psychology and human motivation', 'Social behavior and group dynamics'],
+                vocab: ['cognitive', 'perception', 'stimulus', 'subconscious', 'empirical', 'hypothesis', 'correlation', 'neurological', 'subjective', 'intrinsic', 'behavioral', 'manifestation'],
+                passageType: 'Passage 2 or 3 (Explanatory or Argumentative).',
+                description: 'These texts delve into detailed psychological experiments, complex theories of the human mind, and rigorous studies on behavior, requiring a strong grasp of abstract concepts.'
+            },
+            linguistics: {
+                id: 'linguistics',
+                title: 'Linguistics & Education',
+                frequency: 10,
+                color: '#6366f1', // indigo-500
+                chartColor: '#818cf8',
+                badgeText: 'Lower Frequency',
+                subtopics: ['Language acquisition and bilingualism', 'The evolution and extinction of languages', 'Comparative pedagogical methods', 'Literacy development and neuroplasticity'],
+                vocab: ['acquisition', 'bilingualism', 'pedagogy', 'linguistic', 'dialect', 'vernacular', 'syntax', 'comprehension', 'curriculum', 'assimilate', 'fluency', 'multilingual'],
+                passageType: 'Passage 3 (Argumentative/Abstract).',
+                description: 'Often representing the most challenging texts on the exam, these passages explore theories of learning, the intricate structure of language, and ongoing academic debates surrounding educational practices.'
+            },
+            business: {
+                id: 'business',
+                title: 'Business & Economics',
+                frequency: 7,
+                color: '#0ea5e9', // sky-500
+                chartColor: '#38bdf8',
+                badgeText: 'Lower Frequency',
+                subtopics: ['Global supply chains and international trade', 'Management theories and corporate culture', 'The economic impacts of global tourism', 'The psychology behind marketing and advertising'],
+                vocab: ['lucrative', 'commerce', 'monopoly', 'fluctuation', 'entrepreneurial', 'stakeholder', 'revenue', 'commodities', 'liability', 'macroeconomics', 'incentive', 'outsourcing'],
+                passageType: 'Passage 2 (Explanatory).',
+                description: 'These passages critically examine corporate structures, analyze global economic trends, or detail the complex logistics of modern business operations, requiring knowledge of specific economic terminology.'
+            }
+        };
+
+        let currentActiveId = 'science';
+        let chartInstance = null;
+
+        function init() {
+            renderNavigation();
+            renderChart();
+            renderDetails(currentActiveId);
+        }
+
+        function renderNavigation() {
+            const navContainer = document.getElementById('categoryNav');
+            navContainer.innerHTML = '';
+
+            Object.values(ieltsData).forEach(category => {
+                const btn = document.createElement('div');
+                // Base classes for vertical nav items
+                btn.className = `nav-item transition-all-ease flex items-center justify-between p-4 rounded-2xl border bg-white`;
+                btn.dataset.id = category.id;
+                
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2.5 h-2.5 rounded-full" style="background-color: ${category.color}"></div>
+                        <span class="font-bold text-gray-700 name-label">${category.title}</span>
+                    </div>
+                    <span class="freq-badge text-xs font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-500 transition-colors">${category.frequency}%</span>
+                `;
+                
+                btn.onclick = () => {
+                    currentActiveId = category.id;
+                    updateNavigationUI();
+                    renderDetails(category.id);
+                };
+                navContainer.appendChild(btn);
+            });
+            updateNavigationUI();
+        }
+
+        function updateNavigationUI() {
+            const buttons = document.querySelectorAll('.nav-item');
+            buttons.forEach(btn => {
+                const categoryId = btn.dataset.id;
+                const freqBadge = btn.querySelector('.freq-badge');
+                const nameLabel = btn.querySelector('.name-label');
+                
+                if (categoryId === currentActiveId) {
+                    btn.classList.add('active');
+                    btn.classList.remove('border-gray-100', 'hover:border-pink-200', 'hover:bg-pink-50/50');
+                    
+                    freqBadge.classList.remove('bg-gray-100', 'text-gray-500');
+                    freqBadge.classList.add('bg-white', 'text-rose-600', 'shadow-sm');
+                    
+                    nameLabel.classList.remove('text-gray-700');
+                    nameLabel.classList.add('text-rose-700');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.add('border-gray-100', 'hover:border-pink-200', 'hover:bg-pink-50/50');
+                    
+                    freqBadge.classList.add('bg-gray-100', 'text-gray-500');
+                    freqBadge.classList.remove('bg-white', 'text-rose-600', 'shadow-sm');
+                    
+                    nameLabel.classList.add('text-gray-700');
+                    nameLabel.classList.remove('text-rose-700');
+                }
+            });
+        }
+
+        function renderDetails(categoryId) {
+            const data = ieltsData[categoryId];
+            
+            // Text Content
+            document.getElementById('detailTitle').textContent = data.title;
+            document.getElementById('detailDescription').textContent = data.description;
+            document.getElementById('detailBadge').textContent = data.badgeText;
+            document.getElementById('freqValue').textContent = `${data.frequency}% of Exam Passages`;
+            document.getElementById('detailPassageType').textContent = data.passageType;
+            
+            // Subtopics Array
+            const subtopicsContainer = document.getElementById('detailSubtopics');
+            subtopicsContainer.innerHTML = data.subtopics.map(st => `
+                <li class="flex items-start text-gray-700">
+                    <div class="mt-1.5 w-1.5 h-1.5 rounded-full mr-3 flex-shrink-0" style="background-color: ${data.color}"></div>
+                    <span class="font-medium text-gray-800">${st}</span>
+                </li>
+            `).join('');
+            
+            // Vocab Array
+            const vocabContainer = document.getElementById('detailVocab');
+            vocabContainer.innerHTML = data.vocab.map(v => `<span class="vocab-pill">${v}</span>`).join('');
+            
+            // Update Dynamic Link pointing to sub-page
+            const linkBtn = document.getElementById('detailLink');
+            linkBtn.href = `https://ieltschantruong.github.io/IELTS/lesson_plan/vocab/reading_topic_${data.id}.html`;
+            
+            // Add a subtle fade-in animation to content when swapping
+            const contentPane = document.getElementById('detailTitle').parentElement.parentElement;
+            contentPane.style.opacity = '0.5';
+            setTimeout(() => {
+                contentPane.style.transition = 'opacity 0.3s ease';
+                contentPane.style.opacity = '1';
+            }, 50);
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('frequencyChart').getContext('2d');
+            
+            const labels = Object.values(ieltsData).map(d => d.title);
+            const data = Object.values(ieltsData).map(d => d.frequency);
+            const colors = Object.values(ieltsData).map(d => d.chartColor);
+
+            if(chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false // Hide default legend to keep it clean in sidebar
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(24, 24, 27, 0.9)',
+                            padding: 10,
+                            cornerRadius: 8,
+                            titleFont: { family: "'Inter', sans-serif", size: 13 },
+                            bodyFont: { family: "'Inter', sans-serif", size: 13 },
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

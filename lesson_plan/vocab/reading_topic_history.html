@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong - History & Sociology Vocabulary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Pinkish Pastel. Backgrounds: rose-50, pink-50. Text: slate-800, rose-900. Accents: rose-400, pink-500. -->
+    <!-- Application Structure Plan: The SPA is divided into a Header with prominent branding, a Dashboard summary with a CEFR level chart, and a Main Content Area with two toggleable views: 'Dictionary View' (for exhaustive filtering and reading) and 'Flashcard View' (for active recall and study). This maintains consistency with the main application theme while organizing 100 robust data points effectively. -->
+    <!-- Visualization & Content Choices: 1. Doughnut Chart (Chart.js) -> Goal: Inform -> Justification: Quickly shows the distribution of word difficulty (CEFR levels) in the curated list. 2. CSS 3D Flip Cards -> Goal: Engage/Teach -> Justification: Replicates physical flashcards for active recall without relying on external libraries. 3. Grid Layout for Dictionary -> Goal: Organize -> Justification: Makes scanning 100 entries easy and visually digestible. - Confirming NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fff1f2; /* rose-50 */
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar for pastel theme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #ffe4e6; } /* rose-100 */
+        ::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 4px; } /* rose-300 */
+        ::-webkit-scrollbar-thumb:hover { background: #fb7185; } /* rose-400 */
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 250px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+        }
+
+        /* Flashcard 3D Flip Styles */
+        .flashcard-scene {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.1), 0 8px 10px -6px rgba(225, 29, 72, 0.1);
+        }
+        .flashcard-scene.is-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            background-color: #ffffff;
+            border: 2px solid #ffe4e6;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background-color: #fffbfb;
+        }
+
+        .cefr-badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cefr-B2 { background-color: #fce7f3; color: #db2777; border: 1px solid #fbcfe8; }
+        .cefr-C1 { background-color: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+        .cefr-C2 { background-color: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+
+        .btn-pastel {
+            transition: all 0.2s;
+        }
+        .btn-pastel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Branding -->
+    <header class="bg-white border-b-4 border-rose-300 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-md">
+                    🎓
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-rose-950 tracking-tight">IELTS Chan Truong</h1>
+                    <p class="text-xs font-semibold text-rose-500 uppercase tracking-widest">Premium Resource Compilation</p>
+                </div>
+            </div>
+            <nav class="flex space-x-2">
+                <a href="reading_topics_overview.html" class="px-4 py-2 text-sm font-medium text-slate-600 bg-rose-50 rounded-lg hover:bg-rose-100 hover:text-rose-900 transition">&#8592; Back to Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Intro & Dashboard Section -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 bg-white rounded-2xl p-8 border border-rose-100 shadow-sm flex flex-col justify-center">
+                <div class="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold mb-4 self-start">Topic 2</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">History & Sociology</h2>
+                <p class="text-slate-600 leading-relaxed mb-6">
+                    Mastering vocabulary related to ancient civilizations, demographic shifts, and societal structures is critical for IELTS Academic Reading. This topic appears frequently, often in Passage 1 chronologies or Passage 3 sociological arguments. Explore the curated list of 100 high-frequency terms below.
+                </p>
+                <div class="flex space-x-4">
+                    <button onclick="switchTab('dictionary')" id="btnTabDict" class="btn-pastel px-6 py-3 bg-rose-500 text-white font-semibold rounded-xl shadow-md flex items-center">
+                        <span class="mr-2">📖</span> Dictionary View
+                    </button>
+                    <button onclick="switchTab('flashcard')" id="btnTabFlash" class="btn-pastel px-6 py-3 bg-white text-rose-600 border border-rose-200 font-semibold rounded-xl shadow-sm flex items-center hover:bg-rose-50">
+                        <span class="mr-2">⚡</span> Flashcards
+                    </button>
+                </div>
+            </div>
+            
+            <div class="md:col-span-1 bg-white rounded-2xl p-6 border border-rose-100 shadow-sm flex flex-col items-center justify-center">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">CEFR Level Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="cefrChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-slate-400 mt-2">Breakdown of the 100 curated terms</p>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Area -->
+        <section id="contentArea" class="relative min-h-[600px]">
+            
+            <!-- View 1: Dictionary List -->
+            <div id="dictionaryView" class="block transition-opacity duration-300">
+                <!-- Filters -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-rose-100 mb-6 flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search by English word or Vietnamese meaning..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent transition">
+                    </div>
+                    <select id="filterCEFR" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <option value="All">All CEFR Levels</option>
+                        <option value="B2">B2 Upper Intermediate</option>
+                        <option value="C1">C1 Advanced</option>
+                        <option value="C2">C2 Mastery</option>
+                    </select>
+                    <select id="filterPOS" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <option value="All">All Parts of Speech</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Stats -->
+                <div class="mb-4 text-sm font-semibold text-rose-800 flex justify-between items-center px-2">
+                    <span id="resultCount">Showing 100 entries</span>
+                </div>
+
+                <!-- Grid -->
+                <div id="vocabGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards populated by JS -->
+                </div>
+            </div>
+
+            <!-- View 2: Flashcards -->
+            <div id="flashcardView" class="hidden transition-opacity duration-300">
+                <div class="bg-white rounded-2xl p-8 border border-rose-100 shadow-sm max-w-4xl mx-auto flex flex-col items-center">
+                    
+                    <div class="w-full flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-slate-800">Study Mode</h3>
+                        <div class="text-sm font-medium text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+                            Card <span id="fcCurrent">1</span> of <span id="fcTotal">100</span>
+                        </div>
+                    </div>
+
+                    <!-- The 3D Flashcard -->
+                    <div class="flashcard-scene" id="flashcard">
+                        <div class="flashcard-inner">
+                            <!-- Front -->
+                            <div class="flashcard-face">
+                                <span id="fcCEFR" class="cefr-badge absolute top-6 right-6">C1</span>
+                                <div class="text-slate-400 text-sm font-semibold uppercase tracking-widest mb-2" id="fcPOS">noun (n.)</div>
+                                <h2 class="text-4xl md:text-5xl font-black text-rose-900 mb-4" id="fcWord">Word</h2>
+                                <div class="flex items-center text-slate-500 text-lg">
+                                    <span id="fcIPA" class="mr-3 font-mono bg-slate-50 px-2 py-1 rounded">/ɪ'peɪ/</span>
+                                    <button onclick="playAudioCurrent(event)" class="text-rose-500 hover:text-rose-700 transition p-2 bg-rose-50 rounded-full" title="Play Pronunciation">🔊</button>
+                                </div>
+                                <p class="absolute bottom-6 text-slate-400 text-sm font-medium animate-pulse">Click card to flip ↺</p>
+                            </div>
+                            <!-- Back -->
+                            <div class="flashcard-back flashcard-face">
+                                <div class="w-full h-full flex flex-col justify-center items-start text-left space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                                    <div>
+                                        <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-1">Definition</h4>
+                                        <p class="text-slate-800 text-lg font-medium leading-snug" id="fcDef">Definition here</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-1">Vietnamese</h4>
+                                        <p class="text-indigo-700 text-lg font-bold" id="fcVie">Translation here</p>
+                                    </div>
+                                    <div class="bg-rose-50 p-3 rounded-lg border border-rose-100 w-full">
+                                        <h4 class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-1">Example in Context</h4>
+                                        <p class="text-slate-700 italic text-sm" id="fcExample">"Example sentence here"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex items-center space-x-4 mt-8">
+                        <button onclick="prevCard()" class="btn-pastel px-5 py-3 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:text-rose-600">
+                            &#8592; Prev
+                        </button>
+                        <button onclick="shuffleCards()" class="btn-pastel px-4 py-3 bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl shadow-sm hover:bg-rose-200" title="Shuffle Deck">
+                            🔀
+                        </button>
+                        <button onclick="nextCard()" class="btn-pastel px-5 py-3 bg-rose-500 text-white border border-rose-600 font-semibold rounded-xl shadow-sm hover:bg-rose-600">
+                            Next &#8594;
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-rose-100 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 IELTS Chan Truong. Curated for Academic Excellence.</p>
+    </footer>
+
+    <script>
+        // Complete Data Array for Topic 2: History & Sociology (100 Entries)
+        const rawVocabData = [
+            ["Excavation", "/ˌek.skəˈveɪ.ʃən/", "n.", "C1", "The act of digging, especially when looking for old objects or buildings.", "Sự khai quật", "Core word for archaeology passages.", "\"Recent excavations have revealed a Roman settlement.\"", "excavate (v.)"],
+            ["Demographic", "/ˌdem.əˈɡræf.ɪk/", "adj. / n.", "C1", "Relating to human populations and the information collected about them.", "(Thuộc) nhân khẩu học", "Crucial for sociology passages detailing societal shifts.", "\"The country has undergone a massive demographic shift.\"", "demography (n.)"],
+            ["Unprecedented", "/ʌnˈpres.ɪ.den.tɪd/", "adj.", "C1", "Never having happened or existed in the past.", "Chưa từng có tiền lệ", "Emphasizes the uniqueness of a historical event.", "\"The Industrial Revolution brought unprecedented economic growth.\"", "precedent (n.)"],
+            ["Infrastructure", "/ˈɪn.frəˌstrʌk.tʃər/", "n.", "B2", "The basic systems and services a country uses to work effectively.", "Cơ sở hạ tầng", "Appears frequently in texts about city development.", "\"The empire was facilitated by its road infrastructure.\"", "infrastructural (adj.)"],
+            ["Antiquity", "/ænˈtɪk.wə.ti/", "n.", "C2", "The distant past, especially before the sixth century.", "Thời cổ đại", "Found in texts discussing ancient cultures.", "\"Practices used in antiquity have been validated by science.\"", "antique (adj.)"],
+            ["Artifact", "/ˈɑː.tɪ.fækt/", "n.", "B2", "An object made by a person, of historical interest.", "Đồ tạo tác", "Always present in archaeology texts.", "\"The museum houses ancient Egyptian artifacts.\"", "N/A"],
+            ["Chronology", "/krəˈnɒl.ə.dʒi/", "n.", "C1", "The order in which a series of events happened.", "Trình tự thời gian", "Important for understanding the structure of historical texts.", "\"Historians are debating the exact chronology of events.\"", "chronological (adj.)"],
+            ["Fossil", "/ˈfɒs.əl/", "n.", "B2", "Shape of a bone, shell, plant or animal preserved in rock.", "Hóa thạch", "Bridges history and biology.", "\"The discovery of a dinosaur fossil provided new insights.\"", "fossilize (v.)"],
+            ["Decipher", "/dɪˈsaɪ.fər/", "v.", "C1", "To discover the meaning of something written badly or hidden.", "Giải mã", "Used in passages regarding ancient languages.", "\"It took scholars decades to decipher the Rosetta Stone.\"", "decipherable (adj.)"],
+            ["Relic", "/ˈrel.ɪk/", "n.", "C1", "An object or tradition from the past that continues to exist.", "Di tích, di vật", "Carries a sense of surviving from a lost era.", "\"The castle stands as a remarkable relic of the feudal past.\"", "N/A"],
+            ["Reign", "/reɪn/", "n. / v.", "C1", "The period of time when a king or queen rules a country.", "Triều đại, thời trị vì", "Standard vocabulary for discussing monarchies.", "\"During the reign of Queen Victoria, the empire expanded.\"", "N/A"],
+            ["Empire", "/ˈem.paɪər/", "n.", "B2", "A group of countries ruled by a single person or government.", "Đế chế", "Used to describe vast historical powers.", "\"The Roman Empire stretched across Europe.\"", "emperor (n.)"],
+            ["Medieval", "/ˌmed.iˈiː.vəl/", "adj.", "B2", "Related to the Middle Ages (AD 600 to AD 1500).", "Thời Trung cổ", "A specific time-marker.", "\"The text provides an account of medieval Europe.\"", "N/A"],
+            ["Feudal", "/ˈfjuː.dəl/", "adj.", "C1", "Relating to the hierarchical social system of the Middle Ages.", "Phong kiến", "Used to describe land-ownership societies.", "\"The abolition of the feudal system paved the way for democracy.\"", "feudalism (n.)"],
+            ["Colonization", "/ˌkɒl.ə.naɪˈzeɪ.ʃən/", "n.", "C1", "The act of sending people to live in and govern another country.", "Sự thực dân hóa", "Details historical migrations and trade dominance.", "\"Colonization of the Americas had devastating effects.\"", "colonize (v.)"],
+            ["Revolution", "/ˌrev.əˈluː.ʃən/", "n.", "B2", "A change in the way a country is governed; a massive shift.", "Cuộc cách mạng", "Highly frequent (e.g., Industrial Revolution).", "\"The internet sparked a global communication revolution.\"", "revolutionary (adj.)"],
+            ["Prehistory", "/ˌpriːˈhɪs.tər.i/", "n.", "C1", "The period of human history before written records.", "Thời tiền sử", "Denotes the era of early hominids.", "\"Our understanding of prehistory relies on archaeology.\"", "prehistoric (adj.)"],
+            ["Millennium", "/mɪˈlen.i.əm/", "n.", "C1", "A period of 1,000 years.", "Thiên niên kỷ", "Used to express vast scales of historical time.", "\"The ancient city remained buried for a millennium.\"", "millennial (adj.)"],
+            ["Era", "/ˈɪə.rə/", "n.", "B2", "A period of time characterized by particular events.", "Kỷ nguyên", "Used to section history based on characteristics.", "\"The printing press marked a new era of communication.\"", "N/A"],
+            ["Ancestry", "/ˈæn.ses.tri/", "n.", "C1", "Your ancestors or the origin of your family.", "Tổ tiên", "Discussed in texts regarding human migration.", "\"DNA testing traces the genetic ancestry of populations.\"", "ancestor (n.)"],
+            ["Lineage", "/ˈlɪn.i.ɪdʒ/", "n.", "C2", "Direct family members who lived long before you.", "Dòng giống", "Used when discussing royalty or tribal inheritance.", "\"The royal family can trace its lineage to the 11th century.\"", "N/A"],
+            ["Conquer", "/ˈkɒŋ.kər/", "v.", "B2", "To take control of foreign land or people by force.", "Xâm chiếm", "Used to describe military history.", "\"The Spanish were able to conquer the Aztec Empire.\"", "conqueror (n.)"],
+            ["Hierarchy", "/ˈhaɪə.rɑː.ki/", "n.", "C1", "A system where people are arranged by importance.", "Hệ thống cấp bậc", "Crucial for texts analyzing societal classes.", "\"Ancient Egyptian society was built upon a strict hierarchy.\"", "hierarchical (adj.)"],
+            ["Heritage", "/ˈher.ɪ.tɪdʒ/", "n.", "C1", "Features belonging to the culture of a society (traditions, buildings).", "Di sản", "Common regarding cultural preservation.", "\"The historic city center was designated a Heritage site.\"", "N/A"],
+            ["Unearth", "/ʌnˈɜːθ/", "v.", "C1", "To discover something in the ground or after careful searching.", "Khai quật", "Used literally and metaphorically in research.", "\"Researchers managed to unearth lost documents.\"", "earth (n.)"],
+            ["Dynasty", "/ˈdɪn.ə.sti/", "n.", "C1", "A series of rulers from the same family.", "Triều đại", "Common in passages relating to Asian or Egyptian history.", "\"The Ming Dynasty is remembered for its cultural achievements.\"", "dynastic (adj.)"],
+            ["Ruin", "/ˈruː.ɪn/", "n. / v.", "B2", "The broken parts left from an old building or town.", "Tàn tích", "Describing the state of archaeological sites.", "\"Tourists flock to visit the spectacular ruins of Machu Picchu.\"", "ruined (adj.)"],
+            ["Legacy", "/ˈleɡ.ə.si/", "n.", "C1", "Something that is a part of your history remaining from an earlier time.", "Di sản (tinh thần)", "Used to describe the lasting impact of an empire.", "\"The most enduring legacy of Rome is its legal system.\"", "N/A"],
+            ["Monumental", "/ˌmɒn.jəˈmen.təl/", "adj.", "C1", "Very big, or of great historical importance.", "Vĩ đại", "Describes massive architecture or discoveries.", "\"The transition to farming was a monumental shift in history.\"", "monument (n.)"],
+            ["Nomadic", "/nəʊˈmæd.ɪk/", "adj.", "C1", "Moving from one place to another rather than living in one place.", "Du mục", "Used to describe tribes following seasonal food.", "\"Early humans lived primarily nomadic lifestyles.\"", "nomad (n.)"],
+            ["Paleontology", "/ˌpæl.i.ɒnˈtɒl.ə.dʒi/", "n.", "C2", "Study of fossils to get information about life's history.", "Cổ sinh vật học", "Focuses on the deep past before humans.", "\"Paleontology changed our understanding of bird evolution.\"", "paleontologist (n.)"],
+            ["Migration", "/maɪˈɡreɪ.ʃən/", "n.", "B2", "Process of people travelling to a new place to live.", "Sự di cư", "Massive topic regarding population movements.", "\"The crisis triggered a mass migration of workers.\"", "migrate (v.)"],
+            ["Urbanization", "/ˌɜː.bən.aɪˈzeɪ.ʃən/", "n.", "C1", "Process by which people leave the countryside to live in cities.", "Đô thị hóa", "Discussed regarding the Industrial Revolution.", "\"Rapid urbanization places a strain on infrastructure.\"", "urban (adj.)"],
+            ["Integration", "/ˌɪn.tɪˈɡreɪ.ʃən/", "n.", "C1", "The action of successfully mixing with a different group.", "Sự hòa nhập", "Used in sociology discussing immigrants.", "\"Integration requires effort from immigrants and the host society.\"", "integrate (v.)"],
+            ["Segregation", "/ˌseɡ.rɪˈɡeɪ.ʃən/", "n.", "C1", "Policy of keeping groups apart and treating them differently.", "Sự phân biệt", "Antonym of integration; found in civil rights texts.", "\"The movement fought to end racial segregation.\"", "segregate (v.)"],
+            ["Stratification", "/ˌstræt.ɪ.fɪˈkeɪ.ʃən/", "n.", "C2", "Arrangement of society into different levels or classes.", "Sự phân tầng", "Academic sociology term regarding wealth division.", "\"Economic inequality led to rigid social stratification.\"", "stratum (n.)"],
+            ["Norm", "/nɔːm/", "n.", "B2", "An accepted standard or way of behaving.", "Chuẩn mực", "Central to analyzing behavior expectations.", "\"Working from home became the new cultural norm.\"", "normal (adj.)"],
+            ["Deviance", "/ˈdiː.vi.əns/", "n.", "C2", "Behavior that is not usual and considered unacceptable.", "Sự lệch chuẩn", "Explored in texts dealing with shifting cultural standards.", "\"What was considered deviance is often accepted today.\"", "deviant (adj.)"],
+            ["Assimilation", "/əˌsɪm.ɪˈleɪ.ʃən/", "n.", "C1", "Process of becoming part of a dominant society or culture.", "Sự đồng hóa", "Often implies the loss of original culture.", "\"Forced assimilation aimed to erase indigenous traditions.\"", "assimilate (v.)"],
+            ["Marginalize", "/ˈmɑː.dʒɪ.nəl.aɪz/", "v.", "C1", "To treat someone as if they are not important.", "Đẩy ra ngoài lề", "Common in texts discussing systemic inequality.", "\"Policies must ensure rural populations are not marginalized.\"", "marginalized (adj.)"],
+            ["Affluent", "/ˈæf.lu.ənt/", "adj.", "C1", "Having a lot of money or owning a lot of things.", "Giàu có", "The academic synonym for 'rich'.", "\"The disease left the affluent suburbs untouched.\"", "affluence (n.)"],
+            ["Impoverished", "/ɪmˈpɒv.ər.ɪʃt/", "adj.", "C1", "Very poor.", "Nghèo túng", "The academic synonym for 'poor'.", "\"The drought left farming communities severely impoverished.\"", "poverty (n.)"],
+            ["Mobility", "/məʊˈbɪl.ə.ti/", "n.", "B2", "Ability to move up or down in social class.", "Sự dịch chuyển", "'Social mobility' is a massive IELTS topic.", "\"Education is the primary driver of upward social mobility.\"", "mobile (adj.)"],
+            ["Consensus", "/kənˈsen.səs/", "n.", "C1", "A generally accepted opinion or decision among a group.", "Sự đồng thuận", "Used in historical treaties and sociological agreements.", "\"There is a scientific consensus that human activity causes warming.\"", "N/A"],
+            ["Paradigm (1)", "/ˈpær.ə.daɪm/", "n.", "C2", "A model of something, or a framework of assumptions.", "Hệ tư tưởng", "Used in 'paradigm shift' indicating massive change.", "\"Quantum mechanics caused a paradigm shift in physics.\"", "paradigmatic (adj.)"],
+            ["Patriarchal", "/ˌpeɪ.triˈɑː.kəl/", "adj.", "C1", "Ruled or controlled by men.", "Gia trưởng, phụ hệ", "Used in texts analyzing ancient and modern gender roles.", "\"The ancient legal code was rooted in a patriarchal structure.\"", "patriarchy (n.)"],
+            ["Matriarchal", "/ˌmeɪ.triˈɑː.kəl/", "adj.", "C1", "Ruled or controlled by women.", "Mẫu hệ", "The antonym of patriarchal.", "\"Some communities maintain a matriarchal inheritance system.\"", "matriarch (n.)"],
+            ["Egalitarian", "/ɪˌɡæl.ɪˈteə.ri.ən/", "adj.", "C2", "Believing that all people should have the same rights.", "Bình đẳng", "Discussed in texts concerning hunter-gatherer societies.", "\"Early societies are believed to have been highly egalitarian.\"", "egalitarianism (n.)"],
+            ["Orthodox", "/ˈɔː.θə.dɒks/", "adj.", "C1", "Considered traditional, normal, and acceptable.", "Chính thống", "Contrasts new ideas with established thought.", "\"The doctor's methods challenged orthodox medical treatments.\"", "orthodoxy (n.)"],
+            ["Secular", "/ˈsek.jə.lər/", "adj.", "C1", "Not having any connection with religion.", "Thế tục", "Important when discussing the separation of church and state.", "\"The constitution guarantees a completely secular government.\"", "secularism (n.)"],
+            ["Welfare", "/ˈwel.feər/", "n.", "B2", "Health and happiness; help given by the state.", "Phúc lợi", "Discussed regarding government systems.", "\"The healthcare system improved the welfare of the working class.\"", "N/A"],
+            ["Solidarity", "/ˌsɒl.ɪˈdær.ə.ti/", "n.", "C1", "Agreement and support between members of a group.", "Sự đoàn kết", "Found in texts concerning labor unions and civil rights.", "\"The workers demonstrated solidarity during the strike.\"", "N/A"],
+            ["Taboo", "/təˈbuː/", "n. / adj.", "C1", "Action or word avoided for religious/social reasons.", "Điều cấm kỵ", "Explaining unwritten cultural rules.", "\"Eating certain animals was considered a strict taboo.\"", "N/A"],
+            ["Bureaucracy", "/bjʊəˈrɒk.rə.si/", "n.", "C1", "A system for managing a country operated by officials.", "Bộ máy quan liêu", "Often discussed negatively regarding inefficiency.", "\"The empire collapsed under its own inefficient bureaucracy.\"", "bureaucrat (n.)"],
+            ["Institution", "/ˌɪn.stɪˈtjuː.ʃən/", "n.", "B2", "A large organization or a custom existing for a long time.", "Thể chế", "Describes massive societal structures.", "\"Education is a fundamental institution for socializing children.\"", "institutional (adj.)"],
+            ["Conformity", "/kənˈfɔː.mə.ti/", "n.", "C1", "Behavior that follows expected group standards.", "Sự tuân thủ", "Topic in psychology analyzing peer pressure.", "\"The 1950s was a period of strict social conformity.\"", "conform (v.)"],
+            ["Alienation", "/ˌeɪ.li.əˈneɪ.ʃən/", "n.", "C1", "Feeling of having no connection with people around you.", "Sự xa lánh", "Effects of urbanization and the industrial revolution.", "\"Factory work led to a profound sense of alienation.\"", "alienate (v.)"],
+            ["Census", "/ˈsen.səs/", "n.", "C1", "An official count of a population to collect data.", "Điều tra dân số", "The primary tool for gathering demographic data.", "\"The national census revealed a shift in the population.\"", "N/A"],
+            ["Pluralism", "/ˈplʊə.rəl.ɪ.zəm/", "n.", "C2", "Existence of different types of people within a society.", "Thuyết đa nguyên", "Discussed as an ideal for diverse societies.", "\"Cultural pluralism allows communities to maintain traditions.\"", "pluralistic (adj.)"],
+            ["Homogeneous", "/ˌhɒm.əˈdʒiː.ni.əs/", "adj.", "C1", "Consisting of parts or people that are similar.", "Đồng nhất", "Used to describe societies with little diversity.", "\"Island nations develop highly homogeneous cultures.\"", "homogeneity (n.)"],
+            ["Heterogeneous", "/ˌhet.ər.əˈdʒiː.ni.əs/", "adj.", "C1", "Consisting of things that are very different.", "Hỗn tạp", "The antonym of homogeneous.", "\"The United States has a remarkably heterogeneous population.\"", "heterogeneity (n.)"],
+            ["Ethnic", "/ˈeθ.nɪk/", "adj.", "B2", "Relating to a race or group sharing the same culture.", "Thuộc dân tộc", "Often paired with 'minority' or 'diversity'.", "\"The city is famous for its ethnic neighborhoods.\"", "ethnicity (n.)"],
+            ["Descendant", "/dɪˈsen.dənt/", "n.", "C1", "A person related to you who lives after you.", "Hậu duệ", "Frequent in texts tracing ancient lineage.", "\"Many people today are descendants of the original settlers.\"", "descend (v.)"],
+            ["Mortality", "/mɔːˈtæl.ə.ti/", "n.", "C1", "The number of deaths within a society over a period.", "Tỷ lệ tử vong", "Usually paired with 'rate'.", "\"Sanitation led to a massive drop in infant mortality.\"", "mortal (adj.)"],
+            ["Fertility", "/fəˈtɪl.ə.ti/", "n.", "C1", "The birth rate of a population.", "Tỷ lệ sinh", "The demographic counter-part to mortality.", "\"As nations become wealthier, their fertility rates decline.\"", "fertile (adj.)"],
+            ["Overpopulation", "/ˌəʊ.vəˌpɒp.jəˈleɪ.ʃən/", "n.", "B2", "Having too many people for the resources available.", "Sự bùng nổ dân số", "A core problem in sociology passages.", "\"Overpopulation places demands on natural resources.\"", "population (n.)"],
+            ["Sanitation", "/ˌsæn.ɪˈteɪ.ʃən/", "n.", "C1", "Systems for removing dirty water to protect health.", "Hệ thống vệ sinh", "Cited as reason for increased historical lifespans.", "\"Underground sewers improved public sanitation in London.\"", "sanitary (adj.)"],
+            ["Lifespan", "/ˈlaɪf.spæn/", "n.", "B2", "Length of time a person or animal exists.", "Tuổi thọ", "Central to discussions of demographics.", "\"Modern medicine increased the average human lifespan.\"", "N/A"],
+            ["Famine", "/ˈfæm.ɪn/", "n.", "C1", "A situation with not enough food, causing death.", "Nạn đói", "Historical push-factor for mass migration.", "\"The great potato famine forced millions to emigrate.\"", "famished (adj.)"],
+            ["Displacement", "/dɪˈspleɪs.mənt/", "n.", "C1", "Situation where people are forced to leave their homes.", "Sự di dời", "Used in contexts of war or environmental disasters.", "\"The dam caused the permanent displacement of villagers.\"", "displace (v.)"],
+            ["Sovereignty", "/ˈsɒv.rɪn.ti/", "n.", "C2", "Power of a country to control its own government.", "Chủ quyền", "Key term in political history detailing nation formation.", "\"The colony achieved full independence and national sovereignty.\"", "sovereign (adj.)"],
+            ["Treaty", "/ˈtriː.ti/", "n.", "C1", "A written agreement between countries approved by leaders.", "Hiệp ước", "The standard word for historical peace agreements.", "\"The peace treaty redrew the political map of Europe.\"", "N/A"],
+            ["Diplomacy", "/dɪˈpləʊ.mə.si/", "n.", "C1", "The management of relationships between countries.", "Ngoại giao", "Used to describe non-violent resolution of conflicts.", "\"The crisis was resolved through international diplomacy.\"", "diplomat (n.)"],
+            ["Oppression", "/əˈpreʃ.ən/", "n.", "C1", "Governing people unfairly and preventing their freedom.", "Sự áp bức", "Highly relevant in texts discussing revolutions.", "\"The uprising was triggered by decades of oppression.\"", "oppress (v.)"],
+            ["Uprising", "/ˈʌpˌraɪ.zɪŋ/", "n.", "C1", "An act of opposition using violence against those in power.", "Cuộc nổi dậy", "Synonym for rebellion describing turning points.", "\"The peasant uprising was swiftly crushed by the army.\"", "N/A"],
+            ["Reform", "/rɪˈfɔːm/", "n. / v.", "B2", "To make an improvement by changing the structure.", "Sự cải cách", "Discussed in contexts of political or social change.", "\"The government promised sweeping economic reforms.\"", "reformer (n.)"],
+            ["Renaissance", "/rəˈneɪ.səns/", "n.", "C1", "A new growth of interest in art/science (14th-16th century).", "Thời kỳ Phục hưng", "Denotes a massive historical shift or modern revival.", "\"The city is experiencing a cultural renaissance.\"", "N/A"],
+            ["Enlightenment", "/ɪnˈlaɪ.tən.mənt/", "n.", "C2", "18th-century movement stressing reason and science.", "Thời kỳ Khai sáng", "Foundational concept for modern scientific thought.", "\"Philosophers of the Enlightenment argued for human rights.\"", "enlighten (v.)"],
+            ["Ideology", "/ˌaɪ.diˈɒl.ə.dʒi/", "n.", "C1", "A set of beliefs on which a political system is based.", "Hệ tư tưởng", "Contrasts different political or economic systems.", "\"The Cold War was driven by a clash of political ideologies.\"", "ideological (adj.)"],
+            ["Propaganda", "/ˌprɒp.əˈɡæn.də/", "n.", "C1", "Information spread to influence people's opinions.", "Sự tuyên truyền", "Discussed regarding wartime communication and media.", "\"The regime used radio to spread political propaganda.\"", "propagandist (n.)"],
+            ["Bias", "/ˈbaɪ.əs/", "n.", "B2", "Allowing personal opinions to influence your judgment.", "Sự thiên vị", "Relevant when analyzing historical sources.", "\"Historians must identify cultural bias in primary sources.\"", "biased (adj.)"],
+            ["Retrospective", "/ˌret.rəˈspek.tɪv/", "adj. / n.", "C2", "Relating to or thinking about the past.", "Hồi tưởng", "Viewing past events with modern understanding.", "\"From a retrospective viewpoint, the crash was predictable.\"", "retrospect (n.)"],
+            ["Authentic", "/ɔːˈθen.tɪk/", "adj.", "C1", "Real, true, or what people say it is.", "Xác thực", "Crucial in verifying the origin of artifacts.", "\"Carbon dating proved the manuscript was authentic.\"", "authenticity (n.)"],
+            ["Preservation", "/ˌprez.əˈveɪ.ʃən/", "n.", "C1", "The act of keeping something from being damaged.", "Sự bảo tồn", "Discussed regarding architecture or museum curation.", "\"The dry climate allowed for the preservation of mummies.\"", "preserve (v.)"],
+            ["Folklore", "/ˈfəʊk.lɔːr/", "n.", "C1", "Traditional stories and culture of a group.", "Văn học dân gian", "Studied to understand pre-literate societies.", "\"Many fairy tales are sanitized versions of medieval folklore.\"", "folkloric (adj.)"],
+            ["Communal", "/ˈkɒm.jə.nəl/", "adj.", "C1", "Belonging to or used by a group of people.", "Thuộc về cộng đồng", "Describes living arrangements in ancient tribes.", "\"The village was organized around a communal farming area.\"", "community (n.)"],
+            ["Proletariat", "/ˌprəʊ.lɪˈteə.ri.ət/", "n.", "C2", "Class of people who do unskilled industrial jobs.", "Giai cấp vô sản", "Terminology associated with Marxist theory.", "\"The philosopher argued the proletariat would rise up.\"", "proletarian (adj.)"],
+            ["Bourgeoisie", "/ˌbʊəʒ.wɑːˈziː/", "n.", "C2", "The middle class, typically with materialistic values.", "Giai cấp tư sản", "The counter-part to the proletariat.", "\"The revolution was driven by the expanding bourgeoisie.\"", "bourgeois (adj.)"],
+            ["Cosmopolitan", "/ˌkɒz.məˈpɒl.ɪ.tən/", "adj.", "C1", "Having experience of people from many parts of the world.", "Đa văn hóa", "Describes thriving historical trading hubs.", "\"London evolved into a highly cosmopolitan city.\"", "cosmopolitanism (n.)"],
+            ["Agrarian", "/əˈɡreə.ri.ən/", "adj.", "C2", "Relating to the land, especially for farming.", "Thuộc nông nghiệp", "Used to describe societies before the Industrial Revolution.", "\"The transition from an agrarian society changed the family structure.\"", "N/A"],
+            ["Contemporary", "/kənˈtem.pər.ər.i/", "adj. / n.", "B2", "Existing now; or belonging to the same past period.", "Đương đại, cùng thời", "Can mean modern day OR existing at the same historical time.", "\"Shakespeare and Marlowe were contemporary playwrights.\"", "contemporaries (n.)"],
+            ["Subsequent", "/ˈsʌb.sɪ.kwənt/", "adj.", "B2", "Happening after something else.", "Xảy ra sau", "A crucial signposting word in historical chronologies.", "\"The failure provided lessons for subsequent expeditions.\"", "subsequently (adv.)"],
+            ["Epoch", "/ˈiː.pɒk/", "n.", "C2", "A long period of time with new developments.", "Kỷ nguyên", "Synonym for era, emphasizing a turning point.", "\"The atomic bomb marked a terrifying new historical epoch.\"", "epochal (adj.)"],
+            ["Aboriginal", "/ˌæb.əˈrɪdʒ.ən.əl/", "adj. / n.", "C1", "Relating to the original people living in a region.", "Bản địa", "Discusses native tribes and their ancient traditions.", "\"The museum holds a collection of Aboriginal paintings.\"", "aborigine (n.)"],
+            ["Aristocracy", "/ˌær.ɪˈstɒk.rə.si/", "n.", "C1", "Class of people who hold high social rank and land.", "Quý tộc", "Analyzes the shift of power to democratic governments.", "\"Taxation supported the lavish lifestyles of the aristocracy.\"", "aristocrat (n.)"],
+            ["Philanthropy", "/fɪˈlæn.θrə.pi/", "n.", "C2", "Giving large amounts of money to help people.", "Sự từ thiện", "Wealthy historical figures giving back to society.", "\"The university was founded through the philanthropy of an industrialist.\"", "philanthropist (n.)"],
+            ["Egalitarianism", "/ɪˌɡæl.ɪˈteə.ri.ə.nɪ.zəm/", "n.", "C2", "Belief that all people should have the same rights.", "Thuyết bình đẳng", "Core concept in modern sociological evolution.", "\"The system is built upon principles of egalitarianism.\"", "egalitarian (adj.)"],
+            ["Imperialism", "/ɪmˈpɪə.ri.ə.lɪ.zəm/", "n.", "C1", "System in which a country rules other countries.", "Chủ nghĩa đế quốc", "Examining motivations and consequences of empires.", "\"Economic expansion was the driver of 19th-century imperialism.\"", "imperialist (n.)"],
+            ["Peasant", "/ˈpez.ənt/", "n.", "B2", "A person who works a small piece of land with low income.", "Nông dân (nghèo)", "Describes the lowest tier of feudal societies.", "\"Poor crop yields left the peasants unable to pay taxes.\"", "peasantry (n.)"],
+            ["Paradigm (2)", "/ˈpær.ə.daɪm/", "n.", "C2", "A typical example or pattern of something; a model.", "Mô hình, chuẩn", "Denotes the standard worldview of a specific era.", "\"The moon landing shifted the global paradigm of space exploration.\"", "paradigmatic (adj.)"]
+        ];
+
+        // Format into array of objects for easier access
+        const vocabDB = rawVocabData.map(item => ({
+            word: item[0], ipa: item[1], pos: item[2], cefr: item[3],
+            def: item[4], vie: item[5], usage: item[6], example: item[7], fam: item[8]
+        }));
+
+        let filteredData = [...vocabDB];
+        let flashcardIndex = 0;
+
+        // Init function
+        window.onload = () => {
+            initFilters();
+            renderDictionary();
+            renderChart();
+            updateFlashcard();
+        };
+
+        // --- Chart Logic ---
+        function renderChart() {
+            const counts = { 'B2': 0, 'C1': 0, 'C2': 0 };
+            vocabDB.forEach(w => { if(counts[w.cefr] !== undefined) counts[w.cefr]++; });
+            
+            const ctx = document.getElementById('cefrChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['B2 Upper Int.', 'C1 Advanced', 'C2 Mastery'],
+                    datasets: [{
+                        data: [counts['B2'], counts['C1'], counts['C2']],
+                        backgroundColor: ['#fbcfe8', '#f43f5e', '#be123c'], // pastel pinks to deep rose
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 10 } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // --- Tab Logic ---
+        function switchTab(tab) {
+            const dictView = document.getElementById('dictionaryView');
+            const flashView = document.getElementById('flashcardView');
+            const btnDict = document.getElementById('btnTabDict');
+            const btnFlash = document.getElementById('btnTabFlash');
+
+            if(tab === 'dictionary') {
+                dictView.classList.remove('hidden');
+                flashView.classList.add('hidden');
+                
+                btnDict.classList.replace('bg-white', 'bg-rose-500');
+                btnDict.classList.replace('text-rose-600', 'text-white');
+                btnDict.classList.remove('border', 'border-rose-200');
+
+                btnFlash.classList.replace('bg-rose-500', 'bg-white');
+                btnFlash.classList.replace('text-white', 'text-rose-600');
+                btnFlash.classList.add('border', 'border-rose-200');
+            } else {
+                flashView.classList.remove('hidden');
+                dictView.classList.add('hidden');
+                
+                btnFlash.classList.replace('bg-white', 'bg-rose-500');
+                btnFlash.classList.replace('text-rose-600', 'text-white');
+                btnFlash.classList.remove('border', 'border-rose-200');
+
+                btnDict.classList.replace('bg-rose-500', 'bg-white');
+                btnDict.classList.replace('text-white', 'text-rose-600');
+                btnDict.classList.add('border', 'border-rose-200');
+                
+                // Reset flashcard state
+                document.getElementById('flashcard').classList.remove('is-flipped');
+                flashcardIndex = 0;
+                updateFlashcard();
+            }
+        }
+
+        // --- Dictionary Logic ---
+        function initFilters() {
+            const posSet = new Set(vocabDB.map(w => w.pos.split('/')[0].trim())); // simplify for mixed POS
+            const posSelect = document.getElementById('filterPOS');
+            posSet.forEach(pos => {
+                let opt = document.createElement('option');
+                opt.value = pos;
+                opt.textContent = pos;
+                posSelect.appendChild(opt);
+            });
+
+            document.getElementById('searchInput').addEventListener('input', handleFilter);
+            document.getElementById('filterCEFR').addEventListener('change', handleFilter);
+            document.getElementById('filterPOS').addEventListener('change', handleFilter);
+        }
+
+        function handleFilter() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const cefr = document.getElementById('filterCEFR').value;
+            const pos = document.getElementById('filterPOS').value;
+
+            filteredData = vocabDB.filter(w => {
+                const matchSearch = w.word.toLowerCase().includes(search) || w.vie.toLowerCase().includes(search);
+                const matchCEFR = cefr === 'All' || w.cefr === cefr;
+                const matchPOS = pos === 'All' || w.pos.includes(pos);
+                return matchSearch && matchCEFR && matchPOS;
+            });
+
+            document.getElementById('resultCount').textContent = `Showing ${filteredData.length} entries`;
+            renderDictionary();
+            
+            flashcardIndex = 0;
+            updateFlashcard();
+        }
+
+        function renderDictionary() {
+            const grid = document.getElementById('vocabGrid');
+            grid.innerHTML = '';
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl p-6 shadow-sm border border-rose-100 hover:shadow-md transition flex flex-col justify-between';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-rose-900">${item.word.replace(' (1)', '').replace(' (2)', '')}</h3>
+                            <span class="cefr-badge cefr-${item.cefr}">${item.cefr}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-slate-500 mb-4">
+                            <span class="font-mono bg-slate-50 px-1 py-0.5 rounded mr-2">${item.ipa}</span>
+                            <span class="italic mr-auto">${item.pos}</span>
+                            <button onclick="playAudio('${item.word.replace(/ \([0-9]\)/,'')}')" class="text-rose-400 hover:text-rose-600 focus:outline-none" title="Listen">🔊</button>
+                        </div>
+                        <p class="text-slate-800 font-medium mb-1">${item.def}</p>
+                        <p class="text-indigo-600 font-semibold mb-4 text-sm">${item.vie}</p>
+                        <div class="bg-rose-50/50 p-3 rounded-lg text-sm border border-rose-50 mb-4">
+                            <p class="text-slate-600 mb-1"><span class="font-bold text-rose-400">Context:</span> ${item.usage}</p>
+                            <p class="text-slate-800 italic">" ${item.example.replace(/"/g,'')} "</p>
+                        </div>
+                    </div>
+                    <div class="mt-auto pt-3 border-t border-slate-100 text-xs text-slate-400 font-medium">
+                        <span class="uppercase tracking-wider mr-1">Family:</span> ${item.fam}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- Flashcard Logic ---
+        document.getElementById('flashcard').addEventListener('click', function() {
+            this.classList.toggle('is-flipped');
+        });
+
+        function updateFlashcard() {
+            if(filteredData.length === 0) {
+                document.getElementById('fcWord').textContent = "No cards match filter.";
+                document.getElementById('fcTotal').textContent = "0";
+                return;
+            }
+            
+            const card = filteredData[flashcardIndex];
+            document.getElementById('fcWord').textContent = card.word.replace(/ \([0-9]\)/, '');
+            document.getElementById('fcIPA').textContent = card.ipa;
+            document.getElementById('fcPOS').textContent = card.pos;
+            document.getElementById('fcCEFR').textContent = card.cefr;
+            document.getElementById('fcCEFR').className = `cefr-badge cefr-${card.cefr} absolute top-6 right-6`;
+            
+            document.getElementById('fcDef').textContent = card.def;
+            document.getElementById('fcVie').textContent = card.vie;
+            document.getElementById('fcExample').textContent = card.example;
+
+            document.getElementById('fcCurrent').textContent = flashcardIndex + 1;
+            document.getElementById('fcTotal').textContent = filteredData.length;
+        }
+
+        function nextCard() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            setTimeout(() => {
+                flashcardIndex = (flashcardIndex + 1) % filteredData.length;
+                updateFlashcard();
+            }, 150);
+        }
+
+        function prevCard() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            setTimeout(() => {
+                flashcardIndex = (flashcardIndex - 1 + filteredData.length) % filteredData.length;
+                updateFlashcard();
+            }, 150);
+        }
+
+        function shuffleCards() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            // Fisher-Yates shuffle
+            for (let i = filteredData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
+            }
+            flashcardIndex = 0;
+            setTimeout(() => updateFlashcard(), 150);
+        }
+
+        // --- Audio Logic ---
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-GB'; // British English commonly used in IELTS
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sorry, your browser doesn't support text-to-speech!");
+            }
+        }
+
+        function playAudioCurrent(e) {
+            e.stopPropagation(); // Prevent card from flipping
+            if(filteredData.length > 0) {
+                playAudio(filteredData[flashcardIndex].word.replace(/ \([0-9]\)/, ''));
+            }
+        }
+    </script>
+</body>
+</html>

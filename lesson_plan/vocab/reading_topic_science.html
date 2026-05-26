@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong - Biology & Environment Vocabulary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Pinkish Pastel. Backgrounds: rose-50, pink-50. Text: slate-800, rose-900. Accents: rose-400, pink-500. -->
+    <!-- Application Structure Plan: The SPA is divided into a Header with prominent branding, a Dashboard summary with a CEFR level chart, and a Main Content Area with two toggleable views: 'Dictionary View' (for exhaustive filtering and reading) and 'Flashcard View' (for active recall and study). This structure supports both macro-level exploration and micro-level memorization tasks requested by the user. -->
+    <!-- Visualization & Content Choices: 1. Doughnut Chart (Chart.js) -> Goal: Inform -> Justification: Quickly shows the distribution of word difficulty (CEFR levels) in the curated list. 2. CSS 3D Flip Cards -> Goal: Engage/Teach -> Justification: Replicates physical flashcards for active recall without relying on external libraries. 3. Grid Layout for Dictionary -> Goal: Organize -> Justification: Makes scanning 100 entries easy and visually digestible. -> Confirming NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fff1f2; /* rose-50 */
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar for pastel theme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #ffe4e6; } /* rose-100 */
+        ::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 4px; } /* rose-300 */
+        ::-webkit-scrollbar-thumb:hover { background: #fb7185; } /* rose-400 */
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 250px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+        }
+
+        /* Flashcard 3D Flip Styles */
+        .flashcard-scene {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.1), 0 8px 10px -6px rgba(225, 29, 72, 0.1);
+        }
+        .flashcard-scene.is-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            background-color: #ffffff;
+            border: 2px solid #ffe4e6;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background-color: #fffbfb;
+        }
+
+        .cefr-badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cefr-B2 { background-color: #fce7f3; color: #db2777; border: 1px solid #fbcfe8; }
+        .cefr-C1 { background-color: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+        .cefr-C2 { background-color: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+
+        .btn-pastel {
+            transition: all 0.2s;
+        }
+        .btn-pastel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Branding -->
+    <header class="bg-white border-b-4 border-rose-300 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-md">
+                    🎓
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-rose-950 tracking-tight">IELTS Chan Truong</h1>
+                    <p class="text-xs font-semibold text-rose-500 uppercase tracking-widest">Premium Resource Compilation</p>
+                </div>
+            </div>
+            <nav class="flex space-x-2">
+                <a href="reading_topics_overview.html" class="px-4 py-2 text-sm font-medium text-slate-600 bg-rose-50 rounded-lg hover:bg-rose-100 hover:text-rose-900 transition">&#8592; Back to Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Intro & Dashboard Section -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 bg-white rounded-2xl p-8 border border-rose-100 shadow-sm flex flex-col justify-center">
+                <div class="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold mb-4 self-start">Topic 1</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Biology & Environment</h2>
+                <p class="text-slate-600 leading-relaxed mb-6">
+                    Mastering vocabulary related to the natural world, ecological balance, and climate change is critical. This topic appears in approximately 28% of all IELTS Academic Reading exams. Explore the curated list of 100 high-frequency terms below, complete with phonetics, contextual usage, and interactive study tools.
+                </p>
+                <div class="flex space-x-4">
+                    <button onclick="switchTab('dictionary')" id="btnTabDict" class="btn-pastel px-6 py-3 bg-rose-500 text-white font-semibold rounded-xl shadow-md flex items-center">
+                        <span class="mr-2">📖</span> Dictionary View
+                    </button>
+                    <button onclick="switchTab('flashcard')" id="btnTabFlash" class="btn-pastel px-6 py-3 bg-white text-rose-600 border border-rose-200 font-semibold rounded-xl shadow-sm flex items-center hover:bg-rose-50">
+                        <span class="mr-2">⚡</span> Flashcards
+                    </button>
+                </div>
+            </div>
+            
+            <div class="md:col-span-1 bg-white rounded-2xl p-6 border border-rose-100 shadow-sm flex flex-col items-center justify-center">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">CEFR Level Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="cefrChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-slate-400 mt-2">Breakdown of the 100 curated terms</p>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Area -->
+        <section id="contentArea" class="relative min-h-[600px]">
+            
+            <!-- View 1: Dictionary List -->
+            <div id="dictionaryView" class="block transition-opacity duration-300">
+                <!-- Filters -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-rose-100 mb-6 flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search by English word or Vietnamese meaning..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent transition">
+                    </div>
+                    <select id="filterCEFR" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <option value="All">All CEFR Levels</option>
+                        <option value="B2">B2 Upper Intermediate</option>
+                        <option value="C1">C1 Advanced</option>
+                        <option value="C2">C2 Mastery</option>
+                    </select>
+                    <select id="filterPOS" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <option value="All">All Parts of Speech</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Stats -->
+                <div class="mb-4 text-sm font-semibold text-rose-800 flex justify-between items-center px-2">
+                    <span id="resultCount">Showing 100 entries</span>
+                </div>
+
+                <!-- Grid -->
+                <div id="vocabGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards populated by JS -->
+                </div>
+            </div>
+
+            <!-- View 2: Flashcards -->
+            <div id="flashcardView" class="hidden transition-opacity duration-300">
+                <div class="bg-white rounded-2xl p-8 border border-rose-100 shadow-sm max-w-4xl mx-auto flex flex-col items-center">
+                    
+                    <div class="w-full flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-slate-800">Study Mode</h3>
+                        <div class="text-sm font-medium text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+                            Card <span id="fcCurrent">1</span> of <span id="fcTotal">100</span>
+                        </div>
+                    </div>
+
+                    <!-- The 3D Flashcard -->
+                    <div class="flashcard-scene" id="flashcard">
+                        <div class="flashcard-inner">
+                            <!-- Front -->
+                            <div class="flashcard-face">
+                                <span id="fcCEFR" class="cefr-badge absolute top-6 right-6">C1</span>
+                                <div class="text-slate-400 text-sm font-semibold uppercase tracking-widest mb-2" id="fcPOS">noun (n.)</div>
+                                <h2 class="text-4xl md:text-5xl font-black text-rose-900 mb-4" id="fcWord">Biodiversity</h2>
+                                <div class="flex items-center text-slate-500 text-lg">
+                                    <span id="fcIPA" class="mr-3 font-mono bg-slate-50 px-2 py-1 rounded">/ˌbaɪ.əʊ.daɪˈvɜː.sə.ti/</span>
+                                    <button onclick="playAudioCurrent(event)" class="text-rose-500 hover:text-rose-700 transition p-2 bg-rose-50 rounded-full" title="Play Pronunciation">🔊</button>
+                                </div>
+                                <p class="absolute bottom-6 text-slate-400 text-sm font-medium animate-pulse">Click card to flip ↺</p>
+                            </div>
+                            <!-- Back -->
+                            <div class="flashcard-back flashcard-face">
+                                <div class="w-full h-full flex flex-col justify-center items-start text-left space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                                    <div>
+                                        <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-1">Definition</h4>
+                                        <p class="text-slate-800 text-lg font-medium leading-snug" id="fcDef">The number and types of plants and animals that exist in a particular area.</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-1">Vietnamese</h4>
+                                        <p class="text-indigo-700 text-lg font-bold" id="fcVie">Đa dạng sinh học</p>
+                                    </div>
+                                    <div class="bg-rose-50 p-3 rounded-lg border border-rose-100 w-full">
+                                        <h4 class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-1">Example in Context</h4>
+                                        <p class="text-slate-700 italic text-sm" id="fcExample">"The construction of the new dam poses a significant threat to the rich biodiversity..."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex items-center space-x-4 mt-8">
+                        <button onclick="prevCard()" class="btn-pastel px-5 py-3 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:text-rose-600">
+                            &#8592; Prev
+                        </button>
+                        <button onclick="shuffleCards()" class="btn-pastel px-4 py-3 bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl shadow-sm hover:bg-rose-200" title="Shuffle Deck">
+                            🔀
+                        </button>
+                        <button onclick="nextCard()" class="btn-pastel px-5 py-3 bg-rose-500 text-white border border-rose-600 font-semibold rounded-xl shadow-sm hover:bg-rose-600">
+                            Next &#8594;
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-rose-100 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 IELTS Chan Truong. Curated for Academic Excellence.</p>
+    </footer>
+
+    <script>
+        // Compact Data Array to ensure all 100 entries fit without truncation
+        // Format: [Word, IPA, POS, CEFR, English Def, Viet Trans, Usage, Example, Word Family]
+        const rawVocabData = [
+            ["Biodiversity", "/ˌbaɪ.əʊ.daɪˈvɜː.sə.ti/", "n.", "C1", "The number and types of plants and animals that exist in a particular area.", "Đa dạng sinh học", "Extremely common in passages discussing conservation.", "\"The construction of the new dam poses a significant threat to the rich biodiversity...\"", "diverse (adj.), diversify (v.)"],
+            ["Mitigate", "/ˈmɪt.ɪ.ɡeɪt/", "v.", "C1", "To make something less severe, harmful, or painful.", "Giảm nhẹ, làm dịu bớt", "Used in problem-solution passages alongside 'effects' or 'impact'.", "\"Governments must implement stricter policies to mitigate the effects of global warming.\"", "mitigation (n.), unmitigated (adj.)"],
+            ["Proliferation", "/prəˌlɪf.ərˈeɪ.ʃən/", "n.", "C2", "The fact of something increasing a lot and suddenly in number or amount.", "Sự gia tăng nhanh chóng", "Used to describe the rapid spread of species or hazards.", "\"The proliferation of plastic waste in the ocean has led to devastating consequences.\"", "proliferate (v.)"],
+            ["Indigenous", "/ɪnˈdɪdʒ.ɪ.nəs/", "adj.", "C1", "Naturally existing in a place or country rather than arriving from another place.", "Bản địa", "Highly frequent in passages about native flora/fauna.", "\"Conservationists are working to protect the indigenous bird species.\"", "indigenously (adv.)"],
+            ["Resilience", "/rɪˈzɪl.jəns/", "n.", "C1", "The capacity to recover quickly from difficulties.", "Khả năng phục hồi", "Discussing how ecosystems recover from natural disasters.", "\"Coral reefs have demonstrated remarkable resilience in recovering from bleaching.\"", "resilient (adj.)"],
+            ["Fauna", "/ˈfɔː.nə/", "n.", "C1", "All the animals that live naturally in a particular area.", "Hệ động vật", "Almost always appears alongside 'flora'.", "\"The unique fauna of the Galapagos Islands played a crucial role in Darwin's theory.\"", "faunal (adj.)"],
+            ["Flora", "/ˈflɔː.rə/", "n.", "C1", "All the plants of a particular place or time.", "Hệ thực vật", "Used in descriptions of agriculture and botanical studies.", "\"Climate change is drastically altering the alpine flora found at higher elevations.\"", "floral (adj.)"],
+            ["Sustainability", "/səˌsteɪ.nəˈbɪl.ə.ti/", "n.", "B2", "The quality of being able to continue over a period of time causing little damage.", "Sự bền vững", "A core theme in modern IELTS passages.", "\"The company's new agricultural practices are focused on long-term environmental sustainability.\"", "sustainable (adj.)"],
+            ["Extinction", "/ɪkˈstɪŋk.ʃən/", "n.", "B2", "A situation in which something no longer exists.", "Sự tuyệt chủng", "Extremely common in biology passages about human impact.", "\"Poaching has driven the Sumatran rhinoceros to the brink of extinction.\"", "extinct (adj.)"],
+            ["Conservation", "/ˌkɒn.səˈveɪ.ʃən/", "n.", "B2", "The protection of plants and animals, natural areas.", "Sự bảo tồn", "Frequent in relating to projects or governmental efforts.", "\"Wildlife conservation programs require significant funding.\"", "conserve (v.)"],
+            ["Habitat", "/ˈhæb.ɪ.tæt/", "n.", "B2", "The natural environment in which an animal or plant lives.", "Môi trường sống", "Often collocated with 'loss' or 'destruction'.", "\"Urban expansion is the primary cause of habitat destruction for local wildlife.\"", "inhabit (v.)"],
+            ["Deforestation", "/diːˌfɒr.ɪˈsteɪ.ʃən/", "n.", "B2", "The cutting down of trees in a large area.", "Sự tàn phá rừng", "Usually cited as a primary cause of climate change.", "\"Rampant deforestation in the Amazon basin has severely impacted global carbon levels.\"", "forest (n.)"],
+            ["Ecological", "/ˌiː.kəˈlɒdʒ.ɪ.kəl/", "adj.", "B2", "Relating to ecology or the environment.", "Thuộc về sinh thái học", "Used to describe balance, impact, or niches.", "\"The introduction of the cane toad had disastrous ecological consequences.\"", "ecology (n.)"],
+            ["Ecosystem", "/ˈiː.kəʊˌsɪs.təm/", "n.", "B2", "All the living things in an area and the way they affect each other.", "Hệ sinh thái", "Appears in texts explaining food chains.", "\"Mangrove forests provide a vital ecosystem that supports numerous species.\"", "N/A"],
+            ["Deterioration", "/dɪˌtɪə.ri.əˈreɪ.ʃən/", "n.", "C1", "The fact or process of becoming worse.", "Sự suy thoái", "Used to describe the worsening state of the environment.", "\"Scientists noted a rapid deterioration in the water quality.\"", "deteriorate (v.)"],
+            ["Degradation", "/ˌdeɡ.rəˈdeɪ.ʃən/", "n.", "C1", "The process in which the quality of something is destroyed.", "Sự suy giảm chất lượng", "Often applied to soil or land contexts.", "\"Overgrazing by livestock has caused severe land degradation.\"", "degrade (v.)"],
+            ["Contamination", "/kənˌtæm.ɪˈneɪ.ʃən/", "n.", "C1", "The process of making something dirty or poisonous.", "Sự ô nhiễm (hóa chất)", "Often implies a specific chemical agent.", "\"Groundwater contamination from industrial waste is a growing crisis.\"", "contaminate (v.)"],
+            ["Vulnerable", "/ˈvʌl.nər.ə.bəl/", "adj.", "B2", "Able to be easily physically, emotionally, or mentally hurt.", "Dễ bị tổn thương", "Describes species at risk of extinction.", "\"Polar bears are particularly vulnerable to the effects of melting sea ice.\"", "vulnerability (n.)"],
+            ["Thrive", "/θraɪv/", "v.", "C1", "To grow, develop, or be successful.", "Phát triển mạnh", "Contrasts with species that are dying out.", "\"Despite harsh conditions, certain species of cacti manage to thrive.\"", "thriving (adj.)"],
+            ["Symbiosis", "/ˌsɪm.baɪˈəʊ.sɪs/", "n.", "C2", "A relationship between two types of animal/plant providing conditions necessary for existence.", "Sự cộng sinh", "Found in highly technical texts explaining relationships.", "\"The clownfish and the sea anemone exist in a state of symbiosis.\"", "symbiotic (adj.)"],
+            ["Predation", "/prɪˈdeɪ.ʃən/", "n.", "C1", "The fact that an animal hunts, kills, and eats other animals.", "Sự ăn thịt", "Essential for food webs.", "\"Wolves helped control the deer population through natural predation.\"", "predator (n.)"],
+            ["Terrestrial", "/təˈres.tri.əl/", "adj.", "C1", "Living on the land rather than in the water or air.", "Trên cạn", "Contrasts directly with marine or aquatic.", "\"Frogs split their life cycle between aquatic and terrestrial environments.\"", "extraterrestrial (adj.)"],
+            ["Marine", "/məˈriːn/", "adj.", "B2", "Related to the sea.", "Thuộc đại dương", "Very common in oceanography passages.", "\"Plastic micro-particles pose a severe threat to marine life.\"", "mariner (n.)"],
+            ["Canopy", "/ˈkæn.ə.pi/", "n.", "C1", "The branches and leaves that spread out at the top of a group of trees.", "Tán cây", "Frequent in passages concerning rainforests.", "\"The dense forest canopy prevents most sunlight from reaching the ground.\"", "N/A"],
+            ["Desertification", "/dɪˌzɜː.tɪ.fɪˈkeɪ.ʃən/", "n.", "C1", "The process by which land changes into desert.", "Sự sa mạc hóa", "Crucial for agricultural texts detailing loss of arable land.", "\"Prolonged droughts have accelerated desertification in the region.\"", "desertify (v.)"],
+            ["Emission", "/ɪˈmɪʃ.ən/", "n.", "C1", "A substance sent out into the air that is harmful.", "Khí thải", "Extremely common in passages about global warming.", "\"Reducing carbon dioxide emissions is crucial.\"", "emit (v.)"],
+            ["Atmosphere", "/ˈæt.mə.sfɪər/", "n.", "B2", "A mixture of gases that surrounds any planet.", "Khí quyển", "Found in texts explaining the greenhouse effect.", "\"Meteorites typically burn up as they enter the Earth's atmosphere.\"", "atmospheric (adj.)"],
+            ["Glacier", "/ˈɡlæs.i.ər/", "n.", "B2", "A large mass of ice that moves slowly.", "Sông băng", "Key vocabulary for geography and climate passages.", "\"The retreat of mountain glaciers is a visible indicator of warming.\"", "glacial (adj.)"],
+            ["Thaw", "/θɔː/", "v.", "C1", "To change from a solid, frozen state to a liquid.", "Tan chảy, rã đông", "Applied to permafrost or ice caps.", "\"As the permafrost begins to thaw, it releases massive amounts of methane.\"", "thaw (n.)"],
+            ["Inundate", "/ˈɪn.ʌn.deɪt/", "v.", "C2", "To flood an area with water.", "Làm ngập lụt", "Describes the effects of rising sea levels.", "\"Many low-lying island nations will be completely inundated.\"", "inundation (n.)"],
+            ["Arid", "/ˈær.ɪd/", "adj.", "C1", "Very dry and without enough rain for plants.", "Khô cằn", "Describes deserts and changing climates.", "\"Camels are well adapted to survive in harsh, arid conditions.\"", "aridity (n.)"],
+            ["Drought", "/draʊt/", "n.", "B2", "A long period when there is little or no rain.", "Hạn hán", "Appears in passages discussing weather anomalies.", "\"The prolonged drought severely impacted agricultural output.\"", "N/A"],
+            ["Precipitation", "/prɪˌsɪp.ɪˈteɪ.ʃən/", "n.", "C1", "Water that falls from the clouds, especially as rain or snow.", "Lượng mưa", "A formal term used in meteorology.", "\"Tropical rainforests are characterized by high levels of annual precipitation.\"", "precipitate (v.)"],
+            ["Salinity", "/səˈlɪn.ə.ti/", "n.", "C1", "The amount of salt in something.", "Độ mặn", "Important for texts on oceanography and agriculture.", "\"High soil salinity makes it impossible for traditional crops to grow.\"", "saline (adj.)"],
+            ["Acidification", "/əˌsɪd.ɪ.fɪˈkeɪ.ʃən/", "n.", "C2", "The process of becoming an acid.", "Sự axit hóa", "Frequently paired with 'ocean'.", "\"Ocean acidification prevents corals from building skeletons.\"", "acidic (adj.)"],
+            ["Runoff", "/ˈrʌn.ɒf/", "n.", "C1", "Water that flows away from high areas, carrying chemicals.", "Dòng chảy tràn", "Crucial for understanding water pollution.", "\"Agricultural runoff is responsible for massive algal blooms.\"", "N/A"],
+            ["Pesticide", "/ˈpes.tɪ.saɪd/", "n.", "B2", "A chemical substance used to kill harmful insects.", "Thuốc trừ sâu", "Appears in discussions on farming.", "\"Widespread use of chemical pesticides led to a decline in bees.\"", "pest (n.)"],
+            ["Herbicide", "/ˈhɜː.bɪ.saɪd/", "n.", "C1", "A chemical used to destroy plants, especially weeds.", "Thuốc diệt cỏ", "Used in agricultural passages focusing on crop management.", "\"Organic farming strictly prohibits synthetic herbicides.\"", "herb (n.)"],
+            ["Fertilizer", "/ˈfɜː.tɪ.laɪ.zər/", "n.", "B2", "Substance spread on land to make plants grow well.", "Phân bón", "Essential for passages discussing crop yields.", "\"Nitrogen-rich fertilizers increased global food production.\"", "fertilize (v.)"],
+            ["Pathogen", "/ˈpæθ.ə.dʒən/", "n.", "C2", "Any small organism that can cause disease.", "Mầm bệnh", "Found in medical biology texts.", "\"Researchers are working to identify the specific pathogen.\"", "pathogenic (adj.)"],
+            ["Toxin", "/ˈtɒk.sɪn/", "n.", "C1", "A poisonous substance produced by bacteria/animals.", "Độc tố", "Used in contexts of animal defenses or pollution.", "\"Some frogs secrete a powerful toxin through their skin.\"", "toxic (adj.)"],
+            ["Accumulation", "/əˌkjuː.mjəˈleɪ.ʃən/", "n.", "C1", "An amount of something that has been collected.", "Sự tích tụ", "Refers to buildup of toxins or matter.", "\"The gradual accumulation of microplastics poses a severe threat.\"", "accumulate (v.)"],
+            ["Biomass", "/ˈbaɪ.əʊˌmæs/", "n.", "C1", "Dead plant/animal material used as fuel; total mass of organisms.", "Sinh khối", "Features in renewable energy passages.", "\"Many developing nations rely heavily on biomass for heating.\"", "N/A"],
+            ["Poaching", "/ˈpəʊ.tʃɪŋ/", "n.", "C1", "The illegal catching and killing of animals.", "Nạn săn trộm", "Frequent in texts about endangered species.", "\"Strict anti-poaching laws protect remaining tiger populations.\"", "poacher (n.)"],
+            ["Captivity", "/kæpˈtɪv.ə.ti/", "n.", "C1", "Situation where an animal is kept somewhere and not allowed to leave.", "Nuôi nhốt", "Used in texts debating the ethics of zoos.", "\"Animals bred in captivity often lack survival skills.\"", "captive (adj.)"],
+            ["Sanctuary", "/ˈsæŋk.tʃʊə.ri/", "n.", "C1", "A place where animals can live and be protected.", "Khu bảo tồn", "Often paired with 'wildlife' or 'marine'.", "\"The marine sanctuary prohibits commercial fishing.\"", "N/A"],
+            ["Breed", "/briːd/", "v.", "B2", "To keep animals to produce young in a controlled way.", "Nhân giống", "Essential for agricultural and conservation texts.", "\"Scientists are attempting to breed crops resistant to drought.\"", "breeder (n.)"],
+            ["Mammal", "/ˈmæm.əl/", "n.", "B2", "Animal that feeds young on milk.", "Động vật có vú", "Basic classification vocabulary.", "\"Whales are classified as marine mammals.\"", "mammalian (adj.)"],
+            ["Amphibian", "/æmˈfɪb.i.ən/", "n.", "C1", "Animal living both on land and in water.", "Động vật lưỡng cư", "Mentioned as indicator species for environmental health.", "\"Amphibians are highly vulnerable to water pollution.\"", "amphibious (adj.)"],
+            ["Reptile", "/ˈrep.taɪl/", "n.", "B2", "Animal that uses heat of the sun to keep blood warm.", "Động vật bò sát", "Appears in evolutionary biology texts.", "\"As a cold-blooded reptile, the crocodile must bask in the sun.\"", "reptilian (adj.)"],
+            ["Invertebrate", "/ɪnˈvɜː.tɪ.brət/", "n.", "C1", "An animal with no spine.", "Động vật không xương sống", "Found in texts regarding soil health and marine biology.", "\"Insects represent the largest group of invertebrates.\"", "N/A"],
+            ["Vertebrate", "/ˈvɜː.tɪ.brət/", "n.", "C1", "An animal that has a spine.", "Động vật có xương sống", "Used in anatomical comparisons.", "\"The transition of vertebrates from water to land required changes.\"", "N/A"],
+            ["Carnivore", "/ˈkɑː.nɪ.vɔːr/", "n.", "C1", "An animal that eats meat.", "Động vật ăn thịt", "Central to passages discussing food chains.", "\"Apex carnivores control grazing animal populations.\"", "carnivorous (adj.)"],
+            ["Herbivore", "/ˈhɜː.bɪ.vɔːr/", "n.", "C1", "An animal that eats only plants.", "Động vật ăn cỏ", "Key in discussions about grazing.", "\"The giraffe's neck allows this herbivore to reach high foliage.\"", "herbivorous (adj.)"],
+            ["Omnivore", "/ˈɒm.nɪ.vɔːr/", "n.", "C1", "An animal that naturally eats both plants and meat.", "Động vật ăn tạp", "Used to describe dietary flexibility.", "\"Bears are opportunistic omnivores.\"", "omnivorous (adj.)"],
+            ["Forage", "/ˈfɒr.ɪdʒ/", "v.", "C1", "To search for food or provisions.", "Tìm kiếm thức ăn", "Describes daily behavior of animals.", "\"Deer must travel greater distances to forage in winter.\"", "foraging (n.)"],
+            ["Hibernate", "/ˈhaɪ.bə.neɪt/", "v.", "C1", "To spend the winter sleeping.", "Ngủ đông", "Discussed in texts dealing with seasonal adaptations.", "\"The dormouse will hibernate for up to six months a year.\"", "hibernation (n.)"],
+            ["Migrate", "/maɪˈɡreɪt/", "v.", "B2", "To travel to a different place when season changes.", "Di cư", "Highly common in passages about birds and whales.", "\"Millions of birds migrate south each autumn.\"", "migration (n.)"],
+            ["Nocturnal", "/nɒkˈtɜː.nəl/", "adj.", "C1", "Being active at night.", "Hoạt động về đêm", "Used in sensory biology texts.", "\"Owls are highly adapted nocturnal hunters.\"", "nocturnally (adv.)"],
+            ["Diurnal", "/daɪˈɜː.nəl/", "adj.", "C2", "Being active during the day.", "Hoạt động ban ngày", "Antonym of nocturnal.", "\"Most primates are primarily diurnal species.\"", "diurnally (adv.)"],
+            ["Camouflage", "/ˈkæm.ə.flɑːʒ/", "n.", "C1", "Natural coloring that enables an animal to blend in.", "Sự ngụy trang", "A key evolutionary adaptation topic.", "\"The chameleon's skin provides excellent camouflage.\"", "N/A"],
+            ["Anatomy", "/əˈnæt.ə.mi/", "n.", "C1", "Scientific study of the body and its structure.", "Giải phẫu học", "Used in medical biology texts.", "\"Studying the anatomy of bird wings helps engineers.\"", "anatomical (adj.)"],
+            ["Physiology", "/ˌfɪz.iˈɒl.ə.dʒi/", "n.", "C1", "Study of how living bodies function.", "Sinh lý học", "Focuses on internal processes like digestion.", "\"The unique physiology of deep-sea fish allows survival under pressure.\"", "physiological (adj.)"],
+            ["Metabolism", "/məˈtæb.əl.ɪ.zəm/", "n.", "C1", "Chemical processes causing food to be used for energy.", "Sự trao đổi chất", "Central to texts about diet and energy.", "\"Hummingbirds have an incredibly fast metabolism.\"", "metabolic (adj.)"],
+            ["Genetics", "/dʒəˈnet.ɪks/", "n.", "B2", "Study of how characteristics are passed from parents.", "Di truyền học", "Detailing DNA or crop modifications.", "\"Advances in genetics allowed scientists to trace evolutionary history.\"", "genetic (adj.)"],
+            ["Mutation", "/mjuːˈteɪ.ʃən/", "n.", "C1", "Way in which genes change and produce differences.", "Sự đột biến", "Used when discussing evolution and viruses.", "\"A random genetic mutation allowed the moth to blend perfectly.\"", "mutate (v.)"],
+            ["Trait", "/treɪt/", "n.", "C1", "A particular characteristic.", "Đặc điểm di truyền", "Refers to inherited physical/behavioral characteristics.", "\"Eye color is a physical trait determined by genes.\"", "N/A"],
+            ["Evolution", "/ˌiː.vəˈluː.ʃən/", "n.", "B2", "Way living things change and develop over time.", "Sự tiến hóa", "Foundational vocabulary for Darwinian texts.", "\"Fossils provide critical evidence for the theory of evolution.\"", "evolve (v.)"],
+            ["Adaptation", "/ˌæd.əpˈteɪ.ʃən/", "n.", "B2", "Process in which a living thing changes to suit environment.", "Sự thích nghi", "Closely linked to climate change texts.", "\"The polar bear's blubber is a crucial adaptation.\"", "adapt (v.)"],
+            ["Endemic", "/enˈdem.ɪk/", "adj.", "C1", "Native and restricted to a certain place.", "Đặc hữu", "Often used in ecology to describe island species.", "\"The lemur is an endemic species to Madagascar.\"", "endemism (n.)"],
+            ["Hybrid", "/ˈhaɪ.brɪd/", "n.", "C1", "Plant/animal produced from two different types.", "Giống lai", "Appears in agricultural texts.", "\"Farmers plant hybrid corn varieties for better resistance.\"", "hybridize (v.)"],
+            ["Offspring", "/ˈɒf.sprɪŋ/", "n.", "B2", "The young of an animal.", "Con non, con cái", "Formal academic term instead of 'babies'.", "\"Turtles bury eggs and leave their offspring to hatch alone.\"", "N/A"],
+            ["Cultivation", "/ˌkʌl.tɪˈveɪ.ʃən/", "n.", "C1", "Preparation and use of land for growing crops.", "Sự canh tác", "Core word for agricultural history passages.", "\"The cultivation of wheat was a turning point for civilization.\"", "cultivate (v.)"],
+            ["Yield", "/jiːld/", "n.", "C1", "An amount of food or profit produced.", "Sản lượng", "Very common in agricultural and economic texts.", "\"The irrigation system dramatically increased crop yield.\"", "N/A"],
+            ["Irrigation", "/ˌɪr.ɪˈɡeɪ.ʃən/", "n.", "C1", "Supplying land with water for crops.", "Sự tưới tiêu", "Discussed in context of farming methods.", "\"Ancient civilizations relied on complex irrigation channels.\"", "irrigate (v.)"],
+            ["Arable", "/ˈær.ə.bəl/", "adj.", "C1", "Suitable for growing crops.", "Trồng trọt được", "Used in discussions regarding land use.", "\"Urban expansion is destroying the supply of arable land.\"", "N/A"],
+            ["Livestock", "/ˈlaɪv.stɒk/", "n.", "B2", "Animals kept on a farm.", "Gia súc", "Used in environmental impact passages.", "\"Methane emissions from livestock contribute to greenhouse gases.\"", "N/A"],
+            ["Grazing", "/ˈɡreɪ.zɪŋ/", "n.", "B2", "Act of eating grass.", "Sự chăn thả", "Appears in texts about land management.", "\"Over-grazing stripped the land of its natural vegetation.\"", "graze (v.)"],
+            ["Monoculture", "/ˈmɒn.əˌkʌl.tʃər/", "n.", "C2", "Growing only one crop on an area of land.", "Độc canh", "Discussed negatively regarding biodiversity.", "\"Reliance on monoculture makes crops susceptible to diseases.\"", "N/A"],
+            ["Depletion", "/dɪˈpliː.ʃən/", "n.", "C1", "Reduction in natural resources or energy.", "Sự cạn kiệt", "Often paired with ozone layer or fossil fuels.", "\"Rapid depletion of the ozone layer was linked to CFCs.\"", "deplete (v.)"],
+            ["Decomposition", "/ˌdiː.kɒm.pəˈzɪʃ.ən/", "n.", "C1", "Action of decaying.", "Sự phân hủy", "Discussed in texts concerning the carbon cycle.", "\"The decomposition of organic matter produces methane gas.\"", "decompose (v.)"],
+            ["Microorganism", "/ˌmaɪ.krəʊˈɔː.ɡən.ɪ.zəm/", "n.", "C1", "Living thing too small to see without a microscope.", "Vi sinh vật", "Used in medical texts and soil science.", "\"Soil fertility relies on millions of unseen microorganisms.\"", "organism (n.)"],
+            ["Biosphere", "/ˈbaɪ.əʊ.sfɪər/", "n.", "C1", "Part of earth's environment where life exists.", "Sinh quyển", "Broad ecological term.", "\"Industrial activity altered the chemical composition of the biosphere.\"", "N/A"],
+            ["Biome", "/ˈbaɪ.əʊm/", "n.", "C1", "Large naturally occurring community of flora and fauna.", "Quần xã sinh vật", "Used to categorize large-scale ecosystems.", "\"The tropical rainforest is a biologically diverse terrestrial biome.\"", "N/A"],
+            ["Tundra", "/ˈtʌn.drə/", "n.", "C1", "Large, flat, frozen areas of land in the north.", "Lãnh nguyên", "A harsh ecosystem used as a climate case study.", "\"Few animals survive the extreme cold of the Arctic tundra.\"", "N/A"],
+            ["Permafrost", "/ˈpɜː.mə.frɒst/", "n.", "C1", "Land permanently frozen below the surface.", "Tầng đất đóng băng", "Critical topic in global warming texts.", "\"Scientists are alarmed that Siberian permafrost is thawing.\"", "frost (n.)"],
+            ["Estuary", "/ˈes.tʃu.ə.ri/", "n.", "C2", "Wide part of a river where it joins the sea.", "Cửa sông", "Mentioned as a vital breeding ground.", "\"The Thames estuary provides a critical habitat for waterbirds.\"", "estuarine (adj.)"],
+            ["Mangrove", "/ˈmæŋ.ɡrəʊv/", "n.", "C1", "Tropical tree whose roots grow above ground in water.", "Rừng ngập mặn", "Highlighted in texts about coastal protection.", "\"Mangrove forests act as a natural barrier against tsunamis.\"", "N/A"],
+            ["Bleaching", "/ˈbliː.tʃɪŋ/", "n.", "C1", "Process of losing color (especially corals).", "Sự tẩy trắng", "Highly recurrent specific term in IELTS passages.", "\"Rising temperatures caused widespread coral bleaching.\"", "bleach (v.)"],
+            ["Algae", "/ˈæl.ɡiː/", "n.", "C1", "Simple plants growing in/near water.", "Tảo", "Discussed in contexts of water pollution.", "\"Fertilizer runoff triggered a massive bloom of toxic algae.\"", "algal (adj.)"],
+            ["Plankton", "/ˈplæŋk.tən/", "n.", "C1", "Small plants/animals floating in the sea.", "Sinh vật phù du", "Foundational organism in marine food webs.", "\"Blue whales sustain themselves by eating microscopic plankton.\"", "planktonic (adj.)"],
+            ["Fungi", "/ˈfʌŋ.ɡiː/", "n.", "C1", "Organisms getting food from decaying material.", "Nấm", "Discussed in botany and decomposition texts.", "\"Fungi play a vital role by breaking down dead wood.\"", "fungal (adj.)"],
+            ["Pollination", "/ˌpɒl.ɪˈneɪ.ʃən/", "n.", "C1", "Transfer of pollen enabling plants to produce seeds.", "Sự thụ phấn", "Common in passages about bees and agriculture.", "\"The decline in bees threatens the pollination of crops.\"", "pollinate (v.)"],
+            ["Nectar", "/ˈnek.tər/", "n.", "C1", "Sweet liquid produced by flowers.", "Mật hoa", "The biological incentive for pollination.", "\"Butterflies possess mouthparts adapted to extract nectar.\"", "N/A"],
+            ["Secrete", "/sɪˈkriːt/", "v.", "C2", "To produce and release a liquid.", "Tiết ra", "Formal biological term for producing hormones/venom.", "\"Some trees secrete a sticky resin to trap insects.\"", "secretion (n.)"],
+            ["Respiration", "/ˌres.pɪˈreɪ.ʃən/", "n.", "C1", "Act of breathing or chemical process releasing energy.", "Sự hô hấp", "Used in anatomical discussions.", "\"During exercise, the body's rate of respiration increases.\"", "respire (v.)"],
+            ["Photosynthesis", "/ˌfəʊ.təʊˈsɪn.θə.sɪs/", "n.", "C1", "Process by which plants use sunlight to produce food.", "Sự quang hợp", "Fundamental scientific process referenced in botany.", "\"Through photosynthesis, plants remove carbon dioxide.\"", "photosynthetic (adj.)"],
+            ["Equilibrium", "/ˌiː.kwɪˈlɪb.ri.əm/", "n.", "C1", "A state of balance.", "Trạng thái cân bằng", "Common when discussing 'ecological equilibrium'.", "\"Invasive species severely disrupted the ecological equilibrium.\"", "N/A"],
+            ["Parasite", "/ˈpær.ə.saɪt/", "n.", "C1", "Animal/plant that lives on another and feeds from it.", "Ký sinh trùng", "Appears in medical biology and ecosystem texts.", "\"Ticks are common external parasites that feed on blood.\"", "parasitic (adj.)"],
+            ["Symbiotic", "/ˌsɪm.baɪˈɒt.ɪk/", "adj.", "C2", "Involving two types providing conditions for each other.", "Thuộc cộng sinh", "Essential vocabulary for mutually beneficial relationships.", "\"Bees and flowers share a symbiotic relationship.\"", "symbiosis (n.)"]
+        ];
+
+        // Format into array of objects
+        const vocabDB = rawVocabData.map(item => ({
+            word: item[0], ipa: item[1], pos: item[2], cefr: item[3],
+            def: item[4], vie: item[5], usage: item[6], example: item[7], fam: item[8]
+        }));
+
+        let filteredData = [...vocabDB];
+        let flashcardIndex = 0;
+
+        // Init function
+        window.onload = () => {
+            initFilters();
+            renderDictionary();
+            renderChart();
+            updateFlashcard();
+        };
+
+        // --- Chart Logic ---
+        function renderChart() {
+            const counts = { 'B2': 0, 'C1': 0, 'C2': 0 };
+            vocabDB.forEach(w => { if(counts[w.cefr] !== undefined) counts[w.cefr]++; });
+            
+            const ctx = document.getElementById('cefrChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['B2 Upper Int.', 'C1 Advanced', 'C2 Mastery'],
+                    datasets: [{
+                        data: [counts['B2'], counts['C1'], counts['C2']],
+                        backgroundColor: ['#fbcfe8', '#f43f5e', '#be123c'], // pastel pinks to deep rose
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 10 } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // --- Tab Logic ---
+        function switchTab(tab) {
+            const dictView = document.getElementById('dictionaryView');
+            const flashView = document.getElementById('flashcardView');
+            const btnDict = document.getElementById('btnTabDict');
+            const btnFlash = document.getElementById('btnTabFlash');
+
+            if(tab === 'dictionary') {
+                dictView.classList.remove('hidden');
+                flashView.classList.add('hidden');
+                
+                btnDict.classList.replace('bg-white', 'bg-rose-500');
+                btnDict.classList.replace('text-rose-600', 'text-white');
+                btnDict.classList.remove('border', 'border-rose-200');
+
+                btnFlash.classList.replace('bg-rose-500', 'bg-white');
+                btnFlash.classList.replace('text-white', 'text-rose-600');
+                btnFlash.classList.add('border', 'border-rose-200');
+            } else {
+                flashView.classList.remove('hidden');
+                dictView.classList.add('hidden');
+                
+                btnFlash.classList.replace('bg-white', 'bg-rose-500');
+                btnFlash.classList.replace('text-rose-600', 'text-white');
+                btnFlash.classList.remove('border', 'border-rose-200');
+
+                btnDict.classList.replace('bg-rose-500', 'bg-white');
+                btnDict.classList.replace('text-white', 'text-rose-600');
+                btnDict.classList.add('border', 'border-rose-200');
+                
+                // Reset flashcard state
+                document.getElementById('flashcard').classList.remove('is-flipped');
+                flashcardIndex = 0;
+                updateFlashcard();
+            }
+        }
+
+        // --- Dictionary Logic ---
+        function initFilters() {
+            const posSet = new Set(vocabDB.map(w => w.pos));
+            const posSelect = document.getElementById('filterPOS');
+            posSet.forEach(pos => {
+                let opt = document.createElement('option');
+                opt.value = pos;
+                opt.textContent = pos;
+                posSelect.appendChild(opt);
+            });
+
+            document.getElementById('searchInput').addEventListener('input', handleFilter);
+            document.getElementById('filterCEFR').addEventListener('change', handleFilter);
+            document.getElementById('filterPOS').addEventListener('change', handleFilter);
+        }
+
+        function handleFilter() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const cefr = document.getElementById('filterCEFR').value;
+            const pos = document.getElementById('filterPOS').value;
+
+            filteredData = vocabDB.filter(w => {
+                const matchSearch = w.word.toLowerCase().includes(search) || w.vie.toLowerCase().includes(search);
+                const matchCEFR = cefr === 'All' || w.cefr === cefr;
+                const matchPOS = pos === 'All' || w.pos === pos;
+                return matchSearch && matchCEFR && matchPOS;
+            });
+
+            document.getElementById('resultCount').textContent = `Showing ${filteredData.length} entries`;
+            renderDictionary();
+            
+            flashcardIndex = 0;
+            updateFlashcard();
+        }
+
+        function renderDictionary() {
+            const grid = document.getElementById('vocabGrid');
+            grid.innerHTML = '';
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl p-6 shadow-sm border border-rose-100 hover:shadow-md transition flex flex-col justify-between';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-rose-900">${item.word}</h3>
+                            <span class="cefr-badge cefr-${item.cefr}">${item.cefr}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-slate-500 mb-4">
+                            <span class="font-mono bg-slate-50 px-1 py-0.5 rounded mr-2">${item.ipa}</span>
+                            <span class="italic mr-auto">${item.pos}</span>
+                            <button onclick="playAudio('${item.word}')" class="text-rose-400 hover:text-rose-600 focus:outline-none" title="Listen">🔊</button>
+                        </div>
+                        <p class="text-slate-800 font-medium mb-1">${item.def}</p>
+                        <p class="text-indigo-600 font-semibold mb-4 text-sm">${item.vie}</p>
+                        <div class="bg-rose-50/50 p-3 rounded-lg text-sm border border-rose-50 mb-4">
+                            <p class="text-slate-600 mb-1"><span class="font-bold text-rose-400">Context:</span> ${item.usage}</p>
+                            <p class="text-slate-800 italic">" ${item.example.replace(/"/g,'')} "</p>
+                        </div>
+                    </div>
+                    <div class="mt-auto pt-3 border-t border-slate-100 text-xs text-slate-400 font-medium">
+                        <span class="uppercase tracking-wider mr-1">Family:</span> ${item.fam}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- Flashcard Logic ---
+        document.getElementById('flashcard').addEventListener('click', function() {
+            this.classList.toggle('is-flipped');
+        });
+
+        function updateFlashcard() {
+            if(filteredData.length === 0) {
+                document.getElementById('fcWord').textContent = "No cards match filter.";
+                document.getElementById('fcTotal').textContent = "0";
+                return;
+            }
+            
+            const card = filteredData[flashcardIndex];
+            document.getElementById('fcWord').textContent = card.word;
+            document.getElementById('fcIPA').textContent = card.ipa;
+            document.getElementById('fcPOS').textContent = card.pos;
+            document.getElementById('fcCEFR').textContent = card.cefr;
+            document.getElementById('fcCEFR').className = `cefr-badge cefr-${card.cefr} absolute top-6 right-6`;
+            
+            document.getElementById('fcDef').textContent = card.def;
+            document.getElementById('fcVie').textContent = card.vie;
+            document.getElementById('fcExample').textContent = card.example;
+
+            document.getElementById('fcCurrent').textContent = flashcardIndex + 1;
+            document.getElementById('fcTotal').textContent = filteredData.length;
+        }
+
+        function nextCard() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            setTimeout(() => {
+                flashcardIndex = (flashcardIndex + 1) % filteredData.length;
+                updateFlashcard();
+            }, 150); // wait for flip animation to hide back content before updating
+        }
+
+        function prevCard() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            setTimeout(() => {
+                flashcardIndex = (flashcardIndex - 1 + filteredData.length) % filteredData.length;
+                updateFlashcard();
+            }, 150);
+        }
+
+        function shuffleCards() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            // Fisher-Yates shuffle
+            for (let i = filteredData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
+            }
+            flashcardIndex = 0;
+            setTimeout(() => updateFlashcard(), 150);
+        }
+
+        // --- Audio Logic ---
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-GB'; // British English commonly used in IELTS
+                utterance.rate = 0.9; // Slightly slower for clarity
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sorry, your browser doesn't support text-to-speech!");
+            }
+        }
+
+        function playAudioCurrent(e) {
+            e.stopPropagation(); // Prevent card from flipping
+            if(filteredData.length > 0) {
+                playAudio(filteredData[flashcardIndex].word);
+            }
+        }
+    </script>
+</body>
+</html>

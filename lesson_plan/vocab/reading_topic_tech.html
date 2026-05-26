@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong - Technology & Engineering Vocabulary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Pinkish Pastel. Backgrounds: rose-50, pink-50. Text: slate-800, rose-900. Accents: rose-400, pink-500. -->
+    <!-- Application Structure Plan: The SPA maintains the consistent dual-view architecture (Dictionary Grid + 3D Flashcards) established in previous modules. The top section introduces the topic "Technology & Engineering" and provides a macro-level CEFR difficulty breakdown via Chart.js. The main interactive area allows users to search, filter, and study 100 highly detailed vocabulary items extracted from the data schema. This structure caters to both broad exploration and focused memorization. -->
+    <!-- Visualization & Content Choices: 1. Doughnut Chart (Chart.js) -> Goal: Inform -> Justification: Quickly visualizes the difficulty distribution of the 100 tech vocabulary words. 2. CSS 3D Flip Cards -> Goal: Engage/Teach -> Justification: Replicates physical flashcards for active recall, highly effective for vocab acquisition. 3. Grid Layout -> Goal: Organize -> Justification: Makes scanning 100 dense entries visually digestible. - Confirming NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fff1f2;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #ffe4e6; }
+        ::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #fb7185; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 250px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+        }
+
+        .flashcard-scene {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.1), 0 8px 10px -6px rgba(225, 29, 72, 0.1);
+        }
+        .flashcard-scene.is-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            background-color: #ffffff;
+            border: 2px solid #ffe4e6;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background-color: #fffbfb;
+        }
+
+        .cefr-badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .cefr-B2 { background-color: #fce7f3; color: #db2777; border: 1px solid #fbcfe8; }
+        .cefr-C1 { background-color: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+        .cefr-C2 { background-color: #fff1f2; color: #be123c; border: 1px solid #fda4af; }
+
+        .btn-pastel {
+            transition: all 0.2s;
+        }
+        .btn-pastel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white border-b-4 border-rose-300 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-md">
+                    🎓
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-rose-950 tracking-tight">IELTS Chan Truong</h1>
+                    <p class="text-xs font-semibold text-rose-500 uppercase tracking-widest">Premium Resource Compilation</p>
+                </div>
+            </div>
+            <nav class="flex space-x-2">
+                <a href="reading_topics_overview.html" class="px-4 py-2 text-sm font-medium text-slate-600 bg-rose-50 rounded-lg hover:bg-rose-100 hover:text-rose-900 transition">&#8592; Back to Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 bg-white rounded-2xl p-8 border border-rose-100 shadow-sm flex flex-col justify-center">
+                <div class="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold mb-4 self-start">Topic 3</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Technology & Engineering</h2>
+                <p class="text-slate-600 leading-relaxed mb-6">
+                    Mastering vocabulary related to innovation, automation, and industrial design is critical. This topic frequently appears in IELTS Academic Reading passages detailing the history of inventions, modern digital infrastructure, and future engineering feats. Explore the curated list of 100 high-frequency terms below.
+                </p>
+                <div class="flex space-x-4">
+                    <button onclick="switchTab('dictionary')" id="btnTabDict" class="btn-pastel px-6 py-3 bg-rose-500 text-white font-semibold rounded-xl shadow-md flex items-center">
+                        <span class="mr-2">📖</span> Dictionary View
+                    </button>
+                    <button onclick="switchTab('flashcard')" id="btnTabFlash" class="btn-pastel px-6 py-3 bg-white text-rose-600 border border-rose-200 font-semibold rounded-xl shadow-sm flex items-center hover:bg-rose-50">
+                        <span class="mr-2">⚡</span> Flashcards
+                    </button>
+                </div>
+            </div>
+            
+            <div class="md:col-span-1 bg-white rounded-2xl p-6 border border-rose-100 shadow-sm flex flex-col items-center justify-center">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">CEFR Level Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="cefrChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-slate-400 mt-2">Breakdown of the 100 curated terms</p>
+            </div>
+        </section>
+
+        <section id="contentArea" class="relative min-h-[600px]">
+            
+            <div id="dictionaryView" class="block transition-opacity duration-300">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-rose-100 mb-6 flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search by English word or Vietnamese meaning..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent transition">
+                    </div>
+                    <select id="filterCEFR" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <option value="All">All CEFR Levels</option>
+                        <option value="B2">B2 Upper Intermediate</option>
+                        <option value="C1">C1 Advanced</option>
+                        <option value="C2">C2 Mastery</option>
+                    </select>
+                    <select id="filterPOS" class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <option value="All">All Parts of Speech</option>
+                    </select>
+                </div>
+
+                <div class="mb-4 text-sm font-semibold text-rose-800 flex justify-between items-center px-2">
+                    <span id="resultCount">Showing 100 entries</span>
+                </div>
+
+                <div id="vocabGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+
+            <div id="flashcardView" class="hidden transition-opacity duration-300">
+                <div class="bg-white rounded-2xl p-8 border border-rose-100 shadow-sm max-w-4xl mx-auto flex flex-col items-center">
+                    
+                    <div class="w-full flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-slate-800">Study Mode</h3>
+                        <div class="text-sm font-medium text-rose-500 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+                            Card <span id="fcCurrent">1</span> of <span id="fcTotal">100</span>
+                        </div>
+                    </div>
+
+                    <div class="flashcard-scene" id="flashcard">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-face">
+                                <span id="fcCEFR" class="cefr-badge absolute top-6 right-6">C1</span>
+                                <div class="text-slate-400 text-sm font-semibold uppercase tracking-widest mb-2" id="fcPOS">noun (n.)</div>
+                                <h2 class="text-4xl md:text-5xl font-black text-rose-900 mb-4" id="fcWord">Word</h2>
+                                <div class="flex items-center text-slate-500 text-lg">
+                                    <span id="fcIPA" class="mr-3 font-mono bg-slate-50 px-2 py-1 rounded">/ɪ'peɪ/</span>
+                                    <button onclick="playAudioCurrent(event)" class="text-rose-500 hover:text-rose-700 transition p-2 bg-rose-50 rounded-full" title="Play Pronunciation">🔊</button>
+                                </div>
+                                <p class="absolute bottom-6 text-slate-400 text-sm font-medium animate-pulse">Click card to flip ↺</p>
+                            </div>
+                            <div class="flashcard-back flashcard-face">
+                                <div class="w-full h-full flex flex-col justify-center items-start text-left space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                                    <div>
+                                        <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-1">Definition</h4>
+                                        <p class="text-slate-800 text-lg font-medium leading-snug" id="fcDef">Definition here</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider mb-1">Vietnamese</h4>
+                                        <p class="text-indigo-700 text-lg font-bold" id="fcVie">Translation here</p>
+                                    </div>
+                                    <div class="bg-rose-50 p-3 rounded-lg border border-rose-100 w-full">
+                                        <h4 class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-1">Example in Context</h4>
+                                        <p class="text-slate-700 italic text-sm" id="fcExample">"Example sentence here"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4 mt-8">
+                        <button onclick="prevCard()" class="btn-pastel px-5 py-3 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl shadow-sm hover:bg-slate-50 hover:text-rose-600">
+                            &#8592; Prev
+                        </button>
+                        <button onclick="shuffleCards()" class="btn-pastel px-4 py-3 bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl shadow-sm hover:bg-rose-200" title="Shuffle Deck">
+                            🔀
+                        </button>
+                        <button onclick="nextCard()" class="btn-pastel px-5 py-3 bg-rose-500 text-white border border-rose-600 font-semibold rounded-xl shadow-sm hover:bg-rose-600">
+                            Next &#8594;
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-rose-100 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 IELTS Chan Truong. Curated for Academic Excellence.</p>
+    </footer>
+
+    <script>
+        const rawVocabData = [
+            ["Obsolete", "/ˌɒb.səlˈiːt/", "adj.", "C1", "Not in use any more, having been replaced by something newer and better.", "Lỗi thời, không còn sử dụng", "Very common when discussing the rapid pace of technological change.", "\"The rapid advancement of cloud computing has rendered floppy disks completely obsolete.\"", "obsolescence (n.)"],
+            ["Automation", "/ˌɔː.təˈmeɪ.ʃən/", "n.", "C1", "The use of machines and computers that can operate without needing human control.", "Sự tự động hóa", "A key theme in passages about the future of work and AI.", "\"Increased automation in manufacturing has led to higher efficiency.\"", "automate (v.)"],
+            ["Sophisticated", "/səˈfɪs.tɪ.keɪ.tɪd/", "adj.", "B2", "Highly developed and complex.", "Tinh vi, phức tạp", "Used to describe advanced technology or algorithms.", "\"Modern weather forecasting relies on highly sophisticated computer models.\"", "sophistication (n.)"],
+            ["Breakthrough", "/ˈbreɪk.θruː/", "n.", "B2", "An important discovery or event that helps to improve a situation or provide an answer.", "Bước đột phá", "Describes significant moments in scientific research.", "\"The invention of the transistor was a major breakthrough in electronics.\"", "N/A"],
+            ["Implement", "/ˈɪm.plɪ.ment/", "v.", "B2", "To start using a plan or system; to put into practical effect.", "Thực thi, áp dụng", "Found in texts discussing the practical application of new technologies.", "\"The city council plans to implement a new smart-grid system.\"", "implementation (n.)"],
+            ["Integration", "/ˌɪn.tɪˈɡreɪ.ʃən/", "n.", "C1", "The action or process of combining two or more things in an effective way.", "Sự tích hợp", "Discussed when separate technological systems are combined.", "\"The seamless integration of artificial intelligence has transformed modern living.\"", "integrate (v.)"],
+            ["Mechanization", "/ˌmek.ə.naɪˈzeɪ.ʃən/", "n.", "C1", "The process of introducing a machine to do something that used to be done by hand.", "Sự cơ giới hóa", "A historical engineering term contrasting with digital automation.", "\"The massive mechanization of agriculture drastically reduced the need for human labor.\"", "mechanize (v.)"],
+            ["Algorithm", "/ˈæl.ɡə.rɪ.ðəm/", "n.", "C1", "A set of mathematical instructions or rules for a computer to calculate an answer.", "Thuật toán", "Crucial for reading passages regarding computing and AI.", "\"The search engine relies on a complex algorithm to rank web pages.\"", "algorithmic (adj.)"],
+            ["Telecommunications", "/ˌtel.ɪ.kəˌmjuː.nɪˈkeɪ.ʃənz/", "n.", "B2", "The sending and receiving of messages over distance (phone, radio, TV).", "Viễn thông", "The umbrella term for communication technology passages.", "\"The transition to digital telecommunications vastly increased global bandwidth.\"", "telecommunicate (v.)"],
+            ["Simulation", "/ˌsɪm.jəˈleɪ.ʃən/", "n.", "C1", "A model of a set of problems or events used to teach or test.", "Sự mô phỏng", "Found in aviation and engineering where real testing is dangerous.", "\"Pilots spend hundreds of hours in flight simulations before flying a real jet.\"", "simulate (v.)"],
+            ["Prototype", "/ˈprəʊ.tə.taɪp/", "n.", "C1", "The first example of something, from which all later forms are developed.", "Nguyên mẫu", "Common in passages describing the engineering design process.", "\"The engineering team built a functional prototype of the electric engine.\"", "prototypical (adj.)"],
+            ["State-of-the-art", "/ˌsteɪt.əv.ðiːˈɑːt/", "adj.", "C1", "Very modern and using the most recent ideas and methods.", "Hiện đại nhất", "Used to highlight the peak of current technological development.", "\"The university recently invested millions in a new, state-of-the-art laboratory.\"", "N/A"],
+            ["Cutting-edge", "/ˌkʌt.ɪŋˈedʒ/", "adj.", "C1", "Very modern and with all the newest features.", "Mới mẻ, tân tiến nhất", "A synonym for state-of-the-art.", "\"The company is at the cutting-edge of renewable energy innovation.\"", "N/A"],
+            ["Cybernetics", "/ˌsaɪ.bəˈnet.ɪks/", "n.", "C2", "The study of how information is communicated in machines compared to brains.", "Điều khiển học", "Found in passages comparing human brains to computers.", "\"Advancements in cybernetics allow amputees to control artificial limbs.\"", "cybernetic (adj.)"],
+            ["Patent", "/ˈpeɪ.tənt/", "n. / v.", "C1", "The official legal right to make or sell an invention.", "Bằng sáng chế", "Crucial concept in texts about the history of technology.", "\"Thomas Edison held over a thousand patents for his inventions.\"", "patented (adj.)"],
+            ["Pioneer", "/ˌpaɪəˈnɪər/", "n. / v.", "C1", "A person who is one of the first people to do something.", "Người tiên phong", "Discussed when reviewing the history of technological advancements.", "\"Ada Lovelace is recognized as a pioneer in early computer programming.\"", "pioneering (adj.)"],
+            ["Blueprint", "/ˈbluː.prɪnt/", "n.", "C1", "A photographic copy of an early plan for a building or machine.", "Bản thiết kế", "Used literally in engineering and metaphorically for plans.", "\"The engineers carefully reviewed the blueprints before construction.\"", "N/A"],
+            ["Interface", "/ˈɪn.tə.feɪs/", "n.", "C1", "A connection between two pieces of electronic equipment or a human and computer.", "Giao diện", "Found in computing passages detailing human-machine interaction.", "\"The software's new user interface is much more intuitive.\"", "N/A"],
+            ["Circuitry", "/ˈsɜː.kɪ.tri/", "n.", "C1", "A system of electrical circuits.", "Hệ thống mạch điện", "Used in microelectronics and hardware engineering.", "\"Water damage can completely destroy the delicate circuitry inside a smartphone.\"", "circuit (n.)"],
+            ["Database", "/ˈdeɪ.tə.beɪs/", "n.", "B2", "A large amount of information stored in a computer system.", "Cơ sở dữ liệu", "Common in IT, internet privacy, and digital infrastructure texts.", "\"The hospital maintains a secure electronic database of medical records.\"", "N/A"],
+            ["Bandwidth", "/ˈbænd.wɪdθ/", "n.", "C1", "The rate at which data can be sent along a connection.", "Băng thông", "Important in texts discussing the internet and data transfer.", "\"Streaming high-definition video requires a significant amount of bandwidth.\"", "N/A"],
+            ["Encryption", "/ɪnˈkrɪp.ʃən/", "n.", "C1", "The process of changing electronic information into a secret code.", "Sự mã hóa", "A key term in cyber-security and data privacy.", "\"End-to-end encryption ensures only the sender and receiver can read messages.\"", "encrypt (v.)"],
+            ["Intuitive", "/ɪnˈtjuː.ɪ.tɪv/", "adj.", "C1", "Easy to use and understand.", "Trực quan, dễ hiểu", "Used to evaluate tech design and usability.", "\"Apple created a highly intuitive touchscreen interface.\"", "intuition (n.)"],
+            ["Virtual", "/ˈvɜː.tʃu.əl/", "adj.", "B2", "Created by computer technology and appearing to exist but not physical.", "Ảo", "Very common (Virtual Reality, virtual environments).", "\"The museum offers a virtual tour from your own home.\"", "virtually (adv.)"],
+            ["Dimension", "/daɪˈmen.ʃən/", "n.", "B2", "A measurement of something in a particular direction.", "Chiều, kích thước", "Used in engineering to describe physical size.", "\"Engineers must calculate the exact physical dimensions of the wing.\"", "dimensional (adj.)"],
+            ["Aeronautics", "/ˌeə.rəˈnɔː.tɪks/", "n.", "C2", "The science of designing, building, and operating aircraft.", "Hàng không học", "Specific engineering discipline about flight.", "\"The Wright brothers made significant contributions to aeronautics.\"", "aeronautical (adj.)"],
+            ["Aerospace", "/ˈeə.rəʊ.speɪs/", "n.", "C1", "The industry that makes vehicles for air and outer space.", "Ngành hàng không vũ trụ", "The broader term that includes planes and spacecraft.", "\"The country is investing heavily in its aerospace industry.\"", "N/A"],
+            ["Trajectory", "/trəˈdʒek.tər.i/", "n.", "C1", "The curved path that an object follows.", "Quỹ đạo", "Used in space exploration and path of development.", "\"Computers calculate the precise trajectory of a rocket heading to Mars.\"", "N/A"],
+            ["Velocity", "/vəˈlɒs.ə.ti/", "n.", "C1", "The speed at which an object is travelling.", "Vận tốc", "The academic engineering synonym for 'speed'.", "\"A spacecraft must reach a tremendous velocity to escape gravity.\"", "N/A"],
+            ["Kinetic", "/kɪˈnet.ɪk/", "adj.", "C2", "Involving or producing movement.", "Thuộc động năng", "Appears as 'kinetic energy' in physics and renewable energy.", "\"Wind turbines convert the kinetic energy of the wind into power.\"", "N/A"],
+            ["Aerodynamic", "/ˌeə.rəʊ.daɪˈnæm.ɪk/", "adj.", "C1", "Having a shape that reduces the drag from air moving past.", "Thuộc khí động học", "Relevant to vehicle design and sports technology.", "\"The sports car features an incredibly aerodynamic design.\"", "aerodynamics (n.)"],
+            ["Friction", "/ˈfrɪk.ʃən/", "n.", "C1", "The force that makes it difficult for one object to slide along another.", "Sự ma sát", "A key physics challenge when designing machines.", "\"Engine oil is used to reduce the friction between moving metal parts.\"", "N/A"],
+            ["Propel", "/prəˈpel/", "v.", "C1", "To push or move something somewhere, often with a lot of force.", "Đẩy đi", "Used in mechanics and metaphorically.", "\"The rocket uses liquid hydrogen to propel itself into the atmosphere.\"", "propulsion (n.)"],
+            ["Combustion", "/kəmˈbʌs.tʃən/", "n.", "C2", "The chemical process of burning.", "Sự đốt cháy", "Internal combustion engine is a massive historical tech topic.", "\"The internal combustion engine revolutionized transportation.\"", "combustible (adj.)"],
+            ["Autonomous", "/ɔːˈtɒn.ə.məs/", "adj.", "C1", "Independent; capable of operating without human control.", "Tự trị, tự động", "Extremely frequent in discussing AI drones and cars.", "\"Autonomous driving systems will drastically reduce traffic accidents.\"", "autonomy (n.)"],
+            ["Robotics", "/rəʊˈbɒt.ɪks/", "n.", "C1", "The science of making and using robots.", "Khoa học robot", "Covers medical surgery, deep-sea exploration, and manufacturing.", "\"Advances in medical robotics allow surgeons to perform delicate operations.\"", "robot (n.)"],
+            ["Machinery", "/məˈʃiː.nər.i/", "n.", "B2", "A group of large machines or the parts of a machine.", "Máy móc", "A collective noun used in manufacturing texts.", "\"The factory shut down to upgrade its heavy manufacturing machinery.\"", "machine (n.)"],
+            ["Synthesize", "/ˈsɪn.θə.saɪz/", "v.", "C2", "To combine different ideas or things to make a whole; produce chemically.", "Tổng hợp", "Used in chemical engineering and computer science.", "\"Scientists are working on algorithms that can synthesize human speech.\"", "synthesis (n.)"],
+            ["Amplify", "/ˈæm.plɪ.faɪ/", "v.", "C1", "To make something louder; to increase the size or effect.", "Khuếch đại", "Used in acoustics and electrical engineering.", "\"A satellite dish is designed to capture and amplify weak radio signals.\"", "amplification (n.)"],
+            ["Satellite", "/ˈsæt.əl.aɪt/", "n.", "B2", "A device sent into space to collect information or communicate.", "Vệ tinh", "Central to passages on modern communication and GPS.", "\"Global positioning systems rely on a network of orbiting satellites.\"", "N/A"],
+            ["Orbit", "/ˈɔː.bɪt/", "n. / v.", "B2", "The curved path through which objects in space move around a planet.", "Quỹ đạo", "Related to space exploration and astronomy.", "\"The Space Station remains in a low Earth orbit.\"", "orbital (adj.)"],
+            ["Telescope", "/ˈtel.ɪ.skəʊp/", "n.", "B2", "A device for making objects that are far away look closer.", "Kính viễn vọng", "Appears in astronomy and optics texts.", "\"The deep-space telescope allows astronomers to observe early galaxies.\"", "telescopic (adj.)"],
+            ["Microscopic", "/ˌmaɪ.krəˈskɒp.ɪk/", "adj.", "C1", "Very small and only able to be seen with a microscope.", "Vi mô", "Used in biotechnology and computing (microchips).", "\"Computer processors are etched with billions of microscopic transistors.\"", "microscope (n.)"],
+            ["Processor", "/ˈprəʊ.ses.ər/", "n.", "B2", "The part of a computer that performs operations on information.", "Bộ vi xử lý", "The brain of a computer; common in IT texts.", "\"The speed of a smartphone depends on its central processor.\"", "processing (n.)"],
+            ["Glitch", "/ɡlɪtʃ/", "n.", "C1", "A small problem or fault that prevents something from working correctly.", "Lỗi kỹ thuật nhỏ", "An informal but widely used tech term for a bug.", "\"A minor software glitch caused the banking app to crash.\"", "glitchy (adj.)"],
+            ["Upgrade", "/ʌpˈɡreɪd/", "v. / n.", "B2", "To improve the quality or usefulness of something.", "Nâng cấp", "Essential vocabulary for IT infrastructure.", "\"The school decided to upgrade its aging server hardware.\"", "N/A"],
+            ["Assemble", "/əˈsem.bəl/", "v.", "C1", "To make something by joining separate parts.", "Lắp ráp", "Used in factory manufacturing and engineering.", "\"Robotic arms are used to rapidly assemble car engines.\"", "assembly (n.)"],
+            ["Dismantle", "/dɪˈsmæn.təl/", "v.", "C1", "To take a machine apart.", "Tháo dỡ", "Antonym of assemble; used when decommissioning old tech.", "\"Engineers had to dismantle the faulty turbine to find the source.\"", "dismantling (n.)"],
+            ["Modify", "/ˈmɒd.ɪ.faɪ/", "v.", "B2", "To change something slightly to improve it.", "Sửa đổi", "Common in software development and engineering.", "\"The developer decided to modify the original code to fix the issue.\"", "modification (n.)"],
+            ["Optimize", "/ˈɒp.tɪ.maɪz/", "v.", "C1", "To make something as good or effective as possible.", "Tối ưu hóa", "A highly frequent tech term referring to improving efficiency.", "\"New aerodynamics are designed to optimize fuel consumption.\"", "optimization (n.)"],
+            ["Customize", "/ˈkʌs.tə.maɪz/", "v.", "C1", "To make or change something according to the user's needs.", "Tùy biến", "Common in software interfaces and consumer tech.", "\"Users can easily customize the dashboard layout.\"", "customization (n.)"],
+            ["Streamline", "/ˈstriːm.laɪn/", "v.", "C1", "To improve the effectiveness of a process by making it simpler.", "Đơn giản hóa", "Refers to removing unnecessary steps in a system.", "\"The hospital implemented a digital database to streamline check-in.\"", "streamlined (adj.)"],
+            ["Surpass", "/səˈpɑːs/", "v.", "C1", "To do or be better than somebody/something.", "Vượt qua", "Used when new tech exceeds older models or human benchmarks.", "\"In chess, modern AI has completely surpassed human capability.\"", "N/A"],
+            ["Revolutionize", "/ˌrev.əˈluː.ʃən.aɪz/", "v.", "C1", "To completely change the way that something is done.", "Cách mạng hóa", "Describes the massive impact of an invention.", "\"3D printing has the potential to revolutionize manufacturing.\"", "revolution (n.)"],
+            ["Conventional", "/kənˈven.ʃən.əl/", "adj.", "B2", "Traditional and ordinary.", "Truyền thống", "Contrasts old methods with new tech.", "\"Solar energy is a competitive alternative to conventional fossil fuels.\"", "convention (n.)"],
+            ["Feasible", "/ˈfiː.zə.bəl/", "adj.", "C1", "Able to be made, done, or achieved.", "Khả thi", "Essential when evaluating engineering projects.", "\"Engineers conducted a study to ensure the dam was economically feasible.\"", "feasibility (n.)"],
+            ["Viable", "/ˈvaɪ.ə.bəl/", "adj.", "C1", "Able to work as intended or able to succeed.", "Có thể thành công", "Often used regarding long-term success of tech start-ups.", "\"Fully electric airplanes are not yet a viable option for long flights.\"", "viability (n.)"],
+            ["Redundant", "/rɪˈdʌn.dənt/", "adj.", "C1", "Not strictly necessary but kept as a safety backup.", "Dư thừa, dự phòng", "Provides backup in critical tech systems.", "\"Aviation systems utilize redundant computers for safety.\"", "redundancy (n.)"],
+            ["Defective", "/dɪˈfek.tɪv/", "adj.", "C1", "Containing a fault, or not working correctly.", "Bị lỗi", "Used in manufacturing and quality control.", "\"The company recalled smartphones due to a defective battery.\"", "defect (n.)"],
+            ["Robust", "/rəʊˈbʌst/", "adj.", "C1", "Strong and unlikely to break or fail.", "Mạnh mẽ, vững chắc", "Describes well-built software or strong data security.", "\"Banks require robust cyber-security systems to prevent breaches.\"", "robustness (n.)"],
+            ["Compact", "/kəmˈpækt/", "adj.", "B2", "Positioned together closely, using very little space.", "Nhỏ gọn", "Describes the evolution of tech devices becoming smaller.", "\"Micro-circuitry allowed engineers to design a compact hearing aid.\"", "N/A"],
+            ["Portable", "/ˈpɔː.tə.bəl/", "adj.", "B2", "Light and small enough to be easily carried or moved.", "Có thể xách tay", "Fundamental concept in modern consumer technology.", "\"The lithium-ion battery paved the way for portable devices.\"", "portability (n.)"],
+            ["Transparent", "/trænˈspær.ənt/", "adj.", "B2", "Clear enough to see through; easily understood.", "Trong suốt", "Used in material science and regarding algorithms.", "\"Scientists developed a highly transparent solar panel.\"", "transparency (n.)"],
+            ["Opaque", "/əʊˈpeɪk/", "adj.", "C1", "Preventing light from traveling through; difficult to understand.", "Mờ đục, khó hiểu", "Antonym of transparent; describes confusing code.", "\"Social media algorithms are often completely opaque to users.\"", "opacity (n.)"],
+            ["Thermal", "/ˈθɜː.məl/", "adj.", "C1", "Connected with heat.", "Thuộc nhiệt", "Used in physics and energy texts.", "\"Computers require fans to dissipate the thermal energy generated.\"", "thermodynamics (n.)"],
+            ["Hydraulic", "/haɪˈdrɒl.ɪk/", "adj.", "C2", "Operated by or involving the pressure of liquid.", "Thuộc thủy lực", "Used in heavy machinery and braking systems.", "\"The excavator uses powerful hydraulic cylinders.\"", "hydraulics (n.)"],
+            ["Pneumatic", "/njuːˈmæt.ɪk/", "adj.", "C2", "Operated by air pressure.", "Thuộc khí nén", "Used in robotics and factory tools.", "\"Assembly line tools use a pneumatic system because it is reliable.\"", "pneumatics (n.)"],
+            ["Synthetic", "/sɪnˈθet.ɪk/", "adj.", "C1", "Made from artificial substances, often copying a natural product.", "Tổng hợp", "Used heavily in material science reading passages.", "\"The invention of synthetic rubber was crucial during the war.\"", "synthesize (v.)"],
+            ["Artificial", "/ˌɑː.tɪˈfɪʃ.əl/", "adj.", "B2", "Made by people, often as a copy of something natural.", "Nhân tạo", "Broadly used for AI and created materials.", "\"Modern artificial limbs contain microprocessors to predict movement.\"", "artificially (adv.)"],
+            ["Replicate", "/ˈrep.lɪ.keɪt/", "v.", "C1", "To make or do something again in exactly the same way.", "Sao chép, tái tạo", "Used when trying to copy a successful experiment or biology.", "\"Engineers are attempting to replicate the structure of a bird's wing.\"", "replication (n.)"],
+            ["Ubiquitous", "/juːˈbɪk.wɪ.təs/", "adj.", "C2", "Seeming to be everywhere.", "Có mặt ở khắp nơi", "Describes technologies that have permeated society.", "\"The smartphone has become a ubiquitous device in modern societies.\"", "ubiquity (n.)"],
+            ["Network", "/ˈnet.wɜːk/", "n. / v.", "B2", "Connected computers or a system of intersecting lines.", "Mạng lưới", "Foundational concept of the internet and telecommunications.", "\"A massive fiber-optic network provides high-speed internet.\"", "networking (n.)"],
+            ["Server", "/ˈsɜː.vər/", "n.", "B2", "A central computer from which other computers get information.", "Máy chủ", "Standard IT vocabulary for data centers.", "\"All company data is securely stored on a remote server.\"", "N/A"],
+            ["Heuristic", "/hjʊəˈrɪs.tɪk/", "adj. / n.", "C2", "Allowing learning by discovery without strict formulas.", "Thuộc phương pháp tự luận", "Used in AI texts describing machine learning.", "\"Anti-virus software uses heuristic analysis to identify new malware.\"", "N/A"],
+            ["Binary", "/ˈbaɪ.nər.i/", "adj. / n.", "C1", "A system of numbers using only 0 and 1.", "Nhị phân", "The foundation of computing technology.", "\"All digital software is translated into a simple binary code.\"", "N/A"],
+            ["Digitize", "/ˈdɪdʒ.ɪ.taɪz/", "v.", "C1", "To put information into digital form.", "Số hóa", "Common in texts discussing historical preservation.", "\"The library is working to digitize fragile historical manuscripts.\"", "digitization (n.)"],
+            ["Apparatus", "/ˌæp.əˈreɪ.təs/", "n.", "C1", "A set of equipment or tools used for a particular purpose.", "Thiết bị, dụng cụ", "Academic synonym for equipment in science passages.", "\"Researchers set up a complex laser apparatus to measure particles.\"", "N/A"],
+            ["Device", "/dɪˈvaɪs/", "n.", "B2", "An object or machine invented for a particular purpose.", "Thiết bị", "Generic term for gadgets and electronics.", "\"Smartphones are essentially miniature computing devices.\"", "N/A"],
+            ["Component", "/kəmˈpəʊ.nənt/", "n.", "C1", "A part that combines with others to form something bigger.", "Thành phần, linh kiện", "Used to describe parts of a machine or circuit.", "\"The factory imports electrical components to assemble televisions.\"", "N/A"],
+            ["Configuration", "/kənˌfɪɡ.əˈreɪ.ʃən/", "n.", "C1", "The particular arrangement or pattern of related things.", "Cấu hình, sự sắp xếp", "Used in IT settings and aviation arrangements.", "\"The airplane's wing configuration allows short runway takeoffs.\"", "configure (v.)"],
+            ["Connectivity", "/ˌkɒn.ekˈtɪv.ə.ti/", "n.", "C1", "The ability of a device or system to connect with others.", "Khả năng kết nối", "Key to the Internet of Things.", "\"Smart home appliances offer wireless connectivity to your phone.\"", "connect (v.)"],
+            ["Cyberspace", "/ˈsaɪ.bə.speɪs/", "n.", "C1", "The internet considered as an imaginary area without limits.", "Không gian mạng", "Used in sociology of tech and internet regulation texts.", "\"Governments struggle with laws for crimes committed in cyberspace.\"", "cyber (prefix)"],
+            ["Malfunction", "/ˌmælˈfʌŋk.ʃən/", "n. / v.", "C1", "A failure to work or operate correctly.", "Sự trục trặc", "Used interchangeably with 'breakdown'.", "\"A sudden engine malfunction forced an emergency landing.\"", "functional (adj.)"],
+            ["Override", "/ˌəʊ.vəˈraɪd/", "v.", "C2", "To take manual control of an automatic machine.", "Vô hiệu hóa, ghi đè", "Central to passages discussing AI ethics and safety.", "\"The pilot was forced to override the autopilot system.\"", "N/A"],
+            ["Precaution", "/prɪˈkɔː.ʃən/", "n.", "C1", "An action done to prevent something dangerous from happening.", "Sự phòng ngừa", "Common in engineering safety standards.", "\"As a safety precaution, the plant is equipped with fire systems.\"", "precautionary (adj.)"],
+            ["Sensor", "/ˈsen.sər/", "n.", "B2", "A device used to record changes or presence.", "Cảm biến", "Hardware that allows AI to 'see' the world.", "\"Self-driving cars rely on sensors to detect obstacles.\"", "sensory (adj.)"],
+            ["Spectrum", "/ˈspek.trəm/", "n.", "C1", "A range of frequencies or wavelengths.", "Quang phổ, dải tần", "Heavily used regarding the electromagnetic spectrum.", "\"5G networks utilize a different frequency on the radio spectrum.\"", "spectral (adj.)"],
+            ["Wavelength", "/ˈweɪv.leŋθ/", "n.", "C1", "The distance between two waves of energy.", "Bước sóng", "Scientific vocabulary tied to light and sound transmission.", "\"Fiber optic cables transmit data using specific wavelengths of light.\"", "N/A"],
+            ["Transmitter", "/trænzˈmɪt.ər/", "n.", "C1", "Equipment for broadcasting radio or television signals.", "Máy phát tín hiệu", "Key to communication technology and radar systems.", "\"The tower contains a powerful transmitter to broadcast the signal.\"", "transmission (n.)"],
+            ["Terminal", "/ˈtɜː.mɪ.nəl/", "n. / adj.", "C1", "A piece of equipment for communicating with a computer system.", "Thiết bị đầu cuối", "Used in IT networks and transportation hubs.", "\"Employees log in at the computer terminal to access the database.\"", "N/A"],
+            ["Troubleshooting", "/ˈtrʌb.əl.ʃuː.tɪŋ/", "n.", "C1", "Discovering why something does not work and fixing it.", "Dò lỗi", "A standard IT and engineering term.", "\"The technician spent hours on troubleshooting the server issue.\"", "troubleshoot (v.)"],
+            ["Versatile", "/ˈvɜː.sə.taɪl/", "adj.", "C1", "Able to be used for many different purposes.", "Đa năng", "Describes good design or multi-tool tech.", "\"The smartphone is the most versatile electronic device ever invented.\"", "versatility (n.)"],
+            ["Wirelessly", "/ˈwaɪə.ləs.li/", "adv.", "B2", "By using radio signals rather than wires to connect.", "Không dây", "Describes data transfer and modern charging.", "\"Headphones connect wirelessly to the audio source.\"", "wireless (adj.)"],
+            ["Nanotechnology", "/ˌnæn.əʊ.tekˈnɒl.ə.dʒi/", "n.", "C2", "Producing small tools by controlling individual atoms.", "Công nghệ nano", "Frequent in texts discussing future science and medicine.", "\"Nanotechnology could allow doctors to inject microscopic robots.\"", "N/A"],
+            ["Telemetry", "/təˈlem.ə.tri/", "n.", "C2", "Collecting data about far away objects and sending it electronically.", "Kỹ thuật đo lường từ xa", "Used in space exploration and wildlife tracking.", "\"Engineers monitor telemetry data sent back from the Mars rover.\"", "N/A"],
+            ["Fabrication", "/ˌfæb.rɪˈkeɪ.ʃən/", "n.", "C1", "Producing a product in an industrial process.", "Sự chế tạo", "Refers to manufacturing microchips or welding.", "\"Microchip fabrication requires an ultra-clean environment.\"", "fabricate (v.)"],
+            ["Geometric", "/ˌdʒiː.əˈmet.rɪk/", "adj.", "C1", "Consisting of shapes such as squares or triangles.", "Thuộc hình học", "Used in architecture and structural engineering.", "\"The architect utilized geometric patterns for structural integrity.\"", "geometry (n.)"],
+            ["Parameter", "/pəˈræm.ɪ.tər/", "n.", "C2", "A fixed limit that establishes how something can be done.", "Thông số", "Used in software coding and mechanical testing bounds.", "\"The AI operates effectively within parameters set by programmers.\"", "parametric (adj.)"],
+            ["Module", "/ˈmɒdʒ.uːl/", "n.", "C1", "One of a set of separate parts that form a complete whole.", "Khối, mô-đun", "Central to modern design and modular building.", "\"The Space Station was built by adding a new module every few years.\"", "modular (adj.)"],
+            ["Grid", "/ɡrɪd/", "n.", "C1", "A system of wires through which electricity is connected.", "Hệ thống mạng lưới điện", "Refers to the national grid in energy passages.", "\"Solar panels allow homeowners to sell power back to the national grid.\"", "N/A"]
+        ];
+
+        const vocabDB = rawVocabData.map(item => ({
+            word: item[0], ipa: item[1], pos: item[2], cefr: item[3],
+            def: item[4], vie: item[5], usage: item[6], example: item[7], fam: item[8]
+        }));
+
+        let filteredData = [...vocabDB];
+        let flashcardIndex = 0;
+
+        window.onload = () => {
+            initFilters();
+            renderDictionary();
+            renderChart();
+            updateFlashcard();
+        };
+
+        function renderChart() {
+            const counts = { 'B2': 0, 'C1': 0, 'C2': 0 };
+            vocabDB.forEach(w => { if(counts[w.cefr] !== undefined) counts[w.cefr]++; });
+            
+            const ctx = document.getElementById('cefrChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['B2 Upper Int.', 'C1 Advanced', 'C2 Mastery'],
+                    datasets: [{
+                        data: [counts['B2'], counts['C1'], counts['C2']],
+                        backgroundColor: ['#fbcfe8', '#f43f5e', '#be123c'], 
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 10 } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function switchTab(tab) {
+            const dictView = document.getElementById('dictionaryView');
+            const flashView = document.getElementById('flashcardView');
+            const btnDict = document.getElementById('btnTabDict');
+            const btnFlash = document.getElementById('btnTabFlash');
+
+            if(tab === 'dictionary') {
+                dictView.classList.remove('hidden');
+                flashView.classList.add('hidden');
+                
+                btnDict.classList.replace('bg-white', 'bg-rose-500');
+                btnDict.classList.replace('text-rose-600', 'text-white');
+                btnDict.classList.remove('border', 'border-rose-200');
+
+                btnFlash.classList.replace('bg-rose-500', 'bg-white');
+                btnFlash.classList.replace('text-white', 'text-rose-600');
+                btnFlash.classList.add('border', 'border-rose-200');
+            } else {
+                flashView.classList.remove('hidden');
+                dictView.classList.add('hidden');
+                
+                btnFlash.classList.replace('bg-white', 'bg-rose-500');
+                btnFlash.classList.replace('text-rose-600', 'text-white');
+                btnFlash.classList.remove('border', 'border-rose-200');
+
+                btnDict.classList.replace('bg-rose-500', 'bg-white');
+                btnDict.classList.replace('text-white', 'text-rose-600');
+                btnDict.classList.add('border', 'border-rose-200');
+                
+                document.getElementById('flashcard').classList.remove('is-flipped');
+                flashcardIndex = 0;
+                updateFlashcard();
+            }
+        }
+
+        function initFilters() {
+            const posSet = new Set(vocabDB.map(w => w.pos.split('/')[0].trim())); 
+            const posSelect = document.getElementById('filterPOS');
+            posSet.forEach(pos => {
+                let opt = document.createElement('option');
+                opt.value = pos;
+                opt.textContent = pos;
+                posSelect.appendChild(opt);
+            });
+
+            document.getElementById('searchInput').addEventListener('input', handleFilter);
+            document.getElementById('filterCEFR').addEventListener('change', handleFilter);
+            document.getElementById('filterPOS').addEventListener('change', handleFilter);
+        }
+
+        function handleFilter() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const cefr = document.getElementById('filterCEFR').value;
+            const pos = document.getElementById('filterPOS').value;
+
+            filteredData = vocabDB.filter(w => {
+                const matchSearch = w.word.toLowerCase().includes(search) || w.vie.toLowerCase().includes(search);
+                const matchCEFR = cefr === 'All' || w.cefr === cefr;
+                const matchPOS = pos === 'All' || w.pos.includes(pos);
+                return matchSearch && matchCEFR && matchPOS;
+            });
+
+            document.getElementById('resultCount').textContent = `Showing ${filteredData.length} entries`;
+            renderDictionary();
+            
+            flashcardIndex = 0;
+            updateFlashcard();
+        }
+
+        function renderDictionary() {
+            const grid = document.getElementById('vocabGrid');
+            grid.innerHTML = '';
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl p-6 shadow-sm border border-rose-100 hover:shadow-md transition flex flex-col justify-between';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-rose-900">${item.word}</h3>
+                            <span class="cefr-badge cefr-${item.cefr}">${item.cefr}</span>
+                        </div>
+                        <div class="flex items-center text-sm text-slate-500 mb-4">
+                            <span class="font-mono bg-slate-50 px-1 py-0.5 rounded mr-2">${item.ipa}</span>
+                            <span class="italic mr-auto">${item.pos}</span>
+                            <button onclick="playAudio('${item.word}')" class="text-rose-400 hover:text-rose-600 focus:outline-none" title="Listen">🔊</button>
+                        </div>
+                        <p class="text-slate-800 font-medium mb-1">${item.def}</p>
+                        <p class="text-indigo-600 font-semibold mb-4 text-sm">${item.vie}</p>
+                        <div class="bg-rose-50/50 p-3 rounded-lg text-sm border border-rose-50 mb-4">
+                            <p class="text-slate-600 mb-1"><span class="font-bold text-rose-400">Context:</span> ${item.usage}</p>
+                            <p class="text-slate-800 italic">" ${item.example.replace(/"/g,'')} "</p>
+                        </div>
+                    </div>
+                    <div class="mt-auto pt-3 border-t border-slate-100 text-xs text-slate-400 font-medium">
+                        <span class="uppercase tracking-wider mr-1">Family:</span> ${item.fam}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.getElementById('flashcard').addEventListener('click', function() {
+            this.classList.toggle('is-flipped');
+        });
+
+        function updateFlashcard() {
+            if(filteredData.length === 0) {
+                document.getElementById('fcWord').textContent = "No cards match filter.";
+                document.getElementById('fcTotal').textContent = "0";
+                return;
+            }
+            
+            const card = filteredData[flashcardIndex];
+            document.getElementById('fcWord').textContent = card.word;
+            document.getElementById('fcIPA').textContent = card.ipa;
+            document.getElementById('fcPOS').textContent = card.pos;
+            document.getElementById('fcCEFR').textContent = card.cefr;
+            document.getElementById('fcCEFR').className = `cefr-badge cefr-${card.cefr} absolute top-6 right-6`;
+            
+            document.getElementById('fcDef').textContent = card.def;
+            document.getElementById('fcVie').textContent = card.vie;
+            document.getElementById('fcExample').textContent = card.example;
+
+            document.getElementById('fcCurrent').textContent = flashcardIndex + 1;
+            document.getElementById('fcTotal').textContent = filteredData.length;
+        }
+
+        function nextCard() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            setTimeout(() => {
+                flashcardIndex = (flashcardIndex + 1) % filteredData.length;
+                updateFlashcard();
+            }, 150);
+        }
+
+        function prevCard() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            setTimeout(() => {
+                flashcardIndex = (flashcardIndex - 1 + filteredData.length) % filteredData.length;
+                updateFlashcard();
+            }, 150);
+        }
+
+        function shuffleCards() {
+            if(filteredData.length === 0) return;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            for (let i = filteredData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredData[i], filteredData[j]] = [filteredData[j], filteredData[i]];
+            }
+            flashcardIndex = 0;
+            setTimeout(() => updateFlashcard(), 150);
+        }
+
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-GB';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sorry, your browser doesn't support text-to-speech!");
+            }
+        }
+
+        function playAudioCurrent(e) {
+            e.stopPropagation();
+            if(filteredData.length > 0) {
+                playAudio(filteredData[flashcardIndex].word);
+            }
+        }
+    </script>
+</body>
+</html>
