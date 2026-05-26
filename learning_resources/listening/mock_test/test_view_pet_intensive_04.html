@@ -152,6 +152,15 @@
         .footer-scroll::-webkit-scrollbar-thumb:hover {
             background: #f472b6; 
         }
+
+        /* User Highlight Feature */
+        .user-highlight {
+            background-color: #fef08a; /* Tailwind yellow-200 */
+            border-radius: 2px;
+            cursor: context-menu;
+            padding: 2px 0;
+            box-shadow: 0 0 0 1px #fde047;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -161,7 +170,8 @@
         <h1 class="text-4xl font-bold mb-6 text-[#be185d]">IELTS Chan Truong | PET Intensive 04</h1>
         <p class="mb-10 text-xl text-gray-700 max-w-2xl text-center leading-relaxed">
             Welcome to the computer-delivered IELTS Listening test simulation. <br><br>
-            Please ensure your volume is turned up. Once you click "Start Test", the timer will begin, the audio will play automatically, and you will not be able to pause it.
+            Please ensure your volume is turned up. Once you click "Start Test", the timer will begin, the audio will play automatically, and you will not be able to pause it. <br><br>
+            <span class="text-sm bg-yellow-100 text-yellow-800 border border-yellow-300 py-1 px-3 rounded inline-block mt-2 shadow-sm font-bold">💡 Tip: You can select text and right-click to highlight it.</span>
         </p>
         <button onclick="startTest()" class="bg-[#be185d] hover:bg-pink-800 text-white font-bold py-4 px-10 rounded text-xl shadow-lg transition-colors">
             Start Test
@@ -186,8 +196,6 @@
 
     <!-- Main Content Area -->
     <main id="main-scroll-area" class="flex-1 overflow-y-auto bg-[#fdf2f8] p-4 md:p-8 relative scroll-smooth pb-32">
-        
-        <!-- Background Audio Player (Hidden visually or placed unobtrusively if needed, but handled by JS below) -->
         
         <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 shadow-sm border border-gray-200 rounded-sm">
             
@@ -556,6 +564,18 @@
         </div>
     </footer>
 
+    <!-- Custom Context Menu for Highlighting -->
+    <div id="ielts-context-menu" class="hidden fixed bg-white border border-gray-300 shadow-lg rounded py-1 z-50 min-w-[140px] text-sm font-bold text-gray-700">
+        <div id="menu-highlight" class="px-4 py-2 hover:bg-pink-50 cursor-pointer text-[#be185d] flex items-center gap-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            Highlight
+        </div>
+        <div id="menu-clear" class="px-4 py-2 hover:bg-pink-50 cursor-pointer text-gray-600 flex items-center gap-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            Clear Highlight
+        </div>
+    </div>
+
     <script>
         // Global State
         const STORAGE_KEY = 'ieltsMockAnswers_pet_04';
@@ -747,6 +767,95 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
             window.location.href = 'result_view_pet_intensive_04.html';
         }
+
+        // --- Highlight Feature Logic ---
+        const contextMenu = document.getElementById('ielts-context-menu');
+        const menuHighlight = document.getElementById('menu-highlight');
+        const menuClear = document.getElementById('menu-clear');
+        let contextMenuTarget = null;
+        let savedRange = null;
+
+        document.addEventListener('contextmenu', (e) => {
+            // Ensure we are inside the main test area
+            if(!e.target.closest('#main-scroll-area')) return;
+
+            const selection = window.getSelection();
+            const hasSelection = selection.toString().trim().length > 0;
+            const isHighlight = e.target.closest('.user-highlight');
+
+            // If text is selected or clicking on an existing highlight, show menu
+            if (hasSelection || isHighlight) {
+                e.preventDefault(); 
+                
+                if (hasSelection) {
+                    savedRange = selection.getRangeAt(0).cloneRange();
+                } else {
+                    savedRange = null;
+                }
+
+                contextMenu.classList.remove('hidden');
+                contextMenu.style.left = `${e.clientX}px`;
+                contextMenu.style.top = `${e.clientY}px`;
+
+                // Toggle visibility of specific actions
+                menuHighlight.style.display = hasSelection ? 'flex' : 'none';
+                
+                if (isHighlight) {
+                    menuClear.style.display = 'flex';
+                    contextMenuTarget = isHighlight;
+                } else {
+                    menuClear.style.display = 'none';
+                    contextMenuTarget = null;
+                }
+            } else {
+                contextMenu.classList.add('hidden');
+            }
+        });
+
+        // Prevent selection loss when clicking the menu
+        contextMenu.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+        });
+
+        // Hide menu on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#ielts-context-menu')) {
+                contextMenu.classList.add('hidden');
+            }
+        });
+
+        // Apply Highlight
+        menuHighlight.addEventListener('click', () => {
+            if (!savedRange) return;
+
+            const span = document.createElement('span');
+            span.className = 'user-highlight';
+
+            try {
+                // Safely extract contents and wrap them.
+                const contents = savedRange.extractContents();
+                span.appendChild(contents);
+                savedRange.insertNode(span);
+            } catch (e) {
+                alert("Please select text within a single section or paragraph to highlight.");
+            }
+            window.getSelection().removeAllRanges();
+            contextMenu.classList.add('hidden');
+            savedRange = null;
+        });
+
+        // Clear Highlight
+        menuClear.addEventListener('click', () => {
+            if (contextMenuTarget) {
+                const parent = contextMenuTarget.parentNode;
+                // Move all children out of the span and insert them before the span
+                while (contextMenuTarget.firstChild) {
+                    parent.insertBefore(contextMenuTarget.firstChild, contextMenuTarget);
+                }
+                parent.removeChild(contextMenuTarget);
+            }
+            contextMenu.classList.add('hidden');
+        });
 
         // --- Drag and Drop Logic placeholders ---
         function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add('drag-over'); }
