@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   // Very light blush
+                            100: '#fce8eb',  // Pale pink
+                            200: '#f7cdd5',  // Pastel pink
+                            300: '#f0a8b6',  // Soft pink
+                            400: '#e67c91',  // Muted dark pink
+                            500: '#d75872',  // Primary elegant pink (pastel/dusty)
+                            600: '#bf3f58',  // Deeper elegant pink
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; }
+        .active-target { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 700; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200">
+
+    <!-- Custom Toast Message for NOT GIVEN Explanations -->
+    <div id="custom-toast" class="fixed top-24 left-1/4 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-4 rounded-xl shadow-2xl z-50 hidden w-[90%] max-w-sm transition-opacity duration-300 border-l-4 border-brand-400">
+        <p class="font-bold text-brand-300 mb-1 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Explanation
+        </p>
+        <p id="toast-msg" class="text-sm leading-relaxed text-gray-100"></p>
+    </div>
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-brand-500 text-white flex items-center justify-center font-bold text-xl pb-1">I</div>
+            <h1 class="font-bold text-gray-800 text-lg tracking-tight">IELTS Chan Truong <span class="text-gray-400 font-normal text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-colors shadow-sm focus:ring-4 focus:ring-brand-200">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Left Pane: Passage -->
+        <div id="left-pane" class="w-1/2 h-full overflow-y-auto bg-white border-r border-gray-200 p-8 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-4">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-wider mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 mb-2 leading-snug">Examining the placebo effect</h2>
+                    <p class="text-gray-500 italic">By Steve Silberman</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-lg text-justify space-y-6">
+                    <p>The fact that taking a fake drug can powerfully improve some people's health - the so-called placebo effect - was long considered an embarrassment to the serious practice of pharmacology, but now things have changed.</p>
+                    <p>Several years ago, <span id="exp-q6" class="explanation-target">Merck, a global pharmaceutical company, was falling behind its rivals in sales.</span> To make matters worse, patents on five blockbuster drugs were about to expire, which would allow cheaper generic products to flood the market. In interviews with the press, Edward Scolnick, Merck's Research Director, presented his plan to restore the firm to pre-eminence. <span id="exp-q7" class="explanation-target">Key to his strategy was expanding the company’s reach into the antidepressant market</span>, where Merck had trailed behind, while competitors like Pfizer and GlaxoSmithKline had created some of the best-selling drugs in the world. "To remain dominant in the future,” he told one media company, "we need to dominate the central nervous system."</p>
+                    
+                    <p>His plan hinged on the success of an experimental anti-depressant codenamed MK-869. Still in clinical trials, it was a new kind of medication that exploited brain chemistry in innovative ways to promote feelings of well-being. <span id="exp-q8" class="explanation-target">The drug tested extremely well early on, with minimal side effects.</span> Behind the scenes, however, MK-869 was starting to unravel. <span id="exp-q9" class="explanation-target">True, many test subjects treated with the medication felt their hopelessness and anxiety lift.</span> But so did nearly the same number who took a placebo, a look-alike pill made of milk sugar or another inert substance given to groups of volunteers in subsequent clinical trials to gauge the effectiveness of the real drug by comparison. <span id="exp-q10" class="explanation-target">Ultimately Merck's venture into the antidepressant market failed. In the jargon of the industry, the trials crossed the "futility boundary".</span></p>
+                    
+                    <p><span id="exp-q1" class="explanation-target">MK-869 has not been the only much-awaited medical breakthrough to be undone in recent years by the placebo effect.</span> And it's not only trials of new drugs that are crossing the futility boundary. Some products that have been on the market for decades are faltering in more recent follow-up tests. It's not that the old medications are getting weaker, drug developers say it's as if the placebo effect is somehow getting stronger. The fact that an increasing number of medications are unable to beat sugar pills has thrown the industry into crisis. The stakes could hardly be higher. To win FDA(1) approval, a new medication must beat placebo in at least two authenticated trials. <span id="exp-q2" class="explanation-target">In today’s economy, the fate of a well-established company can hang on the outcome of a handful of tests.</span></p>
+                    
+                    <p>Why are fake pills suddenly overwhelming promising new drugs and established medicines alike? The reasons are only just beginning to be understood. A network of independent researchers is doggedly uncovering the inner workings and potential applications of the placebo effect. A psychiatrist William Potter, who knew that some patients really do seem to get healthier for reasons that have more to do with a doctor's empathy than with the contents of a pill, was baffled by the fact that drugs he had been prescribing for years seemed to be struggling to prove their effectiveness. Thinking that a crucial factor may have been overlooked, Potter combed through his company’s database of published and unpublished trials - <span id="exp-q11" class="explanation-target">including those that had been kept secret because of high placebo response</span>. His team aggregated the findings from decades of antidepressant trials, looking for patterns and trying to see what was changing over time. What they found challenged some of the industry’s basic assumptions about its drug-vetting process.</p>
+                    
+                    <p>Assumption number one was that if a trial were managed correctly, a medication would perform as well or badly in a Phoenix hospital as in a Bangalore clinic. Potter discovered, however, that <span id="exp-q12" class="explanation-target">geographic location alone could determine the outcome</span>. By the late 1990s, for example, the anti-anxiety drug Diazepam was still beating placebo in France and Belgium. But when the drug was tested in the U.S., it was likely to fail. Conversely, a similar drug, Prozac, performed better in America than it did in western Europe and South Africa. It was an unsettling prospect: FDA approval could hinge on where the company chose to conduct a trial.</p>
+                    
+                    <p>Mistaken assumption number two was that <span id="exp-q13" class="explanation-target">the standard tests used to gauge volunteers' improvement in trials yielded consistent results.</span> Potter and his colleagues discovered that ratings by trial observers varied significantly from one testing site to another. It was like finding out that the judges in a tight race each had a different idea about the placement of the finish line.</p>
+                    
+                    <p>After some coercion by Potter and others, the National Institute of Health (NIH) focused on the issue in 2000, hosting a three-day conference in Washington, and this conference launched a new wave of placebo research in academic laboratories in the U.S. and Italy that would make significant progress toward solving the mystery of what was happening in clinical trials.</p>
+                    
+                    <p>In one study last year, Harvard Medical School researcher Ted Kaptchuk devised a clever strategy for testing his volunteers’ response to varying levels of therapeutic ritual. The study focused on a common but painful medical condition that costs more than $40 billion a year worldwide to treat. First, the volunteers were placed randomly in one of three groups. One group was simply put on a waiting list; researchers know that some patients get better just because they sign up for a trial. Another group received placebo treatment from a clinician who declined to engage in small talk. Volunteers in the third group got the same fake treatment from a clinician who asked them questions about symptoms, outlined the causes of the illness, and displayed optimism about their condition.</p>
+                    
+                    <p><span id="exp-q4" class="explanation-target">Not surprisingly, the health of those in the third group improved most.</span> In fact, just by participating in the trial, volunteers in this high-interaction group got as much relief as did people taking the two leading prescription drugs for the condition. <span id="exp-q14" class="explanation-target">And the benefits of their “bogus” treatment persisted for weeks afterward</span>, contrary to the belief - widespread in the pharmaceutical industry - that the placebo response is short-lived.</p>
+                    
+                    <p><span id="exp-q5" class="explanation-target">Studies like this open the door to hybrid treatment strategies that exploit the placebo effect to make real drugs safer and more effective.</span> As Potter says, “To really do the best for your patients, you want the best placebo response plus the best drug response''.</p>
+
+                    <div class="mt-8 pt-4 border-t border-gray-200 text-sm text-gray-500">
+                        <p>adapted from Wired Magazine.</p>
+                        <p class="mt-2">(1) The Food and Drugs Administration (an agency in the United States responsible for protecting public health by assuring the safety of human drugs)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Questions -->
+        <div id="right-pane" class="w-1/2 h-full overflow-y-auto bg-gray-50 p-8 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-20">
+                
+                <!-- Results Banner (Hidden initially) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-xl p-6 shadow-sm text-center transform transition-all">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-500" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-gray-600 mb-4 text-sm bg-brand-50 p-3 rounded-lg border border-brand-100">Review your answers below. We have marked your answers, provided the correct keys, and enabled the <strong>'View Explanation'</strong> buttons for each question.</p>
+                </div>
+
+                <!-- Section 1: YES / NO / NOT GIVEN -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 transition-colors duration-300">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-700">Do the following statements agree with the claims of the writer?</p>
+                        <ul class="text-sm mt-2 space-y-1 font-medium text-gray-600">
+                            <li><strong class="text-gray-900">YES</strong> if the statement agrees with the claims of the writer</li>
+                            <li><strong class="text-gray-900">NO</strong> if the statement contradicts the claims of the writer</li>
+                            <li><strong class="text-gray-900">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Q1 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="1">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">1</div>
+                                <div class="flex-1">
+                                    <p class="text-gray-800 mb-3">Merck's experience with MK-869 was unique.</p>
+                                    <select onchange="updateAnswer(1, this.value)" class="w-40 border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 focus:ring-opacity-50 text-sm p-2 bg-gray-50 outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                        <option value="NOT GIVEN">NOT GIVEN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q1')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+                        
+                        <!-- Q2 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="2">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">2</div>
+                                <div class="flex-1">
+                                    <p class="text-gray-800 mb-3">These days, a small number of unsuccessful test results can ruin a well-established drugs company.</p>
+                                    <select onchange="updateAnswer(2, this.value)" class="w-40 border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 focus:ring-opacity-50 text-sm p-2 bg-gray-50 outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                        <option value="NOT GIVEN">NOT GIVEN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q2')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="3">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">3</div>
+                                <div class="flex-1">
+                                    <p class="text-gray-800 mb-3">Some medical conditions are more easily treated by a placebo than others.</p>
+                                    <select onchange="updateAnswer(3, this.value)" class="w-40 border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 focus:ring-opacity-50 text-sm p-2 bg-gray-50 outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                        <option value="NOT GIVEN">NOT GIVEN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('not-given-q3')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="4">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">4</div>
+                                <div class="flex-1">
+                                    <p class="text-gray-800 mb-3">It was to be expected that the third group in Kaptchuk's trial would do better than the other two groups.</p>
+                                    <select onchange="updateAnswer(4, this.value)" class="w-40 border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 focus:ring-opacity-50 text-sm p-2 bg-gray-50 outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                        <option value="NOT GIVEN">NOT GIVEN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q4')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="5">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">5</div>
+                                <div class="flex-1">
+                                    <p class="text-gray-800 mb-3">Kaptchuk's research highlights the fact that combined drug and placebo treatments should be avoided.</p>
+                                    <select onchange="updateAnswer(5, this.value)" class="w-40 border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 focus:ring-opacity-50 text-sm p-2 bg-gray-50 outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="YES">YES</option>
+                                        <option value="NO">NO</option>
+                                        <option value="NOT GIVEN">NOT GIVEN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q5')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Summary Completion -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 transition-colors duration-300">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 6-10</h3>
+                        <p class="text-sm text-gray-700 mb-1">Complete the summary using the list of words, A-I, below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2">Drag the correct option from the word bank and drop it into the blanks. Click a filled blank to clear it.</p>
+                    </div>
+
+                    <!-- Word Bank -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium select-none" id="word-bank">
+                        <div draggable="true" data-val="A" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">A activity</div>
+                        <div draggable="true" data-val="B" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">B prices</div>
+                        <div draggable="true" data-val="C" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">C success</div>
+                        <div draggable="true" data-val="D" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">D patients</div>
+                        <div draggable="true" data-val="E" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">E tests</div>
+                        <div draggable="true" data-val="F" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">F diseases</div>
+                        <div draggable="true" data-val="G" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">G symptoms</div>
+                        <div draggable="true" data-val="H" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">H competition</div>
+                        <div draggable="true" data-val="I" class="draggable-word p-2 bg-white border border-gray-300 rounded cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all duration-200">I criticism</div>
+                    </div>
+
+                    <!-- Summary Text with Drop Zones -->
+                    <div class="text-gray-800 leading-loose text-justify text-sm sm:text-base">
+                        <h4 class="font-bold mb-4 text-center">Merck and MK-869</h4>
+                        
+                        <p class="leading-[3rem]">
+                            As a result of concerns about increasing 
+                            <span class="inline-flex items-center mx-1 gap-1 align-middle q-row relative" data-q="6">
+                                <strong class="text-xs text-gray-500">6</strong>
+                                <span class="drop-zone min-w-[100px] px-3 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer text-sm whitespace-nowrap" data-q="6"></span>
+                            </span> 
+                            in the drugs industry, the pharmaceutical company Merck decided to increase its 
+                            <span class="inline-flex items-center mx-1 gap-1 align-middle q-row relative" data-q="7">
+                                <strong class="text-xs text-gray-500">7</strong>
+                                <span class="drop-zone min-w-[100px] px-3 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer text-sm whitespace-nowrap" data-q="7"></span>
+                            </span>
+                            in the anti-depressant market. The development of the drug MK-869 was seen as the way forward.
+                        </p>
+                        <p class="mt-4 leading-[3rem]">
+                            Initially, MK-869 had some 
+                            <span class="inline-flex items-center mx-1 gap-1 align-middle q-row relative" data-q="8">
+                                <strong class="text-xs text-gray-500">8</strong>
+                                <span class="drop-zone min-w-[100px] px-3 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer text-sm whitespace-nowrap" data-q="8"></span>
+                            </span>
+                            , but later trials revealed a different picture. Although key 
+                            <span class="inline-flex items-center mx-1 gap-1 align-middle q-row relative" data-q="9">
+                                <strong class="text-xs text-gray-500">9</strong>
+                                <span class="drop-zone min-w-[100px] px-3 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer text-sm whitespace-nowrap" data-q="9"></span>
+                            </span>
+                            could be treated with the drug, a sugar pill was proving equally effective. In the end, the 
+                            <span class="inline-flex items-center mx-1 gap-1 align-middle q-row relative" data-q="10">
+                                <strong class="text-xs text-gray-500">10</strong>
+                                <span class="drop-zone min-w-[100px] px-3 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer text-sm whitespace-nowrap" data-q="10"></span>
+                            </span>
+                            indicated that it was pointless continuing with the development of the drug.
+                        </p>
+                    </div>
+
+                    <!-- Explanations panel for Q6-10 (Hidden until submit) -->
+                    <div id="exp-panel-6-10" class="hidden mt-8 pt-6 border-t border-gray-200">
+                        <h4 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Explanations for Summary (Q6-10)
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button class="text-left text-sm text-brand-600 font-medium hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors border border-brand-100" onclick="showExplanation('exp-q6')">Q6. Competition (H)</button>
+                            <button class="text-left text-sm text-brand-600 font-medium hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors border border-brand-100" onclick="showExplanation('exp-q7')">Q7. Activity (A)</button>
+                            <button class="text-left text-sm text-brand-600 font-medium hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors border border-brand-100" onclick="showExplanation('exp-q8')">Q8. Success (C)</button>
+                            <button class="text-left text-sm text-brand-600 font-medium hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors border border-brand-100" onclick="showExplanation('exp-q9')">Q9. Symptoms (G)</button>
+                            <button class="text-left text-sm text-brand-600 font-medium hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-lg transition-colors border border-brand-100" onclick="showExplanation('exp-q10')">Q10. Tests (E)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Multiple Choice -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 11-14</h3>
+                        <p class="text-sm text-gray-700">Choose the correct letter, A, B, C or D.</p>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <!-- Q11 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="11">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">11</div>
+                                <div>
+                                    <p class="text-gray-800 mb-3 font-medium">Which of the following is true of William Potter's research?</p>
+                                    <div class="space-y-2 text-sm text-gray-700">
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q11" value="A" onchange="updateAnswer(11, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>A.</strong> It was based on recently developed drugs that he had recommended.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q11" value="B" onchange="updateAnswer(11, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>B.</strong> It included trial results from a range of drugs companies.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q11" value="C" onchange="updateAnswer(11, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>C.</strong> Some of the trial results he investigated had not been made public.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q11" value="D" onchange="updateAnswer(11, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>D.</strong> Some of his findings were not accepted by the drugs industry.</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q11')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q12 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="12">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">12</div>
+                                <div>
+                                    <p class="text-gray-800 mb-3 font-medium">What did William Potter's research reveal about the location of drugs trials?</p>
+                                    <div class="space-y-2 text-sm text-gray-700">
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q12" value="A" onchange="updateAnswer(12, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>A.</strong> The placebo effect was weakest in the US.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q12" value="B" onchange="updateAnswer(12, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>B.</strong> Results were not consistent around the world.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q12" value="C" onchange="updateAnswer(12, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>C.</strong> Results varied depending on the type of hospital.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q12" value="D" onchange="updateAnswer(12, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>D.</strong> The FDA preferred drugs to be tested in different countries.</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q12')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q13 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="13">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">13</div>
+                                <div>
+                                    <p class="text-gray-800 mb-3 font-medium">What does the tight race refer to in line 80?</p>
+                                    <div class="space-y-2 text-sm text-gray-700">
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q13" value="A" onchange="updateAnswer(13, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>A.</strong> the standard tests</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q13" value="B" onchange="updateAnswer(13, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>B.</strong> consistent results</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q13" value="C" onchange="updateAnswer(13, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>C.</strong> ratings by trial observers</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q13" value="D" onchange="updateAnswer(13, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>D.</strong> testing sites</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q13')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q14 -->
+                        <div class="q-row rounded-lg p-2 transition-colors duration-300" data-q="14">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-700">14</div>
+                                <div>
+                                    <p class="text-gray-800 mb-3 font-medium">What significant discovery was made by Ted Kaptchuk?</p>
+                                    <div class="space-y-2 text-sm text-gray-700">
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q14" value="A" onchange="updateAnswer(14, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>A.</strong> The effects of a placebo can last longer than previously thought.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q14" value="B" onchange="updateAnswer(14, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>B.</strong> Patients' health can improve while waiting to undergo a trial.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q14" value="C" onchange="updateAnswer(14, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>C.</strong> Patients respond better to a placebo if they are treated by the same clinician throughout the trial.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer transition-colors border border-transparent hover:border-gray-200">
+                                            <input type="radio" name="q14" value="D" onchange="updateAnswer(14, this.value)" class="mt-1 text-brand-500 focus:ring-brand-400">
+                                            <span class="mc-option"><strong>D.</strong> Those conducting a placebo trial need to know the subjects' disorder well.</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q14')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                View Explanation
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="h-16 bg-white border-t border-gray-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3">
+            <span>Question Map:</span>
+            <div id="q-map" class="flex gap-1">
+                <!-- Javascript will generate boxes here -->
+            </div>
+            
+            <!-- Result Legend (hidden until submit) -->
+            <div id="result-legend" class="hidden ml-4 flex gap-4 text-xs">
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-500"></div> Correct</div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-red-500"></div> Incorrect</div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-yellow-400"></div> Unanswered</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-600 font-medium cursor-help" id="highlight-hint">
+            💡 Tip: Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        const ANSWER_KEYS = {
+            1: "NO", 2: "YES", 3: "NOT GIVEN", 4: "YES", 5: "NO",
+            6: "H", 7: "A", 8: "C", 9: "G", 10: "E",
+            11: "C", 12: "B", 13: "A", 14: "A"
+        };
+        
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=14; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border border-gray-300 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-colors bg-white hover:bg-gray-50`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => document.querySelector(`.q-row[data-q="${i}"]`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateAnswer(qNum, value) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = value;
+            
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(value && value.trim() !== '') {
+                mapBox.classList.add('bg-brand-100', 'border-brand-300', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-300', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-100', 'border-brand-300', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-300', 'text-gray-500');
+            }
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) { // 5 mins
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                }
+            }, 1000);
+        }
+
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-word');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', draggable.dataset.val);
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => {
+                    e.preventDefault(); 
+                    if (zone.style.pointerEvents !== 'none') {
+                        zone.classList.add('ring-4', 'ring-brand-300', 'scale-110');
+                    }
+                });
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault(); 
+                    if (zone.style.pointerEvents !== 'none') {
+                        zone.classList.add('ring-4', 'ring-brand-300', 'scale-110');
+                    }
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('ring-4', 'ring-brand-300', 'scale-110');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300', 'scale-110');
+                    if (zone.style.pointerEvents === 'none') return;
+
+                    const val = e.dataTransfer.getData('text/plain');
+                    const validOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+                    
+                    if (val && validOptions.includes(val.trim().toUpperCase())) {
+                        const finalVal = val.trim().toUpperCase();
+                        
+                        // Look up full text for display
+                        const sourceElement = document.querySelector(`.draggable-word[data-val="${finalVal}"]`);
+                        zone.textContent = sourceElement ? sourceElement.textContent : finalVal;
+                        
+                        zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100', 'text-sm');
+                        zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md', 'text-xs');
+                        
+                        updateAnswer(zone.dataset.q, finalVal);
+                    }
+                });
+                
+                zone.addEventListener('click', () => {
+                    if (zone.textContent && zone.style.pointerEvents !== 'none') {
+                        zone.textContent = '';
+                        zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md', 'text-xs');
+                        zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100', 'text-sm');
+                        updateAnswer(zone.dataset.q, '');
+                    }
+                });
+            });
+        }
+
+        // Custom Highlighting Feature for Students
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', () => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            let score = 0;
+            
+            // Disable Inputs & Lock UI
+            document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+            document.querySelectorAll('.draggable-word').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => {
+                el.style.pointerEvents = 'none';
+                el.classList.remove('cursor-pointer');
+            });
+
+            // Reveal explanation panel for Q6-10
+            document.getElementById('exp-panel-6-10').classList.remove('hidden');
+
+            // Evaluate and Annotate
+            for(let i=1; i<=14; i++) {
+                const uAns = userAnswers[i] || '';
+                const cAns = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const mapBox = document.getElementById(`map-q${i}`);
+                
+                // Show standard explanation buttons
+                const expBtn = qRow.querySelector('.exp-btn');
+                if(expBtn) expBtn.classList.remove('hidden');
+
+                // Clear previous map classes
+                mapBox.className = `w-7 h-7 rounded border flex items-center justify-center text-xs font-bold text-white cursor-pointer transition-colors shadow-sm`;
+
+                let isCorrect = (uAns === cAns);
+
+                // Apply highlighting status
+                if(uAns === '') { // Unanswered
+                    mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+                    if (i < 6 || i > 10) qRow.classList.add('bg-yellow-50', 'border-l-4', 'border-yellow-400');
+                } else if(isCorrect) { // Correct
+                    score++;
+                    mapBox.classList.add('bg-green-500', 'border-green-600');
+                    if (i < 6 || i > 10) qRow.classList.add('bg-green-50', 'border-l-4', 'border-green-500');
+                } else { // Incorrect
+                    mapBox.classList.add('bg-red-500', 'border-red-600');
+                    if (i < 6 || i > 10) qRow.classList.add('bg-red-50', 'border-l-4', 'border-red-500');
+                }
+
+                // Explicitly display the Correct Answer if wrong or unanswered
+                if (!isCorrect) {
+                    if (i >= 6 && i <= 10) {
+                        // Drag and drop inline error highlighting
+                        const dropZone = document.querySelector(`.drop-zone[data-q="${i}"]`);
+                        dropZone.classList.remove('border-brand-500', 'bg-white', 'border-dashed', 'border-gray-400', 'bg-gray-100');
+                        dropZone.classList.add('border-solid', 'border-red-500', 'bg-red-100', 'text-red-700', 'line-through');
+                        
+                        // Append correct answer badge next to drop zone
+                        const correctBadge = document.createElement('span');
+                        correctBadge.className = 'inline-flex items-center justify-center px-2 py-[0.15rem] ml-2 text-xs font-bold text-green-700 bg-green-100 border border-green-400 rounded align-middle shadow-sm whitespace-nowrap';
+                        
+                        // Fetch full text for the correct answer from the word bank
+                        const sourceElement = document.querySelector(`.draggable-word[data-val="${cAns}"]`);
+                        correctBadge.innerHTML = `<svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>${sourceElement ? sourceElement.textContent : cAns}`;
+                        
+                        dropZone.parentNode.insertBefore(correctBadge, dropZone.nextSibling);
+                    } else {
+                        // Multiple Choice / Select Correct Answer Alert
+                        const correctMarker = document.createElement('div');
+                        correctMarker.className = 'text-sm text-green-800 font-bold mt-3 ml-12 bg-green-100 py-2 px-3 rounded-md inline-block border border-green-300 shadow-sm flex items-center gap-2';
+                        
+                        let answerText = cAns;
+                        if (i >= 11 && i <= 14) {
+                            // Find the full text string of the correct MC option
+                            const correctInput = document.querySelector(`input[name="q${i}"][value="${cAns}"]`);
+                            if(correctInput) {
+                                answerText = correctInput.nextElementSibling.innerText.replace(/^[A-D]\.\s*/, '');
+                            }
+                        }
+                        
+                        correctMarker.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Correct Answer: ${answerText}`;
+                        qRow.appendChild(correctMarker);
+                    }
+                } else {
+                    // Make sure correct drag and drops turn green
+                    if (i >= 6 && i <= 10) {
+                        const dropZone = document.querySelector(`.drop-zone[data-q="${i}"]`);
+                        dropZone.classList.remove('border-brand-500', 'text-brand-700');
+                        dropZone.classList.add('border-solid', 'border-green-500', 'bg-green-100', 'text-green-800');
+                    }
+                }
+            }
+
+            // Update Global UI State
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            
+            // Scroll to top of right pane
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        // View Explanation Highlights
+        function showExplanation(targetId) {
+            // Remove previous active highlights
+            document.querySelectorAll('.active-target').forEach(el => {
+                el.classList.remove('active-target');
+            });
+            
+            // Handle NOT GIVEN exception (Q3) via toast
+            if (targetId === 'not-given-q3') {
+                const toast = document.getElementById('custom-toast');
+                const msg = document.getElementById('toast-msg');
+                msg.innerText = "The passage mentions a 'common but painful medical condition' in Kaptchuk's study, but it does NOT compare whether some medical conditions are more easily treated by a placebo than others. Therefore, the statement is NOT GIVEN.";
+                toast.classList.remove('hidden');
+                
+                // Hide after 7 seconds
+                setTimeout(() => toast.classList.add('hidden'), 7000);
+                
+                // Scroll to Kaptchuk paragraph to give context
+                document.getElementById('exp-q4').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            const targetEl = document.getElementById(targetId);
+            if(targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetEl.classList.add('active-target');
+            }
+        }
+
+        // Start App
+        window.onload = function() {
+            initQuestionMap();
+            initDragAndDrop();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

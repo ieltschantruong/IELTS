@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Chan Truong - Listening Practice</title>
+    
+    <!-- Tailwind CSS (Fixed: Added CDN and Config) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            blush: '#FFF0F5',  /* Very light pink background */
+                            pink: '#F4B6C2',   /* Soft pink borders/accents */
+                            rose: '#E78EA0',   /* Mid-tone pink for active states */
+                            accent: '#A75D67', /* Darker pink for hover/buttons */
+                            dark: '#4A252B'    /* Deep brown/pink for text */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FAFAFA; color: #4A4A4A; }
+        
+        /* Highlight tool styling */
+        ::selection {
+            background-color: #F4B6C2;
+            color: #000;
+        }
+        .user-highlight {
+            background-color: #FFF06C; /* Yellow highlighter look */
+            border-radius: 4px;
+            padding: 2px 4px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .user-highlight:hover { 
+            background-color: #FFE066; 
+            opacity: 0.8;
+        }
+        .user-highlight:hover::after {
+            content: 'Click to remove';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            margin-bottom: 4px;
+        }
+        
+        /* Transcript syncing styling */
+        .transcript-line { transition: all 0.3s ease; padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 4px solid transparent;}
+        .transcript-line.active { background-color: #FFF0F5; border-left-color: #F4B6C2; font-weight: 500; color: #4A252B; }
+        .transcript-line.target-highlight { background-color: #E78EA0; color: white; animation: pulse 2s 1; border-left-color: #A75D67; }
+
+        @keyframes pulse {
+            0% { background-color: #FAD4D4; color: #4A252B;}
+            50% { background-color: #E78EA0; color: white; }
+            100% { background-color: transparent; color: inherit; }
+        }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #F4B6C2; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #A75D67; }
+
+        /* Input styling */
+        .ielts-input { border-bottom: 2px solid #ccc; outline: none; background: transparent; padding: 2px 5px; min-width: 150px; transition: border-color 0.3s; }
+        .ielts-input:focus { border-color: #E78EA0; }
+        
+        /* Hidden UI states */
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col text-gray-800">
+
+    <!-- HEADER -->
+    <header class="bg-white border-b-2 border-pastel-pink p-4 shadow-sm flex justify-between items-center z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-pastel-rose rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
+                <i class="fa-solid fa-headphones-simple"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-pastel-dark tracking-tight">IELTS Chan Truong</h1>
+        </div>
+        
+        <!-- Timer (Visible only in Test View) -->
+        <div id="timerDisplay" class="hidden-view bg-pastel-blush px-4 py-2 rounded-lg border border-pastel-pink text-pastel-dark font-semibold text-lg flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-clock"></i>
+            <span id="timeRemaining">10:00</span>
+        </div>
+
+        <!-- Result View Score Summary -->
+        <div id="scoreSummaryHeader" class="hidden-view items-center gap-4">
+            <span class="text-gray-500 font-medium">Section 3 Overview</span>
+            <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold text-lg border border-green-200 shadow-sm">
+                Score: <span id="finalScoreDisplay">0</span> / 10
+            </div>
+        </div>
+    </header>
+
+    <!-- VIEW 1: START SCREEN -->
+    <main id="startView" class="flex-1 flex flex-col items-center justify-center bg-gray-50 p-6 overflow-y-auto custom-scroll">
+        <div class="max-w-4xl bg-white p-10 rounded-2xl shadow-xl border border-gray-200 w-full">
+            
+            <div class="text-center mb-8 border-b pb-6">
+                <span class="bg-pastel-blush text-pastel-dark px-3 py-1 rounded-full text-sm font-semibold tracking-wide uppercase border border-pastel-pink">Computer-Delivered Practice</span>
+                <h2 class="text-3xl font-bold text-pastel-dark mt-4" id="startSectionTitle">Section 3: Clinic Treatments and Patient Route</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2 text-gray-800">
+                        <i class="fa-solid fa-circle-info text-pastel-rose"></i> Test Details
+                    </h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i> <strong>Audio:</strong> Plays automatically. Cannot be paused or rewound.</li>
+                        <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i> <strong>Duration:</strong> 10 minutes. Auto-submits when time is up.</li>
+                        <li class="flex gap-2"><i class="fa-solid fa-check text-green-500 mt-1"></i> <strong>Questions:</strong> 10 questions (Matching & Flowchart Completion).</li>
+                    </ul>
+                </div>
+                <div class="bg-blue-50 border border-blue-100 p-5 rounded-xl">
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2 text-blue-800">
+                        <i class="fa-solid fa-lightbulb text-yellow-500"></i> Pro Tip: Highlighting
+                    </h3>
+                    <p class="text-blue-700 text-sm leading-relaxed mb-3">
+                        Use your mouse to select text within the questions. A highlight button will appear.
+                    </p>
+                    <div class="flex items-center gap-2 text-sm bg-white p-2 rounded border border-blue-200 shadow-sm inline-block">
+                        Select text ➔ Click <span class="bg-pastel-dark text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-highlighter"></i> Highlight</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-10">
+                <button onclick="app.startTest()" class="bg-pastel-dark hover:bg-pastel-accent text-white font-bold py-4 px-12 rounded-full shadow-lg transition-transform transform hover:scale-105 text-xl flex items-center justify-center gap-3 mx-auto">
+                    <i class="fa-solid fa-headphones"></i> Start Test Now
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- VIEW 2: TEST VIEW -->
+    <main id="testView" class="hidden-view flex-1 flex bg-white overflow-hidden relative">
+        
+        <!-- Highlight Tooltip -->
+        <div id="highlightTooltip" class="absolute hidden z-50 bg-pastel-dark text-white px-4 py-2 rounded-lg cursor-pointer text-sm font-semibold shadow-xl hover:bg-pastel-accent transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-highlighter"></i> Highlight
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-gray-50 border-r border-gray-200 flex flex-col shrink-0 hidden md:flex">
+            <div class="p-4 border-b border-gray-200 bg-pastel-blush">
+                <h3 class="font-semibold text-pastel-dark flex items-center gap-2">
+                    <i class="fa-solid fa-list-ol"></i> Navigation
+                </h3>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scroll p-4" id="questionNavPanel">
+                <!-- Navigation pills generated by JS -->
+            </div>
+            <div class="p-4 border-t border-gray-200 bg-white">
+                <button onclick="app.submitTest()" class="w-full bg-pastel-accent hover:bg-pastel-dark text-white font-bold py-3 rounded-lg shadow transition-colors flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Answers
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Question Area -->
+        <section class="flex-1 overflow-y-auto custom-scroll p-6 md:p-10 relative" id="testQuestionArea">
+            <div class="max-w-4xl mx-auto pb-20" id="testContentContainer">
+                <!-- Dynamic questions injected here -->
+            </div>
+
+            <!-- Mobile submit button -->
+            <div class="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg">
+                 <button onclick="app.submitTest()" class="w-full bg-pastel-accent text-white font-bold py-3 rounded-lg shadow flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Answers
+                </button>
+            </div>
+
+            <!-- Invisible Audio Player for Test Mode -->
+            <audio id="testAudioElement" src="#" class="hidden"></audio>
+        </section>
+    </main>
+
+    <!-- VIEW 3: RESULT VIEW -->
+    <main id="resultView" class="hidden-view flex-1 flex flex-col lg:flex-row bg-gray-50 overflow-hidden">
+        
+        <!-- Left Pane: Review Questions & Explanations -->
+        <section class="w-full lg:w-1/2 flex flex-col border-r border-gray-300 bg-white h-1/2 lg:h-full">
+            <div class="p-4 bg-pastel-blush border-b border-gray-200 flex justify-between items-center shrink-0">
+                <h2 class="text-xl font-bold text-pastel-dark flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check"></i> Review Answers
+                </h2>
+            </div>
+            
+            <!-- ADDED: Result Navigation Bar -->
+            <div id="resultNavPanel" class="bg-white border-b border-gray-200 p-3 flex gap-2 overflow-x-auto custom-scroll shrink-0 items-center shadow-sm z-10">
+                <!-- Nav pills injected by JS -->
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scroll p-6" id="resultQuestionArea">
+                <!-- Result questions injected here -->
+            </div>
+        </section>
+
+        <!-- Right Pane: Transcript & Media Controls -->
+        <section class="w-full lg:w-1/2 flex flex-col bg-[#FDFDFD] h-1/2 lg:h-full">
+            <!-- Audio Controls Bar -->
+            <div class="p-4 bg-white border-b border-gray-200 shadow-sm shrink-0">
+                <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-file-audio text-pastel-dark"></i> Audio & Transcript
+                </h3>
+                <div class="flex flex-col gap-2">
+                    <audio id="reviewAudioElement" controls class="w-full h-10 outline-none rounded">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div class="flex justify-between items-center text-sm text-gray-600 mt-1">
+                        <span class="font-medium"><i class="fa-solid fa-gauge-high"></i> Playback Speed:</span>
+                        <select id="playbackRate" class="border border-gray-300 rounded px-3 py-1 bg-white outline-none focus:border-pastel-dark" onchange="document.getElementById('reviewAudioElement').playbackRate = parseFloat(this.value)">
+                            <option value="0.75">0.75x</option>
+                            <option value="1" selected>1x (Normal)</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transcript Area -->
+            <div class="flex-1 overflow-y-auto custom-scroll p-6 text-base leading-relaxed text-gray-700" id="transcriptArea">
+                <!-- Transcript injected here -->
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- DATA STATE ---
+        const PLACEHOLDER_AUDIO_URL = "https://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_studentbook_unit3.mp3"; 
+        
+        const mockTestData = {
+            sectionTitle: "Section 3: Clinic Treatments and Patient Route",
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: PLACEHOLDER_AUDIO_URL,
+            questions: [
+                {
+                    id: "q1", type: "fill-in", number: 1,
+                    text: `
+                        <div class="bg-pastel-blush border border-pastel-pink p-5 rounded-xl mb-6 shadow-sm">
+                            <p class="font-bold text-pastel-dark mb-3 text-lg">Comments</p>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
+                                <li><strong class="text-pastel-dark mr-2">A.</strong> It strengthens the whole body.</li>
+                                <li><strong class="text-pastel-dark mr-2">B.</strong> It is the most popular.</li>
+                                <li><strong class="text-pastel-dark mr-2">C.</strong> It requires special sportswear.</li>
+                                <li><strong class="text-pastel-dark mr-2">D.</strong> It is the most effective.</li>
+                                <li><strong class="text-pastel-dark mr-2">E.</strong> It is best done in the evening.</li>
+                                <li><strong class="text-pastel-dark mr-2">F.</strong> It is rarely used.</li>
+                            </ul>
+                        </div>
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">1. Manual therapy</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q1">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["D", "d"], timestamp: 63, transcriptRef: "tr_1_03",
+                    explanation: "Steve says about manual therapy: 'it gets results more quickly than anything else', which means it is the most effective (D)."
+                },
+                {
+                    id: "q2", type: "fill-in", number: 2,
+                    text: `
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">2. Stability training</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q2">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["A", "a"], timestamp: 97, transcriptRef: "tr_1_37",
+                    explanation: "Regarding stability training, Steve states 'we improve your overall form, and that's quite good if you're tired or a bit weak', aligning with strengthening the whole body (A)."
+                },
+                {
+                    id: "q3", type: "fill-in", number: 3,
+                    text: `
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">3. Electrotherapy</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q3">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["F", "f"], timestamp: 126, transcriptRef: "tr_2_06",
+                    explanation: "When asked about electrotherapy, Steve confirms 'we tend to avoid it most of the time', indicating it is rarely used (F)."
+                },
+                {
+                    id: "q4", type: "fill-in", number: 4,
+                    text: `
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">4. Video analysis</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q4">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["B", "b"], timestamp: 148, transcriptRef: "tr_2_28",
+                    explanation: "For video analysis, Steve notes 'It's what everyone asks for ... it outstrips all our other services', making it the most popular (B)."
+                },
+                {
+                    id: "q5", type: "fill-in", number: 5,
+                    text: `
+                        <div class="flex items-center gap-4 mb-6">
+                           <span class="w-48 font-medium">5. Workstation analysis</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q5">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["E", "e"], timestamp: 170, transcriptRef: "tr_2_50",
+                    explanation: "Steve suggests that 'people come at the end of the day for this' (workstation analysis), which matches being best done in the evening (E)."
+                },
+                {
+                    id: "q6", type: "fill-in", number: 6,
+                    text: `
+                        <div class="mt-8 pt-8 border-t-2 border-dashed border-gray-200">
+                            <h3 class="font-bold text-xl mb-6 text-center text-pastel-dark uppercase tracking-wider">Example of patient route</h3>
+                            <div class="flex flex-col items-center text-center space-y-2">
+                                <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                    <span class="font-bold text-pastel-dark text-lg mr-2">6.</span> Arrives at clinic with an <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q6" autocomplete="off">
+                                </div>
+                                <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["injury", "existing injury"], timestamp: 196, transcriptRef: "tr_3_16",
+                    explanation: "Steve explains a situation where a patient sustained an injury a year ago, referring to it as an 'existing injury'."
+                },
+                {
+                    id: "q7", type: "fill-in", number: 7,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <span class="font-bold text-pastel-dark text-lg mr-2">7.</span> Physiotherapist evaluates <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q7" autocomplete="off"> to ankle.
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                    `,
+                    correctAnswer: ["damage", "the damage"], timestamp: 231, transcriptRef: "tr_3_51",
+                    explanation: "Steve says the first thing they do is 'assess the damage to the joint area'."
+                },
+                {
+                    id: "q8", type: "fill-in", number: 8,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <span class="font-bold text-pastel-dark text-lg mr-2">8.</span> Treatment is given, and an <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q8" autocomplete="off"> is prepared.
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                    `,
+                    correctAnswer: ["exercise plan"], timestamp: 244, transcriptRef: "tr_4_04",
+                    explanation: "After selecting a treatment, Steve mentions they 'design an exercise plan for you'."
+                },
+                {
+                    id: "q9", type: "fill-in", number: 9,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <span class="font-bold text-pastel-dark text-lg mr-2">9.</span> Return trips are made to check joint <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q9" autocomplete="off">
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                    `,
+                    correctAnswer: ["movement"], timestamp: 259, transcriptRef: "tr_4_19",
+                    explanation: "During regular appointments, Steve explains they 'monitor the movement in the joint each time'."
+                },
+                {
+                    id: "q10", type: "fill-in", number: 10,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-pastel-pink bg-opacity-20 p-5 rounded-lg shadow-sm border border-pastel-pink w-full max-w-lg">
+                                <span class="font-bold text-pastel-dark text-lg mr-2">10.</span> A <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q10" autocomplete="off"> supervises activity in the gym.
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["personal trainer"], timestamp: 282, transcriptRef: "tr_4_42",
+                    explanation: "Steve mentions that a 'personal trainer' devises the training plan and oversees the programme."
+                }
+            ],
+            transcript: [
+                { id: "tr_0_05", start: 0, end: 7, text: "<strong>Steve:</strong> Good morning, guys, come on in." },
+                { id: "tr_0_07", start: 7, end: 50, text: "<strong>Mike:</strong> Thanks, Steve - it's good of you to spare us some of your time. <br><strong>Flo:</strong> Yeah we really appreciate it. <br><strong>Steve:</strong> That's OK. So you're studying sports science, are you? <br><strong>Mike:</strong> Yeah we've only just started our course, actually - but as I explained on the phone, um, we have this seminar to do on sports injuries and we thought, who better to talk to than someone like yourself? <br><strong>Steve:</strong> Fine, OK. So what would you like to know? <br><strong>Flo:</strong> Well, we thought we'd start by asking you about some of the treatments and services you offer here at the clinic. <br><strong>Steve:</strong> OK - well, as you know, physiotherapists deal with a whole range of different 'problem areas' in the body. <br><strong>Mike:</strong> Yeah - what sort of techniques do you use to help people? I mean. I know you use massage - and I understand that's a key form of treatment..." },
+                { id: "tr_0_50", start: 50, end: 63, text: "<strong>Steve:</strong> Yeah. Well, we call it 'manual therapy', you know, because it's a hands-on treatment and it just involves manipulating the soft tissue around a joint to relieve stiffness and pain. <br><strong>Flo:</strong> Is that something that a lot of people come here for?" },
+                { id: "tr_1_03", start: 63, end: 81, text: "<strong>Steve:</strong> Um - well, we generally decide what's best for the individual. This treatment can hurt sometimes, but it gets results more quickly than anything else. <em>(Q1)</em> <br><strong>Flo:</strong> And is that true whatever the injury? <br><strong>Steve:</strong> For sports injuries, generally, yes. But it doesn't stop there - you have to do other things as well." },
+                { id: "tr_1_21", start: 81, end: 85, text: "<strong>Mike:</strong> I've heard of something called 'stability training'. Do you do that?" },
+                { id: "tr_1_25", start: 85, end: 92, text: "<strong>Steve:</strong> Definitely. This is something that's designed to improve overall posture and body shape. <br><strong>Mike:</strong> So it's for the back and neck?" },
+                { id: "tr_1_32", start: 92, end: 97, text: "<strong>Flo:</strong> I think I've heard of this... it works on everything and gives you more power." },
+                { id: "tr_1_37", start: 97, end: 112, text: "<strong>Steve:</strong> Yeah - this is important - we improve your overall form, and that's quite good if you're tired or a bit weak. <em>(Q2)</em> <br><strong>Flo:</strong> Do you use any aids to boost performance? <br><strong>Steve:</strong> Occasionally we recommend a pad or block for a sports shoe, but not often. <br><strong>Mike:</strong> What about electrical equipment?" },
+                { id: "tr_1_52", start: 112, end: 120, text: "<strong>Steve:</strong> We do sometimes use electrotherapy, which is supposed to stimulate the body to repair itself. <br><strong>Flo:</strong> So that's actually using a small electrical charge?" },
+                { id: "tr_2_00", start: 120, end: 124, text: "<strong>Steve:</strong> Yes, but there's growing evidence that the effect is limited." },
+                { id: "tr_2_04", start: 124, end: 126, text: "<strong>Mike:</strong> So I guess you don't use it much?" },
+                { id: "tr_2_06", start: 126, end: 141, text: "<strong>Steve:</strong> No, we tend to avoid it most of the time. <em>(Q3)</em> <br><strong>Mike:</strong> I see. What if people don't have an injury but just want to get better at their sport? I mean, sometimes people know they do something wrong when they... swing a golf club, for example." },
+                { id: "tr_2_21", start: 141, end: 148, text: "<strong>Steve:</strong> Ah - then we film them and show them exactly what they do. It's called video analysis. <br><strong>Flo:</strong> That must be really helpful." },
+                { id: "tr_2_28", start: 148, end: 158, text: "<strong>Steve:</strong> It's what everyone asks for ... it outstrips all our other services - because it's great for so many activities - not just sporting ones. <em>(Q4)</em> <br><strong>Mike:</strong> Can you help people with sedentary activities?" },
+                { id: "tr_2_38", start: 158, end: 164, text: "<strong>Steve:</strong> Absolutely - we offer workstation analysis because so many people have asked us for it." },
+                { id: "tr_2_44", start: 164, end: 170, text: "<strong>Flo:</strong> Yeah, I spend hours on my laptop, and as the day goes on, my posture gets worse and worse!" },
+                { id: "tr_2_50", start: 170, end: 196, text: "<strong>Steve:</strong> That's why we tend to suggest that people come at the end of the day for this. <em>(Q5)</em> <br><strong>Mike:</strong> I guess the problem is that everyone's built differently... I think we both need some help there. <br><strong>Flo:</strong> That was really interesting. So what happens when someone comes to your clinic? <br><strong>Steve:</strong> Well, let's imagine you're the patient. <br><strong>Flo:</strong> OK." },
+                { id: "tr_3_16", start: 196, end: 231, text: "<strong>Steve:</strong> A common situation will be that you sustained an injury. say, a year ago. So it's not new... so you turn up with what we call an 'existing injury'. <em>(Q6)</em> <br><strong>Flo:</strong> Right. Like I sprained my ankle. <br><strong>Steve:</strong> Exactly - that's a typical one. <br><strong>Flo:</strong> OK, and I've been to the doctor, and he's sent me to the hospital for an X-ray, and then I've been prescribed a cream or even painkillers. <br><strong>Steve:</strong> You've been through that medical route. <br><strong>Flo:</strong> OK. And I had to rest it for a while, of course, and that meant not doing any sport. So I've come to you because I'm fed up, basically." },
+                { id: "tr_3_51", start: 231, end: 244, text: "<strong>Steve:</strong> Yes - you need to get the joint moving again. So what we would do first is to assess the damage <em>(Q7)</em> to the joint area. <br><strong>Flo:</strong> I guess there's a whole range of problems that it could be, and some are more serious than others." },
+                { id: "tr_4_04", start: 244, end: 259, text: "<strong>Steve:</strong> And we can't afford to make mistakes. Now, once we know what the problem is, we select a treatment - perhaps one that we talked about earlier - plus we design an exercise plan <em>(Q8)</em> for you. <br><strong>Flo:</strong> That's great if you stick to it." },
+                { id: "tr_4_19", start: 259, end: 282, text: "<strong>Steve:</strong> Yes, that's the hard part for patients because they don't have time or they get bored. So we ask them to come back regularly - we make appointments - and we monitor the movement <em>(Q9)</em> in the joint each time. <br><strong>Flo:</strong> And you expect that to work? <br><strong>Steve:</strong> Yes, and it usually does - quite quickly, in fact, and then we can go on to rehabilitation. <br><strong>Flo:</strong> You mean getting them back into the sporting activity they used to do?" },
+                { id: "tr_4_42", start: 282, end: 9999, text: "<strong>Steve:</strong> That's right. We have a fully equipped gym and we devise a training plan - well, a personal trainer <em>(Q10)</em> does that, and they oversee the programme for at least a couple of months and make sure the patient carries it out. <br><strong>Flo:</strong> It sounds really thorough. That's great, Steve, thanks." }
+            ]
+        };
+
+        // --- APP LOGIC ---
+        const app = {
+            state: {
+                answers: {},
+                timerInterval: null,
+                timeRemaining: mockTestData.totalTimeSeconds,
+                currentHighlightRange: null,
+                audioSyncInterval: null
+            },
+            
+            init() {
+                // Setup Audio sources
+                document.getElementById('testAudioElement').src = mockTestData.audioUrl;
+                document.getElementById('reviewAudioElement').src = mockTestData.audioUrl;
+                
+                this.renderTestQuestions();
+                this.setupHighlightTool();
+            },
+
+            setupHighlightTool() {
+                const questionArea = document.getElementById('testQuestionArea');
+                const tooltip = document.getElementById('highlightTooltip');
+
+                // Listen for text selection
+                questionArea.addEventListener('mouseup', (e) => {
+                    const selection = window.getSelection();
+                    if (selection.toString().trim().length > 0) {
+                        const range = selection.getRangeAt(0);
+                        
+                        // Prevent highlighting across complex DOM elements (like inputs)
+                        if (range.cloneContents().querySelectorAll('input, select, .ielts-input').length > 0) {
+                             tooltip.classList.add('hidden');
+                             return; 
+                        }
+
+                        this.state.currentHighlightRange = range;
+                        
+                        // Position tooltip relative to viewport
+                        const rect = range.getBoundingClientRect();
+                        const scrollY = window.scrollY || document.documentElement.scrollTop;
+                        
+                        tooltip.style.left = `${rect.left + (rect.width / 2) - 40}px`;
+                        tooltip.style.top = `${rect.top - 40}px`; // Just above selection
+                        tooltip.classList.remove('hidden');
+                    } else {
+                        tooltip.classList.add('hidden');
+                    }
+                });
+
+                // Handle Highlight click
+                tooltip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (this.state.currentHighlightRange) {
+                        try {
+                            const span = document.createElement('span');
+                            span.className = 'user-highlight';
+                            
+                            // Make highlight removable on click
+                            span.onclick = function(e) {
+                                e.stopPropagation();
+                                const parent = this.parentNode;
+                                while(this.firstChild) {
+                                    parent.insertBefore(this.firstChild, this);
+                                }
+                                parent.removeChild(this);
+                            };
+
+                            this.state.currentHighlightRange.surroundContents(span);
+                        } catch (err) {
+                            console.warn("Could not highlight selection across HTML boundaries.");
+                        }
+                    }
+                    tooltip.classList.add('hidden');
+                    window.getSelection().removeAllRanges();
+                });
+
+                // Hide tooltip on scroll or click elsewhere
+                document.addEventListener('mousedown', (e) => {
+                    if(e.target.id !== 'highlightTooltip') {
+                        tooltip.classList.add('hidden');
+                    }
+                });
+                questionArea.addEventListener('scroll', () => tooltip.classList.add('hidden'));
+            },
+
+            startTest() {
+                // Switch Views
+                document.getElementById('startView').classList.add('hidden-view');
+                document.getElementById('testView').classList.remove('hidden-view');
+                document.getElementById('timerDisplay').classList.remove('hidden-view');
+                
+                // Start Audio
+                const audio = document.getElementById('testAudioElement');
+                audio.play().catch(e => console.log("Audio play blocked by browser, user interaction needed first."));
+
+                // Start Timer
+                this.updateTimerDisplay();
+                this.state.timerInterval = setInterval(() => {
+                    this.state.timeRemaining--;
+                    this.updateTimerDisplay();
+                    if (this.state.timeRemaining <= 0) {
+                        this.submitTest();
+                    }
+                }, 1000);
+            },
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.state.timeRemaining / 60);
+                const seconds = this.state.timeRemaining % 60;
+                document.getElementById('timeRemaining').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            },
+
+            renderTestQuestions() {
+                const container = document.getElementById('testContentContainer');
+                const navPanel = document.getElementById('questionNavPanel');
+                container.innerHTML = '';
+                navPanel.innerHTML = '<div class="grid grid-cols-5 gap-2 mt-2"></div>';
+                const navGrid = navPanel.querySelector('div');
+
+                mockTestData.questions.forEach((q, index) => {
+                    // Render Question HTML
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'mb-4';
+                    qDiv.id = `question-block-${q.id}`;
+                    qDiv.innerHTML = q.text;
+                    container.appendChild(qDiv);
+
+                    // Render Nav Pill
+                    const pill = document.createElement('button');
+                    pill.className = 'bg-white border border-gray-300 rounded p-2 text-sm font-medium text-gray-600 hover:bg-pastel-blush hover:border-pastel-pink transition-colors';
+                    pill.textContent = q.number;
+                    pill.onclick = () => document.getElementById(`question-block-${q.id}`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                    navGrid.appendChild(pill);
+                });
+
+                // Attach Listeners to inputs and selects to save state
+                document.querySelectorAll('.ielts-input').forEach(input => {
+                    const eventType = input.tagName === 'SELECT' ? 'change' : 'input';
+                    input.addEventListener(eventType, (e) => {
+                        this.state.answers[e.target.dataset.qid] = e.target.value.trim();
+                        
+                        // Update Nav Pill color if answered
+                        const qNum = mockTestData.questions.find(q => q.id === e.target.dataset.qid).number;
+                        const pills = document.querySelectorAll('#questionNavPanel button');
+                        if(e.target.value.trim() !== '') {
+                            pills[qNum-1].classList.add('bg-pastel-pink', 'text-white', 'border-pastel-rose');
+                            pills[qNum-1].classList.remove('bg-white', 'text-gray-600');
+                        } else {
+                            pills[qNum-1].classList.remove('bg-pastel-pink', 'text-white', 'border-pastel-rose');
+                            pills[qNum-1].classList.add('bg-white', 'text-gray-600');
+                        }
+                    });
+                });
+            },
+
+            submitTest() {
+                clearInterval(this.state.timerInterval);
+                document.getElementById('testAudioElement').pause();
+                
+                // Switch Views
+                document.getElementById('testView').classList.add('hidden-view');
+                document.getElementById('timerDisplay').classList.add('hidden-view');
+                document.getElementById('resultView').classList.remove('hidden-view');
+                document.getElementById('scoreSummaryHeader').classList.remove('hidden-view');
+                document.getElementById('scoreSummaryHeader').classList.add('flex');
+
+                this.renderResultView();
+                this.renderTranscript();
+                this.setupAudioSync();
+            },
+
+            renderResultView() {
+                const resultArea = document.getElementById('resultQuestionArea');
+                const navPanel = document.getElementById('resultNavPanel');
+                
+                resultArea.innerHTML = '';
+                navPanel.innerHTML = '<span class="text-sm text-gray-500 font-medium mr-1 whitespace-nowrap"><i class="fa-solid fa-bars-staggered"></i> Jump to:</span>';
+                
+                let correctCount = 0;
+
+                mockTestData.questions.forEach(q => {
+                    const userAnswer = this.state.answers[q.id] || '';
+                    const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase() === userAnswer.toLowerCase());
+                    if (isCorrect) correctCount++;
+
+                    // 1. Build Navigation Pill for the Top Bar
+                    const navPill = document.createElement('button');
+                    navPill.className = `flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm transition-transform hover:scale-110 ${isCorrect ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`;
+                    navPill.textContent = q.number;
+                    navPill.title = `Go to Question ${q.number} (${isCorrect ? 'Correct' : 'Incorrect'})`;
+                    navPill.onclick = () => {
+                        const target = document.getElementById(`result-q-${q.id}`);
+                        if(target) target.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    };
+                    navPanel.appendChild(navPill);
+
+                    // 2. Build the detailed Question Review Block
+                    const qBlock = document.createElement('div');
+                    qBlock.id = `result-q-${q.id}`; // Added ID for scrolling anchor
+                    qBlock.className = `p-5 mb-4 rounded-xl border-l-4 shadow-sm bg-white border ${isCorrect ? 'border-l-green-500' : 'border-l-red-500'}`;
+                    
+                    // Replace input/select elements with text for review mode
+                    let reviewText = q.text.replace(/<input[^>]*>/g, `___`).replace(/<select[^>]*>[\s\S]*?<\/select>/g, `___`);
+
+                    qBlock.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="font-bold text-lg text-gray-700">Question ${q.number}</span>
+                            <span>${isCorrect ? '<i class="fa-solid fa-circle-check text-green-500 text-xl"></i>' : '<i class="fa-solid fa-circle-xmark text-red-500 text-xl"></i>'}</span>
+                        </div>
+                        <div class="mb-4 text-gray-600">${reviewText}</div>
+                        <div class="bg-gray-50 p-4 rounded-lg mb-3 border border-gray-100">
+                            <div class="mb-1"><span class="font-medium text-gray-500">Your Answer:</span> <span class="font-bold ${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || '<i>(blank)</i>'}</span></div>
+                            <div><span class="font-medium text-gray-500">Correct Answer:</span> <span class="font-bold text-gray-800">${q.correctAnswer.join(' / ')}</span></div>
+                        </div>
+                        <button onclick="app.toggleExplanation('${q.id}')" class="group flex items-center gap-2 bg-pastel-blush hover:bg-pastel-pink text-pastel-dark font-semibold px-4 py-2 rounded-full text-sm transition-colors w-max border border-pastel-pink">
+                            <i class="fa-solid fa-circle-play text-pastel-accent group-hover:text-white transition-colors"></i> View Explanation
+                        </button>
+                        <div id="exp-${q.id}" class="hidden mt-3 text-sm text-gray-700 bg-white border border-pastel-pink p-3 rounded-lg shadow-inner">
+                            ${q.explanation}
+                        </div>
+                    `;
+                    resultArea.appendChild(qBlock);
+                });
+
+                document.getElementById('finalScoreDisplay').textContent = correctCount;
+            },
+
+            toggleExplanation(qId) {
+                const expDiv = document.getElementById(`exp-${qId}`);
+                expDiv.classList.toggle('hidden');
+                
+                // If opening, jump to audio
+                if (!expDiv.classList.contains('hidden')) {
+                    const qData = mockTestData.questions.find(q => q.id === qId);
+                    const audio = document.getElementById('reviewAudioElement');
+                    audio.currentTime = qData.timestamp;
+                    audio.play();
+
+                    // Highlight Transcript
+                    document.querySelectorAll('.transcript-line').forEach(el => el.classList.remove('target-highlight'));
+                    const targetTr = document.getElementById(qData.transcriptRef);
+                    if (targetTr) {
+                        targetTr.classList.add('target-highlight');
+                        targetTr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            },
+
+            renderTranscript() {
+                const area = document.getElementById('transcriptArea');
+                area.innerHTML = mockTestData.transcript.map(tr => 
+                    `<div id="${tr.id}" class="transcript-line" data-start="${tr.start}" data-end="${tr.end}">
+                        ${tr.text}
+                    </div>`
+                ).join('');
+            },
+
+            setupAudioSync() {
+                const audio = document.getElementById('reviewAudioElement');
+                const transcriptLines = document.querySelectorAll('.transcript-line');
+                
+                audio.addEventListener('timeupdate', () => {
+                    const currentTime = audio.currentTime;
+                    transcriptLines.forEach(line => {
+                        const start = parseFloat(line.dataset.start);
+                        const end = parseFloat(line.dataset.end);
+                        if (currentTime >= start && currentTime < end) {
+                            line.classList.add('active');
+                            // Optional: Auto-scroll while playing (can be annoying if user is reading elsewhere)
+                            // line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        } else {
+                            line.classList.remove('active');
+                        }
+                    });
+                });
+            }
+        };
+
+        // Initialize on load
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
