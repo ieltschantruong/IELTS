@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   // Very light blush
+                            100: '#fce8eb',  // Pale pink
+                            200: '#f7cdd5',  // Pastel pink
+                            300: '#f0a8b6',  // Soft pink
+                            400: '#e67c91',  // Muted dark pink
+                            500: '#d75872',  // Primary elegant pink (pastel/dusty rose)
+                            600: '#bf3f58',  // Deeper elegant pink
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; }
+        .active-target { background-color: #fce8eb; border-left: 4px solid #d75872; padding: 2px 4px; color: #852b3d; font-weight: 700; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(191,63,88,0.3);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+            transition: background 0.2s;
+        }
+        #highlight-tooltip:hover { background: #a03046; }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notifications */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px) translateX(-50%); }
+            10% { opacity: 1; transform: translateY(0) translateX(-50%); }
+            90% { opacity: 1; transform: translateY(0) translateX(-50%); }
+            100% { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+        }
+        .toast-msg {
+            animation: slideUpFade 4s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Left Pane: Passage -->
+        <div id="left-pane" class="w-1/2 h-full overflow-y-auto bg-white border-r border-gray-200 p-8 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Scientific research reveals hidden benefits of regular exercise</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-lg text-justify space-y-6">
+                    <p>Exercising for up to an hour a day can improve memory and learning for both young and old, scientists have found.</p>
+                    
+                    <p>Concerns that children in developed countries are leading increasingly sedentary lifestyles are growing. Recent research suggests that almost nine in ten children fail to get the 60 minutes of daily exercise which is the minimum recommended for good health, and a third completed less than an hour each week. In most cases, this is because they are spending hours every day glued to televisions, the Internet and games consoles. <span id="exp-q1" class="explanation-target">Alarmingly, there is evidence to suggest that this lack of exercise is not only having a negative physiological effect on them, but is also adversely affecting their academic performance at school.</span></p>
+
+                    <p>Psychologist Dr Aric Sigman believes that regular exercise can significantly improve pupils' academic ability, and suggests that access to high-quality PEV lessons is just as likely to have a long-term impact on children's education as time spent in conventional classrooms. <span id="exp-q2" class="explanation-target">He also supports the long-held conviction that vigorous physical activity is much better than moderate activity.</span> 'Children should spend at least an hour a day doing some form of vigorous exercise,' he says. <span id="exp-q3" class="explanation-target">And his message to schools and parents is obvious. 'Schools and parents should devise ways of increasing physical activity in and out of school time.'</span> This, he believes, is the key to improved academic performance.</p>
+                    
+                    <p><span id="exp-q4" class="explanation-target">For those who are sceptical about this, and no doubt there are many, he quotes two pieces of research that underline the link between physical activity and brain capacity.</span> One study compared brain capacity and test scores among two groups of nine- and ten-year- olds, one with higher levels of physical fitness than the other. It revealed that fitter pupils had a twelve percent larger brain capacity than their peers, which was associated with better performance in cognitive tests. They were able to complete the test more quickly and got more answers correct. A second study of 1.2 million male teenagers in Sweden was perhaps even more revealing. It found that those who were fit were more likely to have a high IQ and go on to university.</p>
+                    
+                    <p>Dr Sigman says, 'Physical activity is thought to help a child's cognitive processes by increasing blood and oxygen flow to the brain. <span id="exp-q6" class="explanation-target">This increases levels of chemicals like endorphin in the brain which decrease stress and improve mood.</span> It also increases growth factors that help create new nerve cells and support the connections between brain cell synapses that are the basis of learning.</p>
+                    
+                    <p><span id="exp-q7" class="explanation-target">According to other researchers, there is also evidence that suggests regular exercise can increase the size of crucial parts of the brain</span>, and that <span id="exp-q8" class="explanation-target">children who are fit also tend to be better at multi-tasking and performing difficult mental tasks than their unfit friends.</span> Professor Art Kramer, director of the Beckman Institute for Advanced Science and Technology at the University of Illinois, who led the research, said <span id="exp-q9" class="explanation-target">their findings could have important implications for improving children's performance at school.</span> <span id="exp-q10" class="explanation-target">He said it could also be used to help people combat memory loss and retain problem-solving skills in old age.</span></p>
+                    
+                    <p>It is a sad fact of aging that our brain function decreases as we get older,' says Kramer. 'Increasingly, people are also living more sedentary lifestyles. While we know that exercise can have positive effects on cardiovascular disease and diabetes, we have found it can also bring about improvements in cognition and brain function. <span id="exp-q11" class="explanation-target">Aerobic exercise is best for this</span>, so by starting off doing 15 minutes a day and working up to 45 minutes to an hour of continuous exercising, we can see some real improvements in cognition after six months to a year.'</p>
+                    
+                    <p>Professor Kramer's team did a lot of <span id="exp-q12" class="explanation-target">neuroimaging work alongside their studies, which provided visual evidence to show that brain networks and structures actually change with exercise.</span> This, they say, is the reason why their aerobically-fit test subjects were found to exhibit superior cognitive control to those who were less fit, and that regular exercise helped to improve memory, attention and an increased ability to multi-task. The hippocampus, that part of the brain involved in memory, of elderly people who exercised regularly for more than six months increased by two percent, effectively reversing brain ageing by one to two years.</p>
+                    
+                    <p>Tests carried out on children also yielded some interesting results. One test involved them crossing a 'street' using a virtual reality simulation. Fitter children were better at crossing the street when distracted by music or holding a conversation on a hands-free mobile phone compared to those who were less fit. While both groups tended to walk at the same speed, the children who were less fit often misjudged the speed and distance of the computer-generated vehicles. "The low fitness kids were just as good at crossing the street when it was the only thing they were doing,' says Kramer. 'If they were listening to music or talking on the headset, they performed badly. They often ended up with the screen going red to show they had been hit. One way to look at it is that fit children think more efficiently and so are better at multi-tasking.'</p>
+                    
+                    <p>Professor Kramer presented his findings at the American Association for the Advancement of Science annual meeting in Vancouver, where other research presented showed that reducing the number of calories we consume could help to prevent brain disorders, especially in the elderly. Dr Mark Mattson, a neuroscientist from the National Institute of Ageing in Baltimore found that <span id="exp-q13" class="explanation-target">restricting people's diets to just 500 calories every other day increased production of proteins that are known to protect neurons from damage.</span> "There is considerable evidence that doing this is not only good for your heart, but is also good for your brain', he said.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Questions -->
+        <div id="right-pane" class="w-1/2 h-full overflow-y-auto bg-gray-50 p-8 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Hidden initially) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-8 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-3xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-5">
+                        <span class="text-6xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-2xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-gray-700 mb-4 bg-brand-50 p-4 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green, and you can click <strong class="text-brand-600">View Explanation</strong> to see exactly where the answers are found in the passage.</p>
+                </div>
+
+                <!-- Section 1: YES / NO / NOT GIVEN -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 mb-8 transition-colors duration-300">
+                    <div class="bg-brand-50 p-5 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg">Questions 1-5</h3>
+                        <p class="text-sm text-gray-700 mb-3">Do the following statements agree with the claims of the writer? In boxes 1-5, select:</p>
+                        <ul class="text-sm text-gray-800 space-y-1 font-medium bg-white p-3 rounded-lg border border-brand-100">
+                            <li><span class="font-bold text-brand-700 w-24 inline-block">YES</span> if the statement agrees with the claims of the writer</li>
+                            <li><span class="font-bold text-brand-700 w-24 inline-block">NO</span> if the statement contradicts the claims of the writer</li>
+                            <li><span class="font-bold text-brand-700 w-24 inline-block">NOT GIVEN</span> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-5">
+                        <!-- Q1 -->
+                        <div class="q-row rounded-xl p-4 border border-gray-200 bg-gray-50 flex flex-col gap-3" data-q="1">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm">1</div>
+                                <p class="text-gray-800 font-medium leading-relaxed">The possible impact of a sedentary lifestyle on the way children perform in the classroom is very worrying.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-12">
+                                <select onchange="updateAnswer(1, this.value)" class="w-full sm:w-48 border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-2.5 bg-white font-medium outline-none transition-colors">
+                                    <option value="">Select answer...</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                    <option value="NOT GIVEN">NOT GIVEN</option>
+                                </select>
+                                <button class="exp-btn hidden text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q1')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="q-row rounded-xl p-4 border border-gray-200 bg-gray-50 flex flex-col gap-3" data-q="2">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm">2</div>
+                                <p class="text-gray-800 font-medium leading-relaxed">It is only recently that people have discovered exercise is more beneficial for you when you put more effort into it.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-12">
+                                <select onchange="updateAnswer(2, this.value)" class="w-full sm:w-48 border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-2.5 bg-white font-medium outline-none transition-colors">
+                                    <option value="">Select answer...</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                    <option value="NOT GIVEN">NOT GIVEN</option>
+                                </select>
+                                <button class="exp-btn hidden text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q2')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="q-row rounded-xl p-4 border border-gray-200 bg-gray-50 flex flex-col gap-3" data-q="3">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm">3</div>
+                                <p class="text-gray-800 font-medium leading-relaxed">It is unclear what Dr Aric Sigman thinks schools and parents should do.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-12">
+                                <select onchange="updateAnswer(3, this.value)" class="w-full sm:w-48 border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-2.5 bg-white font-medium outline-none transition-colors">
+                                    <option value="">Select answer...</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                    <option value="NOT GIVEN">NOT GIVEN</option>
+                                </select>
+                                <button class="exp-btn hidden text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q3')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Q4 -->
+                        <div class="q-row rounded-xl p-4 border border-gray-200 bg-gray-50 flex flex-col gap-3" data-q="4">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm">4</div>
+                                <p class="text-gray-800 font-medium leading-relaxed">There are probably a lot of people who disbelieve Dr Sigman's theory.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-12">
+                                <select onchange="updateAnswer(4, this.value)" class="w-full sm:w-48 border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-2.5 bg-white font-medium outline-none transition-colors">
+                                    <option value="">Select answer...</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                    <option value="NOT GIVEN">NOT GIVEN</option>
+                                </select>
+                                <button class="exp-btn hidden text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q4')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Q5 -->
+                        <div class="q-row rounded-xl p-4 border border-gray-200 bg-gray-50 flex flex-col gap-3" data-q="5">
+                            <div class="flex gap-4">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm">5</div>
+                                <p class="text-gray-800 font-medium leading-relaxed">Researchers were surprised to discover a link between levels of fitness in Swedish teenagers and their IQ.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-12">
+                                <select onchange="updateAnswer(5, this.value)" class="w-full sm:w-48 border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-2.5 bg-white font-medium outline-none transition-colors">
+                                    <option value="">Select answer...</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                    <option value="NOT GIVEN">NOT GIVEN</option>
+                                </select>
+                                <button class="exp-btn hidden text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('toast', true, 'The passage mentions the study of Swedish teenagers, but it never states whether the researchers were SURPRISED by the findings.')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Summary Completion (Drag and Drop) -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-5 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg">Questions 6-10</h3>
+                        <p class="text-sm text-gray-800 mb-2">Complete the summary using the list of words, A-I, below.</p>
+                        <p class="text-xs text-brand-700 font-bold uppercase tracking-wider bg-brand-100 inline-block px-2 py-1 rounded">Interactive Feature</p>
+                        <p class="text-sm text-brand-800 font-medium mt-2">Drag the correct letter from the word bank and drop it into the blank spaces in the text. Click a filled space to remove the answer.</p>
+                    </div>
+
+                    <!-- Word Bank -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8 p-5 bg-gray-50 rounded-xl border border-gray-200 text-sm font-medium select-none shadow-inner" id="word-bank">
+                        <div draggable="true" data-val="A" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">A ancients</div>
+                        <div draggable="true" data-val="B" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">B anxiety</div>
+                        <div draggable="true" data-val="C" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">C discoveries</div>
+                        <div draggable="true" data-val="D" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">D elderly</div>
+                        <div draggable="true" data-val="E" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">E exercises</div>
+                        <div draggable="true" data-val="F" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">F anger</div>
+                        <div draggable="true" data-val="G" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">G performances</div>
+                        <div draggable="true" data-val="H" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">H possibility</div>
+                        <div draggable="true" data-val="I" class="draggable-word p-2.5 bg-white border-2 border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 text-center shadow-sm transition-all">I proof</div>
+                    </div>
+
+                    <!-- Summary Text -->
+                    <div class="text-gray-800 leading-loose text-justify text-[15px] p-2">
+                        Dr Sigman believes that when children do physical exercise, they experience less 
+                        <span class="inline-flex items-center mx-1 gap-1 q-row align-middle" data-q="6">
+                            <strong class="text-sm bg-gray-200 w-6 h-6 rounded-full inline-flex items-center justify-center">6</strong>
+                            <div class="drop-zone min-w-[3rem] h-8 px-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-md inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap" data-q="6"></div>
+                        </span> 
+                        as a result of a chemical change caused by increased blood and oxygen flow to the brain. Other researchers, such as Professor Art Kramer, think there is 
+                        <span class="inline-flex items-center mx-1 gap-1 q-row align-middle" data-q="7">
+                            <strong class="text-sm bg-gray-200 w-6 h-6 rounded-full inline-flex items-center justify-center">7</strong>
+                            <div class="drop-zone min-w-[3rem] h-8 px-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-md inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap" data-q="7"></div>
+                        </span>
+                        that some parts of the brain become bigger, and fit children are better than unfit children at doing complicated 
+                        <span class="inline-flex items-center mx-1 gap-1 q-row align-middle" data-q="8">
+                            <strong class="text-sm bg-gray-200 w-6 h-6 rounded-full inline-flex items-center justify-center">8</strong>
+                            <div class="drop-zone min-w-[3rem] h-8 px-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-md inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap" data-q="8"></div>
+                        </span>
+                        that require mental thought. Among other things, these scientific 
+                        <span class="inline-flex items-center mx-1 gap-1 q-row align-middle" data-q="9">
+                            <strong class="text-sm bg-gray-200 w-6 h-6 rounded-full inline-flex items-center justify-center">9</strong>
+                            <div class="drop-zone min-w-[3rem] h-8 px-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-md inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap" data-q="9"></div>
+                        </span>
+                        could be used to benefit the 
+                        <span class="inline-flex items-center mx-1 gap-1 q-row align-middle" data-q="10">
+                            <strong class="text-sm bg-gray-200 w-6 h-6 rounded-full inline-flex items-center justify-center">10</strong>
+                            <div class="drop-zone min-w-[3rem] h-8 px-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-md inline-flex items-center justify-center font-bold text-brand-700 transition-all duration-200 cursor-pointer shrink-0 whitespace-nowrap" data-q="10"></div>
+                        </span>
+                        when it comes to fighting memory loss and keeping the skills that allow them to solve problems.
+                    </div>
+
+                    <!-- Explanations panel (revealed on submit) -->
+                    <div id="summary-explanations" class="hidden mt-6 pt-6 border-t border-gray-200 flex flex-wrap gap-3">
+                        <p class="w-full font-bold text-sm text-gray-700 mb-1">Summary Explanations:</p>
+                        <button class="text-sm text-brand-600 font-bold hover:text-brand-800 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q6')">Q6 Exp.</button>
+                        <button class="text-sm text-brand-600 font-bold hover:text-brand-800 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q7')">Q7 Exp.</button>
+                        <button class="text-sm text-brand-600 font-bold hover:text-brand-800 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q8')">Q8 Exp.</button>
+                        <button class="text-sm text-brand-600 font-bold hover:text-brand-800 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q9')">Q9 Exp.</button>
+                        <button class="text-sm text-brand-600 font-bold hover:text-brand-800 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q10')">Q10 Exp.</button>
+                    </div>
+                </div>
+
+                <!-- Section 3: Multiple Choice -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="bg-brand-50 p-5 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg">Questions 11-13</h3>
+                        <p class="text-sm text-gray-800">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Q11 -->
+                        <div class="q-row p-5 rounded-xl border border-gray-200 bg-gray-50 flex flex-col gap-4" data-q="11">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm mt-0.5">11</div>
+                                <div class="w-full">
+                                    <p class="text-gray-900 font-semibold mb-3">Which of the following is true, according to Professor Art Kramer?</p>
+                                    <select onchange="updateAnswer(11, this.value)" class="w-full border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-3 bg-white outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="A">A. People become less active as they grow older.</option>
+                                        <option value="B">B. Exercising is an effective way of preventing diseases like diabetes.</option>
+                                        <option value="C">C. One particular type of exercise is more effective than others.</option>
+                                        <option value="D">D. When exercising, you should take short breaks during the exercise period.</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden ml-12 self-start text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q11')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q12 -->
+                        <div class="q-row p-5 rounded-xl border border-gray-200 bg-gray-50 flex flex-col gap-4" data-q="12">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm mt-0.5">12</div>
+                                <div class="w-full">
+                                    <p class="text-gray-900 font-semibold mb-3">What did Professor Kramer's neuroimaging work show?</p>
+                                    <select onchange="updateAnswer(12, this.value)" class="w-full border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-3 bg-white outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="A">A. Exercising physically alters the brain.</option>
+                                        <option value="B">B. Unfit people have poor memories.</option>
+                                        <option value="C">C. A particular part of the brain becomes more active during exercise.</option>
+                                        <option value="D">D. Exercise can reduce ageing of the brain for up to two years.</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden ml-12 self-start text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q12')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q13 -->
+                        <div class="q-row p-5 rounded-xl border border-gray-200 bg-gray-50 flex flex-col gap-4" data-q="13">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-8 h-8 shrink-0 bg-white border-2 border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold shadow-sm mt-0.5">13</div>
+                                <div class="w-full">
+                                    <p class="text-gray-900 font-semibold mb-3">What does <span class="italic">'doing this'</span> in the final paragraph refer to?</p>
+                                    <select onchange="updateAnswer(13, this.value)" class="w-full border border-gray-300 rounded-lg shadow-sm focus:border-brand-400 focus:ring focus:ring-brand-200 text-sm p-3 bg-white outline-none transition-colors">
+                                        <option value="">Select answer...</option>
+                                        <option value="A">A. changing the kinds of food we eat</option>
+                                        <option value="B">B. eating no more than 500 calories a day</option>
+                                        <option value="C">C. eating foods that are high in protein</option>
+                                        <option value="D">D. eating less on certain days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="exp-btn hidden ml-12 self-start text-sm text-brand-600 font-bold hover:text-brand-800 flex items-center gap-1 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 transition-colors" onclick="showExplanation('exp-q13')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-wrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <!-- Result Legend (hidden until submit) -->
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container for "NOT GIVEN" -->
+    <div id="toast-container" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: "YES", 2: "NO", 3: "NO", 4: "YES", 5: "NOT GIVEN",
+            6: "B", 7: "I", 8: "E", 9: "C", 10: "D",
+            11: "C", 12: "A", 13: "D"
+        };
+        
+        const WORD_BANK_MAP = {
+            'A': 'A ancients', 'B': 'B anxiety', 'C': 'C discoveries', 
+            'D': 'D elderly', 'E': 'E exercises', 'F': 'F anger', 
+            'G': 'G performances', 'H': 'H possibility', 'I': 'I proof'
+        };
+
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=13; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => document.querySelector(`.q-row[data-q="${i}"]`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateAnswer(qNum, value) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = value.trim();
+            updateMapStatus(qNum, value && value.trim() !== '');
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Timer Logic
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) { // 5 mins
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        // Submission Logic
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            let score = 0;
+            
+            // Disable Inputs & Drag/Drop
+            document.querySelectorAll('select').forEach(el => {
+                el.disabled = true;
+                el.classList.add('opacity-75', 'cursor-not-allowed', 'bg-gray-100');
+            });
+            document.querySelectorAll('.draggable-word').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.replace('cursor-grab', 'cursor-default');
+                el.classList.add('opacity-50');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => {
+                el.style.pointerEvents = 'none';
+            });
+
+            // Evaluate and Annotate
+            for(let i=1; i<=13; i++) {
+                let uAnsRaw = userAnswers[i] || '';
+                let uAns = uAnsRaw.toUpperCase();
+                let displayKey = ANSWER_KEYS[i];
+                let isCorrect = (uAns === displayKey);
+
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const mapBox = document.getElementById(`map-q${i}`);
+                
+                // Show Explanations
+                const expBtn = qRow.querySelector('.exp-btn');
+                if(expBtn) expBtn.classList.remove('hidden');
+                document.getElementById('summary-explanations').classList.remove('hidden');
+
+                // Map Box UI
+                mapBox.className = `w-7 h-7 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+
+                if(uAnsRaw === '') { // Blank
+                    mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if(isCorrect) { // Correct
+                    score++;
+                    mapBox.classList.add('bg-green-500', 'border-green-600');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else { // Incorrect
+                    mapBox.classList.add('bg-red-500', 'border-red-600');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+
+                // Append Correct Answer Badge universally
+                let displayKeyFormatted = displayKey;
+                if(i >= 6 && i <= 10) displayKeyFormatted = WORD_BANK_MAP[displayKey]; // Show full text for summary
+
+                const correctMarker = document.createElement('div');
+                correctMarker.className = `text-sm text-green-800 font-bold bg-green-100 py-2 px-4 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-3 w-fit`;
+                correctMarker.innerHTML = `<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct Answer: ${displayKeyFormatted}`;
+                
+                if (i >= 6 && i <= 10) {
+                    // For drag and drop, put it directly after the dropzone inline
+                    qRow.appendChild(correctMarker);
+                    correctMarker.classList.replace('mt-3', 'ml-2');
+                    correctMarker.classList.add('inline-flex');
+                } else {
+                    qRow.appendChild(correctMarker);
+                }
+            }
+
+            // Update UI State
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            // Scroll to top of results
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        // View Explanation Highlights
+        function showExplanation(targetId, isToast = false, toastMessage = "") {
+            // Remove previous active highlights
+            document.querySelectorAll('.active-target').forEach(el => {
+                el.classList.remove('active-target');
+            });
+
+            if (isToast) {
+                // Show Custom Toast for "Not Given" type explanations
+                const toast = document.createElement('div');
+                toast.className = 'toast-msg bg-gray-900 text-white px-6 py-4 rounded-xl shadow-2xl border-2 border-brand-500 max-w-sm text-sm font-medium leading-relaxed flex items-start gap-3 pointer-events-auto';
+                toast.innerHTML = `<svg class="w-6 h-6 text-brand-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <div>${toastMessage}</div>`;
+                
+                document.getElementById('toast-container').appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            } else {
+                // Highlight passage text
+                const targetEl = document.getElementById(targetId);
+                if(targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetEl.classList.add('active-target');
+                }
+            }
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 8}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                // Native robust highlighting
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.classList.add('hidden');
+            });
+        }
+
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-word');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', draggable.dataset.val);
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault(); 
+                    if (zone.style.pointerEvents !== 'none') {
+                        zone.classList.add('ring-4', 'ring-brand-200', 'scale-105');
+                    }
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('ring-4', 'ring-brand-200', 'scale-105');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-200', 'scale-105');
+                    if (zone.style.pointerEvents === 'none') return;
+
+                    const val = e.dataTransfer.getData('text/plain');
+                    const validOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+                    
+                    if (val && validOptions.includes(val.trim().toUpperCase())) {
+                        const letter = val.trim().toUpperCase();
+                        // Put full text in the UI
+                        zone.textContent = WORD_BANK_MAP[letter];
+                        
+                        zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                        zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md', 'text-brand-800');
+                        
+                        const qNum = zone.dataset.q;
+                        updateAnswer(qNum, letter);
+                    }
+                });
+                
+                zone.addEventListener('click', () => {
+                    if (zone.textContent && zone.style.pointerEvents !== 'none') {
+                        zone.textContent = '';
+                        zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md', 'text-brand-800');
+                        zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                        
+                        const qNum = zone.dataset.q;
+                        updateAnswer(qNum, '');
+                    }
+                });
+            });
+        }
+
+        // Start App
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

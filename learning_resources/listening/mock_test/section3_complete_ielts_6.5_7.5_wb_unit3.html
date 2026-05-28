@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Computer Based</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            blush: '#FDF1F4',
+                            pink: '#F4C2C2',
+                            rose: '#E29596',
+                            dark: '#A65A5B',
+                            accent: '#D47A7B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar for a premium look */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #FDF1F4; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #F4C2C2; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #E29596; }
+
+        /* Highlight feature styles */
+        ::selection { background: #fef08a; color: #374151; } /* Tailwind Yellow-200 */
+        .user-highlight {
+            background-color: #fef08a;
+            border-radius: 2px;
+            padding: 0 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .user-highlight:hover {
+            background-color: #fde047; /* Yellow-300 on hover to hint it's clickable */
+        }
+        
+        /* Transcript sync highlight */
+        .transcript-highlight {
+            background-color: #FDF1F4; /* Pastel blush */
+            border-left: 4px solid #E29596;
+            padding: 4px 8px;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Tooltip for highlighter */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            z-index: 50;
+            transform: translate(-50%, -120%);
+        }
+
+        /* Inputs for IELTS */
+        .ielts-input {
+            border: none;
+            border-bottom: 2px solid #cbd5e1;
+            background: transparent;
+            transition: border-color 0.3s;
+        }
+        .ielts-input:focus {
+            outline: none;
+            border-color: #A65A5B;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b-2 border-pastel-pink px-6 py-4 flex justify-between items-center shadow-sm z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-pastel-rose rounded-full flex items-center justify-center text-white font-bold text-xl shadow-inner">
+                <i class="fa-solid fa-headphones"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-pastel-dark tracking-wide">IELTS Chan Truong</h1>
+                <p class="text-xs text-gray-500 font-medium" id="header-section-title">Computer-Delivered Listening</p>
+            </div>
+        </div>
+        
+        <div id="timer-display" class="hidden flex items-center gap-2 bg-pastel-blush px-4 py-2 rounded-full border border-pastel-pink shadow-inner">
+            <i class="fa-regular fa-clock text-pastel-dark"></i>
+            <span class="font-mono font-bold text-pastel-dark text-lg" id="time-remaining">10:00</span>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 relative overflow-hidden flex">
+        
+        <!-- ================= START SCREEN ================= -->
+        <div id="start-screen" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-40 transition-opacity duration-500 overflow-y-auto py-10">
+            <div class="bg-white p-10 rounded-2xl shadow-xl max-w-2xl w-full mx-4 border-t-8 border-pastel-rose">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Listening Test</h2>
+                    <h3 class="text-xl text-pastel-dark font-medium" id="start-title">Loading...</h3>
+                </div>
+                
+                <div class="bg-pastel-blush p-6 rounded-xl border border-pastel-pink mb-8">
+                    <h4 class="font-bold text-pastel-dark mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation"></i> Important Instructions
+                    </h4>
+                    <ul class="space-y-3 text-gray-700 list-disc pl-5">
+                        <li>The audio will start playing automatically when you click "Start Test".</li>
+                        <li>You <strong>cannot</strong> pause or stop the audio once it begins.</li>
+                        <li>Answer the questions as you listen. You have time to read the questions before the audio begins.</li>
+                        <li>You can highlight text by selecting it with your mouse. Click a highlight to remove it.</li>
+                        <li>At the end of the test, click "Submit" to view your results and review the transcript.</li>
+                    </ul>
+                </div>
+                
+                <button id="start-btn" class="w-full py-4 bg-pastel-rose hover:bg-pastel-dark text-white rounded-xl font-bold text-lg transition-colors shadow-md transform hover:scale-[1.02]">
+                    Start Test <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= TEST VIEW ================= -->
+        <div id="test-view" class="hidden flex-1 h-full w-full max-w-5xl mx-auto flex flex-col bg-white shadow-lg border-l border-r border-gray-200">
+            
+            <!-- Tools Bar -->
+            <div class="bg-gray-100 px-6 py-2 flex justify-between items-center text-sm border-b border-gray-200 shrink-0">
+                <div class="flex items-center gap-4">
+                    <span class="text-gray-500 font-medium"><i class="fa-solid fa-highlighter text-yellow-500"></i> Select text to highlight</span>
+                </div>
+                <!-- Hidden Audio Player for Test -->
+                <audio id="test-audio" preload="auto" class="hidden"></audio>
+            </div>
+
+            <!-- Questions Area (Scrollable) -->
+            <div id="questions-container" class="flex-1 overflow-y-auto p-8 lg:p-12 pb-32">
+                <!-- Questions injected here via JS -->
+            </div>
+            
+            <!-- Submit Bar -->
+            <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-end shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                <button id="submit-btn" class="px-8 py-3 bg-pastel-dark hover:bg-opacity-90 text-white rounded-lg font-bold shadow-md transition-all">
+                    Submit Answers
+                </button>
+            </div>
+            
+            <!-- Highlight Tooltip -->
+            <button id="highlight-tooltip" class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 p-2 rounded-full shadow-lg border border-yellow-500 flex items-center justify-center transition-transform hover:scale-110">
+                <i class="fa-solid fa-highlighter"></i>
+            </button>
+        </div>
+
+        <!-- ================= RESULT VIEW ================= -->
+        <div id="result-view" class="hidden flex-1 h-full w-full flex flex-col md:flex-row bg-gray-50">
+            
+            <!-- Left Pane: Questions Review -->
+            <div class="w-full md:w-1/2 h-full flex flex-col border-r border-gray-200 bg-white">
+                
+                <div class="bg-pastel-dark text-white p-6 shrink-0 shadow-md z-10">
+                    <h2 class="text-2xl font-bold mb-2">Section Review</h2>
+                    <div class="flex items-center justify-between">
+                        <span class="text-pastel-blush">Your Score:</span>
+                        <div class="bg-white text-pastel-dark px-4 py-1 rounded-full font-bold text-xl shadow-inner">
+                            <span id="score-display">0</span> / <span id="total-display">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar for Results -->
+                <div class="bg-gray-100 border-b border-gray-200 p-3 shrink-0 flex items-center overflow-x-auto whitespace-nowrap gap-2" id="result-nav-bar">
+                    <!-- Nav pills injected here -->
+                </div>
+
+                <div id="review-container" class="flex-1 overflow-y-auto p-6 pb-12">
+                    <!-- Review Questions Injected Here -->
+                </div>
+            </div>
+
+            <!-- Right Pane: Transcript & Audio Control -->
+            <div class="w-full md:w-1/2 h-full flex flex-col bg-gray-50">
+                
+                <!-- Audio Controls -->
+                <div class="bg-white p-6 border-b border-gray-200 shrink-0 shadow-sm z-10 flex flex-col gap-4">
+                    <h3 class="font-bold text-gray-700"><i class="fa-solid fa-file-audio text-pastel-rose mr-2"></i> Audio & Transcript</h3>
+                    <audio id="review-audio" controls class="w-full outline-none rounded-full"></audio>
+                    <div class="flex items-center gap-3 text-sm">
+                        <span class="text-gray-500 font-medium">Speed:</span>
+                        <select id="playback-speed" class="border border-gray-300 rounded p-1 text-gray-700 bg-gray-50 outline-none focus:border-pastel-rose">
+                            <option value="0.75">0.75x</option>
+                            <option value="1" selected>1.0x (Normal)</option>
+                            <option value="1.25">1.25x</option>
+                            <option value="1.5">1.5x</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Transcript Text -->
+                <div id="transcript-container" class="flex-1 overflow-y-auto p-8 text-gray-700 leading-relaxed text-lg bg-white shadow-inner">
+                    <!-- Transcript injected here -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- STREAMING_CHUNK:Initializing Application State & Mock Data... ---
+        // New Data for Complete IELTS 6.5-7.5 Workbook Unit 3
+        const TEST_AUDIO_URL = "http://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_workbook_unit3.mp3"; 
+        
+        const mockTestData = {
+            sectionTitle: "Section 3: Painkillers and Aspirin History",
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: TEST_AUDIO_URL,
+            questions: [
+                {
+                    id: "q1",
+                    type: "fill-in",
+                    number: 1,
+                    text: `
+                        <div class="bg-pastel-blush border border-pastel-pink p-5 rounded-xl mb-6 shadow-sm">
+                            <p class="font-bold text-pastel-dark mb-3 text-lg">Comments</p>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
+                                <li><strong class="text-pastel-dark mr-2">A.</strong> It is considered unsuitable for children.</li>
+                                <li><strong class="text-pastel-dark mr-2">B.</strong> It is extremely dangerous if you take too much.</li>
+                                <li><strong class="text-pastel-dark mr-2">C.</strong> It is not as strong as other analgesics.</li>
+                                <li><strong class="text-pastel-dark mr-2">D.</strong> Its use requires careful monitoring.</li>
+                                <li><strong class="text-pastel-dark mr-2">E.</strong> It can have slightly unpleasant after effects.</li>
+                                <li><strong class="text-pastel-dark mr-2">F.</strong> It works at the source of the pain.</li>
+                            </ul>
+                        </div>
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">1. Paracetamol</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q1">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["B", "b"],
+                    timestamp: 64, // 01:04
+                    transcriptRef: "tr_1_04",
+                    explanation: "Sara says about paracetamol: 'overdosing on it can have very serious side effects, including liver failure.' This matches B (extremely dangerous if you take too much)."
+                },
+                {
+                    id: "q2",
+                    type: "fill-in",
+                    number: 2,
+                    text: `
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">2. Ibuprofen</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q2">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["F", "f"],
+                    timestamp: 88, // 01:28
+                    transcriptRef: "tr_1_28",
+                    explanation: "Sara states that ibuprofen 'directly targets the affected area or areas.' This aligns with F (works at the source of the pain)."
+                },
+                {
+                    id: "q3",
+                    type: "fill-in",
+                    number: 3,
+                    text: `
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">3. Aspirin</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q3">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["A", "a"],
+                    timestamp: 133, // 02:13
+                    transcriptRef: "tr_2_13",
+                    explanation: "Sara mentions that for aspirin, doctors advise you to 'avoid giving it to anyone under 12.' This means it is unsuitable for children (A)."
+                },
+                {
+                    id: "q4",
+                    type: "fill-in",
+                    number: 4,
+                    text: `
+                        <div class="flex items-center gap-4 mb-2">
+                           <span class="w-48 font-medium">4. Codeine</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q4">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["E", "e"],
+                    timestamp: 152, // 02:32
+                    transcriptRef: "tr_2_32",
+                    explanation: "When you stop taking codeine, Sara says 'you may feel a little ill for a while. Nothing serious, just weak, shaky...'. This describes unpleasant after effects (E)."
+                },
+                {
+                    id: "q5",
+                    type: "fill-in",
+                    number: 5,
+                    text: `
+                        <div class="flex items-center gap-4 mb-6">
+                           <span class="w-48 font-medium">5. Morphine</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q5">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["D", "d"],
+                    timestamp: 178, // 02:58
+                    transcriptRef: "tr_2_58",
+                    explanation: "For morphine, Sara explains 'your doctor will need to see you on a regular basis to check you're getting the right dose and to see how you're responding to it.' This implies careful monitoring (D)."
+                },
+                {
+                    id: "q6",
+                    type: "fill-in",
+                    number: 6,
+                    text: `
+                        <div class="mt-8 pt-8 border-t-2 border-dashed border-gray-200">
+                            <h3 class="font-bold text-xl mb-6 text-center text-pastel-dark uppercase tracking-wider">Aspirin: a brief history</h3>
+                            <div class="flex flex-col items-center text-center space-y-2">
+                                <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                    <p class="font-bold mb-2">Ancient Greece, about 2500 BCE:</p>
+                                    <span class="font-bold text-pastel-dark text-lg mr-2">6.</span> <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q6" autocomplete="off"> from willow trees are used to make a drink with a painkilling effect.
+                                </div>
+                                <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["dried leaves"],
+                    timestamp: 237, // 03:57
+                    transcriptRef: "tr_3_57",
+                    explanation: "Sara says people in Ancient Greece 'took dried willow tree leaves... and made them into tea...'"
+                },
+                {
+                    id: "q7",
+                    type: "fill-in",
+                    number: 7,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <p class="font-bold mb-2">Italy, 1823:</p>
+                                <span class="font-bold text-pastel-dark text-lg mr-2">7.</span> The <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q7" autocomplete="off"> in the willow (salicin) is identified and extracted.
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <p class="font-bold mb-2">Germany 1838:</p>
+                                Salicin is also discovered in the meadowsweet flower.
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                    `,
+                    correctAnswer: ["active ingredient"],
+                    timestamp: 237, // 03:57
+                    transcriptRef: "tr_3_57_2", 
+                    explanation: "Sara mentions that Italian scientists 'identified and extracted the active ingredient, salicin.'"
+                },
+                {
+                    id: "q8",
+                    type: "fill-in",
+                    number: 8,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <p class="font-bold mb-2">France, 1853:</p>
+                                <span class="font-bold text-pastel-dark text-lg mr-2">8.</span> Salicin is first produced in a <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q8" autocomplete="off"> (called salicylic acid).
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <p class="font-bold mb-2">Germany 1893:</p>
+                                Acetyl is added to salicylic acid. Irritant qualities are reduced.
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                    `,
+                    correctAnswer: ["liquid form"],
+                    timestamp: 273, // 04:33
+                    transcriptRef: "tr_4_33",
+                    explanation: "Sara explains that French scientists 'succeeded in making a liquid form of salicin...'"
+                },
+                {
+                    id: "q9",
+                    type: "fill-in",
+                    number: 9,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200 w-full max-w-lg">
+                                <p class="font-bold mb-2">Germany 1897:</p>
+                                <span class="font-bold text-pastel-dark text-lg mr-2">9.</span> A <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q9" autocomplete="off"> of acetyl salicylic acid is first produced by Bayer (1897).
+                            </div>
+                            <div class="text-3xl text-pastel-accent my-2">⬇️</div>
+                        </div>
+                    `,
+                    correctAnswer: ["synthetic version"],
+                    timestamp: 303, // 05:03
+                    transcriptRef: "tr_5_03",
+                    explanation: "Sara notes that Bayer 'developed a process for creating a synthetic version of this acetyl salicylic acid.'"
+                },
+                {
+                    id: "q10",
+                    type: "fill-in",
+                    number: 10,
+                    text: `
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="bg-pastel-pink bg-opacity-20 p-5 rounded-lg shadow-sm border border-pastel-pink w-full max-w-lg">
+                                <p class="font-bold mb-2">Germany 1899:</p>
+                                <span class="font-bold text-pastel-dark text-lg mr-2">10.</span> Aspirin goes on sale in 1899 after successful <input type="text" class="ielts-input text-center w-40 font-semibold text-pastel-dark" data-qid="q10" autocomplete="off">
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["clinical trials"],
+                    timestamp: 330, // 05:30
+                    transcriptRef: "tr_5_30",
+                    explanation: "Sara concludes that aspirin was launched 'two years later, when these clinical trials were complete.'"
+                }
+            ],
+            transcript: [
+                { id: "tr_0_04", start: 4, end: 11, text: "<strong>Sara:</strong> Hi, come in. I'm Sara. Welcome to Chorleywood Pharmaceuticals. It's Matt, isn't it?" },
+                { id: "tr_0_11", start: 11, end: 14, text: "<strong>Matt:</strong> That's right. Thanks for agreeing to see me." },
+                { id: "tr_0_14", start: 14, end: 19, text: "<strong>Sara:</strong> You're welcome. I understand you're interested in the work we do here, right?" },
+                { id: "tr_0_19", start: 19, end: 29, text: "<strong>Matt:</strong> Yes, I am. I'm doing some research into modern medicine for my thesis, and I was hoping you could tell me a bit about painkillers, give me a bit of background information, and so on." },
+                { id: "tr_0_29", start: 29, end: 38, text: "<strong>Sara:</strong> Sure, well, it's a huge area. Let's start by looking at the different types of painkiller we make here, and we'll take it from there. OK?" },
+                { id: "tr_0_38", start: 38, end: 40, text: "<strong>Matt:</strong> Great." },
+                { id: "tr_0_40", start: 40, end: 61, text: "<strong>Sara:</strong> OK, well, here at Chorleywood, we produce five commercially-available painkillers, or analgesics as they're more correctly known, each one based on a different active ingredient. Those ingredients are paracetamol, ibuprofen, aspirin, codeine and morphine. I assume you've heard of them all." },
+                { id: "tr_1_01", start: 61, end: 64, text: "<strong>Matt:</strong> I have. I use paracetamol when I get headaches." },
+                { id: "tr_1_04", start: 64, end: 86, text: "<strong>Sara:</strong> Right, in fact it's the best all-round analgesic for things like headaches and most non-nerve pains. It's believed to work by controlling certain chemicals in the brain so we feel less pain. It's safe to take regularly for long periods, but overdosing on it can have very serious side effects, including liver failure. <em>(Q1)</em>" },
+                { id: "tr_1_26", start: 86, end: 88, text: "<strong>Matt:</strong> Right, I've heard that." },
+                { id: "tr_1_28", start: 88, end: 109, text: "<strong>Sara:</strong> Then there's ibuprofen. This is an anti-inflammatory, which means that unlike paracetamol, it directly targets the affected area or areas. Basically, it works by reducing swelling. So, if you've twisted your ankle, for example, and it's swelling up, ibuprofen will be very effective at reducing that swelling. <em>(Q2)</em>" },
+                { id: "tr_1_49", start: 109, end: 111, text: "<strong>Matt:</strong> Like in a sports injury, for example." },
+                { id: "tr_1_51", start: 111, end: 130, text: "<strong>Sara:</strong> Exactly. Which is why it's so popular with sportsmen and women. And alongside paracetamol, it's the painkiller that doctors recommend for children. The one disadvantage over paracetamol is that while you're taking it, you may get an upset stomach, because it has irritant qualities." },
+                { id: "tr_2_10", start: 130, end: 133, text: "<strong>Matt:</strong> Aspirin can affect you in the same way, can't it?" },
+                { id: "tr_2_13", start: 133, end: 148, text: "<strong>Sara:</strong> Right. Aspirin is believed to work a bit like paracetamol, but with side effects similar to those in ibuprofen. A bit stronger, in fact, which is why doctors and pharmacists advise that you avoid giving it to anyone under 12. <em>(Q3)</em>" },
+                { id: "tr_2_28", start: 148, end: 152, text: "<strong>Matt:</strong> What about the others you mentioned? Codeine and morphine." },
+                { id: "tr_2_32", start: 152, end: 177, text: "<strong>Sara:</strong> Codeine is much stronger than the others, so it's usually diluted, that is, it's usually combined, with paracetamol in pill form. The problem with codeine is that it can cause dependency. In other words, your body comes to rely on it. So once you stop taking it, you may feel a little ill for a while. Nothing serious, just weak, shaky, that kind of thing. <em>(Q4)</em>" },
+                { id: "tr_2_57", start: 177, end: 178, text: "<strong>Matt:</strong> And morphine?" },
+                { id: "tr_2_58", start: 178, end: 215, text: "<strong>Sara:</strong> Well, as you probably know, morphine is the most powerful analgesic available. It's strictly prescription- only, and even then your doctor will need to see you on a regular basis to check you're getting the right dose and to see how you're responding to it. It should only be used as part of a long-term pain management programme. It's highly addictive of course, and when you stop the programme, the after-effects can be extremely bad. <em>(Q5)</em>" },
+                { id: "tr_3_35", start: 215, end: 217, text: "<strong>Matt:</strong> So, what's the most popular painkiller?" },
+                { id: "tr_3_37", start: 217, end: 224, text: "<strong>Sara:</strong> That would be aspirin. In fact, almost 40 percent of the products we make here are aspirin based." },
+                { id: "tr_3_44", start: 224, end: 226, text: "<strong>Matt:</strong> It's been around for a while, hasn't it?" },
+                { id: "tr_3_46", start: 226, end: 234, text: "<strong>Sara:</strong> Indeed. In fact, we could trace its origins right back to ancient Greece, about two and a half thousand years ago." },
+                { id: "tr_3_54", start: 234, end: 237, text: "<strong>Matt:</strong> Wow, I didn't know it went back that far." },
+                { id: "tr_3_57", start: 237, end: 260, text: "<strong>Sara:</strong> Well, obviously it wasn't known as aspirin then, and it wasn't in pill form. People took dried willow tree leaves <em>(Q6)</em>. which they knew had an analgesic effect, and made them into tea, which they then gave to women during childbirth. " },
+                { id: "tr_3_57_2", start: 260, end: 268, text: "Nobody really knew what was in the leaves that helped to ease pain until over two thousand years later, in, er, 1823, I think it was, when Italian scientists identified and extracted the active ingredient <em>(Q7)</em>, salicin." },
+                { id: "tr_4_28", start: 268, end: 273, text: "<strong>Matt:</strong> Salicin, that's S-A-L, er" },
+                { id: "tr_4_33", start: 273, end: 301, text: "<strong>Sara:</strong> S-A-L-I-C-I-N. And later, it was also found in a particular type of flower called the meadowsweet. That was in Germany in 1838. Then in 1853, French scientists succeeded in making a liquid form <em>(Q8)</em> of salicin, which they called salicylic acid, but the patients they tested it on complained that it caused bad stomach pains." },
+                { id: "tr_5_01", start: 301, end: 303, text: "<strong>Matt:</strong> So, a bit counter-productive then!" },
+                { id: "tr_5_03", start: 303, end: 326, text: "<strong>Sara:</strong> Exactly! However, in 1893, German scientists discovered that mixing a chemical called acetyl into the salicylic acid greatly reduced its irritating side effects. And then in 1897, the German pharmaceutical company Bayer developed a process for creating a synthetic version <em>(Q9)</em> of this acetyl salicylic acid." },
+                { id: "tr_5_26", start: 326, end: 330, text: "<strong>Matt:</strong> Acetyl salicylic acid. That's quite a mouthful!" },
+                { id: "tr_5_30", start: 330, end: 345, text: "<strong>Sara:</strong> Which is why they shortened it to aspirin. That year, they began testing their product on patients, and two years later, when these clinical trials <em>(Q10)</em> were complete, aspirin as we know it now was launched onto the market." },
+                { id: "tr_5_45", start: 345, end: 355, text: "<strong>Matt:</strong> Well, thank you for the history lesson. That's actually really useful. I might be able to use some of that. Now, I read recently that aspirin…" }
+            ]
+        };
+
+        // --- STREAMING_CHUNK:Initializing Application State... ---
+        let userAnswers = {};
+        let timerInterval = null;
+        let timeRemaining = mockTestData.totalTimeSeconds;
+        let isTestActive = false;
+
+        // DOM Elements
+        const DOM = {
+            startScreen: document.getElementById('start-screen'),
+            testView: document.getElementById('test-view'),
+            resultView: document.getElementById('result-view'),
+            startBtn: document.getElementById('start-btn'),
+            submitBtn: document.getElementById('submit-btn'),
+            questionsContainer: document.getElementById('questions-container'),
+            reviewContainer: document.getElementById('review-container'),
+            transcriptContainer: document.getElementById('transcript-container'),
+            testAudio: document.getElementById('test-audio'),
+            reviewAudio: document.getElementById('review-audio'),
+            timerDisplay: document.getElementById('timer-display'),
+            timeRemainingText: document.getElementById('time-remaining'),
+            startTitle: document.getElementById('start-title'),
+            headerSectionTitle: document.getElementById('header-section-title'),
+            scoreDisplay: document.getElementById('score-display'),
+            totalDisplay: document.getElementById('total-display'),
+            tooltip: document.getElementById('highlight-tooltip'),
+            playbackSpeed: document.getElementById('playback-speed'),
+            resultNavBar: document.getElementById('result-nav-bar')
+        };
+
+        // --- STREAMING_CHUNK:Setting up Initial View... ---
+        function initApp() {
+            DOM.startTitle.textContent = mockTestData.sectionTitle;
+            DOM.headerSectionTitle.textContent = mockTestData.sectionTitle;
+            
+            // Set up audio sources
+            DOM.testAudio.src = mockTestData.audioUrl;
+            DOM.reviewAudio.src = mockTestData.audioUrl;
+
+            // Render Test Questions
+            renderTestQuestions();
+            
+            // Event Listeners
+            DOM.startBtn.addEventListener('click', startTest);
+            DOM.submitBtn.addEventListener('click', submitTest);
+            DOM.playbackSpeed.addEventListener('change', (e) => {
+                DOM.reviewAudio.playbackRate = parseFloat(e.target.value);
+            });
+
+            // Highlighter logic
+            setupHighlighter();
+        }
+
+        // --- STREAMING_CHUNK:Rendering Questions in Test View... ---
+        function renderTestQuestions() {
+            let html = '';
+            mockTestData.questions.forEach(q => {
+                html += `
+                    <div class="mb-10 p-2 rounded hover:bg-gray-50 transition-colors" id="question-container-${q.id}">
+                        <div class="text-gray-800 text-lg leading-relaxed">
+                            ${q.text}
+                        </div>
+                    </div>
+                `;
+            });
+            DOM.questionsContainer.innerHTML = html;
+
+            // Add listeners to save answers
+            document.querySelectorAll('.ielts-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const qid = e.target.getAttribute('data-qid');
+                    userAnswers[qid] = e.target.value.trim();
+                });
+                input.addEventListener('change', (e) => {
+                    const qid = e.target.getAttribute('data-qid');
+                    userAnswers[qid] = e.target.value.trim();
+                });
+            });
+        }
+
+        // --- STREAMING_CHUNK:Handling Test Lifecycle (Start, Timer, Submit)... ---
+        function startTest() {
+            DOM.startScreen.classList.add('hidden');
+            DOM.testView.classList.remove('hidden');
+            DOM.timerDisplay.classList.remove('hidden');
+            isTestActive = true;
+            
+            // Start audio & timer
+            DOM.testAudio.play().catch(e => console.log("Audio autoplay prevented", e));
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            const s = (timeRemaining % 60).toString().padStart(2, '0');
+            DOM.timeRemainingText.textContent = `${m}:${s}`;
+            if (timeRemaining < 60) {
+                DOM.timeRemainingText.classList.add('text-red-500');
+            }
+        }
+
+        function submitTest() {
+            if (isTestActive) {
+                clearInterval(timerInterval);
+                DOM.testAudio.pause();
+                isTestActive = false;
+                
+                DOM.testView.classList.add('hidden');
+                DOM.timerDisplay.classList.add('hidden');
+                DOM.resultView.classList.remove('hidden');
+                
+                renderResultView();
+            }
+        }
+
+        // --- STREAMING_CHUNK:Rendering Results & Calculating Score... ---
+        function renderResultView() {
+            let score = 0;
+            let reviewHtml = '';
+            let navHtml = '';
+            
+            mockTestData.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[q.id] || "";
+                
+                // Flexible grading (case-insensitive)
+                const isCorrect = q.correctAnswer.some(ans => 
+                    ans.toLowerCase() === userAnswer.toLowerCase()
+                );
+                
+                if (isCorrect) score++;
+
+                const statusColor = isCorrect ? 'text-green-600' : 'text-red-500';
+                const statusBg = isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
+                const statusIcon = isCorrect ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
+                const navBg = isCorrect ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300';
+
+                // Build Nav Pill
+                navHtml += `
+                    <button onclick="document.getElementById('review-q-${q.id}').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                            class="${navBg} border px-3 py-1 rounded-full font-bold text-sm shadow-sm hover:opacity-80 transition-opacity">
+                        Q${q.number} ${statusIcon}
+                    </button>
+                `;
+
+                // Clean up the text field to show what they answered vs correct
+                // Regex to strip inputs/selects for review view
+                let cleanedText = q.text.replace(/<input[^>]*>/g, `_____`).replace(/<select[\s\S]*?<\/select>/g, `_____`);
+
+                reviewHtml += `
+                    <div id="review-q-${q.id}" class="mb-6 border ${statusBg} rounded-xl p-5 shadow-sm">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="font-bold text-lg ${statusColor}">
+                                Question ${q.number} ${statusIcon}
+                            </div>
+                            <button class="text-sm bg-white border border-gray-300 px-4 py-2 rounded-full font-medium hover:bg-pastel-blush hover:text-pastel-dark hover:border-pastel-pink transition-colors text-gray-600 flex items-center gap-2 shadow-sm" onclick="showExplanation('${q.id}', ${q.timestamp}, '${q.transcriptRef}')">
+                                <i class="fa-solid fa-circle-play text-pastel-rose"></i> View Explanation
+                            </button>
+                        </div>
+                        <div class="text-gray-700 mb-4 bg-white p-4 rounded border border-white bg-opacity-60 text-sm">
+                            ${cleanedText}
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4 text-sm bg-white p-3 rounded shadow-inner">
+                            <div class="flex-1">
+                                <span class="text-gray-500 block mb-1 font-semibold text-xs uppercase tracking-wider">Your Answer</span>
+                                <span class="font-bold ${userAnswer ? 'text-gray-800' : 'text-gray-400 italic'}">${userAnswer || 'No answer'}</span>
+                            </div>
+                            <div class="flex-1">
+                                <span class="text-gray-500 block mb-1 font-semibold text-xs uppercase tracking-wider">Correct Answer</span>
+                                <span class="font-bold text-green-600">${q.correctAnswer[0]}</span>
+                            </div>
+                        </div>
+                        <div id="expl-${q.id}" class="hidden mt-4 text-sm text-pastel-dark bg-white p-3 border-l-4 border-pastel-rose rounded-r shadow-sm font-medium">
+                            ${q.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+
+            DOM.scoreDisplay.textContent = score;
+            DOM.totalDisplay.textContent = mockTestData.questions.length;
+            DOM.reviewContainer.innerHTML = reviewHtml;
+            DOM.resultNavBar.innerHTML = navHtml;
+
+            renderTranscript();
+        }
+
+        // --- STREAMING_CHUNK:Rendering & Syncing Transcript... ---
+        function renderTranscript() {
+            let html = '';
+            mockTestData.transcript.forEach(line => {
+                html += `<p id="${line.id}" class="mb-4 transition-colors" data-start="${line.start}" data-end="${line.end}">${line.text}</p>`;
+            });
+            DOM.transcriptContainer.innerHTML = html;
+
+            // Sync highlighting with audio
+            DOM.reviewAudio.addEventListener('timeupdate', () => {
+                const currentTime = DOM.reviewAudio.currentTime;
+                document.querySelectorAll('#transcript-container p').forEach(p => {
+                    const start = parseFloat(p.getAttribute('data-start'));
+                    const end = parseFloat(p.getAttribute('data-end'));
+                    
+                    if (currentTime >= start && currentTime < end) {
+                        p.classList.add('transcript-highlight');
+                    } else {
+                        p.classList.remove('transcript-highlight');
+                    }
+                });
+            });
+        }
+
+        // --- STREAMING_CHUNK:Handling Interactivity (Explanations & Highlights)... ---
+        window.showExplanation = function(qid, timestamp, transcriptRef) {
+            // Toggle explanation text
+            const expDiv = document.getElementById(`expl-${qid}`);
+            expDiv.classList.toggle('hidden');
+
+            // Play audio at timestamp
+            DOM.reviewAudio.currentTime = timestamp;
+            DOM.reviewAudio.play();
+
+            // Scroll transcript
+            const tRef = document.getElementById(transcriptRef);
+            if (tRef) {
+                // Remove existing temporary highlights
+                document.querySelectorAll('.bg-yellow-100').forEach(el => {
+                    el.classList.remove('bg-yellow-100', 'border-l-4', 'border-yellow-400');
+                });
+                
+                tRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Briefly flash the specific transcript line
+                tRef.classList.add('bg-yellow-100', 'border-l-4', 'border-yellow-400', 'p-2', 'rounded');
+                setTimeout(() => {
+                    tRef.classList.remove('bg-yellow-100', 'border-l-4', 'border-yellow-400', 'p-2', 'rounded');
+                }, 3000);
+            }
+        };
+
+        function setupHighlighter() {
+            let selectedRange = null;
+
+            DOM.questionsContainer.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().trim().length > 0) {
+                    const range = selection.getRangeAt(0);
+                    
+                    // Simple safeguard against highlighting across massive structural boundaries
+                    if (range.commonAncestorContainer.nodeType !== 3 && range.commonAncestorContainer.nodeName === 'DIV') {
+                       if(range.commonAncestorContainer.querySelectorAll('select, input').length > 0) {
+                           return; // Do not allow highlighting across inputs
+                       }
+                    }
+
+                    selectedRange = range;
+                    const rect = range.getBoundingClientRect();
+                    const containerRect = DOM.testView.getBoundingClientRect();
+                    
+                    DOM.tooltip.style.left = `${rect.left - containerRect.left + (rect.width / 2)}px`;
+                    DOM.tooltip.style.top = `${rect.top - containerRect.top}px`;
+                    DOM.tooltip.style.display = 'block';
+                } else {
+                    DOM.tooltip.style.display = 'none';
+                }
+            });
+
+            // Prevent UI jumping when clicking inputs
+            DOM.questionsContainer.addEventListener('mousedown', (e) => {
+                if (!e.target.closest('#highlight-tooltip')) {
+                    DOM.tooltip.style.display = 'none';
+                }
+            });
+
+            DOM.tooltip.addEventListener('click', () => {
+                if (selectedRange) {
+                    try {
+                        const span = document.createElement('span');
+                        span.className = 'user-highlight';
+                        span.title = 'Click to remove highlight';
+                        
+                        // Extract content and wrap
+                        const content = selectedRange.extractContents();
+                        span.appendChild(content);
+                        selectedRange.insertNode(span);
+                        
+                        // Add click-to-remove functionality
+                        span.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const parent = this.parentNode;
+                            while(this.firstChild) {
+                                parent.insertBefore(this.firstChild, this);
+                            }
+                            parent.removeChild(this);
+                        });
+
+                    } catch(err) {
+                        console.warn("Complex selection could not be highlighted.", err);
+                    }
+                    window.getSelection().removeAllRanges();
+                    DOM.tooltip.style.display = 'none';
+                }
+            });
+        }
+
+        // Init
+        initApp();
+    </script>
+</body>
+</html>
