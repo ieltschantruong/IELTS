@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   // Very light blush
+                            100: '#fce8eb',  // Pale pink
+                            200: '#f7cdd5',  // Pastel pink
+                            300: '#f0a8b6',  // Soft pink
+                            400: '#e67c91',  // Muted dark pink
+                            500: '#d75872',  // Primary elegant pink (pastel/dusty)
+                            600: '#bf3f58',  // Deeper elegant pink
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 700; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-brand-500 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-sm">I</div>
+            <h1 class="font-bold text-gray-800 text-lg tracking-tight">IELTS Chan Truong <span class="text-gray-400 font-normal text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-colors shadow-sm focus:ring-4 focus:ring-brand-200">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Left Pane: Passage -->
+        <div id="left-pane" class="w-1/2 h-full overflow-y-auto bg-white border-r border-gray-200 p-8 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-4">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-wider mb-2 block">Passage 1</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 mb-2 leading-snug">Measures to combat infectious disease in tsarist Russia</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-lg text-justify space-y-6">
+                    <p><strong>A.</strong> In the second half of the seventeenth century, Russian authorities began implementing controls at the borders of their empire to prevent the importation of plague, a highly infectious and dangerous disease. <span id="exp-q1" class="explanation-target">Information on disease outbreak occurring abroad was regularly reported to the tsar’s court through various means, including commercial channels (travelling merchants), military personnel deployed abroad, undercover agents, the network of Imperial Foreign Office embassies and representations abroad, and the customs offices.</span> For instance, the heads of customs offices were instructed to question foreigners entering Russia about possible epidemics of dangerous diseases in their respective countries.</p>
+                    
+                    <p><strong>B.</strong> If news of an outbreak came from abroad, relations with the affected country were suspended. <span id="exp-q78d" class="explanation-target">For instance, foreign vessels were not allowed to dock in Russian ports if there was credible information about the existence of epidemics in countries from whence they had departed.</span> In addition, all foreigners entering Russia from those countries had to undergo quarantine. <span id="exp-q2" class="explanation-target">In 1665, after receiving news about a plague epidemic in England, Tsar Alexei wrote a letter to King Charles II in which he announced the cessation of Russian trade relations with England and other foreign states. These protective measures appeared to have been effective, as the country did not record any cases of plague during that year and in the next three decades.</span> It was not until 1692 that another plague outbreak was recorded in the Russian province of Astrakhan. This epidemic continued for five months and killed 10,383 people, or about 65 percent of the city’s population. By the end of the seventeenth century, preventative measures had been widely introduced in Russia, including the isolation of persons ill with plague, the imposition of quarantines, and the distribution of explanatory public health notices about plague outbreaks.</p>
+                    
+                    <p><strong>C.</strong> <span id="exp-q910a" class="explanation-target">During the eighteenth century, although none of the occurrences was of the same scale as in the past, plague appeared in Russia several times.</span> For instance, from 1703 to 1705, a plague outbreak that had ravaged Istanbul spread to the Podolsk and Kiev provinces in Russia, and then to Poland and Hungary. <span id="exp-q3" class="explanation-target">After defeating the Swedes in the battle of Poltava in 1709, Tsar Peter I (Peter the Great) dispatched part of his army to Poland, where the plague had been raging for two years. Despite preventive measures, the disease spread among the Russian troops.</span> In 1710, the plague reached Riga (then part of Sweden, now the capital of Latvia), where it was active until 1711 and claimed 60,000 lives. During this period, the Russians besieged Riga and, after the Swedes had surrendered the city in 1710, the Russian army lost 9,800 soldiers to the plague. Russian military chronicles of the time note that more soldiers died of the disease after the capture of Riga than from enemy fire during the siege of that city.</p>
+                    
+                    <p><strong>D.</strong> <span id="exp-q4" class="explanation-target">Tsar Peter, I imposed strict measures to prevent the spread of plague during these conflicts. Soldiers suspected of being infected were isolated and taken to areas far from military camps. In addition, camps were designed to separate divisions, detachments, and smaller units of soldiers. When plague reached Narva (located in present-day Estonia) and threatened to spread to St. Petersburg, the newly built capital of Russia, Tsar Peter I ordered the army to cordon off the entire boundary along the Luga River, including temporarily halting all activity on the river.</span></p>
+                    
+                    <p>In order to prevent the movement of people and goods from Narva to St Petersburg and Novgorod, roadblocks and checkpoints were set up on all roads. The tsar’s orders were rigorously enforced, and those who disobeyed were hung.</p>
+                    
+                    <p><strong>E.</strong> <span id="exp-q5" class="explanation-target">However, although the Russian authorities applied such methods to contain the spread of the disease and limit the number of victims, all of the measures had a provisional character: they were intended to respond to a specific outbreak, and were not designed as a coherent set of measures to be implemented systematically at the first sign of plague.</span> <span id="exp-q910e" class="explanation-target">(Also addresses Q9-10: reactive vs strategic measures)</span> The advent of such a standard response system came a few years later.</p>
+                    
+                    <p><strong>F.</strong> <span id="exp-q6" class="explanation-target">The first attempts to organize procedures and carry out proactive steps to control plague date to the aftermath of the <span id="exp-q11" class="explanation-target">1727- 1728 epidemic in Astrakhan</span>. In response to this, the Russian imperial authorities issued several decrees aimed at controlling the future spread of plague. Among these decrees, the ‘Instructions for Governors and Heads of Townships’ required that all governors immediately inform the Senate</span> - a government body created by Tsar Peter I in 1711 to advise the monarch - if plague cases were detected in their respective provinces.</p>
+                    
+                    <p>Furthermore, the decree required that governors ensure the physical examination of all persons suspected of carrying the disease and their subsequent isolation. In addition, it was ordered that sites, where plague victims were found, had to be encircled by checkpoints and isolated for the duration of the outbreak. These checkpoints were to remain operational for at least six weeks.</p>
+                    
+                    <p>The <span id="exp-q12" class="explanation-target">houses</span> of infected persons were to be burned along with all of the personal property they contained, including farm animals and cattle. The governors were instructed to inform the neighbouring provinces and cities about every plague case occurring on their territories. Finally, letters brought by couriers were heated above a <span id="exp-q13" class="explanation-target">fire</span> before being copied.</p>
+                    
+                    <p><strong>G.</strong> The implementation by the authorities of these combined measures demonstrates their intuitive understanding of the importance of the timely isolation of infected people to limit the spread of plague.</p>
+                    
+                    <div class="mt-8 pt-4 border-t border-gray-200 text-sm text-gray-500">
+                        <p>Note: Q7-8 Option B (Spying) is inferred from "undercover agents" in Section A.</p>
+                        <span id="exp-q78b" class="explanation-target hidden-visual text-transparent select-none text-[0px]">undercover agents</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Questions -->
+        <div id="right-pane" class="w-1/2 h-full overflow-y-auto bg-gray-50 p-8 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-20">
+                
+                <!-- Results Banner (Hidden initially) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-xl p-6 shadow-sm text-center transform transition-all">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-500" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-gray-600 mb-4 text-sm bg-brand-50 p-3 rounded-lg border border-brand-100">Review your answers below. We have marked your answers, provided the correct keys, and enabled the <strong>'View Explanation'</strong> buttons for each question.</p>
+                </div>
+
+                <!-- Section 1: Matching Headings (Q1-Q6) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 transition-colors duration-300">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 1-6</h3>
+                        <p class="text-sm text-gray-700">Reading Passage has SEVEN sections, A-G. Choose the correct heading for sections A-F from the list of headings below. Write the correct number, <strong>i-viii</strong>.</p>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 text-sm">
+                        <h4 class="font-bold mb-3 text-gray-800 border-b pb-2">List of Headings</h4>
+                        <ul class="space-y-2 text-gray-700 leading-relaxed list-none font-medium">
+                            <li><span class="inline-block w-8 font-bold text-brand-600">i.</span> Outbreaks of plague as a result of military campaigns.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">ii.</span> Systematic information-gathering about external cases of plague.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">iii.</span> Early forms of treatment for plague victims.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">iv.</span> The general limitations of early Russian anti-plague measures.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">v.</span> Partly successful bans against foreign states affected by plague.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">vi.</span> Hostile reactions from foreign states to Russian anti-plague measures.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">vii.</span> Various measures to limit outbreaks of plague associated with war.</li>
+                            <li><span class="inline-block w-8 font-bold text-brand-600">viii.</span> The formulation and publication of preventive strategies.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Q1-Q6 rows generated dynamically to keep code DRY -->
+                        <script>
+                            for(let i=1; i<=6; i++) {
+                                const section = String.fromCharCode(64 + i); // A to F
+                                document.write(`
+                                <div class="q-row rounded-lg p-3 transition-colors duration-300 border border-transparent hover:border-gray-200 bg-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3" data-q="${i}">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 shrink-0 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center font-bold">${i}</div>
+                                        <p class="text-gray-800 font-medium">Section ${section}</p>
+                                    </div>
+                                    <div class="flex flex-col sm:items-end w-full sm:w-auto">
+                                        <select onchange="updateAnswer(${i}, this.value)" class="w-full sm:w-40 border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 focus:ring-opacity-50 text-sm p-2 bg-gray-50 outline-none transition-colors">
+                                            <option value="">Select heading...</option>
+                                            <option value="i">i</option>
+                                            <option value="ii">ii</option>
+                                            <option value="iii">iii</option>
+                                            <option value="iv">iv</option>
+                                            <option value="v">v</option>
+                                            <option value="vi">vi</option>
+                                            <option value="vii">vii</option>
+                                            <option value="viii">viii</option>
+                                        </select>
+                                        <button class="exp-btn hidden mt-2 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q${i}')">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            View Explanation
+                                        </button>
+                                    </div>
+                                </div>
+                                `);
+                            }
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Multiple Choice (Q7-8) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 transition-colors duration-300">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 7-8</h3>
+                        <p class="text-sm text-gray-700">Choose <strong>TWO</strong> letters, A-E.</p>
+                        <p class="text-sm font-medium text-gray-800 mt-2">Which TWO measures did Russia take in the seventeenth century to avoid plague outbreaks?</p>
+                    </div>
+
+                    <div class="space-y-3 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">A.</span> Cooperation with foreign leaders.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">B.</span> Spying.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">C.</span> Military campaigns.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">D.</span> Restrictions on access to its ports.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">E.</span> Expulsion of foreigners.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <!-- Q7 Input -->
+                        <div class="q-row flex-1 p-3 rounded-lg border border-gray-200 bg-white" data-q="7">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 shrink-0 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center font-bold">7</div>
+                                <select onchange="updateAnswer(7, this.value)" class="w-full border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 text-sm p-2 bg-gray-50 outline-none">
+                                    <option value="">First measure...</option>
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                                </select>
+                            </div>
+                            <button class="exp-btn hidden text-sm text-brand-600 font-medium hover:text-brand-800 underline ml-11 flex items-center gap-1" onclick="showExplanation('exp-q78b,exp-q78d')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> View Evidence
+                            </button>
+                        </div>
+                        <!-- Q8 Input -->
+                        <div class="q-row flex-1 p-3 rounded-lg border border-gray-200 bg-white" data-q="8">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 shrink-0 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center font-bold">8</div>
+                                <select onchange="updateAnswer(8, this.value)" class="w-full border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 text-sm p-2 bg-gray-50 outline-none">
+                                    <option value="">Second measure...</option>
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                                </select>
+                            </div>
+                            <button class="exp-btn hidden text-sm text-brand-600 font-medium hover:text-brand-800 underline ml-11 flex items-center gap-1" onclick="showExplanation('exp-q78b,exp-q78d')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> View Evidence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Multiple Choice (Q9-10) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 transition-colors duration-300">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 9-10</h3>
+                        <p class="text-sm text-gray-700">Choose <strong>TWO</strong> letters, A-E.</p>
+                        <p class="text-sm font-medium text-gray-800 mt-2">Which TWO statements are made about Russia in the early eighteenth century?</p>
+                    </div>
+
+                    <div class="space-y-3 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">A.</span> Plague outbreaks were consistently smaller than before.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">B.</span> Military casualties at Riga exceeded the number of plague victims.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">C.</span> The design of military camps allowed plague to spread quickly.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">D.</span> The tsar’s plan to protect St Petersburg from plague was not strictly implemented.</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold text-brand-600 w-6 inline-block">E.</span> Anti-plague measures were generally reactive rather than strategic.</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <!-- Q9 Input -->
+                        <div class="q-row flex-1 p-3 rounded-lg border border-gray-200 bg-white" data-q="9">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 shrink-0 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center font-bold">9</div>
+                                <select onchange="updateAnswer(9, this.value)" class="w-full border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 text-sm p-2 bg-gray-50 outline-none">
+                                    <option value="">First statement...</option>
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                                </select>
+                            </div>
+                            <button class="exp-btn hidden text-sm text-brand-600 font-medium hover:text-brand-800 underline ml-11 flex items-center gap-1" onclick="showExplanation('exp-q910a,exp-q910e')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> View Evidence
+                            </button>
+                        </div>
+                        <!-- Q10 Input -->
+                        <div class="q-row flex-1 p-3 rounded-lg border border-gray-200 bg-white" data-q="10">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 shrink-0 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center font-bold">10</div>
+                                <select onchange="updateAnswer(10, this.value)" class="w-full border border-gray-300 rounded-md shadow-sm focus:border-brand-300 focus:ring focus:ring-brand-200 text-sm p-2 bg-gray-50 outline-none">
+                                    <option value="">Second statement...</option>
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                                </select>
+                            </div>
+                            <button class="exp-btn hidden text-sm text-brand-600 font-medium hover:text-brand-800 underline ml-11 flex items-center gap-1" onclick="showExplanation('exp-q910a,exp-q910e')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> View Evidence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Sentence Completion -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="bg-brand-50 p-4 rounded-lg mb-6 border-l-4 border-brand-500">
+                        <h3 class="font-bold text-gray-800 mb-2">Questions 11-13</h3>
+                        <p class="text-sm text-gray-700">Complete the sentences below. Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                    </div>
+                    
+                    <div class="space-y-6 text-gray-800 leading-loose">
+                        
+                        <!-- Q11 -->
+                        <div class="q-row rounded-lg p-3 transition-colors duration-300 bg-gray-50 border border-transparent" data-q="11">
+                            <p>
+                                <span class="inline-block w-8 h-8 bg-brand-100 text-brand-700 rounded-full text-center leading-8 font-bold text-sm mr-2 align-middle">11</span>
+                                An outbreak of plague in 
+                                <input type="text" onchange="updateAnswer(11, this.value)" class="mx-2 w-32 border-b-2 border-brand-300 bg-transparent text-center focus:outline-none focus:border-brand-600 font-medium text-brand-800 placeholder-brand-200 transition-colors" placeholder="...">
+                                prompted the publication of a coherent preventative strategy.
+                            </p>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q11')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q12 -->
+                        <div class="q-row rounded-lg p-3 transition-colors duration-300 bg-gray-50 border border-transparent" data-q="12">
+                            <p>
+                                <span class="inline-block w-8 h-8 bg-brand-100 text-brand-700 rounded-full text-center leading-8 font-bold text-sm mr-2 align-middle">12</span>
+                                Provincial governors were ordered to burn the
+                                <input type="text" onchange="updateAnswer(12, this.value)" class="mx-2 w-32 border-b-2 border-brand-300 bg-transparent text-center focus:outline-none focus:border-brand-600 font-medium text-brand-800 placeholder-brand-200 transition-colors" placeholder="...">
+                                and possessions of plague victims.
+                            </p>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q12')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                            </button>
+                        </div>
+
+                        <!-- Q13 -->
+                        <div class="q-row rounded-lg p-3 transition-colors duration-300 bg-gray-50 border border-transparent" data-q="13">
+                            <p>
+                                <span class="inline-block w-8 h-8 bg-brand-100 text-brand-700 rounded-full text-center leading-8 font-bold text-sm mr-2 align-middle">13</span>
+                                Correspondence was held over a
+                                <input type="text" onchange="updateAnswer(13, this.value)" class="mx-2 w-32 border-b-2 border-brand-300 bg-transparent text-center focus:outline-none focus:border-brand-600 font-medium text-brand-800 placeholder-brand-200 transition-colors" placeholder="...">
+                                prior to copying it.
+                            </p>
+                            <button class="exp-btn hidden mt-3 ml-12 text-sm text-brand-600 font-medium hover:text-brand-800 underline decoration-brand-300 underline-offset-4 flex items-center gap-1" onclick="showExplanation('exp-q13')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> View Explanation
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="h-16 bg-white border-t border-gray-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3">
+            <span>Question Map:</span>
+            <div id="q-map" class="flex gap-1 flex-wrap">
+                <!-- Javascript will generate boxes here -->
+            </div>
+            
+            <!-- Result Legend (hidden until submit) -->
+            <div id="result-legend" class="hidden ml-4 flex gap-4 text-xs font-bold uppercase tracking-wide">
+                <div class="flex items-center gap-1 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1 text-yellow-700"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Unanswered</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-600 font-medium cursor-help bg-brand-50 px-3 py-1 rounded border border-brand-100 shadow-sm" id="highlight-hint">
+            💡 Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        const ANSWER_KEYS = {
+            1: "ii", 2: "v", 3: "i", 4: "vii", 5: "iv", 6: "viii",
+            7: "B or D", 8: "B or D", // handled dynamically in grading logic
+            9: "A or E", 10: "A or E",
+            11: "astrakhan", 12: "houses", 13: "fire"
+        };
+        
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=13; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border border-gray-300 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-colors bg-white hover:bg-gray-50`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => document.querySelector(`.q-row[data-q="${i}"]`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateAnswer(qNum, value) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = value.trim();
+            
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(value && value.trim() !== '') {
+                mapBox.classList.add('bg-brand-100', 'border-brand-400', 'text-brand-800');
+                mapBox.classList.remove('bg-white', 'border-gray-300', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-100', 'border-brand-400', 'text-brand-800');
+                mapBox.classList.add('bg-white', 'border-gray-300', 'text-gray-500');
+            }
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) { // 5 mins
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                }
+            }, 1000);
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            let score = 0;
+            
+            // Disable Inputs
+            document.querySelectorAll('input, select').forEach(el => {
+                el.disabled = true;
+                el.classList.add('opacity-70', 'cursor-not-allowed');
+            });
+
+            // Evaluate and Annotate
+            for(let i=1; i<=13; i++) {
+                let uAnsRaw = userAnswers[i] || '';
+                let uAns = uAnsRaw.toLowerCase();
+                let isCorrect = false;
+                let displayKey = ANSWER_KEYS[i];
+
+                if (i === 7 || i === 8) {
+                    let u7 = (userAnswers[7] || '').toUpperCase();
+                    let u8 = (userAnswers[8] || '').toUpperCase();
+                    let keys78 = ['B', 'D'];
+                    if (i === 7 && keys78.includes(u7)) isCorrect = true;
+                    if (i === 8 && keys78.includes(u8) && u8 !== u7) isCorrect = true; // prevent duplicate valid answers
+                } else if (i === 9 || i === 10) {
+                    let u9 = (userAnswers[9] || '').toUpperCase();
+                    let u10 = (userAnswers[10] || '').toUpperCase();
+                    let keys910 = ['A', 'E'];
+                    if (i === 9 && keys910.includes(u9)) isCorrect = true;
+                    if (i === 10 && keys910.includes(u10) && u10 !== u9) isCorrect = true;
+                } else {
+                    isCorrect = (uAns === ANSWER_KEYS[i].toLowerCase());
+                }
+
+                // Update UI visually for Question and Map
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const mapBox = document.getElementById(`map-q${i}`);
+                
+                // Show Explanation buttons
+                const expBtn = qRow.querySelector('.exp-btn');
+                if(expBtn) expBtn.classList.remove('hidden');
+
+                // Clear previous map classes
+                mapBox.className = `w-7 h-7 rounded border flex items-center justify-center text-xs font-bold text-white cursor-pointer transition-colors shadow-sm`;
+
+                if(uAnsRaw === '') { // Unanswered
+                    mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+                    qRow.classList.replace('border-transparent', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                    qRow.classList.replace('bg-white', 'bg-yellow-50');
+                } else if(isCorrect) { // Correct
+                    score++;
+                    mapBox.classList.add('bg-green-500', 'border-green-600');
+                    qRow.classList.replace('border-transparent', 'border-green-400');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                    qRow.classList.replace('bg-white', 'bg-green-50');
+                } else { // Incorrect
+                    mapBox.classList.add('bg-red-500', 'border-red-600');
+                    qRow.classList.replace('border-transparent', 'border-red-400');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                    qRow.classList.replace('bg-white', 'bg-red-50');
+                }
+
+                // Append explicitly correct answer badge if wrong or empty
+                if (!isCorrect) {
+                    const correctMarker = document.createElement('div');
+                    // Style specific to inputs vs select blocks
+                    let marginClass = i > 10 ? 'mt-2 ml-10 inline-block' : 'mt-3';
+                    correctMarker.className = `text-sm text-green-800 font-bold ${marginClass} bg-green-100 py-1.5 px-3 rounded border border-green-300 shadow-sm flex items-center gap-2 max-w-fit`;
+                    correctMarker.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Answer: ${displayKey}`;
+                    
+                    if (i > 10) {
+                        qRow.querySelector('p').appendChild(correctMarker); // inline for sentences
+                    } else if(i >= 7 && i <= 10) {
+                        qRow.insertBefore(correctMarker, expBtn); // Before explanation btn in multi-choice
+                    } else {
+                        qRow.appendChild(correctMarker); // bottom for match headings
+                    }
+                }
+            }
+
+            // Update Global UI State
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            
+            // Scroll to top of right pane for result summary
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            // Remove previous active highlights
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+            
+            // Handle multiple target IDs (e.g. for Multi-Choice questions needing two highlights)
+            const ids = targetIds.split(',');
+            let scrolled = false;
+
+            ids.forEach(id => {
+                const targetEl = document.getElementById(id.trim());
+                if(targetEl) {
+                    if (!scrolled) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        scrolled = true;
+                    }
+                    targetEl.classList.add('active-explanation');
+                }
+            });
+        }
+
+        // Custom Highlighting Feature for Students utilizing Native browser command
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', () => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    // Ensure selection is inside the passage specifically
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            // Prevent focus loss when clicking tooltip
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            
+            // Hide tooltip if clicked elsewhere
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                // Robust native execution for HTML highlights
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        // Start App
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
