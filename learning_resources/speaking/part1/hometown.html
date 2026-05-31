@@ -28,7 +28,7 @@
         
         /* Accordion transition */
         .accordion-content { transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, opacity 0.4s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
-        .accordion-content.open { max-height: 800px; opacity: 1; padding: 24px; }
+        .accordion-content.open { max-height: 1200px; opacity: 1; padding: 24px; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
@@ -451,8 +451,25 @@
                             <i id="acc-icon-${index}" class="ph-bold ph-caret-down transition-transform duration-300"></i>
                         </div>
                     </button>
-                    <div id="acc-content-${index}" class="accordion-content bg-stone-50 border-t border-stone-200">
-                        <div class="text-stone-700 leading-relaxed text-lg font-medium border-l-4 border-emerald-500 pl-5">
+                    <div id="acc-content-${index}" class="accordion-content bg-stone-50 border-t border-stone-200 flex flex-col gap-6">
+                        
+                        <!-- Recording Feature -->
+                        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+                            <div class="flex items-center gap-3 w-full md:w-auto">
+                                <button id="record-btn-${index}" onclick="toggleRecording(${index})" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-xl font-bold transition-all border border-emerald-200 shadow-sm w-full md:w-auto justify-center hometown-font tracking-wide text-sm">
+                                    <i id="record-icon-${index}" class="ph-fill ph-microphone text-xl"></i>
+                                    <span id="record-text-${index}">Record Answer</span>
+                                </button>
+                            </div>
+                            <div id="record-status-${index}" class="hidden text-emerald-600 font-bold animate-pulse flex items-center gap-2 text-sm tracking-widest uppercase hometown-font">
+                                <div class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div> Recording...
+                            </div>
+                            <audio id="audio-player-${index}" class="hidden h-10 w-full md:max-w-sm ml-auto" controls></audio>
+                        </div>
+
+                        <!-- Sample Answer -->
+                        <div class="text-stone-700 leading-relaxed text-[1.05rem] font-medium border-l-4 border-emerald-500 pl-5">
+                            <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block mb-2 hometown-font">Sample Answer</span>
                             ${item.a}
                         </div>
                     </div>
@@ -551,6 +568,76 @@
             flashcardDeck = [...vocabData];
             fcIndex = 0;
             renderFlashcard();
+        }
+
+        // --- AUDIO RECORDING ENGINE ---
+        let mediaRecorders = {};
+        let audioChunks = {};
+
+        async function toggleRecording(index) {
+            const btn = document.getElementById(`record-btn-${index}`);
+            const icon = document.getElementById(`record-icon-${index}`);
+            const text = document.getElementById(`record-text-${index}`);
+            const status = document.getElementById(`record-status-${index}`);
+            const audioPlayer = document.getElementById(`audio-player-${index}`);
+
+            // Reset error state if it exists
+            status.classList.remove('text-red-600');
+            status.classList.add('text-emerald-600');
+            status.innerHTML = `<div class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div> Recording...`;
+
+            // If already recording, stop it
+            if (mediaRecorders[index] && mediaRecorders[index].state === 'recording') {
+                mediaRecorders[index].stop();
+                
+                // Update UI back to normal state
+                btn.classList.remove('bg-stone-900', 'text-white', 'border-stone-800', 'hover:bg-stone-800');
+                btn.classList.add('bg-emerald-100', 'text-emerald-800', 'hover:bg-emerald-200', 'border-emerald-200');
+                icon.className = "ph-bold ph-arrow-counter-clockwise text-xl";
+                text.innerText = "Re-record";
+                status.classList.add('hidden');
+                return;
+            }
+
+            // Start Recording
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorders[index] = new MediaRecorder(stream);
+                audioChunks[index] = [];
+
+                mediaRecorders[index].ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        audioChunks[index].push(event.data);
+                    }
+                };
+
+                mediaRecorders[index].onstop = () => {
+                    const audioBlob = new Blob(audioChunks[index], { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.classList.remove('hidden');
+                    
+                    // Stop all microphone tracks to release the hardware
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorders[index].start();
+
+                // Update UI to recording state
+                audioPlayer.classList.add('hidden'); // Hide player during new recording
+                btn.classList.remove('bg-emerald-100', 'text-emerald-800', 'hover:bg-emerald-200', 'border-emerald-200');
+                btn.classList.add('bg-stone-900', 'text-white', 'border-stone-800', 'hover:bg-stone-800');
+                icon.className = "ph-fill ph-stop text-xl text-emerald-400";
+                text.innerText = "Stop Recording";
+                status.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                status.classList.remove('hidden');
+                status.classList.remove('text-emerald-600');
+                status.classList.add('text-red-600');
+                status.innerHTML = `<i class="ph-fill ph-warning"></i> Microphone access denied`;
+            }
         }
 
         // --- INIT SECTION 4: QUIZ ENGINE ---
@@ -680,10 +767,10 @@
                     timeLeft--;
                     document.getElementById('quiz-time').innerText = timeLeft + 's';
                     if(timeLeft <= 10) {
-                        document.getElementById('quiz-time').classList.add('text-rose-600');
+                        document.getElementById('quiz-time').classList.add('text-red-600');
                         document.getElementById('quiz-time').classList.remove('text-emerald-700');
                     } else {
-                        document.getElementById('quiz-time').classList.remove('text-rose-600');
+                        document.getElementById('quiz-time').classList.remove('text-red-600');
                         document.getElementById('quiz-time').classList.add('text-emerald-700');
                     }
                 }
@@ -748,14 +835,14 @@
 
             // Visual Feedback
             const feedback = document.getElementById('quiz-feedback');
-            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-red-50', 'text-red-800', 'border-red-200');
             
             if (isCorrect) {
                 feedback.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
                 feedback.innerHTML = '<div class="flex items-center justify-center gap-2"><i class="ph-fill ph-check-circle text-3xl"></i> Correct!</div>';
             } else {
-                feedback.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
-                feedback.innerHTML = `<div class="flex flex-col items-center justify-center gap-1"><div class="flex items-center gap-2 text-rose-600"><i class="ph-fill ph-x-circle text-3xl"></i> Incorrect</div><div class="text-base font-bold mt-1 text-rose-900">The correct answer is: <br><span class="text-xl">${expectedAnswer}</span></div></div>`;
+                feedback.classList.add('bg-red-50', 'text-red-800', 'border-red-200');
+                feedback.innerHTML = `<div class="flex flex-col items-center justify-center gap-1"><div class="flex items-center gap-2 text-red-600"><i class="ph-fill ph-x-circle text-3xl"></i> Incorrect</div><div class="text-base font-bold mt-1 text-red-900">The correct answer is: <br><span class="text-xl">${expectedAnswer}</span></div></div>`;
             }
 
             setTimeout(() => {
@@ -807,10 +894,10 @@
                     reviewHtml += `<div class="mb-4 pb-4 border-b border-stone-200 last:border-0"><div class="text-emerald-700 font-bold flex items-center gap-2 text-lg capitalize hometown-font"><i class="ph-fill ph-check-circle text-2xl text-emerald-500"></i> ${rec.word}</div></div>`;
                 } else {
                     reviewHtml += `<div class="mb-4 pb-4 border-b border-stone-200 last:border-0">
-                        <div class="text-rose-700 font-bold flex items-center gap-2 text-lg capitalize hometown-font"><i class="ph-fill ph-x-circle text-2xl text-rose-500"></i> ${rec.word}</div>
+                        <div class="text-red-700 font-bold flex items-center gap-2 text-lg capitalize hometown-font"><i class="ph-fill ph-x-circle text-2xl text-red-500"></i> ${rec.word}</div>
                         <div class="text-sm text-stone-700 mt-2 bg-white p-4 rounded-xl border border-stone-200 shadow-sm font-medium">
                             <div class="mb-1">Correct Answer: <span class="text-emerald-950 font-bold">${rec.expected}</span></div>
-                            <div>Your Entry: <span class="line-through text-rose-500">${rec.userAnswer}</span></div>
+                            <div>Your Entry: <span class="line-through text-red-500">${rec.userAnswer}</span></div>
                         </div>
                     </div>`;
                 }
