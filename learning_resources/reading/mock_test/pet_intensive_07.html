@@ -114,7 +114,7 @@
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can navigate between passages using the tabs at the top.</li>
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> The timer will not pause once you begin.</li>
-                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> <span class="font-bold">Tip: Simply select text in the passage to quickly highlight it. Click an existing highlight to clear it.</span></li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> <span class="font-bold">Tip: Simply select text in the passage or questions area to quickly highlight it. Click an existing highlight to clear it.</span></li>
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
                 </ul>
             </div>
@@ -592,8 +592,13 @@
             questionsList: [], 
             activeDragItem: null,
             _lastLoadedPart: -1,
-            _preventScrollReset: false
+            _preventScrollReset: false,
+            _forceRebuild: false
         };
+
+        // DOM Caches
+        let cachedPassages = {};
+        let cachedQuestions = {};
 
         const DOM = {
             views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
@@ -645,13 +650,12 @@
             let contextMenuTarget = null;
             let savedRange = null;
 
-            // Show menu immediately after mouseup if text is selected
             document.addEventListener('mouseup', (e) => {
                 if (state.mode !== 'TEST') return;
-                if (!e.target.closest('#pane-passage')) return;
+                // Allow highlighting in both passage and questions panes
+                if (!e.target.closest('#pane-passage') && !e.target.closest('#pane-questions-container')) return;
                 if (e.target.closest('#ielts-context-menu')) return;
 
-                // Tiny delay to ensure selection is registered
                 setTimeout(() => {
                     const selection = window.getSelection();
                     const hasSelection = selection.toString().trim().length > 0;
@@ -670,7 +674,6 @@
                 }, 10);
             });
 
-            // Handle left clicking to clear highlight or dismiss menu
             document.addEventListener('click', (e) => {
                 if (state.mode !== 'TEST') return;
                 if (e.target.closest('#ielts-context-menu')) return;
@@ -680,7 +683,6 @@
                 const isHighlight = e.target.closest('.user-highlight');
 
                 if (isHighlight && !hasSelection) {
-                    // Clicked on a highlight specifically to clear it
                     contextMenuTarget = isHighlight;
                     savedRange = null;
 
@@ -691,12 +693,10 @@
                     menuHighlight.style.display = 'none';
                     menuClear.style.display = 'flex';
                 } else if (!hasSelection) {
-                    // Clicked elsewhere
                     contextMenu.classList.add('hidden');
                 }
             });
 
-            // Prevent selection from clearing when clicking the custom menu
             contextMenu.addEventListener('mousedown', (e) => { e.preventDefault(); });
 
             menuHighlight.addEventListener('click', () => {
@@ -756,7 +756,7 @@
             DOM.navigator.tabs.innerHTML = '';
             TEST_DATA.parts.forEach((p, idx) => {
                 const btn = document.createElement('button');
-                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 outline-none ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
                 btn.textContent = `Part ${idx + 1}`;
                 btn.onclick = () => loadPart(idx);
                 DOM.navigator.tabs.appendChild(btn);
@@ -775,236 +775,291 @@
             DOM.tooltip.container.classList.add('visible');
         }
 
+        function syncUIState(index) {
+            if (state.mode !== 'TEST') return;
+
+            const partData = TEST_DATA.parts[index];
+            partData.questions.forEach(q => {
+                if (q.displayType === 'drag_drop') {
+                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                    q.pool.forEach(item => {
+                        const itemDiv = document.getElementById(`pool_item_${q.id}_${item.id}`);
+                        if (itemDiv) {
+                            itemDiv.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500');
+                            if (!q.isReusable && used.includes(item.id)) {
+                                itemDiv.classList.add('opacity-30', 'cursor-not-allowed');
+                                itemDiv.draggable = false;
+                            } else {
+                                itemDiv.classList.remove('opacity-30', 'cursor-not-allowed');
+                                itemDiv.draggable = true;
+                            }
+                        }
+                    });
+
+                    q.questions.forEach(subQ => {
+                        const drop = document.getElementById(`drop_${subQ.id}`);
+                        if (drop) {
+                            const ansId = state.answers[subQ.id];
+                            const ansItem = q.pool.find(i => i.id === ansId);
+                            if (ansItem) {
+                                drop.className = 'drop-zone w-full min-h-[44px] p-2 border border-pink-400 bg-white rounded-xl flex items-center justify-between text-sm font-bold text-pink-600';
+                                drop.innerHTML = `<span class="truncate">${ansItem.id.length < 3 ? ansItem.id : ansItem.text}</span><button onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)" class="ml-2 text-gray-400 hover:text-gray-800">×</button>`;
+                            } else {
+                                drop.className = 'drop-zone w-full min-h-[44px] border-2 border-dashed rounded-xl flex items-center justify-center text-xs transition-all cursor-pointer hover:bg-white hover:border-pink-200';
+                                drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'inline_blanks') {
+                    q.blanks.forEach(b => {
+                        const input = document.querySelector(`input[data-qid="${b.id}"]`);
+                        if (input) input.value = state.answers[b.id] || '';
+                    });
+                } else if (q.displayType === 'radio') {
+                    q.options.forEach(opt => {
+                        const row = document.getElementById(`radio_row_${q.id}_${opt.id}`);
+                        const radio = document.getElementById(`radio_input_${q.id}_${opt.id}`);
+                        if (row && radio) {
+                            const isSelected = state.answers[q.id] === opt.id;
+                            row.className = `flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all ${isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-100 hover:bg-gray-50'}`;
+                            radio.checked = isSelected;
+                        }
+                    });
+                }
+            });
+        }
+
         function loadPart(idx) {
-            const isNew = state._lastLoadedPart !== idx;
+            const isNewPart = state._lastLoadedPart !== idx;
             state.currentPart = idx;
             state._lastLoadedPart = idx;
-            const data = TEST_DATA.parts[idx];
+            const partData = TEST_DATA.parts[idx];
             renderTabs();
-            DOM.panes.title.textContent = data.title;
-            DOM.panes.content.innerHTML = data.passage;
             
-            DOM.panes.content.querySelectorAll('.vocab-word').forEach(word => {
-                if (state.mode === 'RESULT') {
-                    word.classList.add('mode-result');
-                    word.onclick = handleVocabClick;
-                }
-            });
+            if (state._forceRebuild) {
+                cachedPassages = {};
+                cachedQuestions = {};
+                state._forceRebuild = false;
+            }
+
+            DOM.panes.title.textContent = partData.title;
+
+            // Cache Passage
+            if (!cachedPassages[idx]) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = partData.passage;
+                tempDiv.querySelectorAll('.vocab-word').forEach(word => {
+                    if (state.mode === 'RESULT') {
+                        word.classList.add('mode-result');
+                        word.addEventListener('click', handleVocabClick);
+                    }
+                });
+                cachedPassages[idx] = tempDiv;
+            }
+            DOM.panes.content.innerHTML = '';
+            DOM.panes.content.appendChild(cachedPassages[idx]);
+
+            // Cache Questions
+            if (!cachedQuestions[idx]) {
+                const qContainer = document.createElement('div');
+                partData.questions.forEach((q, qIdx) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.id = `container_${q.id}`;
+                    qDiv.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                    if (q.instructionBox) {
+                        const instr = document.createElement('div');
+                        instr.innerHTML = q.instructionBox;
+                        qDiv.appendChild(instr);
+                    }
+
+                    if (q.displayType === 'drag_drop') {
+                        const wrapper = document.createElement('div');
+                        const pool = document.createElement('div');
+                        pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                        pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                        const poolGrid = document.createElement('div');
+                        poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+
+                        q.pool.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.id = `pool_item_${q.id}_${item.id}`;
+                            itemDiv.className = 'pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm hover:border-pink-300 hover:bg-pink-50 cursor-pointer';
+                            itemDiv.textContent = item.text;
+                            if (state.mode === 'TEST') {
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    state.activeDragItem = null;
+                                };
+                                itemDiv.onclick = (e) => {
+                                    if(itemDiv.classList.contains('cursor-not-allowed')) return;
+                                    e.stopPropagation();
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    state.activeDragItem = item.id;
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                };
+                            }
+                            poolGrid.appendChild(itemDiv);
+                        });
+                        pool.appendChild(poolGrid);
+                        wrapper.appendChild(pool);
+
+                        const qList = document.createElement('div');
+                        qList.className = 'space-y-4';
+                        q.questions.forEach(subQ => {
+                            const row = document.createElement('div');
+                            row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                            const label = document.createElement('span');
+                            label.className = 'text-sm font-semibold text-gray-700';
+                            label.textContent = subQ.text;
+                            
+                            const drop = document.createElement('div');
+                            drop.id = `drop_${subQ.id}`;
+
+                            if (state.mode === 'RESULT') {
+                                const ansId = state.answers[subQ.id];
+                                const ansItem = q.pool.find(i => i.id === ansId);
+                                const isCorrect = ansId === subQ.correct;
+                                drop.className = `drop-zone w-full min-h-[44px] p-2 border-2 rounded-xl flex items-center justify-center text-sm font-medium ${isCorrect ? 'bg-green-50 border-green-500 text-green-700' : 'bg-red-50 border-red-500 text-red-700'}`;
+                                drop.textContent = ansItem ? (ansItem.id.length < 3 ? ansItem.id : ansItem.text) : 'No Answer';
+                                
+                                const exp = document.createElement('div');
+                                exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100';
+                                const correctItem = q.pool.find(p => p.id === subQ.correct);
+                                exp.innerHTML = `
+                                    <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem.text.length > 2 ? '' : ''}</div>
+                                    <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                row.appendChild(label); row.appendChild(drop); row.appendChild(exp);
+                            } else {
+                                drop.className = 'drop-zone w-full min-h-[44px] border-2 border-dashed rounded-xl flex items-center justify-center text-xs transition-all cursor-pointer hover:bg-white hover:border-pink-200';
+                                drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                                drop.ondragover = (e) => {
+                                    e.preventDefault();
+                                    drop.classList.add('bg-pink-50', 'border-pink-400');
+                                };
+                                drop.ondragleave = (e) => {
+                                    drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                };
+                                drop.ondrop = (e) => {
+                                    e.preventDefault();
+                                    drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                    const itemId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                    if (itemId && q.pool.find(p => p.id === itemId)) {
+                                        state.answers[subQ.id] = itemId;
+                                        state.activeDragItem = null;
+                                        syncUIState(idx); updateNavigator();
+                                    }
+                                };
+                                drop.onclick = () => {
+                                    if (state.activeDragItem) {
+                                        state.answers[subQ.id] = state.activeDragItem;
+                                        state.activeDragItem = null;
+                                        syncUIState(idx); updateNavigator();
+                                    }
+                                };
+                                row.appendChild(label); row.appendChild(drop);
+                            }
+                            qList.appendChild(row);
+                        });
+                        wrapper.appendChild(qList); qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'inline_blanks') {
+                        const wrapper = document.createElement('div');
+                        wrapper.innerHTML = q.html;
+                        wrapper.querySelectorAll('input').forEach(input => {
+                            const qid = input.dataset.qid;
+                            const info = q.blanks.find(b => b.id === qid);
+                            if (state.mode === 'RESULT') {
+                                input.value = state.answers[qid] || '';
+                                input.disabled = true;
+                                if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
+                                    input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                                } else {
+                                    input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                                    const corr = document.createElement('span');
+                                    corr.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                    corr.textContent = info.correct;
+                                    input.after(corr);
+                                }
+                            } else {
+                                input.oninput = (e) => { state.answers[qid] = e.target.value; updateNavigator(); };
+                            }
+                        });
+                        qDiv.appendChild(wrapper);
+
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'mt-8 space-y-3';
+                            q.blanks.forEach(b => {
+                                const exp = document.createElement('div');
+                                exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                                const absNum = state.questionsList.find(x => x.qId === b.id).absNum;
+                                exp.innerHTML = `
+                                    <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
+                                    <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                                    <div class="mt-3 text-right">
+                                        <button onclick="locateInPassage('loc_${b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                expContainer.appendChild(exp);
+                            });
+                            qDiv.appendChild(expContainer);
+                        }
+                    } else if (q.displayType === 'radio') {
+                        const header = document.createElement('h3');
+                        header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                        header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qIdx + 1}</span> ${q.text}`;
+                        qDiv.appendChild(header);
+
+                        q.options.forEach(opt => {
+                            const row = document.createElement('label');
+                            row.id = `radio_row_${q.id}_${opt.id}`;
+                            const isSelected = state.answers[q.id] === opt.id;
+                            
+                            if (state.mode === 'RESULT') {
+                                row.className = `flex items-start p-4 mb-3 border-2 rounded-2xl transition-all ${opt.isCorrect ? 'border-green-500 bg-green-50' : isSelected ? 'border-red-500 bg-red-50' : 'opacity-60 border-gray-100'}`;
+                            } else {
+                                row.className = `flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 ${isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-100'}`;
+                                row.onclick = (e) => { e.preventDefault(); selectOption(q.id, opt.id); };
+                            }
+
+                            row.innerHTML = `
+                                <input type="radio" id="radio_input_${q.id}_${opt.id}" name="${q.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0" ${isSelected ? 'checked' : ''} ${state.mode === 'RESULT' ? 'disabled' : ''}>
+                                <div class="ml-4 flex-1">
+                                    <span class="text-sm font-medium ${state.mode === 'RESULT' && opt.isCorrect ? 'text-green-800' : 'text-gray-700'}">${opt.text}</span>
+                                    ${state.mode === 'RESULT' && (isSelected || opt.isCorrect) ? `
+                                        <div class="mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                            <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                            ${opt.explanation}
+                                            <div class="mt-2 text-right">
+                                                <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                    Locate in Passage
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                            qDiv.appendChild(row);
+                        });
+                    }
+                    qContainer.appendChild(qDiv);
+                });
+                cachedQuestions[idx] = qContainer;
+            }
 
             DOM.panes.questions.innerHTML = '';
-            data.questions.forEach((q, qIdx) => {
-                const div = document.createElement('div');
-                div.id = `container_${q.id}`;
-                div.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+            DOM.panes.questions.appendChild(cachedQuestions[idx]);
 
-                if (q.instructionBox) {
-                    const instr = document.createElement('div');
-                    instr.innerHTML = q.instructionBox;
-                    div.appendChild(instr);
-                }
-
-                if (q.displayType === 'drag_drop') {
-                    const wrapper = document.createElement('div');
-                    const pool = document.createElement('div');
-                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
-                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
-                    const poolGrid = document.createElement('div');
-                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
-                    
-                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
-
-                    q.pool.forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        const isUsed = !q.isReusable && used.includes(item.id);
-                        itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
-                        itemDiv.textContent = item.text;
-                        if (state.mode === 'TEST' && !isUsed) {
-                            itemDiv.setAttribute('draggable', 'true');
-                            itemDiv.ondragstart = (e) => {
-                                e.dataTransfer.setData('text/plain', item.id);
-                                state.activeDragItem = item.id;
-                            };
-                            itemDiv.onclick = () => {
-                                document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
-                                state.activeDragItem = item.id;
-                                itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
-                            };
-                        }
-                        poolGrid.appendChild(itemDiv);
-                    });
-                    pool.appendChild(poolGrid);
-                    wrapper.appendChild(pool);
-
-                    const qList = document.createElement('div');
-                    qList.className = 'space-y-4';
-                    q.questions.forEach(subQ => {
-                        const row = document.createElement('div');
-                        row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
-                        const label = document.createElement('span');
-                        label.className = 'text-sm font-semibold text-gray-700';
-                        label.textContent = subQ.text;
-                        
-                        const drop = document.createElement('div');
-                        const currentAnsId = state.answers[subQ.id];
-                        const currentAns = q.pool.find(p => p.id === currentAnsId);
-                        
-                        drop.className = `drop-zone w-full min-h-[44px] border-2 border-dashed rounded-xl flex items-center justify-center text-xs transition-all ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
-                        
-                        if (currentAns) {
-                            drop.classList.remove('border-dashed');
-                            drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
-                            drop.textContent = currentAns.id.length < 3 ? currentAns.id : currentAns.text;
-                            if (state.mode === 'TEST') {
-                                drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; handleRefresh(idx); };
-                            }
-                        } else {
-                            drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
-                            if (state.mode === 'TEST') {
-                                drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; handleRefresh(idx); } };
-                            }
-                        }
-
-                        if (state.mode === 'TEST') {
-                            drop.ondragover = (e) => {
-                                e.preventDefault();
-                                drop.classList.add('bg-pink-50', 'border-pink-400');
-                            };
-                            drop.ondragleave = (e) => {
-                                drop.classList.remove('bg-pink-50', 'border-pink-400');
-                            };
-                            drop.ondrop = (e) => {
-                                e.preventDefault();
-                                drop.classList.remove('bg-pink-50', 'border-pink-400');
-                                const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
-                                if (draggedId && q.pool.find(p => p.id === draggedId)) {
-                                    state.answers[subQ.id] = draggedId;
-                                    state.activeDragItem = null;
-                                    handleRefresh(idx);
-                                }
-                            };
-                        }
-
-                        if (state.mode === 'RESULT') {
-                            drop.classList.remove('text-pink-600', 'border-pink-200');
-                            const isCorrect = currentAnsId === subQ.correct;
-                            if (isCorrect) {
-                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50');
-                            } else {
-                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50');
-                            }
-                            
-                            const exp = document.createElement('div');
-                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100';
-                            const correctItem = q.pool.find(p => p.id === subQ.correct);
-                            exp.innerHTML = `
-                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem.text.length > 2 ? '' : ''}</div>
-                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
-                                <div class="mt-2 text-right">
-                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-                            row.appendChild(label); row.appendChild(drop); row.appendChild(exp);
-                        } else {
-                            row.appendChild(label); row.appendChild(drop);
-                        }
-                        qList.appendChild(row);
-                    });
-                    wrapper.appendChild(qList); div.appendChild(wrapper);
-
-                } else if (q.displayType === 'inline_blanks') {
-                    const wrapper = document.createElement('div');
-                    wrapper.innerHTML = q.html;
-                    wrapper.querySelectorAll('input').forEach(input => {
-                        const qid = input.dataset.qid;
-                        const info = q.blanks.find(b => b.id === qid);
-                        input.value = state.answers[qid] || '';
-                        if (state.mode === 'RESULT') {
-                            input.disabled = true;
-                            if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
-                                input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
-                            } else {
-                                input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
-                                const corr = document.createElement('span');
-                                corr.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
-                                corr.textContent = info.correct;
-                                input.after(corr);
-                            }
-                        } else {
-                            input.oninput = (e) => { state.answers[qid] = e.target.value; updateNavigator(); };
-                        }
-                    });
-                    div.appendChild(wrapper);
-
-                    if (state.mode === 'RESULT') {
-                        const expContainer = document.createElement('div');
-                        expContainer.className = 'mt-8 space-y-3';
-                        q.blanks.forEach(b => {
-                            const exp = document.createElement('div');
-                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
-                            const absNum = state.questionsList.find(x => x.qId === b.id).absNum;
-                            exp.innerHTML = `
-                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
-                                <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
-                                <div class="mt-3 text-right">
-                                    <button onclick="locateInPassage('loc_${b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-                            expContainer.appendChild(exp);
-                        });
-                        div.appendChild(expContainer);
-                    }
-                } else if (q.displayType === 'radio') {
-                    const header = document.createElement('h3');
-                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
-                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qIdx + 1}</span> ${q.text}`;
-                    div.appendChild(header);
-
-                    q.options.forEach(opt => {
-                        const label = document.createElement('label');
-                        const isSelected = state.answers[q.id] === opt.id;
-                        
-                        let classes = 'flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 ';
-                        if (state.mode === 'TEST') {
-                            classes += isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-100';
-                        } else {
-                            classes += 'cursor-default ';
-                            if (opt.isCorrect) classes += 'border-green-500 bg-green-50';
-                            else if (isSelected) classes += 'border-red-500 bg-red-50';
-                            else classes += 'border-gray-100 opacity-60';
-                        }
-
-                        label.className = classes;
-                        label.innerHTML = `
-                            <input type="radio" name="${q.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0" ${isSelected ? 'checked' : ''} ${state.mode === 'RESULT' ? 'disabled' : ''}>
-                            <div class="ml-4 flex-1">
-                                <span class="text-sm font-medium ${state.mode === 'RESULT' && opt.isCorrect ? 'text-green-800' : 'text-gray-700'}">${opt.text}</span>
-                                ${state.mode === 'RESULT' && (isSelected || opt.isCorrect) ? `
-                                    <div class="mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
-                                        <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
-                                        ${opt.explanation}
-                                        <div class="mt-2 text-right">
-                                            <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                                Locate in Passage
-                                            </button>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-
-                        if (state.mode === 'TEST') {
-                            label.onclick = () => { state.answers[q.id] = opt.id; updateNavigator(); handleRefresh(idx); };
-                        }
-                        div.appendChild(label);
-                    });
-                }
-                
-                DOM.panes.questions.appendChild(div);
-            });
+            syncUIState(idx);
 
             if (state.mode === 'TEST' && idx === TEST_DATA.parts.length - 1) {
                 DOM.panes.floatingSubmit.classList.remove('hidden');
@@ -1012,20 +1067,14 @@
                 DOM.panes.floatingSubmit.classList.add('hidden');
             }
 
-            if (isNew && !state._preventScrollReset) {
+            if (isNewPart && !state._preventScrollReset) {
                 document.getElementById('pane-passage').scrollTop = 0;
                 document.getElementById('pane-questions-container').scrollTop = 0;
             }
         }
 
-        function handleRefresh(idx) {
-            state._preventScrollReset = true;
-            const scroll = document.getElementById('pane-questions-container').scrollTop;
-            loadPart(idx);
-            document.getElementById('pane-questions-container').scrollTop = scroll;
-            state._preventScrollReset = false;
-            updateNavigator();
-        }
+        function selectOption(qid, oid) { state.answers[qid] = oid; syncUIState(state.currentPart); updateNavigator(); }
+        window.clearDragDropAnswer = function(qid, idx, e) { e.stopPropagation(); delete state.answers[qid]; syncUIState(idx); updateNavigator(); };
 
         function showSubmitModal() {
             const answered = state.questionsList.filter(q => {
@@ -1038,6 +1087,7 @@
 
         function finishTest() {
             state.mode = 'RESULT';
+            state._forceRebuild = true;
             clearInterval(state.timerInterval);
             DOM.modal.container.classList.add('hidden');
             DOM.header.actions.classList.add('hidden');

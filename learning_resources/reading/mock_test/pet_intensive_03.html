@@ -44,9 +44,22 @@
         .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
         .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Highlight Feature */
+        /* Highlight Feature from Passage Locating */
         .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
         .highlight-active { background-color: #fdf2f8; color: #db2777; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* User Highlight Feature (New) */
+        .user-highlight {
+            background-color: #fef08a; /* Tailwind yellow-200 */
+            border-radius: 2px;
+            cursor: pointer;
+            padding: 2px 0;
+            box-shadow: 0 0 0 1px #fde047;
+        }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
@@ -104,6 +117,7 @@
                     <li>You have exactly 60 minutes to complete all 3 parts of the test.</li>
                     <li>You can navigate between passages using the tabs at the top.</li>
                     <li>The timer will not pause once you begin.</li>
+                    <li><span class="font-bold">Tip: Simply select text in the passage or questions area to quickly highlight it. Click an existing highlight to clear it.</span></li>
                     <li>Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
                 </ul>
             </div>
@@ -223,6 +237,18 @@
                 <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
                 <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-xl bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors shadow-md">Submit Now</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Custom Context Menu for Highlighting -->
+    <div id="ielts-context-menu" class="hidden fixed bg-white border border-gray-300 shadow-lg rounded py-1 z-50 min-w-[140px] text-sm font-bold text-gray-700">
+        <div id="menu-highlight" class="px-4 py-2 hover:bg-pink-50 cursor-pointer text-[#be185d] flex items-center gap-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            Highlight
+        </div>
+        <div id="menu-clear" class="px-4 py-2 hover:bg-pink-50 cursor-pointer text-gray-600 flex items-center gap-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            Clear Highlight
         </div>
     </div>
 
@@ -729,8 +755,13 @@
             questionsList: [], 
             activeDragItem: null, 
             _lastLoadedPart: -1,
-            _preventScrollReset: false
+            _preventScrollReset: false,
+            _forceRebuild: false
         };
+
+        // DOM Caches
+        let cachedPassages = {};
+        let cachedQuestions = {};
 
         // --- 3. DOM ELEMENTS ---
         const DOM = {
@@ -869,6 +900,101 @@
 
             // Format initial timer on start screen
             DOM.header.timer.textContent = formatTime(state.timeRemaining);
+
+            setupHighlightFeature();
+        }
+
+        // --- Highlight Feature ---
+        function setupHighlightFeature() {
+            const contextMenu = document.getElementById('ielts-context-menu');
+            const menuHighlight = document.getElementById('menu-highlight');
+            const menuClear = document.getElementById('menu-clear');
+            let contextMenuTarget = null;
+            let savedRange = null;
+
+            // Show menu immediately after mouseup if text is selected
+            document.addEventListener('mouseup', (e) => {
+                if (state.mode !== 'TEST') return;
+                // Allow highlighting in both passage and questions panes
+                if (!e.target.closest('#pane-passage') && !e.target.closest('#pane-questions-container')) return;
+                if (e.target.closest('#ielts-context-menu')) return;
+
+                // Tiny delay to ensure selection is registered
+                setTimeout(() => {
+                    const selection = window.getSelection();
+                    const hasSelection = selection.toString().trim().length > 0;
+
+                    if (hasSelection) {
+                        savedRange = selection.getRangeAt(0).cloneRange();
+                        
+                        contextMenu.classList.remove('hidden');
+                        contextMenu.style.left = `${e.clientX}px`;
+                        contextMenu.style.top = `${e.clientY + 15}px`;
+
+                        menuHighlight.style.display = 'flex';
+                        menuClear.style.display = 'none';
+                        contextMenuTarget = null;
+                    }
+                }, 10);
+            });
+
+            // Handle left clicking to clear highlight or dismiss menu
+            document.addEventListener('click', (e) => {
+                if (state.mode !== 'TEST') return;
+                if (e.target.closest('#ielts-context-menu')) return;
+
+                const selection = window.getSelection();
+                const hasSelection = selection.toString().trim().length > 0;
+                const isHighlight = e.target.closest('.user-highlight');
+
+                if (isHighlight && !hasSelection) {
+                    // Clicked on a highlight specifically to clear it
+                    contextMenuTarget = isHighlight;
+                    savedRange = null;
+
+                    contextMenu.classList.remove('hidden');
+                    contextMenu.style.left = `${e.clientX}px`;
+                    contextMenu.style.top = `${e.clientY + 15}px`;
+
+                    menuHighlight.style.display = 'none';
+                    menuClear.style.display = 'flex';
+                } else if (!hasSelection) {
+                    // Clicked elsewhere
+                    contextMenu.classList.add('hidden');
+                }
+            });
+
+            // Prevent selection from clearing when clicking the custom menu
+            contextMenu.addEventListener('mousedown', (e) => { e.preventDefault(); });
+
+            menuHighlight.addEventListener('click', () => {
+                if (!savedRange) return;
+
+                const span = document.createElement('span');
+                span.className = 'user-highlight';
+
+                try {
+                    const contents = savedRange.extractContents();
+                    span.appendChild(contents);
+                    savedRange.insertNode(span);
+                } catch (e) {
+                    alert("Please select text within a single section or paragraph to highlight.");
+                }
+                window.getSelection().removeAllRanges();
+                contextMenu.classList.add('hidden');
+                savedRange = null;
+            });
+
+            menuClear.addEventListener('click', () => {
+                if (contextMenuTarget) {
+                    const parent = contextMenuTarget.parentNode;
+                    while (contextMenuTarget.firstChild) {
+                        parent.insertBefore(contextMenuTarget.firstChild, contextMenuTarget);
+                    }
+                    parent.removeChild(contextMenuTarget);
+                }
+                contextMenu.classList.add('hidden');
+            });
         }
 
         function startTest() {
@@ -929,6 +1055,97 @@
             });
         }
 
+        function syncUIState(index) {
+            if (state.mode !== 'TEST') return;
+
+            const partData = TEST_DATA.parts[index];
+            partData.questions.forEach(q => {
+                if (q.displayType === 'drag_drop') {
+                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                    q.pool.forEach(item => {
+                        const itemDiv = document.getElementById(`pool_item_${q.id}_${item.id}`);
+                        if (itemDiv) {
+                            itemDiv.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500');
+                            if (!q.isReusable && used.includes(item.id)) {
+                                itemDiv.classList.add('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                                itemDiv.draggable = false;
+                            } else {
+                                itemDiv.classList.remove('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                                itemDiv.draggable = true;
+                                if (state.activeDragItem === item.id) {
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                }
+                            }
+                        }
+                    });
+
+                    q.questions.forEach(subQ => {
+                        const drop = document.getElementById(`drop_${subQ.id}`);
+                        if (drop) {
+                            const ansId = state.answers[subQ.id];
+                            const ansItem = q.pool.find(i => i.id === ansId);
+                            if (ansItem) {
+                                drop.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border border-pink-400 bg-pink-50 text-pink-800 rounded-xl flex items-center justify-between text-sm font-bold border-solid';
+                                drop.innerHTML = `<span class="truncate pr-2">${ansItem.text}</span><button class="text-pink-500 hover:text-pink-700 p-1 font-bold text-lg" onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>`;
+                            } else {
+                                drop.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm cursor-pointer border-gray-300 text-gray-400';
+                                drop.textContent = 'Drop answer here';
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'inline_blanks') {
+                    q.blanks.forEach(b => {
+                        const input = document.querySelector(`input[data-qid="${b.id}"]`);
+                        if (input) {
+                            input.value = state.answers[b.id] || '';
+                            if (input.value.trim() !== '') {
+                                input.classList.add('border-pink-500', 'text-pink-700');
+                                input.classList.remove('border-gray-400');
+                            } else {
+                                input.classList.remove('border-pink-500', 'text-pink-700');
+                                input.classList.add('border-gray-400');
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'inline_dropdown') {
+                    q.blanks.forEach(b => {
+                        const select = document.querySelector(`select[data-qid="${b.id}"]`);
+                        if (select) {
+                            select.value = state.answers[b.id] || '';
+                            if (select.value) {
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            } else {
+                                select.classList.remove('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.add('border-gray-400', 'bg-white');
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'checkbox') {
+                    const currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                    q.options.forEach(opt => {
+                        const row = document.getElementById(`checkbox_row_${q.id}_${opt.id}`);
+                        const checkbox = document.getElementById(`checkbox_input_${q.id}_${opt.id}`);
+                        if (row && checkbox) {
+                            const isSelected = currentSelections.includes(opt.id);
+                            row.className = `option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ${isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200'}`;
+                            checkbox.checked = isSelected;
+                        }
+                    });
+                } else if (q.displayType === 'radio') {
+                    q.options.forEach(opt => {
+                        const row = document.getElementById(`radio_row_${q.id}_${opt.id}`);
+                        const radio = document.getElementById(`radio_input_${q.id}_${opt.id}`);
+                        if (row && radio) {
+                            const isSelected = state.answers[q.id] === opt.id;
+                            row.className = `option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ${isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200'}`;
+                            radio.checked = isSelected;
+                        }
+                    });
+                }
+            });
+        }
+
         function loadPart(index) {
             const isNewPart = state._lastLoadedPart !== index;
             state.currentPart = index;
@@ -939,70 +1156,77 @@
             // Update UI Tabs
             renderTabs();
 
-            // Render Passage
-            DOM.panes.title.textContent = partData.title;
-            DOM.panes.content.innerHTML = partData.passage;
-
-            // Apply vocab styling based on mode
-            const vocabWords = DOM.panes.content.querySelectorAll('.vocab-word');
-            vocabWords.forEach(word => {
-                if (state.mode === 'RESULT') {
-                    word.classList.add('mode-result');
-                    word.addEventListener('click', handleVocabClick);
-                } else {
-                    word.classList.remove('mode-result');
-                }
-            });
-
-            // Render Questions
-            DOM.panes.questions.innerHTML = '';
-            
-            if (partData.questions.length === 0) {
-                DOM.panes.questions.innerHTML = `
-                    <div class="p-8 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-4">
-                        <p class="text-lg italic">Questions for this part will be injected here...</p>
-                    </div>
-                `;
+            if (state._forceRebuild) {
+                cachedPassages = {};
+                cachedQuestions = {};
+                state._forceRebuild = false;
             }
 
-            partData.questions.forEach((q, qIndex) => {
-
-                const qDiv = document.createElement('div');
-                qDiv.id = 'container_' + q.id;
-                qDiv.className = 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
-                
-                if (q.displayType === 'drag_drop') {
-                    // --- DRAG AND DROP DISPLAY ---
-                    const wrapper = document.createElement('div');
-                    
-                    // Instruction Block
-                    if (q.instructionBox) {
-                        const instrDiv = document.createElement('div');
-                        instrDiv.innerHTML = q.instructionBox;
-                        wrapper.appendChild(instrDiv);
+            // Render Passage
+            DOM.panes.title.textContent = partData.title;
+            
+            if (!cachedPassages[index]) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = partData.passage;
+                const vocabWords = tempDiv.querySelectorAll('.vocab-word');
+                vocabWords.forEach(word => {
+                    if (state.mode === 'RESULT') {
+                        word.classList.add('mode-result');
+                        word.addEventListener('click', handleVocabClick);
+                    } else {
+                        word.classList.remove('mode-result');
                     }
+                });
+                cachedPassages[index] = tempDiv;
+            }
 
-                    // The Draggable Options Pool (Non-sticky fix applied)
-                    const poolContainer = document.createElement('div');
-                    poolContainer.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6'; 
-                    poolContainer.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">${q.poolLabel}</h4>`;
+            DOM.panes.content.innerHTML = '';
+            DOM.panes.content.appendChild(cachedPassages[index]);
 
-                    const poolGrid = document.createElement('div');
-                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-800 font-medium';
+            // Render Questions
+            if (!cachedQuestions[index]) {
+                const qContainer = document.createElement('div');
+
+                if (partData.questions.length === 0) {
+                    qContainer.innerHTML = `
+                        <div class="p-8 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-4">
+                            <p class="text-lg italic">Questions for this part will be injected here...</p>
+                        </div>
+                    `;
+                }
+
+                partData.questions.forEach((q, qIndex) => {
+
+                    const qDiv = document.createElement('div');
+                    qDiv.id = 'container_' + q.id;
+                    qDiv.className = q.displayType === 'instruction' ? 'mb-2' : 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
                     
-                    const usedItems = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
-
-                    q.pool.forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 hover:border-pink-300 transition-colors flex items-center justify-between shadow-sm';
-                        itemDiv.textContent = item.text;
+                    if (q.displayType === 'drag_drop') {
+                        // --- DRAG AND DROP DISPLAY ---
+                        const wrapper = document.createElement('div');
                         
-                        if (state.mode === 'TEST') {
-                            const isUsed = !q.isReusable && usedItems.includes(item.id);
+                        // Instruction Block
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
+                        }
+
+                        // The Draggable Options Pool (Non-sticky fix applied)
+                        const poolContainer = document.createElement('div');
+                        poolContainer.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6'; 
+                        poolContainer.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">${q.poolLabel}</h4>`;
+
+                        const poolGrid = document.createElement('div');
+                        poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-800 font-medium';
+
+                        q.pool.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.id = `pool_item_${q.id}_${item.id}`;
+                            itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 hover:border-pink-300 transition-colors flex items-center justify-between shadow-sm';
+                            itemDiv.textContent = item.text;
                             
-                            if (isUsed) {
-                                itemDiv.classList.add('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
-                            } else {
+                            if (state.mode === 'TEST') {
                                 itemDiv.draggable = true;
                                 
                                 // Native Drag Events
@@ -1016,6 +1240,7 @@
                                 
                                 // Click to Select Fallback
                                 itemDiv.onclick = (e) => {
+                                    if(itemDiv.classList.contains('cursor-not-allowed')) return;
                                     e.stopPropagation();
                                     document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
                                     
@@ -1026,500 +1251,175 @@
                                         itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
                                     }
                                 };
-
-                                // Restore active visual state if returning
-                                if (state.activeDragItem === item.id) {
-                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
-                                }
                             }
+
+                            poolGrid.appendChild(itemDiv);
+                        });
+                        poolContainer.appendChild(poolGrid);
+
+                        if (state.mode === 'TEST') {
+                            const dragNote = document.createElement('p');
+                            dragNote.className = 'text-xs text-gray-500 text-center mt-3';
+                            dragNote.innerHTML = '<em>Drag an item to the boxes below, or Tap an item then Tap a box to place it.</em>';
+                            poolContainer.appendChild(dragNote);
                         }
+                        wrapper.appendChild(poolContainer);
 
-                        poolGrid.appendChild(itemDiv);
-                    });
-                    poolContainer.appendChild(poolGrid);
+                        // Dropzone Questions List
+                        const qListContainer = document.createElement('div');
+                        qListContainer.className = 'space-y-4';
 
-                    if (state.mode === 'TEST') {
-                        const dragNote = document.createElement('p');
-                        dragNote.className = 'text-xs text-gray-500 text-center mt-3';
-                        dragNote.innerHTML = '<em>Drag an item to the boxes below, or Tap an item then Tap a box to place it.</em>';
-                        poolContainer.appendChild(dragNote);
-                    }
-                    wrapper.appendChild(poolContainer);
+                        q.questions.forEach((subQ) => {
+                            const subQDiv = document.createElement('div');
+                            subQDiv.id = 'container_' + subQ.id;
+                            subQDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-xl bg-white transition-colors';
 
-                    // Dropzone Questions List
-                    const qListContainer = document.createElement('div');
-                    qListContainer.className = 'space-y-4';
+                            const qLabel = document.createElement('label');
+                            qLabel.className = 'font-bold text-gray-800 flex-1 leading-relaxed flex items-start';
+                            qLabel.innerHTML = `<span>${subQ.text}</span>`;
 
-                    q.questions.forEach((subQ) => {
-                        const subQDiv = document.createElement('div');
-                        subQDiv.id = 'container_' + subQ.id;
-                        subQDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-xl bg-white transition-colors';
+                            const dropZone = document.createElement('div');
+                            dropZone.id = `drop_${subQ.id}`;
+                            dropZone.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm transition-all relative shrink-0 overflow-hidden';
 
-                        const qLabel = document.createElement('label');
-                        qLabel.className = 'font-bold text-gray-800 flex-1 leading-relaxed flex items-start';
-                        qLabel.innerHTML = `<span>${subQ.text}</span>`;
-
-                        const dropZone = document.createElement('div');
-                        dropZone.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm transition-all relative shrink-0 overflow-hidden';
-
-                        const userAnsId = state.answers[subQ.id];
-                        const userAnsItem = q.pool.find(i => i.id === userAnsId);
-
-                        if (state.mode === 'RESULT') {
-                            dropZone.classList.remove('border-dashed');
-                            dropZone.classList.add('border-solid');
-                            
-                            if (userAnsId === subQ.correct) {
-                                dropZone.classList.add('bg-green-50', 'border-green-500', 'text-green-800', 'font-medium');
-                                dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
-                            } else {
-                                dropZone.classList.add('bg-red-50', 'border-red-500', 'text-red-800', 'font-medium');
-                                dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
-                            }
-                        } else {
-                            if (userAnsItem) {
-                                dropZone.classList.add('border-pink-400', 'bg-pink-50', 'text-pink-800', 'font-medium', 'border-solid');
-                                dropZone.classList.remove('border-dashed', 'border-gray-300');
-                                dropZone.innerHTML = `
-                                    <div class="flex justify-between items-center w-full">
-                                        <span class="truncate pr-2">${userAnsItem.text}</span>
-                                        <button class="text-pink-500 hover:text-pink-700 p-1 font-bold text-lg" onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>
-                                    </div>`;
+                            if (state.mode === 'RESULT') {
+                                const userAnsId = state.answers[subQ.id];
+                                const userAnsItem = q.pool.find(i => i.id === userAnsId);
+                                dropZone.classList.remove('border-dashed');
+                                dropZone.classList.add('border-solid');
+                                
+                                if (userAnsId === subQ.correct) {
+                                    dropZone.classList.add('bg-green-50', 'border-green-500', 'text-green-800', 'font-medium');
+                                    dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                                } else {
+                                    dropZone.classList.add('bg-red-50', 'border-red-500', 'text-red-800', 'font-medium');
+                                    dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                                }
                             } else {
                                 dropZone.classList.add('border-gray-300', 'text-gray-400', 'cursor-pointer');
                                 dropZone.textContent = 'Drop answer here';
-                            }
 
-                            // Drag Drop Handlers
-                            dropZone.ondragover = (e) => {
-                                e.preventDefault();
-                                dropZone.classList.add('bg-pink-100', 'border-pink-500');
-                            };
-                            dropZone.ondragleave = (e) => {
-                                e.preventDefault();
-                                dropZone.classList.remove('bg-pink-100', 'border-pink-500');
-                            };
-                            dropZone.ondrop = (e) => {
-                                e.preventDefault();
-                                dropZone.classList.remove('bg-pink-100', 'border-pink-500');
-                                const itemId = e.dataTransfer.getData('text/plain');
-                                if (itemId) {
-                                    state.answers[subQ.id] = itemId;
-                                    handleDropAndReload(index);
-                                }
-                            };
-                            
-                            // Click to Drop Handler
-                            dropZone.onclick = (e) => {
-                                if (state.activeDragItem) {
-                                    state.answers[subQ.id] = state.activeDragItem;
-                                    state.activeDragItem = null;
-                                    handleDropAndReload(index);
-                                }
-                            };
-                        }
-
-                        // Build structure
-                        if (state.mode === 'RESULT') {
-                            const expContainer = document.createElement('div');
-                            expContainer.className = 'w-full mt-4 pt-4 border-t border-gray-100';
-
-                            const correctItem = q.pool.find(i => i.id === subQ.correct);
-                            if (userAnsId !== subQ.correct) {
-                                const corrAnsMsg = document.createElement('p');
-                                corrAnsMsg.className = 'text-sm text-green-600 font-bold mb-3 flex items-center gap-1.5';
-                                corrAnsMsg.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Correct Answer: <span class="ml-1 text-gray-800">${correctItem.text}</span>`;
-                                expContainer.appendChild(corrAnsMsg);
-                            }
-
-                            const expBtn = document.createElement('button');
-                            expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
-                            expBtn.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                View Explanation
-                            `;
-                            
-                            const expBox = document.createElement('div');
-                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
-                            expBox.innerHTML = `
-                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${subQ.explanation}
-                                <div class="mt-2 text-right">
-                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-
-                            expBtn.onclick = (e) => {
-                                e.stopPropagation();
-                                expBox.classList.toggle('open');
-                            };
-
-                            expContainer.appendChild(expBtn);
-                            expContainer.appendChild(expBox);
-                            
-                            const wrapDiv = document.createElement('div');
-                            wrapDiv.className = 'flex flex-col w-full';
-                            const upperDiv = document.createElement('div');
-                            upperDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full';
-                            upperDiv.appendChild(qLabel);
-                            upperDiv.appendChild(dropZone);
-                            wrapDiv.appendChild(upperDiv);
-                            wrapDiv.appendChild(expContainer);
-                            
-                            subQDiv.classList.remove('flex-row', 'sm:flex-row');
-                            subQDiv.appendChild(wrapDiv);
-                        } else {
-                            subQDiv.appendChild(qLabel);
-                            subQDiv.appendChild(dropZone);
-                        }
-
-                        qListContainer.appendChild(subQDiv);
-                    });
-                    
-                    wrapper.appendChild(qListContainer);
-                    qDiv.appendChild(wrapper);
-
-                } else if (q.displayType === 'checkbox') {
-                    // Checkbox display logic
-                    if (q.instructionBox) {
-                        const instrDiv = document.createElement('div');
-                        instrDiv.innerHTML = q.instructionBox;
-                        qDiv.appendChild(instrDiv);
-                    }
-
-                    const qHeader = document.createElement('h3');
-                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
-                    qHeader.innerHTML = `<span>${q.text}</span>`;
-                    qDiv.appendChild(qHeader);
-
-                    const optionsContainer = document.createElement('div');
-                    optionsContainer.className = 'space-y-3';
-
-                    let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
-
-                    q.options.forEach(opt => {
-                        const isSelected = currentSelections.includes(opt.id);
-                        const optWrapper = document.createElement('div');
-                        
-                        let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
-                        
-                        if (state.mode === 'TEST') {
-                            baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
-                        } else if (state.mode === 'RESULT') {
-                            baseClasses += ' cursor-default ';
-                            if (opt.isCorrect) {
-                                baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
-                            } else if (isSelected && !opt.isCorrect) {
-                                baseClasses += 'border-red-500 bg-red-50 ';
-                            } else {
-                                baseClasses += 'border-gray-200 opacity-60 ';
-                            }
-                        }
-
-                        optWrapper.className = baseClasses;
-                        
-                        if (state.mode === 'TEST') {
-                            optWrapper.onclick = () => toggleCheckbox(q.id, opt.id);
-                        }
-
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.checked = isSelected;
-                        checkbox.disabled = state.mode === 'RESULT';
-                        checkbox.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 rounded border-gray-300 pointer-events-none shrink-0';
-
-                        const labelContent = document.createElement('div');
-                        labelContent.className = 'ml-3 flex-1';
-                        
-                        const textSpan = document.createElement('span');
-                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
-                        textSpan.textContent = opt.text;
-                        labelContent.appendChild(textSpan);
-
-                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
-                            const expBtn = document.createElement('button');
-                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
-                            expBtn.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                View Explanation
-                            `;
-                            
-                            const expBox = document.createElement('div');
-                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
-                            expBox.innerHTML = `
-                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
-                                <div class="mt-2 text-right">
-                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-
-                            expBtn.onclick = (e) => {
-                                e.stopPropagation();
-                                expBox.classList.toggle('open');
-                            };
-
-                            labelContent.appendChild(expBtn);
-                            labelContent.appendChild(expBox);
-                            
-                            if (opt.isCorrect) {
-                                const icon = document.createElement('div');
-                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
-                                optWrapper.appendChild(icon);
-                            } else if (isSelected && !opt.isCorrect) {
-                                const icon = document.createElement('div');
-                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
-                                optWrapper.appendChild(icon);
-                            }
-                        }
-
-                        optWrapper.prepend(checkbox);
-                        optWrapper.appendChild(labelContent);
-                        optionsContainer.appendChild(optWrapper);
-                    });
-
-                    qDiv.appendChild(optionsContainer);
-
-                } else if (q.displayType === 'inline_blanks') {
-                    // Inline Blanks logic
-                    const wrapper = document.createElement('div');
-                    if (q.instructionBox) {
-                        const instrDiv = document.createElement('div');
-                        instrDiv.innerHTML = q.instructionBox;
-                        wrapper.appendChild(instrDiv);
-                    }
-                    
-                    const htmlContainer = document.createElement('div');
-                    htmlContainer.innerHTML = q.html;
-                    
-                    const inputs = htmlContainer.querySelectorAll('input[data-qid]');
-                    inputs.forEach(input => {
-                        const qid = input.getAttribute('data-qid');
-                        const blankInfo = q.blanks.find(b => b.id === qid);
-                        
-                        input.value = state.answers[qid] || '';
-                        
-                        if (state.mode === 'RESULT') {
-                            input.disabled = true;
-                            const userAns = (state.answers[qid] || '').trim().toLowerCase();
-                            const correctText = blankInfo.correct.toLowerCase();
-                            
-                            if (userAns === correctText) {
-                                input.classList.add('border-green-500', 'text-green-700', 'bg-green-50');
-                                input.classList.remove('border-gray-400', 'bg-transparent');
-                            } else {
-                                input.classList.add('border-red-500', 'text-red-700', 'line-through', 'opacity-75');
-                                input.classList.remove('border-gray-400');
+                                // Drag Drop Handlers
+                                dropZone.ondragover = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.add('bg-pink-100', 'border-pink-500');
+                                };
+                                dropZone.ondragleave = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                };
+                                dropZone.ondrop = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                    const itemId = e.dataTransfer.getData('text/plain');
+                                    if (itemId) {
+                                        state.answers[subQ.id] = itemId;
+                                        syncUIState(index);
+                                        updateNavigator();
+                                    }
+                                };
                                 
-                                const corrSpan = document.createElement('span');
-                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-1.5 py-0.5 rounded border border-green-200';
-                                corrSpan.textContent = blankInfo.correct;
-                                input.parentNode.insertBefore(corrSpan, input.nextSibling);
+                                // Click to Drop Handler
+                                dropZone.onclick = (e) => {
+                                    if (state.activeDragItem) {
+                                        state.answers[subQ.id] = state.activeDragItem;
+                                        state.activeDragItem = null;
+                                        syncUIState(index);
+                                        updateNavigator();
+                                    }
+                                };
                             }
-                        } else {
-                            if (state.answers[qid] && state.answers[qid].trim() !== '') {
-                                input.classList.add('border-pink-500', 'text-pink-700');
-                                input.classList.remove('border-gray-400');
-                            }
-                            input.oninput = (e) => {
-                                state.answers[qid] = e.target.value;
-                                if (e.target.value.trim() !== '') {
-                                    input.classList.add('border-pink-500', 'text-pink-700');
-                                    input.classList.remove('border-gray-400');
-                                } else {
-                                    input.classList.remove('border-pink-500', 'text-pink-700');
-                                    input.classList.add('border-gray-400');
+
+                            // Build structure
+                            if (state.mode === 'RESULT') {
+                                const expContainer = document.createElement('div');
+                                expContainer.className = 'w-full mt-4 pt-4 border-t border-gray-100';
+
+                                const correctItem = q.pool.find(i => i.id === subQ.correct);
+                                const userAnsId = state.answers[subQ.id];
+                                if (userAnsId !== subQ.correct) {
+                                    const corrAnsMsg = document.createElement('p');
+                                    corrAnsMsg.className = 'text-sm text-green-600 font-bold mb-3 flex items-center gap-1.5';
+                                    corrAnsMsg.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Correct Answer: <span class="ml-1 text-gray-800">${correctItem.text}</span>`;
+                                    expContainer.appendChild(corrAnsMsg);
                                 }
-                                updateNavigator();
-                            };
-                        }
-                    });
-                    
-                    wrapper.appendChild(htmlContainer);
-                    
-                    if (state.mode === 'RESULT') {
-                        const expContainer = document.createElement('div');
-                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
-                        
-                        q.blanks.forEach(blank => {
-                            const btn = document.createElement('button');
-                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
-                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
-                            
-                            const box = document.createElement('div');
-                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
-                            box.innerHTML = `
-                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
-                                <div class="mt-3 text-right">
-                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-                            
-                            btn.onclick = () => box.classList.toggle('open');
-                            
-                            expContainer.appendChild(btn);
-                            expContainer.appendChild(box);
-                        });
-                        wrapper.appendChild(expContainer);
-                    }
-                    
-                    qDiv.appendChild(wrapper);
 
-                } else if (q.displayType === 'inline_dropdown') {
-                    // Inline Dropdown logic (for summary with word bank)
-                    const wrapper = document.createElement('div');
-                    if (q.instructionBox) {
-                        const instrDiv = document.createElement('div');
-                        instrDiv.innerHTML = q.instructionBox;
-                        wrapper.appendChild(instrDiv);
-                    }
-                    
-                    const htmlContainer = document.createElement('div');
-                    htmlContainer.innerHTML = q.html;
-                    
-                    const selects = htmlContainer.querySelectorAll('select[data-qid]');
-                    selects.forEach(select => {
-                        const qid = select.getAttribute('data-qid');
-                        const blankInfo = q.blanks.find(b => b.id === qid);
-                        
-                        // Populate options
-                        const defaultOpt = document.createElement('option');
-                        defaultOpt.value = '';
-                        defaultOpt.text = 'Select...';
-                        defaultOpt.disabled = true;
-                        if (!state.answers[qid]) defaultOpt.selected = true;
-                        select.appendChild(defaultOpt);
-                        
-                        q.wordBank.forEach(word => {
-                            const opt = document.createElement('option');
-                            opt.value = word.id;
-                            opt.textContent = `${word.id}. ${word.text}`;
-                            if (state.answers[qid] === word.id) opt.selected = true;
-                            select.appendChild(opt);
-                        });
-
-                        if (state.mode === 'RESULT') {
-                            select.disabled = true;
-                            select.className += ' cursor-default appearance-none pr-6 border-2';
-                            const userAns = state.answers[qid];
-                            
-                            if (userAns === blankInfo.correct) {
-                                select.classList.add('border-green-500', 'text-green-800', 'bg-green-50');
-                                select.classList.remove('border-gray-400', 'bg-white');
-                            } else {
-                                select.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
-                                select.classList.remove('border-gray-400', 'bg-white');
+                                const expBtn = document.createElement('button');
+                                expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
+                                expBtn.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    View Explanation
+                                `;
                                 
-                                const corrSpan = document.createElement('span');
-                                corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200 inline-block align-middle';
-                                corrSpan.textContent = blankInfo.correct;
-                                select.parentNode.insertBefore(corrSpan, select.nextSibling);
-                            }
-                        } else {
-                            if (state.answers[qid]) {
-                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
-                                select.classList.remove('border-gray-400', 'bg-white');
-                            }
-                            select.onchange = (e) => {
-                                state.answers[qid] = e.target.value;
-                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
-                                select.classList.remove('border-gray-400', 'bg-white');
-                                updateNavigator();
-                            };
-                        }
-                    });
-                    
-                    wrapper.appendChild(htmlContainer);
+                                const expBox = document.createElement('div');
+                                expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                                expBox.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1">Explanation:</strong> ${subQ.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
 
-                    if (state.mode === 'RESULT') {
-                        const expContainer = document.createElement('div');
-                        expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
-                        
-                        q.blanks.forEach(blank => {
-                            const btn = document.createElement('button');
-                            btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
-                            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
-                            
-                            const box = document.createElement('div');
-                            box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
-                            const correctWord = q.wordBank.find(w => w.id === blank.correct).text;
-                            box.innerHTML = `
-                                <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct} (${correctWord})</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
-                                <div class="mt-3 text-right">
-                                    <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-                            
-                            btn.onclick = () => box.classList.toggle('open');
-                            
-                            expContainer.appendChild(btn);
-                            expContainer.appendChild(box);
+                                expBtn.onclick = (e) => {
+                                    e.stopPropagation();
+                                    expBox.classList.toggle('open');
+                                };
+
+                                expContainer.appendChild(expBtn);
+                                expContainer.appendChild(expBox);
+                                
+                                const wrapDiv = document.createElement('div');
+                                wrapDiv.className = 'flex flex-col w-full';
+                                const upperDiv = document.createElement('div');
+                                upperDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full';
+                                upperDiv.appendChild(qLabel);
+                                upperDiv.appendChild(dropZone);
+                                wrapDiv.appendChild(upperDiv);
+                                wrapDiv.appendChild(expContainer);
+                                
+                                subQDiv.classList.remove('flex-row', 'sm:flex-row');
+                                subQDiv.appendChild(wrapDiv);
+                            } else {
+                                subQDiv.appendChild(qLabel);
+                                subQDiv.appendChild(dropZone);
+                            }
+
+                            qListContainer.appendChild(subQDiv);
                         });
-                        wrapper.appendChild(expContainer);
-                    }
-                    
-                    qDiv.appendChild(wrapper);
+                        
+                        wrapper.appendChild(qListContainer);
+                        qDiv.appendChild(wrapper);
 
-                } else if (q.displayType === 'instruction') {
-                    // Just render instruction, no inputs
-                    if (q.instructionBox) {
-                        const instrDiv = document.createElement('div');
-                        instrDiv.innerHTML = q.instructionBox;
-                        qDiv.appendChild(instrDiv);
-                    }
-                    
-                    // Remove borders and padding so instruction blocks blend smoothly
-                    qDiv.className = 'mb-2';
-                } else {
-                    // Handle standard questions (e.g. Radio buttons)
-                    if (q.instructionBox) {
-                        const instrDiv = document.createElement('div');
-                        instrDiv.innerHTML = q.instructionBox;
-                        qDiv.appendChild(instrDiv);
-                    }
+                    } else if (q.displayType === 'checkbox') {
+                        // Checkbox display logic
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            qDiv.appendChild(instrDiv);
+                        }
 
-                    const qHeader = document.createElement('h3');
-                    qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
-                    
-                    // Prevent double numbering if text already starts with a number (e.g. "27. Text")
-                    if (/^\d+\./.test(q.text)) {
+                        const qHeader = document.createElement('h3');
+                        qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
                         qHeader.innerHTML = `<span>${q.text}</span>`;
-                    } else {
-                        qHeader.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qIndex + 1}</span> <span>${q.text}</span>`;
-                    }
-                    
-                    const flexContainer = document.createElement('div');
-                    flexContainer.className = 'flex items-start';
-                    flexContainer.appendChild(qHeader);
-                    qDiv.appendChild(flexContainer);
+                        qDiv.appendChild(qHeader);
 
-                    const optionsContainer = document.createElement('div');
-                    optionsContainer.className = 'space-y-3';
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'space-y-3';
 
-                    if (q.options) {
                         q.options.forEach(opt => {
-                            const isSelected = state.answers[q.id] === opt.id;
                             const optWrapper = document.createElement('div');
-                        
-                            let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ';
+                            optWrapper.id = `checkbox_row_${q.id}_${opt.id}`;
                             
-                            if (state.mode === 'TEST') {
-                                baseClasses += isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200';
-                            } else if (state.mode === 'RESULT') {
+                            let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 border-gray-200 ';
+                            
+                            if (state.mode === 'RESULT') {
                                 baseClasses += ' cursor-default ';
                                 if (opt.isCorrect) {
                                     baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
-                                } else if (isSelected && !opt.isCorrect) {
+                                } else if (!opt.isCorrect && state.answers[q.id] === opt.id) {
                                     baseClasses += 'border-red-500 bg-red-50 ';
                                 } else {
                                     baseClasses += 'border-gray-200 opacity-60 ';
@@ -1527,76 +1427,379 @@
                             }
 
                             optWrapper.className = baseClasses;
-
-                        if (state.mode === 'TEST') {
-                            optWrapper.onclick = () => selectOption(q.id, opt.id);
-                        }
-
-                        const radio = document.createElement('input');
-                        radio.type = 'radio';
-                        radio.name = q.id;
-                        radio.checked = isSelected;
-                        radio.disabled = state.mode === 'RESULT';
-                        radio.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 border-gray-300 pointer-events-none shrink-0';
-
-                        const labelContent = document.createElement('div');
-                        labelContent.className = 'ml-3 flex-1';
-                        
-                        const textSpan = document.createElement('span');
-                        textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
-                        textSpan.textContent = opt.text;
-                        labelContent.appendChild(textSpan);
-
-                        if (state.mode === 'RESULT' && (opt.isCorrect || isSelected)) {
-                            const expBtn = document.createElement('button');
-                            expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
-                            expBtn.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                View Explanation
-                            `;
                             
-                            const expBox = document.createElement('div');
-                            expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
-                            expBox.innerHTML = `
-                                <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
-                                <div class="mt-2 text-right">
-                                    <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-
-                            expBtn.onclick = (e) => {
-                                e.stopPropagation();
-                                expBox.classList.toggle('open');
-                            };
-
-                            labelContent.appendChild(expBtn);
-                            labelContent.appendChild(expBox);
-                            
-                            if (opt.isCorrect) {
-                                const icon = document.createElement('div');
-                                icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
-                                optWrapper.appendChild(icon);
-                            } else if (isSelected && !opt.isCorrect) {
-                                const icon = document.createElement('div');
-                                icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
-                                optWrapper.appendChild(icon);
+                            if (state.mode === 'TEST') {
+                                optWrapper.onclick = () => toggleCheckbox(q.id, opt.id);
                             }
+
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = `checkbox_input_${q.id}_${opt.id}`;
+                            checkbox.disabled = state.mode === 'RESULT';
+                            checkbox.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 rounded border-gray-300 pointer-events-none shrink-0';
+
+                            const labelContent = document.createElement('div');
+                            labelContent.className = 'ml-3 flex-1';
+                            
+                            const textSpan = document.createElement('span');
+                            textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                            textSpan.textContent = opt.text;
+                            labelContent.appendChild(textSpan);
+
+                            if (state.mode === 'RESULT') {
+                                let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                                let isSelected = currentSelections.includes(opt.id);
+
+                                if (opt.isCorrect || isSelected) {
+                                    const expBtn = document.createElement('button');
+                                    expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                                    expBtn.innerHTML = `
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        View Explanation
+                                    `;
+                                    
+                                    const expBox = document.createElement('div');
+                                    expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                                    expBox.innerHTML = `
+                                        <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                        <div class="mt-2 text-right">
+                                            <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                                Locate in Passage
+                                            </button>
+                                        </div>
+                                    `;
+
+                                    expBtn.onclick = (e) => {
+                                        e.stopPropagation();
+                                        expBox.classList.toggle('open');
+                                    };
+
+                                    labelContent.appendChild(expBtn);
+                                    labelContent.appendChild(expBox);
+                                    
+                                    if (opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    } else if (isSelected && !opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    }
+                                }
+                            }
+
+                            optWrapper.prepend(checkbox);
+                            optWrapper.appendChild(labelContent);
+                            optionsContainer.appendChild(optWrapper);
+                        });
+
+                        qDiv.appendChild(optionsContainer);
+
+                    } else if (q.displayType === 'inline_blanks') {
+                        // Inline Blanks logic
+                        const wrapper = document.createElement('div');
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
+                        }
+                        
+                        const htmlContainer = document.createElement('div');
+                        htmlContainer.innerHTML = q.html;
+                        
+                        const inputs = htmlContainer.querySelectorAll('input[data-qid]');
+                        inputs.forEach(input => {
+                            const qid = input.getAttribute('data-qid');
+                            const blankInfo = q.blanks.find(b => b.id === qid);
+                            
+                            if (state.mode === 'RESULT') {
+                                input.value = state.answers[qid] || '';
+                                input.disabled = true;
+                                const userAns = (state.answers[qid] || '').trim().toLowerCase();
+                                const correctText = blankInfo.correct.toLowerCase();
+                                
+                                if (userAns === correctText) {
+                                    input.classList.add('border-green-500', 'text-green-700', 'bg-green-50');
+                                    input.classList.remove('border-gray-400', 'bg-transparent');
+                                } else {
+                                    input.classList.add('border-red-500', 'text-red-700', 'line-through', 'opacity-75');
+                                    input.classList.remove('border-gray-400');
+                                    
+                                    const corrSpan = document.createElement('span');
+                                    corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-1.5 py-0.5 rounded border border-green-200';
+                                    corrSpan.textContent = blankInfo.correct;
+                                    input.parentNode.insertBefore(corrSpan, input.nextSibling);
+                                }
+                            } else {
+                                input.oninput = (e) => {
+                                    state.answers[qid] = e.target.value;
+                                    syncUIState(index);
+                                    updateNavigator();
+                                };
+                            }
+                        });
+                        
+                        wrapper.appendChild(htmlContainer);
+                        
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                            
+                            q.blanks.forEach(blank => {
+                                const btn = document.createElement('button');
+                                btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
+                                
+                                const box = document.createElement('div');
+                                box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                                box.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                    <div class="mt-3 text-right">
+                                        <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                btn.onclick = () => box.classList.toggle('open');
+                                
+                                expContainer.appendChild(btn);
+                                expContainer.appendChild(box);
+                            });
+                            wrapper.appendChild(expContainer);
+                        }
+                        
+                        qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'inline_dropdown') {
+                        // Inline Dropdown logic (for summary with word bank)
+                        const wrapper = document.createElement('div');
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
+                        }
+                        
+                        const htmlContainer = document.createElement('div');
+                        htmlContainer.innerHTML = q.html;
+                        
+                        const selects = htmlContainer.querySelectorAll('select[data-qid]');
+                        selects.forEach(select => {
+                            const qid = select.getAttribute('data-qid');
+                            const blankInfo = q.blanks.find(b => b.id === qid);
+                            
+                            // Populate options
+                            const defaultOpt = document.createElement('option');
+                            defaultOpt.value = '';
+                            defaultOpt.text = 'Select...';
+                            defaultOpt.disabled = true;
+                            if (!state.answers[qid]) defaultOpt.selected = true;
+                            select.appendChild(defaultOpt);
+                            
+                            q.wordBank.forEach(word => {
+                                const opt = document.createElement('option');
+                                opt.value = word.id;
+                                opt.textContent = `${word.id}. ${word.text}`;
+                                if (state.answers[qid] === word.id) opt.selected = true;
+                                select.appendChild(opt);
+                            });
+
+                            if (state.mode === 'RESULT') {
+                                select.disabled = true;
+                                select.className += ' cursor-default appearance-none pr-6 border-2';
+                                const userAns = state.answers[qid];
+                                
+                                if (userAns === blankInfo.correct) {
+                                    select.classList.add('border-green-500', 'text-green-800', 'bg-green-50');
+                                    select.classList.remove('border-gray-400', 'bg-white');
+                                } else {
+                                    select.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
+                                    select.classList.remove('border-gray-400', 'bg-white');
+                                    
+                                    const corrSpan = document.createElement('span');
+                                    corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200 inline-block align-middle';
+                                    corrSpan.textContent = blankInfo.correct;
+                                    select.parentNode.insertBefore(corrSpan, select.nextSibling);
+                                }
+                            } else {
+                                select.onchange = (e) => {
+                                    state.answers[qid] = e.target.value;
+                                    syncUIState(index);
+                                    updateNavigator();
+                                };
+                            }
+                        });
+                        
+                        wrapper.appendChild(htmlContainer);
+
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                            
+                            q.blanks.forEach(blank => {
+                                const btn = document.createElement('button');
+                                btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
+                                
+                                const box = document.createElement('div');
+                                box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                                const correctWord = q.wordBank.find(w => w.id === blank.correct).text;
+                                box.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct} (${correctWord})</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                    <div class="mt-3 text-right">
+                                        <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                btn.onclick = () => box.classList.toggle('open');
+                                
+                                expContainer.appendChild(btn);
+                                expContainer.appendChild(box);
+                            });
+                            wrapper.appendChild(expContainer);
+                        }
+                        
+                        qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'instruction') {
+                        // Just render instruction, no inputs
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            qDiv.appendChild(instrDiv);
+                        }
+                        
+                        // Remove borders and padding so instruction blocks blend smoothly
+                        qDiv.className = 'mb-2';
+                    } else {
+                        // Handle standard questions (e.g. Radio buttons)
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            qDiv.appendChild(instrDiv);
                         }
 
-                        optWrapper.prepend(radio);
-                        optWrapper.appendChild(labelContent);
-                        optionsContainer.appendChild(optWrapper);
-                        });
-                    }
+                        const qHeader = document.createElement('h3');
+                        qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                        
+                        // Prevent double numbering if text already starts with a number (e.g. "27. Text")
+                        if (/^\d+\./.test(q.text)) {
+                            qHeader.innerHTML = `<span>${q.text}</span>`;
+                        } else {
+                            qHeader.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qIndex + 1}</span> <span>${q.text}</span>`;
+                        }
+                        
+                        const flexContainer = document.createElement('div');
+                        flexContainer.className = 'flex items-start';
+                        flexContainer.appendChild(qHeader);
+                        qDiv.appendChild(flexContainer);
 
-                    qDiv.appendChild(optionsContainer);
-                }
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'space-y-3';
+
+                        if (q.options) {
+                            q.options.forEach(opt => {
+                                const optWrapper = document.createElement('div');
+                                optWrapper.id = `radio_row_${q.id}_${opt.id}`;
+                            
+                                let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 border-gray-200 ';
+                                
+                                if (state.mode === 'RESULT') {
+                                    baseClasses += ' cursor-default ';
+                                    if (opt.isCorrect) {
+                                        baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                                    } else if (state.answers[q.id] === opt.id && !opt.isCorrect) {
+                                        baseClasses += 'border-red-500 bg-red-50 ';
+                                    } else {
+                                        baseClasses += 'border-gray-200 opacity-60 ';
+                                    }
+                                }
+
+                                optWrapper.className = baseClasses;
+
+                                if (state.mode === 'TEST') {
+                                    optWrapper.onclick = () => selectOption(q.id, opt.id);
+                                }
+
+                                const radio = document.createElement('input');
+                                radio.type = 'radio';
+                                radio.name = q.id;
+                                radio.id = `radio_input_${q.id}_${opt.id}`;
+                                radio.disabled = state.mode === 'RESULT';
+                                radio.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 border-gray-300 pointer-events-none shrink-0';
+
+                                const labelContent = document.createElement('div');
+                                labelContent.className = 'ml-3 flex-1';
+                                
+                                const textSpan = document.createElement('span');
+                                textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                                textSpan.textContent = opt.text;
+                                labelContent.appendChild(textSpan);
+
+                                if (state.mode === 'RESULT' && (opt.isCorrect || state.answers[q.id] === opt.id)) {
+                                    const expBtn = document.createElement('button');
+                                    expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                                    expBtn.innerHTML = `
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        View Explanation
+                                    `;
+                                    
+                                    const expBox = document.createElement('div');
+                                    expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                                    expBox.innerHTML = `
+                                        <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                        <div class="mt-2 text-right">
+                                            <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                                Locate in Passage
+                                            </button>
+                                        </div>
+                                    `;
+
+                                    expBtn.onclick = (e) => {
+                                        e.stopPropagation();
+                                        expBox.classList.toggle('open');
+                                    };
+
+                                    labelContent.appendChild(expBtn);
+                                    labelContent.appendChild(expBox);
+                                    
+                                    if (opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    } else if (state.answers[q.id] === opt.id && !opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    }
+                                }
+
+                                optWrapper.prepend(radio);
+                                optWrapper.appendChild(labelContent);
+                                optionsContainer.appendChild(optWrapper);
+                            });
+                        }
+
+                        qDiv.appendChild(optionsContainer);
+                    }
+                    
+                    qContainer.appendChild(qDiv);
+                });
                 
-                DOM.panes.questions.appendChild(qDiv);
-            });
+                cachedQuestions[index] = qContainer;
+            }
+
+            DOM.panes.questions.innerHTML = '';
+            DOM.panes.questions.appendChild(cachedQuestions[index]);
+
+            syncUIState(index);
             
             // Manage Scroll position
             if (isNewPart && !state._preventScrollReset) {
@@ -1621,14 +1824,7 @@
         function selectOption(questionId, optionId) {
             if (state.mode !== 'TEST') return;
             state.answers[questionId] = optionId;
-            
-            // Preserve scroll position for seamless UX
-            state._preventScrollReset = true;
-            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
-            loadPart(state.currentPart);
-            DOM.panes.questions.parentElement.scrollTop = scrollPos;
-            state._preventScrollReset = false;
-            
+            syncUIState(state.currentPart);
             updateNavigator();
         }
 
@@ -1654,29 +1850,21 @@
                 }
             });
             
-            state._preventScrollReset = true;
-            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
-            loadPart(state.currentPart);
-            DOM.panes.questions.parentElement.scrollTop = scrollPos;
-            state._preventScrollReset = false;
-            
+            syncUIState(state.currentPart);
             updateNavigator();
         }
 
         // Dedicated helper to refresh drag-drop seamlessly
         window.handleDropAndReload = function(partIndex) {
-            state._preventScrollReset = true;
-            const scrollPos = DOM.panes.questions.parentElement.scrollTop;
-            loadPart(partIndex);
-            DOM.panes.questions.parentElement.scrollTop = scrollPos;
-            state._preventScrollReset = false;
+            syncUIState(partIndex);
             updateNavigator();
         };
 
         window.clearDragDropAnswer = function(qId, partIndex, e) {
             if(e) e.stopPropagation();
             delete state.answers[qId];
-            window.handleDropAndReload(partIndex);
+            syncUIState(partIndex);
+            updateNavigator();
         };
 
         function confirmSubmit() {
@@ -1761,6 +1949,7 @@
 
             // Reload current part to show explanation UI
             state._preventScrollReset = true;
+            state._forceRebuild = true;
             loadPart(state.currentPart);
             state._preventScrollReset = false;
         }
