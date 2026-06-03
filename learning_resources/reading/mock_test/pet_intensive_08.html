@@ -43,9 +43,18 @@
         .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
         .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Highlight Feature */
+        /* Highlight Feature from Passage Locating */
         .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
         .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* User Highlight Feature (New) */
+        .user-highlight {
+            background-color: #fef08a; /* Tailwind yellow-200 */
+            border-radius: 2px;
+            cursor: pointer;
+            padding: 2px 0;
+            box-shadow: 0 0 0 1px #fde047;
+        }
 
         /* Drag and Drop styling */
         .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
@@ -105,6 +114,7 @@
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can navigate between passages using the tabs at the top.</li>
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> The timer will not pause once you begin.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> <span class="font-bold">Tip: Simply select text in the passage or questions area to quickly highlight it. Click an existing highlight to clear it.</span></li>
                     <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report, complete answer explanations, and contextual vocabulary breakdowns.</li>
                 </ul>
             </div>
@@ -220,6 +230,18 @@
         </div>
     </div>
 
+    <!-- Custom Context Menu for Highlighting -->
+    <div id="ielts-context-menu" class="hidden fixed bg-white border border-gray-300 shadow-lg rounded py-1 z-50 min-w-[140px] text-sm font-bold text-gray-700">
+        <div id="menu-highlight" class="px-4 py-2 hover:bg-pink-50 cursor-pointer text-[#be185d] flex items-center gap-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            Highlight
+        </div>
+        <div id="menu-clear" class="px-4 py-2 hover:bg-pink-50 cursor-pointer text-gray-600 flex items-center gap-2 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            Clear Highlight
+        </div>
+    </div>
+
     <script>
         // --- 1. MOCK DATA ---
         
@@ -258,7 +280,7 @@
                     passage: `
                         <p class="mb-4"><strong>A.</strong> The Sumerians, an ancient people of the Middle East, had a story explaining the invention of writing more than 5,000 years ago. It seems a messenger of the King of Uruk arrived at the court of a distant ruler so exhausted that he was unable to deliver the <span class="vocab-word" data-en="Oracle" data-vi="Lời tiên tri" data-pron="/ˈɒrəkl/" data-context="Một thông điệp mang ý nghĩa thần thánh hoặc tiên báo">oracle</span> message. So the king set down the words of his next messages on a clay tablet. A charming story, whose retelling at a recent <span class="vocab-word" data-en="Symposium" data-vi="Hội nghị chuyên đề" data-pron="/sɪmˈpəʊziəm/" data-context="Một cuộc họp mà các chuyên gia thảo luận về một chủ đề cụ thể">symposium</span> at the University of Pennsylvania amused scholars. <span id="loc_p1_q1" class="highlight-target">They smiled at the <span class="vocab-word" data-en="Absurdity" data-vi="Sự vô lý, ngớ ngẩn" data-pron="/əbˈsɜːrdəti/" data-context="Sự kỳ cục hoặc thiếu hợp lý một cách buồn cười">absurdity</span> of a letter which the recipient would not have been able to read.</span></p>
 
-                        <p class="mb-4"><strong>B.</strong> <span id="loc_p1_q1_alt" class="highlight-target">They also doubted that the earliest writing was a direct <span class="vocab-word" data-en="Rendering" data-vi="Sự thể hiện, diễn giải" data-pron="/ˈrendərɪŋ/" data-context="Cách diễn đạt hoặc truyền tải một thông tin, ngôn ngữ">rendering</span> of speech.</span> Writing more likely began as a separate, symbolic system of communication and only later merged with spoken language.</p>
+                        <p class="mb-4"><strong>B.</strong> <span id="loc_p1_q1_alt" class="highlight-target">They also doubted that the earliest writing was a direct <span class="vocab-word" data-en="Rendering" data-vi="Sự thể hiện, diễn giải" data-pron="/ˈrendərɪŋ/" data-context="Cách diễn đạt hoặc truyền tải một thông điệp, ngôn ngữ">rendering</span> of speech.</span> Writing more likely began as a separate, symbolic system of communication and only later merged with spoken language.</p>
 
                         <p class="mb-4"><strong>C.</strong> <span id="loc_p1_q2" class="highlight-target">Yet in the story the Sumerians, who lived in Mesopotamia, in what is now southern Iraq, seemed to understand writing’s <span class="vocab-word" data-en="Transforming" data-vi="Làm biến đổi" data-pron="/trænsˈfɔːrmɪŋ/" data-context="Thay đổi hoàn toàn bản chất hoặc hình thức của một thứ gì đó">transforming</span> function.</span> As Dr. Holly Pittman, director of the University’s Center for Ancient Studies, observed, writing ‘arose out of the need to store and transmit information …over time and space’.</p>
 
@@ -526,22 +548,32 @@
                             ]
                         },
                         {
-                            id: 'p3_q31_35_instr',
-                            displayType: 'inline_blanks',
+                            id: 'p3_q31_35',
+                            displayType: 'inline_drag_drop',
+                            isReusable: false,
                             instructionBox: `
                                 <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
                                     <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 31–35</h3>
-                                    <p class="text-gray-700 mb-4">Complete the summary using the list of words, <strong>A-J</strong>, below. Write the correct letter in the blanks.</p>
-                                    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl text-sm mb-6 grid grid-cols-2 md:grid-cols-4 gap-2 text-gray-700 font-medium">
-                                        <div>A. teachers</div><div>B. school</div><div>C. dislocation</div><div>D. rate</div><div>E. time</div>
-                                        <div>F. family</div><div>G. communication</div><div>H. type</div><div>I. ability</div><div>J. area</div>
-                                    </div>
+                                    <p class="text-gray-700 mb-4">Complete the summary using the list of words, <strong>A-J</strong>, below. Drag the correct word into the corresponding drop zone.</p>
                                 </div>
                             `,
+                            poolLabel: 'List of Words',
+                            pool: [
+                                { id: 'A', text: 'A. teachers' },
+                                { id: 'B', text: 'B. school' },
+                                { id: 'C', text: 'C. dislocation' },
+                                { id: 'D', text: 'D. rate' },
+                                { id: 'E', text: 'E. time' },
+                                { id: 'F', text: 'F. family' },
+                                { id: 'G', text: 'G. communication' },
+                                { id: 'H', text: 'H. type' },
+                                { id: 'I', text: 'I. ability' },
+                                { id: 'J', text: 'J. area' }
+                            ],
                             html: `
-                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-8 text-base">
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 md:p-8 rounded-2xl shadow-sm text-gray-800 leading-[2.5] text-base">
                                     <strong class="block mb-2 text-indigo-900 text-lg">Bilingual Children</strong>
-                                    It was often recorded that bilingual children acquire the <strong>31</strong> <input type="text" data-qid="p3_q31" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase" placeholder="A-J" maxlength="1"> to converse in the majority language remarkably quickly. The fact that the mother tongue can disappear at a similar <strong>32</strong> <input type="text" data-qid="p3_q32" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase" placeholder="A-J" maxlength="1"> is less well understood. This phenomenon depends, to a certain extent, on the proposition of people with the same linguistic background that have settled in a particular <strong>33</strong> <input type="text" data-qid="p3_q33" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase" placeholder="A-J" maxlength="1">. If this is limited, children are likely to lose the active use of their mother tongue. And thus no longer employ it even with <strong>34</strong> <input type="text" data-qid="p3_q34" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase" placeholder="A-J" maxlength="1"> although they may still understand it. It follows that teenage children in these circumstances experience a sense of <strong>35</strong> <input type="text" data-qid="p3_q35" class="inline-blank w-12 mx-1 px-1 py-0.5 border-b-2 border-gray-400 bg-transparent text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors uppercase" placeholder="A-J" maxlength="1"> in relation to all aspects of their lives.
+                                    It was often recorded that bilingual children acquire the <strong>31</strong> <span id="drop_p3_q31" data-qid="p3_q31" class="inline-drop-zone inline-flex items-center justify-center min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center font-bold text-indigo-900 transition-colors cursor-pointer align-middle overflow-hidden text-sm whitespace-nowrap"></span> to converse in the majority language remarkably quickly. The fact that the mother tongue can disappear at a similar <strong>32</strong> <span id="drop_p3_q32" data-qid="p3_q32" class="inline-drop-zone inline-flex items-center justify-center min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center font-bold text-indigo-900 transition-colors cursor-pointer align-middle overflow-hidden text-sm whitespace-nowrap"></span> is less well understood. This phenomenon depends, to a certain extent, on the proposition of people with the same linguistic background that have settled in a particular <strong>33</strong> <span id="drop_p3_q33" data-qid="p3_q33" class="inline-drop-zone inline-flex items-center justify-center min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center font-bold text-indigo-900 transition-colors cursor-pointer align-middle overflow-hidden text-sm whitespace-nowrap"></span>. If this is limited, children are likely to lose the active use of their mother tongue. And thus no longer employ it even with <strong>34</strong> <span id="drop_p3_q34" data-qid="p3_q34" class="inline-drop-zone inline-flex items-center justify-center min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center font-bold text-indigo-900 transition-colors cursor-pointer align-middle overflow-hidden text-sm whitespace-nowrap"></span> although they may still understand it. It follows that teenage children in these circumstances experience a sense of <strong>35</strong> <span id="drop_p3_q35" data-qid="p3_q35" class="inline-drop-zone inline-flex items-center justify-center min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center font-bold text-indigo-900 transition-colors cursor-pointer align-middle overflow-hidden text-sm whitespace-nowrap"></span> in relation to all aspects of their lives.
                                 </div>
                             `,
                             blanks: [
@@ -622,434 +654,1393 @@
             ]
         };
 
-        // --- 2. ENGINE ---
+        // --- 2. APPLICATION STATE ---
         let state = {
             mode: 'START',
             currentPart: 0,
             timeRemaining: TEST_DATA.totalDurationSeconds,
             timerInterval: null,
             answers: {}, 
+            totalQuestions: 0,
             questionsList: [], 
-            activeDragItem: null,
+            activeDragItem: null, 
             _lastLoadedPart: -1,
-            _preventScrollReset: false
+            _preventScrollReset: false,
+            _forceRebuild: false
         };
 
+        let cachedPassages = {};
+        let cachedQuestions = {};
+
+        // --- 3. DOM ELEMENTS ---
         const DOM = {
-            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
-            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
-            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), time: document.getElementById('time-taken-display') },
-            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
-            panes: { title: document.getElementById('passage-title'), content: document.getElementById('passage-content'), questions: document.getElementById('questions-content'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
-            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
-            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') }
+            views: {
+                start: document.getElementById('view-start'),
+                main: document.getElementById('view-main')
+            },
+            header: {
+                actions: document.getElementById('test-header-actions'),
+                timer: document.getElementById('timer-display'),
+                btnSubmit: document.getElementById('btn-submit-header')
+            },
+            resultBanner: {
+                container: document.getElementById('result-banner'),
+                score: document.getElementById('score-display'),
+                timeTaken: document.getElementById('time-taken-display')
+            },
+            navigation: {
+                tabs: document.getElementById('part-tabs')
+            },
+            navigator: {
+                container: document.getElementById('question-navigator'),
+                grid: document.getElementById('navigator-grid'),
+                legend: document.getElementById('navigator-legend')
+            },
+            panes: {
+                title: document.getElementById('passage-title'),
+                content: document.getElementById('passage-content'),
+                questions: document.getElementById('questions-content'),
+                btnSubmitBottom: document.getElementById('btn-submit-bottom'),
+                floatingSubmit: document.getElementById('floating-submit-container')
+            },
+            tooltip: {
+                container: document.getElementById('vocab-tooltip'),
+                word: document.getElementById('tt-word'),
+                pron: document.getElementById('tt-pron'),
+                vi: document.getElementById('tt-vi'),
+                context: document.getElementById('tt-context'),
+                btnClose: document.getElementById('btn-close-tooltip')
+            },
+            modal: {
+                container: document.getElementById('submit-modal'),
+                message: document.getElementById('modal-message'),
+                btnCancel: document.getElementById('btn-cancel-submit'),
+                btnConfirm: document.getElementById('btn-confirm-submit')
+            }
         };
+
+        // --- 4. CORE FUNCTIONS ---
 
         function init() {
             let absNum = 1;
             TEST_DATA.parts.forEach((part, pIdx) => {
-                part.questions.forEach(q => {
-                    if (q.displayType === 'drag_drop') {
-                        q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
-                    } else if (q.displayType === 'inline_blanks') {
-                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
-                    } else if (q.displayType !== 'instruction') {
-                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                part.questions.forEach((q) => {
+                    if (q.displayType === 'checkbox' && q.answersIds) {
+                        const correctOpts = q.options.filter(o => o.isCorrect);
+                        q.answersIds.forEach((ansId, idx) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: ansId, absNum: absNum++,
+                                isCorrect: correctOpts[idx]?.id,
+                                displayType: 'checkbox',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_blanks' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_blank',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_dropdown' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_dropdown',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'drag_drop' && q.questions) {
+                        q.questions.forEach((subQ) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: subQ.id, absNum: absNum++,
+                                isCorrect: subQ.correct,
+                                displayType: 'drag_drop',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'inline_drag_drop' && q.blanks) {
+                        q.blanks.forEach((blank) => {
+                            state.questionsList.push({
+                                partIndex: pIdx, qId: blank.id, absNum: absNum++,
+                                isCorrect: blank.correct,
+                                displayType: 'inline_drag_drop',
+                                parentQid: q.id
+                            });
+                        });
+                    } else if (q.displayType === 'instruction') {
+                        // Skip instruction blocks
+                    } else {
+                        state.questionsList.push({
+                            partIndex: pIdx, qId: q.id, absNum: absNum++,
+                            isCorrect: q.options?.find(o => o.isCorrect)?.id,
+                            displayType: q.displayType
+                        });
                     }
                 });
             });
 
+            state.totalQuestions = state.questionsList.length;
+
             document.getElementById('btn-start').addEventListener('click', startTest);
-            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
-            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
-            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
-            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.header.btnSubmit.addEventListener('click', confirmSubmit);
+            DOM.panes.btnSubmitBottom.addEventListener('click', confirmSubmit);
             DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+            
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', () => {
+                DOM.modal.container.classList.add('hidden');
+                finishTest();
+            });
 
             document.addEventListener('click', (e) => {
-                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
-                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
-                    state.activeDragItem = null;
-                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                if(state.mode === 'RESULT') {
+                    const isVocab = e.target.classList.contains('vocab-word');
+                    const isTooltip = DOM.tooltip.container.contains(e.target);
+                    if (!isVocab && !isTooltip) {
+                        hideTooltip();
+                    }
+                } else if (state.mode === 'TEST') {
+                    if (state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone') && !e.target.closest('.inline-drop-zone')) {
+                        state.activeDragItem = null;
+                        document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                    }
                 }
+            });
+
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            setupHighlightFeature();
+        }
+
+        function setupHighlightFeature() {
+            const contextMenu = document.getElementById('ielts-context-menu');
+            const menuHighlight = document.getElementById('menu-highlight');
+            const menuClear = document.getElementById('menu-clear');
+            let contextMenuTarget = null;
+            let savedRange = null;
+
+            document.addEventListener('mouseup', (e) => {
+                if (state.mode !== 'TEST') return;
+                if (!e.target.closest('#pane-passage') && !e.target.closest('#pane-questions-container')) return;
+                if (e.target.closest('#ielts-context-menu')) return;
+
+                setTimeout(() => {
+                    const selection = window.getSelection();
+                    const hasSelection = selection.toString().trim().length > 0;
+
+                    if (hasSelection) {
+                        savedRange = selection.getRangeAt(0).cloneRange();
+                        contextMenu.classList.remove('hidden');
+                        contextMenu.style.left = `${e.clientX}px`;
+                        contextMenu.style.top = `${e.clientY + 15}px`;
+                        menuHighlight.style.display = 'flex';
+                        menuClear.style.display = 'none';
+                        contextMenuTarget = null;
+                    }
+                }, 10);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (state.mode !== 'TEST') return;
+                if (e.target.closest('#ielts-context-menu')) return;
+
+                const selection = window.getSelection();
+                const hasSelection = selection.toString().trim().length > 0;
+                const isHighlight = e.target.closest('.user-highlight');
+
+                if (isHighlight && !hasSelection) {
+                    contextMenuTarget = isHighlight;
+                    savedRange = null;
+                    contextMenu.classList.remove('hidden');
+                    contextMenu.style.left = `${e.clientX}px`;
+                    contextMenu.style.top = `${e.clientY + 15}px`;
+                    menuHighlight.style.display = 'none';
+                    menuClear.style.display = 'flex';
+                } else if (!hasSelection) {
+                    contextMenu.classList.add('hidden');
+                }
+            });
+
+            contextMenu.addEventListener('mousedown', (e) => { e.preventDefault(); });
+
+            menuHighlight.addEventListener('click', () => {
+                if (!savedRange) return;
+                const span = document.createElement('span');
+                span.className = 'user-highlight';
+                try {
+                    const contents = savedRange.extractContents();
+                    span.appendChild(contents);
+                    savedRange.insertNode(span);
+                } catch (e) {
+                    alert("Please select text within a single section or paragraph to highlight.");
+                }
+                window.getSelection().removeAllRanges();
+                contextMenu.classList.add('hidden');
+                savedRange = null;
+            });
+
+            menuClear.addEventListener('click', () => {
+                if (contextMenuTarget) {
+                    const parent = contextMenuTarget.parentNode;
+                    while (contextMenuTarget.firstChild) {
+                        parent.insertBefore(contextMenuTarget.firstChild, contextMenuTarget);
+                    }
+                    parent.removeChild(contextMenuTarget);
+                }
+                contextMenu.classList.add('hidden');
             });
         }
 
         function startTest() {
             state.mode = 'TEST';
             DOM.views.start.classList.add('hidden');
+            DOM.views.start.classList.remove('flex', 'flex-col');
             DOM.views.main.classList.remove('hidden');
+            DOM.views.main.classList.add('flex', 'flex-col');
             DOM.header.actions.classList.remove('hidden');
             DOM.header.actions.classList.add('flex');
-            renderTabs(); loadPart(0); updateNavigator();
-            state.timerInterval = setInterval(updateTimer, 1000);
+
+            renderTabs();
+            loadPart(0);
+            updateNavigator();
+            
+            state.timerInterval = setInterval(tickTimer, 1000);
         }
 
-        function updateTimer() {
-            if (state.timeRemaining <= 0) { finishTest(); return; }
-            state.timeRemaining--;
-            DOM.header.timer.textContent = formatTime(state.timeRemaining);
-            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
-        }
-
-        function formatTime(sec) {
-            const m = Math.floor(sec / 60).toString().padStart(2, '0');
-            const s = (sec % 60).toString().padStart(2, '0');
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
             return `${m}:${s}`;
         }
 
+        function tickTimer() {
+            if (state.timeRemaining <= 0) {
+                clearInterval(state.timerInterval);
+                finishTest();
+                return;
+            }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            
+            if(state.timeRemaining < 300) {
+                DOM.header.timer.parentElement.classList.add('bg-red-50', 'border-red-200');
+                DOM.header.timer.classList.add('text-red-600');
+            }
+        }
+
         function renderTabs() {
-            DOM.navigator.tabs.innerHTML = '';
-            TEST_DATA.parts.forEach((p, idx) => {
+            DOM.navigation.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((part, index) => {
                 const btn = document.createElement('button');
-                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
-                btn.textContent = `Part ${idx + 1}`;
-                btn.onclick = () => loadPart(idx);
-                DOM.navigator.tabs.appendChild(btn);
+                btn.className = `px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors border border-b-0 outline-none ${
+                    index === state.currentPart 
+                    ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' 
+                    : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'
+                }`;
+                btn.textContent = `Part ${index + 1}`;
+                btn.onclick = () => loadPart(index);
+                DOM.navigation.tabs.appendChild(btn);
             });
         }
 
-        function handleVocabClick(e) {
-            const d = e.currentTarget.dataset;
-            DOM.tooltip.word.textContent = d.en; 
-            DOM.tooltip.pron.textContent = d.pron; 
-            DOM.tooltip.vi.textContent = d.vi; 
-            DOM.tooltip.context.textContent = d.context;
-            const r = e.currentTarget.getBoundingClientRect();
-            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
-            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
-            DOM.tooltip.container.classList.add('visible');
-        }
+        function syncUIState(index) {
+            if (state.mode !== 'TEST') return;
 
-        function loadPart(idx) {
-            const isNew = state._lastLoadedPart !== idx;
-            state.currentPart = idx;
-            state._lastLoadedPart = idx;
-            const data = TEST_DATA.parts[idx];
-            renderTabs();
-            DOM.panes.title.textContent = data.title;
-            DOM.panes.content.innerHTML = data.passage;
-            
-            DOM.panes.content.querySelectorAll('.vocab-word').forEach(word => {
-                if (state.mode === 'RESULT') {
-                    word.classList.add('mode-result');
-                    word.onclick = handleVocabClick;
+            const partData = TEST_DATA.parts[index];
+            partData.questions.forEach(q => {
+                if (q.displayType === 'drag_drop') {
+                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                    q.pool.forEach(item => {
+                        const itemDiv = document.getElementById(`pool_item_${q.id}_${item.id}`);
+                        if (itemDiv) {
+                            itemDiv.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500');
+                            if (!q.isReusable && used.includes(item.id)) {
+                                itemDiv.classList.add('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                                itemDiv.draggable = false;
+                            } else {
+                                itemDiv.classList.remove('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                                itemDiv.draggable = true;
+                                if (state.activeDragItem === item.id) {
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                }
+                            }
+                        }
+                    });
+
+                    q.questions.forEach(subQ => {
+                        const drop = document.getElementById(`drop_${subQ.id}`);
+                        if (drop) {
+                            const ansId = state.answers[subQ.id];
+                            const ansItem = q.pool.find(i => i.id === ansId);
+                            if (ansItem) {
+                                drop.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border border-pink-400 bg-pink-50 text-pink-800 rounded-xl flex items-center justify-between text-sm font-bold border-solid';
+                                drop.innerHTML = `<span class="truncate pr-2">${ansItem.text}</span><button class="text-pink-500 hover:text-pink-700 p-1 font-bold text-lg" onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>`;
+                            } else {
+                                drop.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm cursor-pointer border-gray-300 text-gray-400';
+                                drop.textContent = 'Drop answer here';
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'inline_drag_drop') {
+                    const used = q.isReusable ? [] : q.blanks.map(sq => state.answers[sq.id]).filter(Boolean);
+                    q.pool.forEach(item => {
+                        const itemDiv = document.getElementById(`pool_item_${q.id}_${item.id}`);
+                        if (itemDiv) {
+                            itemDiv.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500');
+                            if (!q.isReusable && used.includes(item.id)) {
+                                itemDiv.classList.add('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                                itemDiv.draggable = false;
+                            } else {
+                                itemDiv.classList.remove('opacity-40', 'bg-gray-100', 'cursor-not-allowed');
+                                itemDiv.draggable = true;
+                                if (state.activeDragItem === item.id) {
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                }
+                            }
+                        }
+                    });
+
+                    q.blanks.forEach(subQ => {
+                        const drop = document.getElementById(`drop_${subQ.id}`);
+                        if (drop) {
+                            const ansId = state.answers[subQ.id];
+                            const ansItem = q.pool.find(i => i.id === ansId);
+                            if (ansItem) {
+                                drop.className = 'inline-drop-zone inline-flex items-center justify-between min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border border-pink-400 bg-pink-50 text-pink-800 rounded-lg text-sm font-bold align-middle cursor-pointer shadow-sm';
+                                drop.innerHTML = `<span class="truncate pr-2">${ansItem.text}</span><button class="text-pink-500 hover:text-pink-700 p-0.5 font-bold text-base leading-none" onclick="clearDragDropAnswer('${subQ.id}', ${index}, event)">×</button>`;
+                            } else {
+                                drop.className = 'inline-drop-zone inline-flex items-center justify-center min-w-[140px] min-h-[32px] mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-transparent text-center font-bold text-indigo-900 transition-colors cursor-pointer align-middle overflow-hidden text-sm whitespace-nowrap hover:bg-gray-100';
+                                drop.textContent = '';
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'inline_blanks') {
+                    q.blanks.forEach(b => {
+                        const input = document.querySelector(`input[data-qid="${b.id}"]`);
+                        if (input) {
+                            input.value = state.answers[b.id] || '';
+                            if (input.value.trim() !== '') {
+                                input.classList.add('border-pink-500', 'text-pink-700');
+                                input.classList.remove('border-gray-400');
+                            } else {
+                                input.classList.remove('border-pink-500', 'text-pink-700');
+                                input.classList.add('border-gray-400');
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'inline_dropdown') {
+                    q.blanks.forEach(b => {
+                        const select = document.querySelector(`select[data-qid="${b.id}"]`);
+                        if (select) {
+                            select.value = state.answers[b.id] || '';
+                            if (select.value) {
+                                select.classList.add('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.remove('border-gray-400', 'bg-white');
+                            } else {
+                                select.classList.remove('border-pink-500', 'text-pink-700', 'bg-pink-50');
+                                select.classList.add('border-gray-400', 'bg-white');
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'checkbox') {
+                    const currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                    q.options.forEach(opt => {
+                        const row = document.getElementById(`checkbox_row_${q.id}_${opt.id}`);
+                        const checkbox = document.getElementById(`checkbox_input_${q.id}_${opt.id}`);
+                        if (row && checkbox) {
+                            const isSelected = currentSelections.includes(opt.id);
+                            row.className = `option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ${isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200'}`;
+                            checkbox.checked = isSelected;
+                        }
+                    });
+                } else if (q.displayType === 'radio') {
+                    q.options.forEach(opt => {
+                        const row = document.getElementById(`radio_row_${q.id}_${opt.id}`);
+                        const radio = document.getElementById(`radio_input_${q.id}_${opt.id}`);
+                        if (row && radio) {
+                            const isSelected = state.answers[q.id] === opt.id;
+                            row.className = `option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 ${isSelected ? 'border-pink-400 bg-pink-50 ring-1 ring-pink-400' : 'border-gray-200'}`;
+                            radio.checked = isSelected;
+                        }
+                    });
                 }
             });
+        }
 
-            DOM.panes.questions.innerHTML = '';
+        function loadPart(index) {
+            const isNewPart = state._lastLoadedPart !== index;
+            state.currentPart = index;
+            state._lastLoadedPart = index;
+
+            const partData = TEST_DATA.parts[index];
             
-            if (data.questions.length === 0) {
-                DOM.panes.questions.innerHTML = '<div class="text-center text-gray-400 italic py-10">Questions will appear here.</div>';
+            renderTabs();
+
+            if (state._forceRebuild) {
+                cachedPassages = {};
+                cachedQuestions = {};
+                state._forceRebuild = false;
             }
 
-            data.questions.forEach((q, qIdx) => {
-                const div = document.createElement('div');
-                div.id = `container_${q.id}`;
-                div.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+            DOM.panes.title.textContent = partData.title;
+            
+            if (!cachedPassages[index]) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = partData.passage;
+                const vocabWords = tempDiv.querySelectorAll('.vocab-word');
+                vocabWords.forEach(word => {
+                    if (state.mode === 'RESULT') {
+                        word.classList.add('mode-result');
+                        word.addEventListener('click', handleVocabClick);
+                    } else {
+                        word.classList.remove('mode-result');
+                    }
+                });
+                cachedPassages[index] = tempDiv;
+            }
 
-                if (q.instructionBox) {
-                    const instr = document.createElement('div');
-                    instr.innerHTML = q.instructionBox;
-                    div.appendChild(instr);
+            DOM.panes.content.innerHTML = '';
+            DOM.panes.content.appendChild(cachedPassages[index]);
+
+            if (!cachedQuestions[index]) {
+                const qContainer = document.createElement('div');
+
+                if (partData.questions.length === 0) {
+                    qContainer.innerHTML = `
+                        <div class="p-8 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-4">
+                            <p class="text-lg italic">Questions for this part will be injected here...</p>
+                        </div>
+                    `;
                 }
 
-                if (q.displayType === 'drag_drop') {
-                    const wrapper = document.createElement('div');
-                    const pool = document.createElement('div');
-                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
-                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
-                    const poolGrid = document.createElement('div');
-                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                partData.questions.forEach((q, qIndex) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.id = 'container_' + q.id;
+                    qDiv.className = q.displayType === 'instruction' ? 'mb-2' : 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 mb-6';
                     
-                    const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
-
-                    q.pool.forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        const isUsed = !q.isReusable && used.includes(item.id);
-                        itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
-                        itemDiv.textContent = item.text;
-                        
-                        if (state.mode === 'TEST' && !isUsed) {
-                            itemDiv.setAttribute('draggable', 'true');
-                            itemDiv.ondragstart = (e) => {
-                                e.dataTransfer.setData('text/plain', item.id);
-                                state.activeDragItem = item.id;
-                            };
-                            itemDiv.onclick = () => {
-                                document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
-                                state.activeDragItem = item.id;
-                                itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
-                            };
-                        }
-                        poolGrid.appendChild(itemDiv);
-                    });
-                    pool.appendChild(poolGrid);
-                    wrapper.appendChild(pool);
-
-                    const qList = document.createElement('div');
-                    qList.className = 'space-y-4';
-                    q.questions.forEach(subQ => {
-                        const row = document.createElement('div');
-                        row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
-                        const label = document.createElement('span');
-                        label.className = 'text-sm font-semibold text-gray-700';
-                        label.textContent = subQ.text;
-                        
-                        const drop = document.createElement('div');
-                        const currentAnsId = state.answers[subQ.id];
-                        const currentAns = q.pool.find(p => p.id === currentAnsId);
-                        
-                        drop.className = `drop-zone w-full min-h-[44px] border-2 border-dashed rounded-xl flex items-center justify-center text-xs transition-all ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
-                        
-                        if (currentAns) {
-                            drop.classList.remove('border-dashed');
-                            drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
-                            drop.textContent = currentAns.id.length < 3 ? currentAns.id : currentAns.text;
-                            if (state.mode === 'TEST') {
-                                drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; handleRefresh(idx); };
-                            }
-                        } else {
-                            drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
-                            if (state.mode === 'TEST') {
-                                drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; handleRefresh(idx); } };
-                            }
+                    if (q.displayType === 'drag_drop') {
+                        const wrapper = document.createElement('div');
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
                         }
 
-                        if (state.mode === 'TEST') {
-                            drop.ondragover = (e) => {
-                                e.preventDefault();
-                                drop.classList.add('bg-pink-50', 'border-pink-400');
-                            };
-                            drop.ondragleave = (e) => {
-                                drop.classList.remove('bg-pink-50', 'border-pink-400');
-                            };
-                            drop.ondrop = (e) => {
-                                e.preventDefault();
-                                drop.classList.remove('bg-pink-50', 'border-pink-400');
-                                const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
-                                if (draggedId && q.pool.find(p => p.id === draggedId)) {
-                                    state.answers[subQ.id] = draggedId;
-                                    state.activeDragItem = null;
-                                    handleRefresh(idx);
-                                }
-                            };
-                        }
+                        const poolContainer = document.createElement('div');
+                        poolContainer.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6'; 
+                        poolContainer.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">${q.poolLabel}</h4>`;
 
-                        if (state.mode === 'RESULT') {
-                            drop.classList.remove('text-pink-600', 'border-pink-200');
-                            const isCorrect = currentAnsId === subQ.correct;
-                            if (isCorrect) {
-                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50');
-                            } else {
-                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50');
-                            }
+                        const poolGrid = document.createElement('div');
+                        poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-800 font-medium';
+
+                        q.pool.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.id = `pool_item_${q.id}_${item.id}`;
+                            itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 hover:border-pink-300 transition-colors flex items-center justify-between shadow-sm';
+                            itemDiv.textContent = item.text;
                             
-                            const exp = document.createElement('div');
-                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100';
-                            const correctItem = q.pool.find(p => p.id === subQ.correct);
-                            exp.innerHTML = `
-                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem.text.length > 2 ? '' : ''}</div>
-                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
-                                <div class="mt-2 text-right">
-                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-                            row.appendChild(label); row.appendChild(drop); row.appendChild(exp);
-                        } else {
-                            row.appendChild(label); row.appendChild(drop);
-                        }
-                        qList.appendChild(row);
-                    });
-                    wrapper.appendChild(qList); div.appendChild(wrapper);
-
-                } else if (q.displayType === 'inline_blanks') {
-                    const wrapper = document.createElement('div');
-                    wrapper.innerHTML = q.html;
-                    wrapper.querySelectorAll('input').forEach(input => {
-                        const qid = input.dataset.qid;
-                        const info = q.blanks.find(b => b.id === qid);
-                        input.value = state.answers[qid] || '';
-                        if (state.mode === 'RESULT') {
-                            input.disabled = true;
-                            if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
-                                input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
-                            } else {
-                                input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
-                                const corr = document.createElement('span');
-                                corr.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
-                                corr.textContent = info.correct;
-                                input.after(corr);
+                            if (state.mode === 'TEST') {
+                                itemDiv.draggable = true;
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    e.dataTransfer.effectAllowed = 'copyMove';
+                                    itemDiv.classList.add('opacity-50'); 
+                                    state.activeDragItem = null;
+                                };
+                                itemDiv.ondragend = () => itemDiv.classList.remove('opacity-50');
+                                
+                                itemDiv.onclick = (e) => {
+                                    if(itemDiv.classList.contains('cursor-not-allowed')) return;
+                                    e.stopPropagation();
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    
+                                    if (state.activeDragItem === item.id) {
+                                        state.activeDragItem = null; 
+                                    } else {
+                                        state.activeDragItem = item.id;
+                                        itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                    }
+                                };
                             }
-                        } else {
-                            input.oninput = (e) => { state.answers[qid] = e.target.value; updateNavigator(); };
-                        }
-                    });
-                    div.appendChild(wrapper);
-
-                    if (state.mode === 'RESULT') {
-                        const expContainer = document.createElement('div');
-                        expContainer.className = 'mt-8 space-y-3';
-                        q.blanks.forEach(b => {
-                            const exp = document.createElement('div');
-                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
-                            const absNum = state.questionsList.find(x => x.qId === b.id)?.absNum || '';
-                            exp.innerHTML = `
-                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
-                                <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
-                                <div class="mt-3 text-right">
-                                    <button onclick="locateInPassage('loc_${b.parentId || b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
-                                        Locate in Passage
-                                    </button>
-                                </div>
-                            `;
-                            expContainer.appendChild(exp);
+                            poolGrid.appendChild(itemDiv);
                         });
-                        div.appendChild(expContainer);
-                    }
-                } else if (q.displayType === 'radio') {
-                    const header = document.createElement('h3');
-                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
-                    const qMeta = state.questionsList.find(x => x.qId === q.id);
-                    const qNum = qMeta ? qMeta.absNum : (qIdx + 1);
-                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qNum}</span> ${q.text}`;
-                    div.appendChild(header);
+                        poolContainer.appendChild(poolGrid);
 
-                    q.options.forEach(opt => {
-                        const label = document.createElement('label');
-                        const isSelected = state.answers[q.id] === opt.id;
-                        
-                        let classes = 'flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 ';
                         if (state.mode === 'TEST') {
-                            classes += isSelected ? 'border-pink-500 bg-pink-50' : 'border-gray-100';
-                        } else {
-                            classes += 'cursor-default ';
-                            if (opt.isCorrect) classes += 'border-green-500 bg-green-50';
-                            else if (isSelected) classes += 'border-red-500 bg-red-50';
-                            else classes += 'border-gray-100 opacity-60';
+                            const dragNote = document.createElement('p');
+                            dragNote.className = 'text-xs text-gray-500 text-center mt-3';
+                            dragNote.innerHTML = '<em>Drag an item to the boxes below, or Tap an item then Tap a box to place it.</em>';
+                            poolContainer.appendChild(dragNote);
+                        }
+                        wrapper.appendChild(poolContainer);
+
+                        const qListContainer = document.createElement('div');
+                        qListContainer.className = 'space-y-4';
+
+                        q.questions.forEach((subQ) => {
+                            const subQDiv = document.createElement('div');
+                            subQDiv.id = 'container_' + subQ.id;
+                            subQDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-xl bg-white transition-colors';
+
+                            const qLabel = document.createElement('label');
+                            qLabel.className = 'font-bold text-gray-800 flex-1 leading-relaxed flex items-start';
+                            qLabel.innerHTML = `<span>${subQ.text}</span>`;
+
+                            const dropZone = document.createElement('div');
+                            dropZone.id = `drop_${subQ.id}`;
+                            dropZone.className = 'drop-zone w-full sm:w-64 min-h-[48px] p-2 border-2 border-dashed rounded-xl flex items-center justify-center text-sm transition-all relative shrink-0 overflow-hidden';
+
+                            if (state.mode === 'RESULT') {
+                                const userAnsId = state.answers[subQ.id];
+                                const userAnsItem = q.pool.find(i => i.id === userAnsId);
+                                dropZone.classList.remove('border-dashed');
+                                dropZone.classList.add('border-solid');
+                                
+                                if (userAnsId === subQ.correct) {
+                                    dropZone.classList.add('bg-green-50', 'border-green-500', 'text-green-800', 'font-medium');
+                                    dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                                } else {
+                                    dropZone.classList.add('bg-red-50', 'border-red-500', 'text-red-800', 'font-medium');
+                                    dropZone.textContent = userAnsItem ? userAnsItem.text : 'No Answer';
+                                }
+                            } else {
+                                dropZone.classList.add('border-gray-300', 'text-gray-400', 'cursor-pointer');
+                                dropZone.textContent = 'Drop answer here';
+
+                                dropZone.ondragover = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.add('bg-pink-100', 'border-pink-500');
+                                };
+                                dropZone.ondragleave = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                };
+                                dropZone.ondrop = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                    const itemId = e.dataTransfer.getData('text/plain');
+                                    if (itemId) {
+                                        state.answers[subQ.id] = itemId;
+                                        syncUIState(index);
+                                        updateNavigator();
+                                    }
+                                };
+                                dropZone.onclick = (e) => {
+                                    if (state.activeDragItem) {
+                                        state.answers[subQ.id] = state.activeDragItem;
+                                        state.activeDragItem = null;
+                                        syncUIState(index);
+                                        updateNavigator();
+                                    }
+                                };
+                            }
+
+                            if (state.mode === 'RESULT') {
+                                const expContainer = document.createElement('div');
+                                expContainer.className = 'w-full mt-4 pt-4 border-t border-gray-100';
+
+                                const correctItem = q.pool.find(i => i.id === subQ.correct);
+                                const userAnsId = state.answers[subQ.id];
+                                if (userAnsId !== subQ.correct) {
+                                    const corrAnsMsg = document.createElement('p');
+                                    corrAnsMsg.className = 'text-sm text-green-600 font-bold mb-3 flex items-center gap-1.5';
+                                    corrAnsMsg.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Correct Answer: <span class="ml-1 text-gray-800">${correctItem ? correctItem.text : subQ.correct}</span>`;
+                                    expContainer.appendChild(corrAnsMsg);
+                                }
+
+                                const expBtn = document.createElement('button');
+                                expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
+                                expBtn.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    View Explanation
+                                `;
+                                
+                                const expBox = document.createElement('div');
+                                expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                                expBox.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1">Explanation:</strong> ${subQ.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+
+                                expBtn.onclick = (e) => {
+                                    e.stopPropagation();
+                                    expBox.classList.toggle('open');
+                                };
+
+                                expContainer.appendChild(expBtn);
+                                expContainer.appendChild(expBox);
+                                
+                                const wrapDiv = document.createElement('div');
+                                wrapDiv.className = 'flex flex-col w-full';
+                                const upperDiv = document.createElement('div');
+                                upperDiv.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full';
+                                upperDiv.appendChild(qLabel);
+                                upperDiv.appendChild(dropZone);
+                                wrapDiv.appendChild(upperDiv);
+                                wrapDiv.appendChild(expContainer);
+                                
+                                subQDiv.classList.remove('flex-row', 'sm:flex-row');
+                                subQDiv.appendChild(wrapDiv);
+                            } else {
+                                subQDiv.appendChild(qLabel);
+                                subQDiv.appendChild(dropZone);
+                            }
+
+                            qListContainer.appendChild(subQDiv);
+                        });
+                        
+                        wrapper.appendChild(qListContainer);
+                        qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'inline_drag_drop') {
+                        const wrapper = document.createElement('div');
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
                         }
 
-                        label.className = classes;
-                        label.innerHTML = `
-                            <input type="radio" name="${q.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0" ${isSelected ? 'checked' : ''} ${state.mode === 'RESULT' ? 'disabled' : ''}>
-                            <div class="ml-4 flex-1">
-                                <span class="text-sm font-medium ${state.mode === 'RESULT' && opt.isCorrect ? 'text-green-800' : 'text-gray-700'}">${opt.text}</span>
-                                ${state.mode === 'RESULT' && (isSelected || opt.isCorrect) ? `
-                                    <div class="mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
-                                        <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
-                                        ${opt.explanation}
+                        const poolContainer = document.createElement('div');
+                        poolContainer.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6'; 
+                        poolContainer.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-sm">${q.poolLabel}</h4>`;
+
+                        const poolGrid = document.createElement('div');
+                        poolGrid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-800 font-medium';
+
+                        q.pool.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.id = `pool_item_${q.id}_${item.id}`;
+                            itemDiv.className = 'pool-item p-2 bg-white border border-gray-300 rounded cursor-move hover:bg-pink-50 hover:border-pink-300 transition-colors flex items-center justify-between shadow-sm';
+                            itemDiv.textContent = item.text;
+                            
+                            if (state.mode === 'TEST') {
+                                itemDiv.draggable = true;
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    e.dataTransfer.effectAllowed = 'copyMove';
+                                    itemDiv.classList.add('opacity-50'); 
+                                    state.activeDragItem = null;
+                                };
+                                itemDiv.ondragend = () => itemDiv.classList.remove('opacity-50');
+                                
+                                itemDiv.onclick = (e) => {
+                                    if(itemDiv.classList.contains('cursor-not-allowed')) return;
+                                    e.stopPropagation();
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    
+                                    if (state.activeDragItem === item.id) {
+                                        state.activeDragItem = null; 
+                                    } else {
+                                        state.activeDragItem = item.id;
+                                        itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                    }
+                                };
+                            }
+                            poolGrid.appendChild(itemDiv);
+                        });
+                        poolContainer.appendChild(poolGrid);
+
+                        if (state.mode === 'TEST') {
+                            const dragNote = document.createElement('p');
+                            dragNote.className = 'text-xs text-gray-500 text-center mt-3';
+                            dragNote.innerHTML = '<em>Drag an item to the boxes below, or Tap an item then Tap a box to place it.</em>';
+                            poolContainer.appendChild(dragNote);
+                        }
+                        wrapper.appendChild(poolContainer);
+
+                        const htmlContainer = document.createElement('div');
+                        htmlContainer.innerHTML = q.html;
+                        
+                        const dropZones = htmlContainer.querySelectorAll('.inline-drop-zone');
+                        dropZones.forEach(dropZone => {
+                            const subQId = dropZone.getAttribute('data-qid');
+                            if (state.mode === 'TEST') {
+                                dropZone.ondragover = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.add('bg-pink-100', 'border-pink-500');
+                                };
+                                dropZone.ondragleave = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                };
+                                dropZone.ondrop = (e) => {
+                                    e.preventDefault();
+                                    dropZone.classList.remove('bg-pink-100', 'border-pink-500');
+                                    const itemId = e.dataTransfer.getData('text/plain');
+                                    if (itemId) {
+                                        state.answers[subQId] = itemId;
+                                        syncUIState(index);
+                                        updateNavigator();
+                                    }
+                                };
+                                dropZone.onclick = (e) => {
+                                    if (state.activeDragItem) {
+                                        state.answers[subQId] = state.activeDragItem;
+                                        state.activeDragItem = null;
+                                        syncUIState(index);
+                                        updateNavigator();
+                                    }
+                                };
+                            }
+                        });
+                        
+                        wrapper.appendChild(htmlContainer);
+
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                            
+                            q.blanks.forEach(blank => {
+                                const btn = document.createElement('button');
+                                btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
+                                
+                                const box = document.createElement('div');
+                                box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                                const correctItem = q.pool.find(i => i.id === blank.correct);
+                                box.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${correctItem ? correctItem.text : blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                    <div class="mt-3 text-right">
+                                        <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                btn.onclick = () => box.classList.toggle('open');
+                                
+                                expContainer.appendChild(btn);
+                                expContainer.appendChild(box);
+                            });
+                            wrapper.appendChild(expContainer);
+                        }
+                        
+                        qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'checkbox') {
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            qDiv.appendChild(instrDiv);
+                        }
+
+                        const qHeader = document.createElement('h3');
+                        qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                        qHeader.innerHTML = `<span>${q.text}</span>`;
+                        qDiv.appendChild(qHeader);
+
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'space-y-3';
+
+                        q.options.forEach(opt => {
+                            const optWrapper = document.createElement('div');
+                            optWrapper.id = `checkbox_row_${q.id}_${opt.id}`;
+                            
+                            let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 border-gray-200 ';
+                            
+                            if (state.mode === 'RESULT') {
+                                baseClasses += ' cursor-default ';
+                                if (opt.isCorrect) {
+                                    baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                                } else if (!opt.isCorrect && state.answers[q.id] === opt.id) {
+                                    baseClasses += 'border-red-500 bg-red-50 ';
+                                } else {
+                                    baseClasses += 'border-gray-200 opacity-60 ';
+                                }
+                            }
+
+                            optWrapper.className = baseClasses;
+                            
+                            if (state.mode === 'TEST') {
+                                optWrapper.onclick = () => toggleCheckbox(q.id, opt.id);
+                            }
+
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = `checkbox_input_${q.id}_${opt.id}`;
+                            checkbox.disabled = state.mode === 'RESULT';
+                            checkbox.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 rounded border-gray-300 pointer-events-none shrink-0';
+
+                            const labelContent = document.createElement('div');
+                            labelContent.className = 'ml-3 flex-1';
+                            
+                            const textSpan = document.createElement('span');
+                            textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                            textSpan.textContent = opt.text;
+                            labelContent.appendChild(textSpan);
+
+                            if (state.mode === 'RESULT') {
+                                let currentSelections = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                                let isSelected = currentSelections.includes(opt.id);
+
+                                if (opt.isCorrect || isSelected) {
+                                    const expBtn = document.createElement('button');
+                                    expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                                    expBtn.innerHTML = `
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        View Explanation
+                                    `;
+                                    
+                                    const expBox = document.createElement('div');
+                                    expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                                    expBox.innerHTML = `
+                                        <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
                                         <div class="mt-2 text-right">
                                             <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
                                                 Locate in Passage
                                             </button>
                                         </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
+                                    `;
 
-                        if (state.mode === 'TEST') {
-                            label.onclick = () => { state.answers[q.id] = opt.id; updateNavigator(); handleRefresh(idx); };
+                                    expBtn.onclick = (e) => {
+                                        e.stopPropagation();
+                                        expBox.classList.toggle('open');
+                                    };
+
+                                    labelContent.appendChild(expBtn);
+                                    labelContent.appendChild(expBox);
+                                    
+                                    if (opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    } else if (isSelected && !opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    }
+                                }
+                            }
+
+                            optWrapper.prepend(checkbox);
+                            optWrapper.appendChild(labelContent);
+                            optionsContainer.appendChild(optWrapper);
+                        });
+
+                        qDiv.appendChild(optionsContainer);
+
+                    } else if (q.displayType === 'inline_blanks') {
+                        const wrapper = document.createElement('div');
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
                         }
-                        div.appendChild(label);
-                    });
-                }
+                        
+                        const htmlContainer = document.createElement('div');
+                        htmlContainer.innerHTML = q.html;
+                        
+                        const inputs = htmlContainer.querySelectorAll('input[data-qid]');
+                        inputs.forEach(input => {
+                            const qid = input.getAttribute('data-qid');
+                            const blankInfo = q.blanks.find(b => b.id === qid);
+                            
+                            if (state.mode === 'RESULT') {
+                                input.value = state.answers[qid] || '';
+                                input.disabled = true;
+                                const userAns = (state.answers[qid] || '').trim().toLowerCase();
+                                const correctText = blankInfo.correct.toLowerCase();
+                                
+                                if (userAns === correctText) {
+                                    input.classList.add('border-green-500', 'text-green-700', 'bg-green-50');
+                                    input.classList.remove('border-gray-400', 'bg-transparent');
+                                } else {
+                                    input.classList.add('border-red-500', 'text-red-700', 'line-through', 'opacity-75');
+                                    input.classList.remove('border-gray-400');
+                                    
+                                    const corrSpan = document.createElement('span');
+                                    corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-1.5 py-0.5 rounded border border-green-200';
+                                    corrSpan.textContent = blankInfo.correct;
+                                    input.parentNode.insertBefore(corrSpan, input.nextSibling);
+                                }
+                            } else {
+                                input.oninput = (e) => {
+                                    state.answers[qid] = e.target.value;
+                                    syncUIState(index);
+                                    updateNavigator();
+                                };
+                            }
+                        });
+                        
+                        wrapper.appendChild(htmlContainer);
+                        
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                            
+                            q.blanks.forEach(blank => {
+                                const btn = document.createElement('button');
+                                btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
+                                
+                                const box = document.createElement('div');
+                                box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                                box.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct}</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                    <div class="mt-3 text-right">
+                                        <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                btn.onclick = () => box.classList.toggle('open');
+                                
+                                expContainer.appendChild(btn);
+                                expContainer.appendChild(box);
+                            });
+                            wrapper.appendChild(expContainer);
+                        }
+                        
+                        qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'inline_dropdown') {
+                        const wrapper = document.createElement('div');
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            wrapper.appendChild(instrDiv);
+                        }
+                        
+                        const htmlContainer = document.createElement('div');
+                        htmlContainer.innerHTML = q.html;
+                        
+                        const selects = htmlContainer.querySelectorAll('select[data-qid]');
+                        selects.forEach(select => {
+                            const qid = select.getAttribute('data-qid');
+                            const blankInfo = q.blanks.find(b => b.id === qid);
+                            
+                            const defaultOpt = document.createElement('option');
+                            defaultOpt.value = '';
+                            defaultOpt.text = 'Select...';
+                            defaultOpt.disabled = true;
+                            if (!state.answers[qid]) defaultOpt.selected = true;
+                            select.appendChild(defaultOpt);
+                            
+                            q.wordBank.forEach(word => {
+                                const opt = document.createElement('option');
+                                opt.value = word.id;
+                                opt.textContent = `${word.id}. ${word.text}`;
+                                if (state.answers[qid] === word.id) opt.selected = true;
+                                select.appendChild(opt);
+                            });
+
+                            if (state.mode === 'RESULT') {
+                                select.disabled = true;
+                                select.className += ' cursor-default appearance-none pr-6 border-2';
+                                const userAns = state.answers[qid];
+                                
+                                if (userAns === blankInfo.correct) {
+                                    select.classList.add('border-green-500', 'text-green-800', 'bg-green-50');
+                                    select.classList.remove('border-gray-400', 'bg-white');
+                                } else {
+                                    select.classList.add('border-red-500', 'text-red-800', 'bg-red-50');
+                                    select.classList.remove('border-gray-400', 'bg-white');
+                                    
+                                    const corrSpan = document.createElement('span');
+                                    corrSpan.className = 'text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200 inline-block align-middle';
+                                    corrSpan.textContent = blankInfo.correct;
+                                    select.parentNode.insertBefore(corrSpan, select.nextSibling);
+                                }
+                            } else {
+                                select.onchange = (e) => {
+                                    state.answers[qid] = e.target.value;
+                                    syncUIState(index);
+                                    updateNavigator();
+                                };
+                            }
+                        });
+                        
+                        wrapper.appendChild(htmlContainer);
+
+                        if (state.mode === 'RESULT') {
+                            const expContainer = document.createElement('div');
+                            expContainer.className = 'mt-6 pt-4 border-t border-gray-200 space-y-3';
+                            
+                            q.blanks.forEach(blank => {
+                                const btn = document.createElement('button');
+                                btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
+                                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
+                                
+                                const box = document.createElement('div');
+                                box.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-1 mb-2';
+                                const correctWord = q.wordBank.find(w => w.id === blank.correct).text;
+                                box.innerHTML = `
+                                    <strong class="text-pink-600 block mb-1 text-base">Correct Answer: <span class="uppercase">${blank.correct} (${correctWord})</span></strong> <span class="leading-relaxed">${blank.explanation}</span>
+                                    <div class="mt-3 text-right">
+                                        <button onclick="locateInPassage('loc_${blank.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                            Locate in Passage
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                btn.onclick = () => box.classList.toggle('open');
+                                
+                                expContainer.appendChild(btn);
+                                expContainer.appendChild(box);
+                            });
+                            wrapper.appendChild(expContainer);
+                        }
+                        
+                        qDiv.appendChild(wrapper);
+
+                    } else if (q.displayType === 'instruction') {
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            qDiv.appendChild(instrDiv);
+                        }
+                        qDiv.className = 'mb-2';
+                    } else {
+                        if (q.instructionBox) {
+                            const instrDiv = document.createElement('div');
+                            instrDiv.innerHTML = q.instructionBox;
+                            qDiv.appendChild(instrDiv);
+                        }
+
+                        const qHeader = document.createElement('h3');
+                        qHeader.className = 'font-bold text-gray-800 mb-4 text-lg';
+                        
+                        if (/^\d+\./.test(q.text)) {
+                            qHeader.innerHTML = `<span>${q.text}</span>`;
+                        } else {
+                            const qMeta = state.questionsList.find(x => x.qId === q.id);
+                            const qNum = qMeta ? qMeta.absNum : (qIndex + 1);
+                            qHeader.innerHTML = `<span class="inline-flex items-center justify-center bg-gray-100 text-gray-600 rounded-full w-8 h-8 mr-3 text-sm shrink-0 mt-0.5">${qNum}</span> <span>${q.text}</span>`;
+                        }
+                        
+                        const flexContainer = document.createElement('div');
+                        flexContainer.className = 'flex items-start';
+                        flexContainer.appendChild(qHeader);
+                        qDiv.appendChild(flexContainer);
+
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'space-y-3';
+
+                        if (q.options) {
+                            q.options.forEach(opt => {
+                                const optWrapper = document.createElement('div');
+                                optWrapper.id = `radio_row_${q.id}_${opt.id}`;
+                            
+                                let baseClasses = 'option-label relative flex items-start p-4 border rounded-xl transition-all cursor-pointer hover:bg-gray-50 border-gray-200 ';
+                                
+                                if (state.mode === 'RESULT') {
+                                    baseClasses += ' cursor-default ';
+                                    if (opt.isCorrect) {
+                                        baseClasses += 'border-green-500 bg-green-50 shadow-sm ';
+                                    } else if (state.answers[q.id] === opt.id && !opt.isCorrect) {
+                                        baseClasses += 'border-red-500 bg-red-50 ';
+                                    } else {
+                                        baseClasses += 'border-gray-200 opacity-60 ';
+                                    }
+                                }
+
+                                optWrapper.className = baseClasses;
+
+                                if (state.mode === 'TEST') {
+                                    optWrapper.onclick = () => selectOption(q.id, opt.id);
+                                }
+
+                                const radio = document.createElement('input');
+                                radio.type = 'radio';
+                                radio.name = q.id;
+                                radio.id = `radio_input_${q.id}_${opt.id}`;
+                                radio.disabled = state.mode === 'RESULT';
+                                radio.className = 'mt-1 h-5 w-5 text-pink-500 focus:ring-pink-500 border-gray-300 pointer-events-none shrink-0';
+
+                                const labelContent = document.createElement('div');
+                                labelContent.className = 'ml-3 flex-1';
+                                
+                                const textSpan = document.createElement('span');
+                                textSpan.className = `block text-base ${state.mode === 'RESULT' && opt.isCorrect ? 'font-semibold text-green-900' : 'text-gray-700'}`;
+                                textSpan.textContent = opt.text;
+                                labelContent.appendChild(textSpan);
+
+                                if (state.mode === 'RESULT' && (opt.isCorrect || state.answers[q.id] === opt.id)) {
+                                    const expBtn = document.createElement('button');
+                                    expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
+                                    expBtn.innerHTML = `
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        View Explanation
+                                    `;
+                                    
+                                    const expBox = document.createElement('div');
+                                    expBox.className = 'explanation-box bg-white p-4 rounded-xl border border-pink-200 text-sm text-gray-700 shadow-sm mt-3';
+                                    expBox.innerHTML = `
+                                        <strong class="text-pink-600 block mb-1">Explanation:</strong> ${opt.explanation}
+                                        <div class="mt-2 text-right">
+                                            <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 
+                                                Locate in Passage
+                                            </button>
+                                        </div>
+                                    `;
+
+                                    expBtn.onclick = (e) => {
+                                        e.stopPropagation();
+                                        expBox.classList.toggle('open');
+                                    };
+
+                                    labelContent.appendChild(expBtn);
+                                    labelContent.appendChild(expBox);
+                                    
+                                    if (opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    } else if (state.answers[q.id] === opt.id && !opt.isCorrect) {
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = `<svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>`;
+                                        optWrapper.appendChild(icon);
+                                    }
+                                }
+
+                                optWrapper.prepend(radio);
+                                optWrapper.appendChild(labelContent);
+                                optionsContainer.appendChild(optWrapper);
+                            });
+                        }
+
+                        qDiv.appendChild(optionsContainer);
+                    }
+                    
+                    qContainer.appendChild(qDiv);
+                });
                 
-                DOM.panes.questions.appendChild(div);
-            });
-
-            if (isNew && !state._preventScrollReset) {
-                document.getElementById('pane-passage').scrollTop = 0;
-                document.getElementById('pane-questions-container').scrollTop = 0;
+                cachedQuestions[index] = qContainer;
             }
-        }
 
-        function handleRefresh(idx) {
-            state._preventScrollReset = true;
-            const scroll = document.getElementById('pane-questions-container').scrollTop;
-            loadPart(idx);
-            document.getElementById('pane-questions-container').scrollTop = scroll;
-            state._preventScrollReset = false;
-            updateNavigator();
-        }
+            DOM.panes.questions.innerHTML = '';
+            DOM.panes.questions.appendChild(cachedQuestions[index]);
 
-        function showSubmitModal() {
-            const answered = state.questionsList.filter(q => {
-                const ans = state.answers[q.qId];
-                return ans && ans.toString().trim() !== '';
-            }).length;
-            DOM.modal.message.innerHTML = `You have answered <strong>${answered}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
-            DOM.modal.container.classList.remove('hidden');
-        }
-
-        function finishTest() {
-            state.mode = 'RESULT';
-            clearInterval(state.timerInterval);
-            DOM.modal.container.classList.add('hidden');
-            DOM.header.actions.classList.add('hidden');
-            DOM.result.banner.classList.remove('hidden');
-            DOM.result.banner.classList.add('flex');
-
-            let score = 0;
-            state.questionsList.forEach(q => {
-                const ans = state.answers[q.qId];
-                if (q.displayType === 'inline_blank') {
-                    if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++;
-                } else {
-                    if (ans === q.isCorrect) score++;
-                }
-            });
-
-            // Handle edge case if questionsList is empty (e.g. before content is appended)
-            const totalQuestions = state.questionsList.length || 40;
-            DOM.result.score.textContent = `${score}/${totalQuestions}`;
-            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
-            updateNavigator();
-            loadPart(state.currentPart);
-        }
-
-        function updateNavigator() {
-            DOM.navigator.grid.innerHTML = '';
+            syncUIState(index);
             
-            // If no questions exist yet, just clear the navigator
-            if(state.questionsList.length === 0) {
-                DOM.panes.floatingSubmit.classList.add('hidden');
-                return;
+            if (isNewPart && !state._preventScrollReset) {
+                DOM.panes.content.parentElement.parentElement.scrollTop = 0;
+                DOM.panes.questions.parentElement.scrollTop = 0;
             }
 
-            state.questionsList.forEach(q => {
-                const ans = state.answers[q.qId];
-                let bg = '';
-                
-                if (state.mode === 'TEST') {
-                    const isAnswered = ans && ans.toString().trim() !== '';
-                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
-                } else {
-                    const corr = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
-                    bg = corr ? 'bg-green-500 text-white border-green-500' : ans ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
-                }
-                
-                const btn = document.createElement('button');
-                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors flex-shrink-0 ${bg}`;
-                btn.textContent = q.absNum;
-                btn.onclick = () => { 
-                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
-                    setTimeout(() => document.getElementById('container_' + (q.parentId || q.qId))?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); 
-                };
-                DOM.navigator.grid.appendChild(btn);
-            });
-
-            // Show floating submit button only if there are questions
-            if(state.mode === 'TEST') {
+            if (state.mode === 'TEST') {
                 DOM.panes.floatingSubmit.classList.remove('hidden');
+                if (index === TEST_DATA.parts.length - 1) {
+                    DOM.panes.btnSubmitBottom.style.display = 'inline-block';
+                } else {
+                    DOM.panes.btnSubmitBottom.style.display = 'none';
+                }
             } else {
                 DOM.panes.floatingSubmit.classList.add('hidden');
             }
         }
 
-        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+        function selectOption(questionId, optionId) {
+            if (state.mode !== 'TEST') return;
+            state.answers[questionId] = optionId;
+            syncUIState(state.currentPart);
+            updateNavigator();
+        }
+
+        window.handleDropAndReload = function(partIndex) {
+            syncUIState(partIndex);
+            updateNavigator();
+        };
+
+        window.clearDragDropAnswer = function(qId, partIndex, e) {
+            if(e) e.stopPropagation();
+            delete state.answers[qId];
+            syncUIState(partIndex);
+            updateNavigator();
+        };
+
+        function confirmSubmit() {
+            let answeredCount = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (ans && ans.toString().trim() !== '') {
+                    answeredCount++;
+                }
+            });
+
+            if (answeredCount < state.totalQuestions) {
+                DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.totalQuestions}</strong> questions.<br><br>You can submit even if there are unanswered questions. Proceed?`;
+            } else {
+                DOM.modal.message.innerHTML = `You have answered all questions.<br>Are you sure you want to submit your test?`;
+            }
+            
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            clearInterval(state.timerInterval);
+            state.mode = 'RESULT';
+            
+            let correctCount = 0;
+            
+            TEST_DATA.parts.forEach(part => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'text') {
+                        const userAns = state.answers[q.id];
+                        const correctText = q.options[0].text.toLowerCase().trim();
+                        if (userAns && userAns.toLowerCase().trim() === correctText) correctCount++;
+                    } else if (q.displayType === 'checkbox') {
+                        const selectedAns = q.answersIds.map(id => state.answers[id]).filter(Boolean);
+                        const correctIds = q.options.filter(o => o.isCorrect).map(o => o.id);
+                        selectedAns.forEach(ans => {
+                            if (correctIds.includes(ans)) correctCount++;
+                        });
+                    } else if (q.displayType === 'inline_blanks' || q.displayType === 'inline_drag_drop') {
+                        q.blanks.forEach(blank => {
+                            const userAns = state.answers[blank.id];
+                            if (userAns && userAns.toLowerCase().trim() === blank.correct.toLowerCase().trim()) {
+                                correctCount++;
+                            }
+                        });
+                    } else if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => {
+                            const userAns = state.answers[subQ.id];
+                            if (userAns === subQ.correct) correctCount++;
+                        });
+                    } else if (q.displayType !== 'instruction') {
+                        const userAns = state.answers[q.id];
+                        const correctOpt = q.options.find(o => o.isCorrect);
+                        if (userAns === correctOpt.id) correctCount++;
+                    }
+                });
+            });
+
+            DOM.header.actions.classList.add('hidden');
+            DOM.header.actions.classList.remove('flex');
+            
+            DOM.resultBanner.container.classList.remove('hidden');
+            DOM.resultBanner.container.classList.add('flex');
+            
+            DOM.resultBanner.score.textContent = `${correctCount}/${state.totalQuestions}`;
+            const timeTakenSec = TEST_DATA.totalDurationSeconds - state.timeRemaining;
+            DOM.resultBanner.timeTaken.textContent = formatTime(timeTakenSec);
+
+            updateNavigator();
+
+            state._preventScrollReset = true;
+            state._forceRebuild = true;
+            loadPart(state.currentPart);
+            state._preventScrollReset = false;
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            state.questionsList.forEach(qInfo => {
+                const btn = document.createElement('button');
+                let baseClass = 'w-8 h-8 flex-shrink-0 rounded-md font-bold text-sm transition-colors flex items-center justify-center border focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-pink-400 ';
+                
+                const userAns = state.answers[qInfo.qId];
+                
+                if (state.mode === 'TEST') {
+                    if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-pink-500 text-white border-pink-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50';
+                    }
+                } else if (state.mode === 'RESULT') {
+                    let isAnsCorrect = false;
+                    if (qInfo.displayType === 'text' || qInfo.displayType === 'inline_blank') {
+                        isAnsCorrect = userAns && userAns.toString().toLowerCase().trim() === qInfo.isCorrect.toLowerCase().trim();
+                    } else if (qInfo.displayType === 'checkbox') {
+                         let correctArr = [];
+                         TEST_DATA.parts.forEach(p => p.questions.forEach(q => {
+                             if(q.id === qInfo.parentQid) correctArr = q.options.filter(o=>o.isCorrect).map(o=>o.id);
+                         }));
+                         isAnsCorrect = correctArr.includes(userAns);
+                    } else {
+                        isAnsCorrect = userAns === qInfo.isCorrect;
+                    }
+
+                    if (isAnsCorrect) {
+                        baseClass += 'bg-green-500 text-white border-green-500 shadow-sm';
+                    } else if (userAns && userAns.toString().trim() !== '') {
+                        baseClass += 'bg-red-500 text-white border-red-500 shadow-sm';
+                    } else {
+                        baseClass += 'bg-gray-100 text-gray-400 border-gray-200';
+                    }
+                }
+                
+                btn.className = baseClass;
+                btn.textContent = qInfo.absNum;
+                btn.onclick = () => jumpToQuestion(qInfo.partIndex, qInfo.qId);
+                
+                DOM.navigator.grid.appendChild(btn);
+            });
+
+            if (state.mode === 'TEST') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-pink-500"></div> Answered</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] border border-gray-300 bg-white"></div> Unanswered</div>
+                `;
+            } else if (state.mode === 'RESULT') {
+                DOM.navigator.legend.innerHTML = `
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-green-500"></div> Correct</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-red-500"></div> Incorrect</div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-3.5 rounded-[4px] bg-gray-100 border border-gray-200"></div> Skipped</div>
+                `;
+            }
+        }
+
+        function jumpToQuestion(partIndex, qId) {
+            if (state.currentPart !== partIndex) {
+                loadPart(partIndex);
+            }
+            setTimeout(() => {
+                const el = document.getElementById('container_' + qId) || document.getElementById('drop_' + qId) || document.querySelector(`[data-qid="${qId}"]`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-pink-400', 'ring-offset-2');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-pink-400', 'ring-offset-2'), 1500);
+                }
+            }, 50);
+        }
+
+        function handleVocabClick(e) {
+            const wordEl = e.currentTarget;
+            
+            DOM.tooltip.word.textContent = wordEl.dataset.en;
+            DOM.tooltip.pron.textContent = wordEl.dataset.pron;
+            DOM.tooltip.vi.textContent = wordEl.dataset.vi;
+            DOM.tooltip.context.textContent = wordEl.dataset.context;
+
+            const rect = wordEl.getBoundingClientRect();
+            const ttWidth = 300;
+            const ttHeight = DOM.tooltip.container.offsetHeight || 150;
+            
+            let top = rect.bottom + 10;
+            let left = rect.left;
+
+            if (left + ttWidth > window.innerWidth - 20) {
+                left = window.innerWidth - ttWidth - 20;
+            }
+            
+            if (top + ttHeight > window.innerHeight - 20) {
+                top = rect.top - ttHeight - 10;
+            }
+
+            DOM.tooltip.container.style.top = `${top}px`;
+            DOM.tooltip.container.style.left = `${left}px`;
+            
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            DOM.tooltip.container.classList.remove('visible');
+        }
 
         window.locateInPassage = function(targetId) {
             document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
@@ -1081,12 +2072,11 @@
             });
 
             if (!found) {
-                console.warn('Passage location target not found for:', targetId);
-                const pane = document.getElementById('pane-passage');
-                if (pane) pane.scrollTo({ top: 0, behavior: 'smooth' });
+                console.warn('Passage location target not found:', targetId);
             }
         };
 
+        // Initialize App
         init();
     </script>
 </body>
