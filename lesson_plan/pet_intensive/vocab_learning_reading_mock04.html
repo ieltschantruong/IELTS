@@ -17,7 +17,7 @@
             --border: #fde68a;
             --badge-bg: #fde68a;
             --badge-text: #78350f;
-            --success: #0284c7; /* Blue for translation */
+            --success: #0284c7; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -30,14 +30,19 @@
         header { text-align: center; margin-bottom: 2rem; }
         h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
 
-        /* Topic Filter Controls */
-        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
         .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .filter-btn:hover:not(.active) { background: var(--primary-light); }
 
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
         /* View Toggles */
-        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
         .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
         .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
@@ -48,7 +53,7 @@
         .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(217, 119, 6, 0.15); border-color: var(--border); }
         .vocab-card.hidden { display: none; }
         .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
-        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
         .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
         .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
         .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
@@ -116,10 +121,18 @@
 
     <!-- Topic Filter -->
     <div class="filter-controls" id="topic-filters">
-        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
-        <button class="filter-btn" onclick="filterTopic('History of Writing')">History of Writing</button>
-        <button class="filter-btn" onclick="filterTopic('Botany & Climate')">Botany & Climate</button>
-        <button class="filter-btn" onclick="filterTopic('Art & Institutions')">Art & Institutions</button>
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'History of Writing')">Passage 1: Writing</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Botany & Climate')">Passage 2: Botany</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Art & Institutions')">Passage 3: Art Museums</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
     </div>
 
     <div class="view-controls">
@@ -133,8 +146,8 @@
             <div class="flashcard-inner">
                 <div class="flashcard-face flashcard-front">
                     <h2 class="word" id="fc-word">Word</h2>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
                     <div class="meta-row">
-                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
                         <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
                     </div>
                     <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
@@ -155,7 +168,7 @@
 
         <div class="flashcard-controls">
             <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
-            <span class="fc-counter" id="fc-counter">1 / 32</span>
+            <span class="fc-counter" id="fc-counter">1 / 62</span>
             <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
             <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
             <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
@@ -173,44 +186,111 @@
     // Vocabulary Bank (PET Reading Mock Test 4)
     // ---------------------------------------------------------
     const vocabBank = [
-        // --- CATEGORY 1: History of Writing (Passage 1) ---
-        { topic: "History of Writing", word: "Inscribe", phonetic: "/ɪnˈskraɪb/", form: "Verb", forms: "N: Inscription", def: "To write, print, or carve words or letters on or in a surface.", translation: "Khắc, ghi lên", example: "It was most often inscribed on palm-sized, rectangular clay tablets...", extraExample: "The jeweler inscribed their initials inside the wedding rings." },
-        { topic: "History of Writing", word: "Resistant", phonetic: "/rɪˈzɪstənt/", form: "Adjective", forms: "N: Resistance | V: Resist", def: "Not easily harmed or affected by something.", translation: "Có sức đề kháng, chống lại được", example: "But clay has proved to be resistant to those particular kinds of damage.", extraExample: "These new crops are highly resistant to disease and drought." },
-        { topic: "History of Writing", word: "Abstract", phonetic: "/ˈæbstrækt/", form: "Adjective", forms: "N: Abstraction", def: "Existing in thought or as an idea but not having a physical or concrete existence.", translation: "Trừu tượng", example: "Over the centuries, the marks became ever more abstract...", extraExample: "Truth and beauty are abstract concepts that can be hard to define." },
-        { topic: "History of Writing", word: "Intangible", phonetic: "/ɪnˈtændʒəbl/", form: "Adjective", forms: "N: Intangibility", def: "Unable to be touched or grasped; not having physical presence.", translation: "Vô hình, không thể sờ thấy", example: "...when symbols were developed for intangible ideas such as 'female' or 'hot'...", extraExample: "Customer goodwill is an intangible asset for any business." },
-        { topic: "History of Writing", word: "Evolve", phonetic: "/ɪˈvɒlv/", form: "Verb", forms: "N: Evolution | Adj: Evolutionary", def: "To develop gradually, especially from a simple to a more complex form.", translation: "Tiến hóa, phát triển", example: "Cuneiform... evolved from a way used primarily to track and store information...", extraExample: "The company has evolved into a major tech giant over the last decade." },
-        { topic: "History of Writing", word: "Excavate", phonetic: "/ˈekskəveɪt/", form: "Verb", forms: "N: Excavation", def: "To make a hole by digging; to carefully dig up an archaeological site.", translation: "Khai quật", example: "Of the cuneiform tablets that have been discovered, excavated and translated...", extraExample: "Archaeologists are preparing to excavate the ancient Roman ruins." },
-        { topic: "History of Writing", word: "Unintelligible", phonetic: "/ˌʌnɪnˈtelɪdʒəbl/", form: "Adjective", forms: "N/A", def: "Impossible to understand.", translation: "Không thể hiểu được", example: "In fact, it died out and remained unintelligible for almost 2,000 years.", extraExample: "The recording was so full of static that the voices were unintelligible." },
-        { topic: "History of Writing", word: "Decode", phonetic: "/ˌdiːˈkəʊd/", form: "Verb", forms: "N/A", def: "To convert a coded message into intelligible language.", translation: "Giải mã", example: "Eventually, he fully decoded the cuneiform marks...", extraExample: "During the war, scientists worked tirelessly to decode enemy communications." },
-        { topic: "History of Writing", word: "Adapt", phonetic: "/əˈdæpt/", form: "Verb", forms: "N: Adaptation | Adj: Adaptable", def: "To make something suitable for a new use or purpose; modify.", translation: "Thích nghi, cải biên", example: "By the 4th century BCE, the Sumerians had adapted this system to a form of writing.", extraExample: "Animals must adapt to changing environments in order to survive." },
-        { topic: "History of Writing", word: "Representation", phonetic: "/ˌreprɪzenˈteɪʃn/", form: "Noun", forms: "V: Represent | Adj: Representative", def: "The description or portrayal of someone or something in a particular way.", translation: "Sự đại diện, hình ảnh tượng trưng", example: "For example, they might take small stones and use them as tokens or representations of something else...", extraExample: "The painting is a perfect representation of rural life in the 18th century." },
+        // --- PASSAGE 1: History of Writing ---
+        { topic: "History of Writing", level: "C1", word: "Inscribed", form: "Adjective", phonetic: "/ɪnˈskraɪbd/", forms: "V: Inscribe | N: Inscription", def: "Marked or engraved with words, characters, or symbols on a hard surface.", translation: "Được khắc, ghi chữ", example: "The archaeologists found an ancient stone tablet inscribed with royal decrees.", extraExample: "The wedding ring was inscribed with their initials." },
+        { topic: "History of Writing", level: "B2", word: "Palm-sized", form: "Adjective", phonetic: "/ˈpɑːm saɪzd/", forms: "N/A", def: "Small enough to fit or be held in the palm of a person's hand.", translation: "Nhỏ gọn bằng lòng bàn tay", example: "Early portable communication devices were rarely as sleek and palm-sized as modern phones.", extraExample: "She carried a small, palm-sized mirror in her purse." },
+        { topic: "History of Writing", level: "B2", word: "Cylinder", form: "Noun", phonetic: "/ˈsɪlɪndə/", forms: "Adj: Cylindrical", def: "A solid or hollow geometric figure with straight parallel sides and a circular cross-section.", translation: "Hình trụ, khối trụ", example: "The ancient scribes rolled clay cylinders over damp mud to seal official documents.", extraExample: "The engine contains six cylinders." },
+        { topic: "History of Writing", level: "C2", word: "Parchment", form: "Noun", phonetic: "/ˈpɑːtʃmənt/", forms: "N/A", def: "A stiff, flat, thin material made from the prepared skin of an animal, used for writing.", translation: "Da thuộc (dùng để viết)", example: "Before the widespread manufacturing of paper, historical texts were preserved on parchment.", extraExample: "The ancient map was drawn on a piece of faded parchment." },
+        { topic: "History of Writing", level: "C1", word: "Diagonal", form: "Adjective", phonetic: "/daɪˈæɡənl/", forms: "Adv: Diagonally", def: "Joining two opposite corners of a square, rectangle, or other straight-sided shape.", translation: "Chéo, theo đường chéo", example: "The mathematical matrix requires you to sum the numbers along the diagonal axis.", extraExample: "He walked in a diagonal line across the field." },
+        { topic: "History of Writing", level: "B2", word: "Horizontal", form: "Adjective", phonetic: "/ˌhɒrɪˈzɒntl/", forms: "Adv: Horizontally", def: "Parallel to the plane of the horizon; at right angles to the vertical.", translation: "Nằm ngang", example: "On standard graph paper, the horizontal axis typically represents the independent variable.", extraExample: "Draw a horizontal line across the top of the page." },
+        { topic: "History of Writing", level: "B2", word: "Vertical", form: "Adjective", phonetic: "/ˈvɜːtɪkl/", forms: "Adv: Vertically", def: "At right angles to a horizontal plane; aligned straight up and down.", translation: "Thẳng đứng, dọc", example: "The vertical columns in the periodic table group chemical elements with similar attributes.", extraExample: "The cliff has a sheer vertical drop of 100 meters." },
+        { topic: "History of Writing", level: "C1", word: "Impress", form: "Verb", phonetic: "/ɪmˈpres/", forms: "N: Impression", def: "To press a mark, design, or seal into a soft surface.", translation: "Đóng dấu, khắc ấn, ấn vào", example: "Ancient accountants would impress geometric tokens into wet clay to record stock counts.", extraExample: "The baker impressed a decorative pattern onto the dough." },
+        { topic: "History of Writing", level: "C2", word: "Cuneiform", form: "Noun / Adjective", phonetic: "/ˈkjuːnɪfɔːm/", forms: "N/A", def: "Denoting or relating to the wedge-shaped characters used in ancient Mesopotamian writing.", translation: "Chữ hình nêm", example: "Cuneiform is considered by historians to be one of the earliest systems of graphic writing.", extraExample: "Researchers translated the ancient Sumerian cuneiform tablets." },
+        { topic: "History of Writing", level: "C1", word: "Token", form: "Noun", phonetic: "/ˈtəʊkən/", forms: "N/A", def: "A small object serving as a visible or tangible representation of a fact, quality, or value.", translation: "Vật biểu trưng, thẻ/xu", example: "In early economic transactions, clay tokens represented specific quantities of livestock.", extraExample: "Please accept this gift as a token of our appreciation." },
+        { topic: "History of Writing", level: "B2", word: "Herd", form: "Noun / Verb", phonetic: "/hɜːd/", forms: "N: Herder", def: "A large group of animals, especially hoofed mammals / to move or keep livestock together.", translation: "Đàn gia súc / chăn dắt", example: "The nomadic tribe managed a massive herd of cattle across the fertile plains.", extraExample: "The sheep dogs easily herd the sheep into the pen." },
+        { topic: "History of Writing", level: "C1", word: "Transaction", form: "Noun", phonetic: "/trænˈzækʃn/", forms: "V: Transact", def: "An instance of buying or selling something; a commercial or business deal.", translation: "Giao dịch, sự mua bán", example: "Digital ledgers securely record every financial transaction without requiring central banks.", extraExample: "The bank charges a small fee for every overseas transaction." },
+        { topic: "History of Writing", level: "C1", word: "Resemble", form: "Verb", phonetic: "/rɪˈzembl/", forms: "N: Resemblance", def: "To have a similar appearance to or qualities in common with someone or something.", translation: "Giống với, tương tự", example: "The modified symbols began to resemble physical objects less as the script evolved.", extraExample: "She closely resembles her older sister." },
+        { topic: "History of Writing", level: "C2", word: "Intangible", form: "Adjective", phonetic: "/ɪnˈtændʒəbl/", forms: "N: Intangibility", def: "Unable to be touched or physically grasped; not having physical presence.", translation: "Vô hình, phi vật thể", example: "Intellectual property is an intangible asset that holds immense economic value.", extraExample: "Goodwill is an intangible benefit of community service." },
+        { topic: "History of Writing", level: "C1", word: "Abstract", form: "Adjective", phonetic: "/ˈæbstrækt/", forms: "N: Abstraction", def: "Existing in thought or as an idea but not having a physical or concrete existence.", translation: "Trừu tượng", example: "Mathematics translates concrete physical phenomena into abstract numeric formulas.", extraExample: "Love and beauty are highly abstract concepts." },
+        { topic: "History of Writing", level: "C2", word: "Excavate", form: "Verb", phonetic: "/ˈekskəveɪt/", forms: "N: Excavation", def: "To make a hole or channel by digging, especially to uncover archaeological remains.", translation: "Khai quật", example: "Researchers plan to excavate the ancient burial site to extract genomic samples.", extraExample: "They are excavating the area to build a new subway line." },
+        { topic: "History of Writing", level: "C1", word: "Cease", form: "Verb", phonetic: "/siːs/", forms: "N/A", def: "To bring to an end; to stop or discontinue an activity or process.", translation: "Chấm dứt, ngừng", example: "Once a civilization collapses, its administrative writing systems often cease to function.", extraExample: "The factory ceased operations due to a lack of funding." },
+        { topic: "History of Writing", level: "C2", word: "Unintelligible", form: "Adjective", phonetic: "/ˌʌnɪnˈtelɪdʒəbl/", forms: "N/A", def: "Impossible to understand or perceive clearly.", translation: "Không thể hiểu được, lí nhí", example: "Without a proper bilingual key, ancient cryptographic codes remain entirely unintelligible.", extraExample: "He muttered an unintelligible response." },
+        { topic: "History of Writing", level: "C2", word: "Inscription", form: "Noun", phonetic: "/ɪnˈskrɪpʃn/", forms: "V: Inscribe", def: "Words or characters inscribed on a monument, coin, tablet, or stone structure.", translation: "Câu khắc, văn khắc", example: "The historic monument features a brief Latin inscription honoring the fallen soldiers.", extraExample: "The ring bears a romantic inscription." },
 
-        // --- CATEGORY 2: Botany & Climate (Passage 2) ---
-        { topic: "Botany & Climate", word: "Flourish", phonetic: "/ˈflʌrɪʃ/", form: "Verb", forms: "N/A", def: "To grow or develop in a healthy or vigorous way, especially as the result of a particularly favorable environment.", translation: "Phát triển mạnh, hưng thịnh", example: "The bristlecone has adjusted to places... and in these harsh environments has flourished.", extraExample: "With the right amount of sunlight, the plants will flourish in your garden." },
-        { topic: "Botany & Climate", word: "Longevity", phonetic: "/lɒnˈdʒevəti/", form: "Noun", forms: "N/A", def: "Long life.", translation: "Tuổi thọ cao, sự sống lâu", example: "What makes bristlecone pines truly remarkable is their longevity...", extraExample: "The island's residents are known for their exceptional longevity and good health." },
-        { topic: "Botany & Climate", word: "Chronology", phonetic: "/krəˈnɒlədʒi/", form: "Noun", forms: "Adj: Chronological", def: "The arrangement of events or dates in the order of their occurrence.", translation: "Niên đại học, trình tự thời gian", example: "...searching for trees that could extend the tree-ring chronology further back in time.", extraExample: "The historian provided a detailed chronology of the kingdom's rulers." },
-        { topic: "Botany & Climate", word: "Unremarkable", phonetic: "/ˌʌnrɪˈmɑːkəbl/", form: "Adjective", forms: "Adj (opp): Remarkable", def: "Not particularly interesting or surprising.", translation: "Bình thường, không có gì nổi bật", example: "He collected core samples from what appeared to be unremarkable, gnarled old trees...", extraExample: "From the outside, the house looked quite unremarkable, but the interior was stunning." },
-        { topic: "Botany & Climate", word: "Subsequent", phonetic: "/ˈsʌbsɪkwənt/", form: "Adjective", forms: "Adv: Subsequently", def: "Coming after something in time; following.", translation: "Xảy ra sau đó, tiếp theo", example: "Subsequent expeditions revealed even older specimens...", extraExample: "The initial tests failed, but subsequent trials proved to be successful." },
-        { topic: "Botany & Climate", word: "Fluctuate", phonetic: "/ˈflʌktʃueɪt/", form: "Verb", forms: "N: Fluctuation", def: "To rise and fall irregularly in number or amount.", translation: "Dao động, biến động", example: "The trees grow at high altitudes... where temperatures fluctuate wildly...", extraExample: "Vegetable prices tend to fluctuate depending on the season." },
-        { topic: "Botany & Climate", word: "Resilience", phonetic: "/rɪˈzɪliəns/", form: "Noun", forms: "Adj: Resilient", def: "The capacity to recover quickly from difficulties; toughness.", translation: "Sự kiên cường, sức bật", example: "Despite their resilience, bristlecone pines face threats in the modern era.", extraExample: "The community showed great resilience after the devastating earthquake." },
-        { topic: "Botany & Climate", word: "Pathogen", phonetic: "/ˈpæθədʒən/", form: "Noun", forms: "Adj: Pathogenic", def: "A bacterium, virus, or other microorganism that can cause disease.", translation: "Mầm bệnh, mầm mống gây bệnh", example: "...allowing other plant species, as well as insects and pathogens, to move into areas...", extraExample: "Boiling water effectively kills most harmful pathogens." },
-        { topic: "Botany & Climate", word: "Devastate", phonetic: "/ˈdevəsteɪt/", form: "Verb", forms: "N: Devastation | Adj: Devastating", def: "To destroy or ruin (something).", translation: "Tàn phá, phá hủy", example: "Bark beetles, which have devastated forests elsewhere in North America...", extraExample: "The hurricane devastated the coastal town, leaving many homeless." },
-        { topic: "Botany & Climate", word: "Unprecedented", phonetic: "/ʌnˈpresɪdentɪd/", form: "Adjective", forms: "N/A", def: "Never done or known before.", translation: "Chưa từng có tiền lệ", example: "...the oldest living organisms on Earth may be entering a period of unprecedented stress.", extraExample: "The government took unprecedented measures to control the economic crisis." },
-        { topic: "Botany & Climate", word: "Persist", phonetic: "/pəˈsɪst/", form: "Verb", forms: "N: Persistence | Adj: Persistent", def: "To continue to exist; to continue firmly in an opinion or course of action.", translation: "Tồn tại dai dẳng, kiên trì", example: "The bristlecone pines remind us that life can persist, against all odds...", extraExample: "If the symptoms persist for more than three days, consult your doctor." },
+        // --- PASSAGE 2: Botany & Climate ---
+        { topic: "Botany & Climate", level: "C1", word: "Windswept", form: "Adjective", phonetic: "/ˈwɪndswept/", forms: "N/A", def: "Exposed to or swept by strong, unchecked winds.", translation: "Lộng gió, bị gió bão tàn phá", example: "The high, windswept ridges of the mountains are home to very few resilient plant species.", extraExample: "They stood on the windswept beach, watching the waves crash." },
+        { topic: "Botany & Climate", level: "C1", word: "Altitude", form: "Noun", phonetic: "/ˈæltɪtjuːd/", forms: "N/A", def: "The height of an object or point in relation to sea level or ground level.", translation: "Độ cao so với mặt nước biển", example: "At high altitude, lower oxygen levels and freezing temperatures restrict tree growth.", extraExample: "The plane is currently flying at an altitude of 30,000 feet." },
+        { topic: "Botany & Climate", level: "C1", word: "Flourish", form: "Verb", phonetic: "/ˈflʌrɪʃ/", forms: "N/A", def: "To grow vigorously; to thrive or prosper in a favorable environment.", translation: "Phát triển mạnh mẽ, tốt tươi", example: "Certain alpine plants flourish in rocky soil where other vegetation cannot survive.", extraExample: "The local economy is starting to flourish again." },
+        { topic: "Botany & Climate", level: "C2", word: "Dendrochronologist", form: "Noun", phonetic: "/ˌdendrəʊkrəˈnɒlədʒɪst/", forms: "N: Dendrochronology", def: "A scientist who studies tree rings to date past events and environmental changes.", translation: "Nhà niên kỷ học cây", example: "By analyzing old pine structures, a dendrochronologist can reconstruct rainfall patterns from centuries ago.", extraExample: "The dendrochronologist determined the age of the ancient cabin." },
+        { topic: "Botany & Climate", level: "C2", word: "Chronology", form: "Noun", phonetic: "/krəˈnɒlədʒi/", forms: "Adj: Chronological", def: "The arrangement of events or dates in the order of their occurrence.", translation: "Sự sắp xếp theo trình tự thời gian", example: "Tree rings provide an absolute chronology of regional climate variations over millennia.", extraExample: "The historian debated the exact chronology of the king's reign." },
+        { topic: "Botany & Climate", level: "C2", word: "Gnarl", form: "Verb / Noun", phonetic: "/nɑːl/", forms: "Adj: Gnarled", def: "To twist into a knotted, rugged shape / a rough, knotty protuberance on a tree.", translation: "Làm vặn vẹo / mắt cây", example: "Century-old bristlecone pines often gnarl into bizarre shapes due to harsh alpine storms.", extraExample: "The old man had hands that were gnarled from years of hard labor." },
+        { topic: "Botany & Climate", level: "C1", word: "Batter", form: "Verb", phonetic: "/ˈbætə/", forms: "N/A", def: "To strike repeatedly with hard blows; to inflict heavy damage over time.", translation: "Đập mạnh, tàn phá", example: "Severe winter blizzards continuously batter the vegetation growing along the cliff edges.", extraExample: "The coastal towns were battered by hurricane-force winds." },
+        { topic: "Botany & Climate", level: "B2", word: "Rot", form: "Verb / Noun", phonetic: "/rɒt/", forms: "Adj: Rotten", def: "To undergo natural decomposition; to decay due to bacterial or fungal action.", translation: "Mục nát, thối rữa", example: "The high resin content in some conifers prevents the wood from experiencing rapid rot.", extraExample: "The apples were left out too long and started to rot." },
+        { topic: "Botany & Climate", level: "C2", word: "Resinous", form: "Adjective", phonetic: "/ˈrezɪnəs/", forms: "N: Resin", def: "Containing, producing, or tasting like resin (a sticky organic substance from plants).", translation: "Có nhựa, nhiều nhựa cây", example: "Resinous sap acts as a natural defense mechanism for trees against boring insects.", extraExample: "The campfire gave off a strong, resinous smell." },
+        { topic: "Botany & Climate", level: "C2", word: "Sectorial", form: "Adjective", phonetic: "/sekˈtɔːriəl/", forms: "N: Sector", def: "Relating to a distinct sector or zone; operating only in specific parts.", translation: "Cục bộ, theo từng phần", example: "The tree exhibits a sectorial growth strategy, sending nutrients only to living branches.", extraExample: "The city underwent sectorial planning to improve its infrastructure." },
+        { topic: "Botany & Climate", level: "C1", word: "Circulatory", form: "Adjective", phonetic: "/ˌsɜːkjəˈleɪtəri/", forms: "N: Circulation | V: Circulate", def: "Relating to the movement or circulation of fluid within an organism.", translation: "Thuộc tuần hoàn", example: "Damage to the tree's circulatory system restricts the flow of water from roots to leaves.", extraExample: "Exercise greatly benefits the human circulatory system." },
+        { topic: "Botany & Climate", level: "C1", word: "Die off", form: "Phrasal Verb", phonetic: "/daɪ ɒf/", forms: "N/A", def: "To die one by one until the population or group is significantly reduced.", translation: "Chết dần chết mòn", example: "During prolonged droughts, vulnerable sectors of the forest canopy begin to die off.", extraExample: "Many of the weaker animals die off during the harsh winter." },
+        { topic: "Botany & Climate", level: "B2", word: "Tissue", form: "Noun", phonetic: "/ˈtɪʃuː/", forms: "N/A", def: "A group of similar cells working together to perform a specific function in an organism.", translation: "Mô (sinh học)", example: "Vascular tissue in woody plants is responsible for transporting minerals and water.", extraExample: "The burn caused severe damage to the patient's muscle tissue." },
+        { topic: "Botany & Climate", level: "B2", word: "Bark", form: "Noun", phonetic: "/bɑːk/", forms: "N/A", def: "The tough protective outer sheathing of the trunks and branches of trees.", translation: "Vỏ cây", example: "Thick, fire-resistant bark protects the internal living cells of the redwood tree.", extraExample: "The deer chewed on the bark of the young sapling." },
+        { topic: "Botany & Climate", level: "B2", word: "Cone", form: "Noun", phonetic: "/kəʊn/", forms: "Adj: Conical", def: "The dry, woody fruit of a conifer, containing the seeds.", translation: "Quả thông, nón thông", example: "Conifer trees release their seeds from protective scales within the mature cone.", extraExample: "We collected pine cones to use for Christmas decorations." },
+        { topic: "Botany & Climate", level: "C2", word: "Exude", form: "Verb", phonetic: "/ɪɡˈzjuːd/", forms: "N/A", def: "To discharge or secrete a liquid or moisture slowly and steadily.", translation: "Rỉ ra, tiết ra", example: "When the bark is damaged, the pine tree will exude a thick amber fluid to seal the wound.", extraExample: "She managed to exude confidence even during the toughest interview." },
+        { topic: "Botany & Climate", level: "B2", word: "Organism", form: "Noun", phonetic: "/ˈɔːɡənɪzəm/", forms: "Adj: Organic", def: "An individual animal, plant, or single-celled life form.", translation: "Sinh vật, cơ thể sống", example: "Even in extreme arctic conditions, microscopic organisms manage to sustain life.", extraExample: "The amoeba is a very simple single-celled organism." },
+        { topic: "Botany & Climate", level: "C1", word: "Archive", form: "Noun / Verb", phonetic: "/ˈɑːkaɪv/", forms: "Adj: Archival", def: "A collection of historical records providing information; to store such records.", translation: "Kho lưu trữ / lưu trữ", example: "Old growth forests function as a living archive of historical global climate data.", extraExample: "The museum will archive the newly discovered manuscripts." },
+        { topic: "Botany & Climate", level: "C1", word: "Precipitation", form: "Noun", phonetic: "/prɪˌsɪpɪˈteɪʃn/", forms: "V: Precipitate", def: "Rain, snow, sleet, or hail that falls to the ground.", translation: "Lượng mưa, sự giáng thủy", example: "High annual precipitation triggers wider growth rings in moisture-sensitive tree species.", extraExample: "The weather forecast predicts heavy precipitation for the weekend." },
+        { topic: "Botany & Climate", level: "C2", word: "Pathogen", form: "Noun", phonetic: "/ˈpæθədʒən/", forms: "Adj: Pathogenic", def: "A bacterium, virus, or other microorganism that can cause disease.", translation: "Mầm bệnh, tác nhân gây bệnh", example: "Global warming can expand the geographic range of a deadly plant pathogen.", extraExample: "Chlorine is added to the water to kill harmful pathogens." },
+        { topic: "Botany & Climate", level: "C1", word: "Sparsely", form: "Adverb", phonetic: "/ˈspɑːsli/", forms: "Adj: Sparse", def: "In a thinly scattered way; in small amounts.", translation: "Thưa thớt, rải rác", example: "The dry desert landscape is only sparsely covered with drought-resistant shrubs.", extraExample: "The room was sparsely furnished with only a bed and a chair." },
+        { topic: "Botany & Climate", level: "C1", word: "Unprecedented", form: "Adjective", phonetic: "/ʌnˈpresɪdentɪd/", forms: "N/A", def: "Never done, known, or experienced before.", translation: "Chưa từng có tiền lệ", example: "The current rate of glacial melting is unprecedented in modern geographical history.", extraExample: "The company enjoyed an unprecedented level of sales this quarter." },
+        { topic: "Botany & Climate", level: "C2", word: "Climatologist", form: "Noun", phonetic: "/ˌklaɪməˈtɒlədʒɪst/", forms: "N: Climatology", def: "A scientist who studies long-term weather patterns and climate trends.", translation: "Nhà khí hậu học", example: "A climatologist utilizes ice cores and tree rings to build predictive climate models.", extraExample: "The climatologist warned about the severe impacts of global warming." },
 
-        // --- CATEGORY 3: Art & Institutions (Passage 3) ---
-        { topic: "Art & Institutions", word: "Aspiration", phonetic: "/ˌæspəˈreɪʃn/", form: "Noun", forms: "V: Aspire | Adj: Aspirational", def: "A hope or ambition of achieving something.", translation: "Khát vọng, nguyện vọng", example: "...in the light of the aspirations embodied in the original building...", extraExample: "She had strong aspirations to become a leading heart surgeon." },
-        { topic: "Art & Institutions", word: "Embody", phonetic: "/ɪmˈbɒdi/", form: "Verb", forms: "N: Embodiment", def: "To be an expression of or give a tangible or visible form to (an idea, quality, or feeling).", translation: "Hiện thân của, tiêu biểu cho", example: "...in the light of the aspirations embodied in the original building...", extraExample: "The national flag embodies the spirit and history of the country." },
-        { topic: "Art & Institutions", word: "Facilitate", phonetic: "/fəˈsɪlɪteɪt/", form: "Verb", forms: "N: Facilitation, Facilitator", def: "To make (an action or process) easy or easier.", translation: "Tạo điều kiện thuận lợi, làm cho dễ dàng", example: "Its entrance lobby was designed to facilitate the rapid and efficient circulation of visitors.", extraExample: "The new software will facilitate the tracking of online orders." },
-        { topic: "Art & Institutions", word: "Ancillary", phonetic: "/ænˈsɪləri/", form: "Adjective", forms: "N/A", def: "Providing necessary support to the primary activities or operation of an organization.", translation: "Phụ trợ, bổ trợ", example: "...an unprecedented emphasis on the ancillary roles of corporate functions...", extraExample: "The company relies on several ancillary services, such as cleaning and maintenance." },
-        { topic: "Art & Institutions", word: "Supersede", phonetic: "/ˌsuːpəˈsiːd/", form: "Verb", forms: "N/A", def: "To take the place of (a person or thing previously in authority or use); supplant.", translation: "Thay thế, thế chỗ", example: "Over time, this idea has been questioned, and has been superseded by the growing impetus...", extraExample: "Typewriters have largely been superseded by personal computers." },
-        { topic: "Art & Institutions", word: "Impetus", phonetic: "/ˈɪmpɪtəs/", form: "Noun", forms: "N/A", def: "The force or energy with which a body moves; the force that makes something happen.", translation: "Sự thúc đẩy, động lực", example: "...has been superseded by the growing impetus towards the alternative model of the museum...", extraExample: "The financial crisis gave fresh impetus to the demand for economic reform." },
-        { topic: "Art & Institutions", word: "Conundrum", phonetic: "/kəˈnʌndrəm/", form: "Noun", forms: "N/A", def: "A confusing and difficult problem or question.", translation: "Câu đố, bài toán hóc búa", example: "But herein lies the conundrum posed by the NGV renovation...", extraExample: "Arranging childcare over the school holidays is a major conundrum for working parents." },
-        { topic: "Art & Institutions", word: "Supplant", phonetic: "/səˈplɑːnt/", form: "Verb", forms: "N/A", def: "To supersede and replace.", translation: "Chiếm chỗ, thay thế", example: "...the construction of new buildings that supplant the artworks inside them...", extraExample: "Printed books are slowly being supplanted by digital reading devices." },
-        { topic: "Art & Institutions", word: "Commendable", phonetic: "/kəˈmendəbl/", form: "Adjective", forms: "V: Commend | N: Commendation", def: "Deserving praise.", translation: "Đáng khen ngợi, đáng tuyên dương", example: "There has also been... a commendable attempt to leaven the international masterpieces...", extraExample: "Her efforts to raise money for the charity were highly commendable." },
-        { topic: "Art & Institutions", word: "Prevalence", phonetic: "/ˈprevələns/", form: "Noun", forms: "Adj: Prevalent", def: "The fact or condition of being common or widespread.", translation: "Sự phổ biến, sự thịnh hành", example: "Overall, though, the prevalence of these 'rental' blockbusters cannot but help introduce...", extraExample: "The prevalence of smartphones has completely changed how we communicate." },
-        { topic: "Art & Institutions", word: "Adroit", phonetic: "/əˈdrɔɪt/", form: "Adjective", forms: "Adv: Adroitly | N: Adroitness", def: "Clever or skillful in using the hands or mind.", translation: "Khéo léo, tài tình", example: "Even the most adroit organisation, as the NGV assuredly is, needs to be able to juggle...", extraExample: "The politician was adroit at handling difficult questions from reporters." }
+        // --- PASSAGE 3: Art & Institutions ---
+        { topic: "Art & Institutions", level: "C1", word: "Rebrand", form: "Verb", phonetic: "/ˌriːˈbrænd/", forms: "N: Rebranding", def: "To change the corporate image, name, or reputation of an organization or product.", translation: "Tái định vị thương hiệu", example: "The university chose to rebrand its online platform to attract younger international scholars.", extraExample: "The failing company decided to rebrand completely to shed its negative image." },
+        { topic: "Art & Institutions", level: "B2", word: "Qualified", form: "Adjective", phonetic: "/ˈkwɒlɪfaɪd/", forms: "V: Qualify | N: Qualification", def: "Officially recognized as being trained to perform a particular job; certified.", translation: "Có đủ năng lực, đủ tiêu chuẩn", example: "Only highly qualified educators are selected to design the national core curriculum.", extraExample: "She is a fully qualified medical practitioner." },
+        { topic: "Art & Institutions", level: "C1", word: "Embody", form: "Verb", phonetic: "/ɪmˈbɒdi/", forms: "N: Embodiment", def: "To be an expression of or give a tangible or visible form to an idea, quality, or feeling.", translation: "Hiện thân của, bao gồm", example: "The new research initiative aims to embody the core principles of sustainable development.", extraExample: "The national flag embodies the spirit and history of the country." },
+        { topic: "Art & Institutions", level: "C1", word: "Aspiration", form: "Noun", phonetic: "/ˌæspəˈreɪʃn/", forms: "V: Aspire | Adj: Aspirational", def: "A hope or ambition of achieving something.", translation: "Nguyện vọng, khát vọng", example: "Academic guidance counselors help students align their coursework with their career aspirations.", extraExample: "He has political aspirations and hopes to run for mayor." },
+        { topic: "Art & Institutions", level: "C1", word: "In the light of", form: "Idiom", phonetic: "/ɪn ðə laɪt əv/", forms: "N/A", def: "Drawing information from; taking something into consideration.", translation: "Từ góc độ, sau khi xem xét", example: "The admissions policy was thoroughly revised in the light of recent statistical studies.", extraExample: "In the light of the new evidence, the police reopened the investigation." },
+        { topic: "Art & Institutions", level: "B2", word: "Thorough", form: "Adjective", phonetic: "/ˈθʌrə/", forms: "Adv: Thoroughly", def: "Complete with regard to every detail; meticulous and deeply performed.", translation: "Triệt để, kỹ lưỡng", example: "A thorough investigation of the data revealed several anomalies in the initial results.", extraExample: "The mechanic did a thorough check of the engine." },
+        { topic: "Art & Institutions", level: "C1", word: "Credit", form: "Verb", phonetic: "/ˈkredɪt/", forms: "N/A", def: "To publicly acknowledge or attribute a piece of work or an achievement to someone.", translation: "Ghi nhận công lao", example: "Historians usually credit the ancient Sumerians with the early invention of writing tokens.", extraExample: "She was fully credited for her role in developing the software." },
+        { topic: "Art & Institutions", level: "C1", word: "Circulation", form: "Noun", phonetic: "/ˌsɜːkjəˈleɪʃn/", forms: "V: Circulate", def: "The public availability or movement of items (such as books, currency, or ideas).", translation: "Sự lưu hành, tuần hoàn", example: "Digital textbooks allow for a much faster circulation of knowledge within universities.", extraExample: "The newspaper has a daily circulation of 50,000 copies." },
+        { topic: "Art & Institutions", level: "C1", word: "Escort", form: "Verb / Noun", phonetic: "/ɪˈskɔːt/", forms: "N/A", def: "To accompany someone or something for protection, guidance, or security.", translation: "Hộ tống, đi theo hướng dẫn", example: "Security personnel will escort the rare botanical samples safely to the central laboratory.", extraExample: "The president was escorted by heavily armed guards." },
+        { topic: "Art & Institutions", level: "C2", word: "Moat", form: "Noun", phonetic: "/məʊt/", forms: "N/A", def: "A deep, wide ditch surrounding a castle, fort, or town, typically filled with water.", translation: "Hào nước", example: "The medieval fortress was strategically isolated by a wide moat to prevent sudden attacks.", extraExample: "The animals at the zoo are kept behind a deep, dry moat." },
+        { topic: "Art & Institutions", level: "C2", word: "Subtlety", form: "Noun", phonetic: "/ˈsʌtlti/", forms: "Adj: Subtle", def: "The quality of being understated, delicate, or nuanced; a fine distinction.", translation: "Sự tinh tế, khía cạnh tinh vi", example: "Advanced language learners must master the subtlety of tone in professional writing.", extraExample: "The chef appreciates the subtlety of combining sweet and savory flavors." },
+        { topic: "Art & Institutions", level: "B2", word: "Cloakroom", form: "Noun", phonetic: "/ˈkləʊkruːm/", forms: "N/A", def: "A room in a public building where coats, bags, and other personal belongings may be left.", translation: "Phòng để đồ", example: "Visitors are requested to leave their heavy backpacks in the museum cloakroom before entering.", extraExample: "I left my umbrella and winter coat in the cloakroom." },
+        { topic: "Art & Institutions", level: "C1", word: "Reframe", form: "Verb", phonetic: "/ˌriːˈfreɪm/", forms: "N/A", def: "To express, view, or present a concept or plan in a new or different way.", translation: "Tái cấu trúc, nhìn nhận lại", example: "The instructor helped the student reframe their failure as a vital learning opportunity.", extraExample: "We need to reframe the marketing strategy to target a younger audience." },
+        { topic: "Art & Institutions", level: "C2", word: "Herein", form: "Adverb", phonetic: "/ˌhɪərˈɪn/", forms: "N/A", def: "In this document, text, or statement.", translation: "Trong tài liệu này, ở đây", example: "The technical protocols described herein must be strictly followed by all lab personnel.", extraExample: "The terms and conditions contained herein are binding." },
+        { topic: "Art & Institutions", level: "C2", word: "Supplant", form: "Verb", phonetic: "/səˈplɑːnt/", forms: "N/A", def: "To supersede and replace something, especially by force or through evolution.", translation: "Thay thế, thế chỗ", example: "Digital storage media have largely managed to supplant magnetic tapes in modern computing.", extraExample: "Old traditional farming methods have been supplanted by modern machinery." },
+        { topic: "Art & Institutions", level: "C1", word: "Commendable", form: "Adjective", phonetic: "/kəˈmendəbl/", forms: "V: Commend | N: Commendation", def: "Deserving praise or formal recognition; admirable.", translation: "Đáng khen ngợi", example: "The school district's efforts to provide clean latrines for all children are highly commendable.", extraExample: "His courage during the rescue operation was highly commendable." },
+        { topic: "Art & Institutions", level: "C1", word: "Blockbuster", form: "Noun / Adjective", phonetic: "/ˈblɒkbʌstə/", forms: "N/A", def: "A thing of great power or size, in particular a movie or book that is a great commercial success.", translation: "Bom tấn, tác phẩm thành công", example: "The museum hosted a blockbuster exhibition on ancient cuneiform that drew millions of tourists.", extraExample: "The director's latest film proved to be a massive summer blockbuster." },
+        { topic: "Art & Institutions", level: "C1", word: "Curator", form: "Noun", phonetic: "/kjʊəˈreɪtə/", forms: "V: Curate | N: Curation", def: "A keeper or custodian of a museum, gallery, or other collection of cultural value.", translation: "Giám tuyển, người quản lý bảo tàng", example: "The curator spent three decades restoring the inscribed cylinder artifacts to their original state.", extraExample: "The art curator decided how to arrange the paintings in the gallery." },
+        { topic: "Art & Institutions", level: "C2", word: "Adroit", form: "Adjective", phonetic: "/əˈdrɔɪt/", forms: "Adv: Adroitly | N: Adroitness", def: "Clever, skillful, or resourceful in using the hands or mind.", translation: "Khéo léo, tinh khôn", example: "The diplomat was adroit at resolving tense negotiations between the two corporate partners.", extraExample: "She is an adroit debater who easily outsmarts her opponents." },
+        { topic: "Art & Institutions", level: "C1", word: "Obscure", form: "Verb / Adjective", phonetic: "/əbˈskjʊə/", forms: "N: Obscurity", def: "To conceal or hide / not clearly expressed or easily understood.", translation: "Che khuất / mơ hồ", example: "The researcher's overly complex sentence structures tend to obscure the main thesis.", extraExample: "The true meaning of the ancient text remains obscure to most modern readers." }
     ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            if (matchTopic && matchLevel) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
 
     // --- DOM Injection ---
     function renderGrid() {
@@ -220,11 +300,13 @@
             const article = document.createElement('article');
             article.className = 'vocab-card';
             article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
             
             article.innerHTML = `
                 <div class="word-header">
                     <div class="word-main">
                         <span class="word">${item.word}</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
                         <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
                     </div>
                     <div class="meta-info">
@@ -269,28 +351,6 @@
         playAudio(word);
     }
 
-    // --- Topic Filtering ---
-    function filterTopic(topicName) {
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-
-        const allCards = document.querySelectorAll('.vocab-card');
-        allCards.forEach(card => {
-            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
-        });
-
-        if(document.getElementById('flashcard-view').style.display === 'flex') {
-             extractDataFromGrid(topicName);
-             currentCardIndex = 0;
-             updateFlashcardUI();
-        }
-    }
-
     // --- View Toggling ---
     function switchView(viewName) {
         const gridView = document.getElementById('grid-view');
@@ -309,13 +369,7 @@
             btnFlashcards.classList.add('active');
             btnGrid.classList.remove('active');
             
-            const activeFilter = document.querySelector('.filter-btn.active').textContent;
-            let topicName = 'all';
-            if (activeFilter.includes('Writing')) topicName = 'History of Writing';
-            if (activeFilter.includes('Botany')) topicName = 'Botany & Climate';
-            if (activeFilter.includes('Art')) topicName = 'Art & Institutions';
-            
-            extractDataFromGrid(topicName);
+            extractDataFromGrid();
             currentCardIndex = 0;
             updateFlashcardUI();
         }
@@ -326,32 +380,48 @@
     let currentCardIndex = 0;
     const flashcardScene = document.getElementById('flashcard-scene');
 
-    function extractDataFromGrid(topicName = 'all') {
+    function extractDataFromGrid() {
         flashcardData = [];
         vocabBank.forEach(item => {
-            if (topicName === 'all' || item.topic === topicName) {
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            if (matchTopic && matchLevel) {
                 flashcardData.push(item);
             }
         });
     }
 
     function updateFlashcardUI() {
-        if (flashcardData.length === 0) return;
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
         const data = flashcardData[currentCardIndex];
-        
         flashcardScene.classList.remove('is-flipped');
         
         setTimeout(() => {
             document.getElementById('fc-word').textContent = data.word;
-            document.getElementById('fc-phonetic').textContent = data.phonetic;
-            document.getElementById('fc-topic').textContent = data.topic;
             
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
             document.getElementById('fc-definition').textContent = data.def;
             document.getElementById('fc-translation').textContent = data.translation;
             
             const examplesHTML = `
-                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
-                    <strong style="color: #b45309;">Word Forms:</strong> ${data.forms}
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #fde68a; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #b45309;">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: #b45309;">Word Forms:</strong> ${data.forms}
                 </div>
                 <div class="example-box" style="margin-bottom: 0.5rem; background-color: #fef3c7; padding: 1rem; border-left: 4px solid #b45309; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
                     <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #b45309; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
