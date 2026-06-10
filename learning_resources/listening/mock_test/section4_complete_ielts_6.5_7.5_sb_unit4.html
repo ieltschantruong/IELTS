@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Section 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#F9A8D4',
+                            blush: '#FCE7F3',
+                            accent: '#F472B6',
+                            dark: '#DB2777',
+                            light: '#FDF2F8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Input Styles */
+        .ielts-input {
+            border: none;
+            border-bottom: 2px solid #9CA3AF;
+            background-color: transparent;
+            outline: none;
+            padding: 2px 5px;
+            transition: border-color 0.3s;
+            font-weight: 600;
+            color: #DB2777; /* pastel-dark */
+        }
+        .ielts-input:focus {
+            border-bottom: 2px solid #DB2777;
+        }
+
+        /* Highlight tool styles */
+        .highlighted-text {
+            background-color: #FDF2F8; /* pastel-light */
+            border-bottom: 2px solid #F9A8D4; /* pastel-pink */
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+        .highlighted-text:hover {
+            background-color: #FCE7F3;
+        }
+        #highlight-tooltip {
+            position: absolute;
+            background: #DB2777;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+            white-space: nowrap;
+            align-items: center;
+            gap: 6px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #DB2777 transparent transparent transparent;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #F9A8D4; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #F472B6; }
+
+        /* Review modes */
+        .status-correct { border-bottom: 2px solid #10B981 !important; color: #10B981 !important; }
+        .status-incorrect { border-bottom: 2px solid #EF4444 !important; color: #EF4444 !important; text-decoration: line-through; }
+        
+        .nav-pill { transition: all 0.2s ease; }
+        .nav-pill:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-pastel-pink p-4 flex justify-between items-center shrink-0 z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-pastel-pink text-white p-2 rounded-lg">
+                <i class="fa-solid fa-headphones-simple text-xl"></i>
+            </div>
+            <h1 class="font-bold text-2xl text-gray-800 tracking-tight">IELTS <span class="text-pastel-dark">Chan Truong</span></h1>
+        </div>
+        <div id="timer-display" class="hidden font-mono text-xl font-bold text-pastel-dark bg-pastel-blush px-4 py-2 rounded-lg shadow-inner">
+            10:00
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-20">
+            <div class="max-w-2xl w-full p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" id="start-title">Listening Test</h2>
+                    <p class="text-gray-500">Computer-Delivered Format</p>
+                </div>
+                
+                <div class="bg-pastel-light border-l-4 border-pastel-accent p-6 rounded-r-lg mb-8">
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-pastel-dark"></i> Important Instructions
+                    </h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li>The audio will start playing <b>automatically</b> when you click "Start Test".</li>
+                        <li>You cannot pause or replay the audio during the test.</li>
+                        <li>You can select text and click the highlighter icon to mark keywords.</li>
+                        <li>Read the instructions for each question carefully before answering.</li>
+                    </ul>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-btn" class="bg-pastel-dark hover:bg-pink-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-lg">
+                        <i class="fa-solid fa-play"></i> Start Test
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST VIEW -->
+        <div id="test-view" class="hidden h-full flex flex-col overflow-hidden">
+            <!-- Highlight Tooltip -->
+            <div id="highlight-tooltip"><i class="fa-solid fa-highlighter"></i> Highlight</div>
+
+            <!-- Audio Player (Hidden visually from user during test, but needs to exist) -->
+            <audio id="test-audio" class="hidden">
+                Your browser does not support the audio element.
+            </audio>
+
+            <!-- Question Container -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-32" id="question-container">
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div id="questions-area" class="text-lg leading-relaxed">
+                        <!-- Questions injected here via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 flex justify-end shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button id="submit-btn" class="bg-gray-800 hover:bg-black text-white font-bold py-2 px-8 rounded-lg transition-colors">
+                    Submit Section
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULT VIEW -->
+        <div id="result-view" class="hidden h-full flex flex-col overflow-hidden bg-gray-50">
+            
+            <!-- Result Header Banner -->
+            <div class="bg-white border-b border-gray-200 p-4 shrink-0 flex flex-col justify-center items-center">
+                <h2 class="text-2xl font-bold text-gray-800">Section Review</h2>
+                <p class="text-lg mt-1 text-gray-600">Your Score: <span id="score-display" class="font-bold text-pastel-dark text-xl">0/0</span></p>
+            </div>
+
+            <!-- Result Navigation Bar -->
+            <div class="bg-white border-b border-gray-200 p-3 shrink-0 flex overflow-x-auto gap-2 items-center justify-start md:justify-center px-4" id="result-nav-bar">
+                <!-- Nav pills injected here -->
+            </div>
+
+            <!-- Split Layout -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                
+                <!-- Left Pane: Questions Review -->
+                <div class="w-full md:w-1/2 h-1/2 md:h-full border-b md:border-b-0 md:border-r border-gray-200 bg-white overflow-y-auto p-6" id="review-questions-area">
+                    <!-- Review content injected here -->
+                </div>
+
+                <!-- Right Pane: Audio & Transcript -->
+                <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col bg-gray-50">
+                    <!-- Audio Controls -->
+                    <div class="p-4 bg-white border-b border-gray-200 shrink-0">
+                        <audio id="review-audio" controls class="w-full rounded-md outline-none">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <!-- Transcript text -->
+                    <div class="flex-1 overflow-y-auto p-6 relative" id="transcript-area">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 sticky top-0 bg-gray-50 py-2 border-b border-gray-200 z-10">Audio Transcript</h3>
+                        <div id="transcript-content" class="space-y-4 text-gray-700 leading-relaxed">
+                            <!-- Transcript injected here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Custom Confirm Modal -->
+        <div id="confirm-modal" class="hidden absolute inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-pastel-blush text-pastel-dark p-3 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">Submit Section?</h3>
+                </div>
+                <p class="text-gray-600 mb-6">Are you sure you want to submit your answers? You cannot return to the test once submitted.</p>
+                <div class="flex justify-end gap-3">
+                    <button id="cancel-submit-btn" class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                    <button id="confirm-submit-btn" class="px-4 py-2 bg-pastel-dark hover:bg-pink-700 text-white font-bold rounded-lg transition-colors shadow-md">Yes, Submit</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA PAYLOAD ---
+        const PLACEHOLDER_AUDIO_URL = "http://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_studentbook_unit4.mp3"; 
+        
+        const mockTestData = {
+            sectionTitle: "Section 4: Australian Aboriginal Art",
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: PLACEHOLDER_AUDIO_URL,
+            questions: [
+                {
+                    id: "q1", type: "fill-in", number: 1,
+                    text: `
+                        <div>
+                            <h3 class="font-bold text-xl mb-4 text-pastel-dark uppercase tracking-wider text-center border-b border-gray-300 pb-2">Australian Aboriginal Art</h3>
+                            <h4 class="font-bold text-lg text-gray-800 mb-2 uppercase mt-4">Ancient Art</h4>
+                            <ul class="list-disc pl-6 space-y-3 text-gray-700 marker:text-pastel-dark">
+                                <li>Rock and bark painting</li>
+                                <li>Sand drawings</li>
+                                <li class="flex items-center gap-2"><span class="font-bold text-pastel-dark">1.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q1" autocomplete="off"></li>
+                                <li>Decorations on weapons and tools</li>
+                            </ul>
+                        </div>
+                    `,
+                    correctAnswer: ["body art"],
+                    timestamp: 36, transcriptRef: "tr_0_36",
+                    explanation: "The speaker lists rock paintings, bark paintings, and sand drawings, and then mentions 'the whole area of body art, which is so important for ceremonial practice'."
+                },
+                {
+                    id: "q2", type: "fill-in", number: 2,
+                    text: `
+                        <div class="mt-3">
+                            <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                                <h5 class="font-bold text-gray-800 mb-2 px-4">Cave art</h5>
+                                <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                    <li class="flex items-center gap-2">protected from <span class="font-bold text-pastel-dark">2.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q2" autocomplete="off"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["weather", "the weather"],
+                    timestamp: 58, transcriptRef: "tr_0_58",
+                    explanation: "The speaker explains that most of this work is inside caves because 'it's been sheltered, hasn't been destroyed by the weather'."
+                },
+                {
+                    id: "q3", type: "fill-in", number: 3,
+                    text: `
+                        <div class="mt-3">
+                            <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                                <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                    <li class="flex items-center flex-wrap gap-2 leading-loose">styles include dot paintings (e.g. arrows, water holes and <span class="font-bold text-pastel-dark">3.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q3" autocomplete="off">) and naturalistic art</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["animal tracks"],
+                    timestamp: 81, transcriptRef: "tr_1_21",
+                    explanation: "Giving examples of dot painting symbols, the speaker says: 'Typical ones include arrows like this - here's a water hole, and these are animal tracks'."
+                },
+                {
+                    id: "q4", type: "fill-in", number: 4,
+                    text: `
+                        <div class="mt-3">
+                            <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                                <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                    <li class="flex items-center gap-2">main function: <span class="font-bold text-pastel-dark">4.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q4" autocomplete="off"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["storytelling", "story-telling"],
+                    timestamp: 107, transcriptRef: "tr_1_47",
+                    explanation: "Because ancient Aborigines didn't have a written language, 'the key purpose of much of this rock art was storytelling'."
+                },
+                {
+                    id: "q5", type: "fill-in", number: 5,
+                    text: `
+                        <div class="mt-4">
+                        <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                            <h5 class="font-bold text-gray-800 mb-2 px-4">Use of ochre</h5>
+                            <div class="pl-6 border-l-2 border-blue-200 ml-4">
+                                <h6 class="font-semibold text-gray-700 mb-2 px-4 italic">Reason</h6>
+                                <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                    <li>readily available</li>
+                                    <li class="flex items-center gap-2">soil or rock contains <span class="font-bold text-pastel-dark">5.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q5" autocomplete="off"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                correctAnswer: ["iron oxide"],
+                timestamp: 133, transcriptRef: "tr_2_13",
+                explanation: "Ochre is used because it is plentiful, and 'It's coloured by iron oxide, which is the mineral that makes a lot of Australian outback soil'."
+            },
+            {
+                id: "q6", type: "fill-in", number: 6,
+                    text: `
+                        <div class="mt-3">
+                            <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                                <div class="pl-6 border-l-2 border-blue-200 ml-4">
+                                    <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                        <li>produces many colours and shades of red</li>
+                                        <li class="flex items-center flex-wrap gap-2 leading-loose">artist's palette found that is <span class="font-bold text-pastel-dark">6.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q6" autocomplete="off"> old</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["18000 years", "18,000 years", "18 000 years", "18000"],
+                    timestamp: 168, transcriptRef: "tr_2_48",
+                    explanation: "Archaeologists have discovered 'what appears to be an artist's palette of ochres, dating back 18,000 years'."
+                },
+                {
+                    id: "q7", type: "fill-in", number: 7,
+                    text: `
+                        <div class="mt-4">
+                            <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                                <div class="pl-6 border-l-2 border-green-200 ml-4">
+                                    <h6 class="font-semibold text-gray-700 mb-2 px-4 italic">Preparation</h6>
+                                    <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                        <li>ochre collected</li>
+                                        <li class="flex items-center gap-2">turned into a <span class="font-bold text-pastel-dark">7.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q7" autocomplete="off"></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["powder"],
+                    timestamp: 186, transcriptRef: "tr_3_06",
+                    explanation: "After appropriate rocks were collected, the rock 'had to be broken up and ground into a powder'."
+                },
+                {
+                    id: "q8", type: "fill-in", number: 8,
+                    text: `
+                        <div class="mt-3 mb-6">
+                            <div class="pl-6 border-l-2 border-pastel-pink ml-2">
+                                <div class="pl-6 border-l-2 border-green-200 ml-4">
+                                    <ul class="list-disc pl-10 space-y-3 text-gray-700 marker:text-gray-400">
+                                        <li class="flex items-center flex-wrap gap-2 leading-loose">fluid binder, e.g. tree sap or <span class="font-bold text-pastel-dark">8.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q8" autocomplete="off"> added</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["bush honey"],
+                    timestamp: 199, transcriptRef: "tr_3_19",
+                    explanation: "The powder had to be bound. In the past, Aboriginal people used 'things like tree sap, or something similar like bush honey'."
+                },
+                {
+                    id: "q9", type: "fill-in", number: 9,
+                    text: `
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h4 class="font-bold text-lg text-gray-800 mb-4 uppercase">Modern Art</h4>
+                            <ul class="list-disc pl-6 space-y-3 text-gray-700 marker:text-pastel-dark">
+                                <li class="flex items-center flex-wrap gap-2 leading-loose">Artists use acrylic colours and <span class="font-bold text-pastel-dark">9.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q9" autocomplete="off"></li>
+                            </ul>
+                        </div>
+                    `,
+                    correctAnswer: ["canvas"],
+                    timestamp: 233, transcriptRef: "tr_3_53",
+                    explanation: "Things changed in the 1970s when Aboriginal people 'took up acrylic painting and began to paint on canvas'."
+                },
+                {
+                    id: "q10", type: "fill-in", number: 10,
+                    text: `
+                        <div class="mt-3">
+                            <ul class="list-disc pl-6 space-y-3 text-gray-700 marker:text-pastel-dark">
+                                <li class="flex items-center flex-wrap gap-2 leading-loose">Paint and decorate pottery and a range of <span class="font-bold text-pastel-dark">10.</span> <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q10" autocomplete="off"></li>
+                            </ul>
+                        </div>
+                    `,
+                    correctAnswer: ["musical instruments", "instruments"],
+                    timestamp: 287, transcriptRef: "tr_4_47",
+                    explanation: "Modern Aboriginal art can also be found on 'pottery and various musical instruments like didgeridoos and clapping sticks'."
+                }
+            ],
+            transcript: [
+                { id: "tr_0_04", start: 4, end: 36, text: "We're going to have a look today at Aboriginal art and painting. which actually dates back 60,000 years, making it one of the oldest art traditions in the world. Now, as long as indigenous people have been living in Australia, they've been creating different types of art. So let's start by having a look at some examples of ancient art. It includes things like, as you can see here, rock paintings, bark paintings... even some sand drawings like this have been found." },
+                { id: "tr_0_36", start: 36, end: 48, text: "Then there's the whole area of <strong>body art</strong> <em>(Q1)</em>, which is so important for ceremonial practice, and lastly, here are some examples of decorative art on weapons and tools." },
+                { id: "tr_0_48", start: 48, end: 58, text: "The oldest art examples today are the rock paintings because, obviously, rock is more durable than other materials and so the art has been preserved." },
+                { id: "tr_0_58", start: 58, end: 81, text: "In fact, most of this work is inside caves-largely because there, it's been sheltered, hasn't been destroyed by the <strong>weather</strong> <em>(Q2)</em>, while the paintings on outside rock surfaces have often been washed away over the years. Now, there are enormous variations in the style of Aboriginal rock art, depending on its age and location." },
+                { id: "tr_1_21", start: 81, end: 107, text: "Dot paintings are one of the best-known visual art forms of Aboriginal culture in which a surface is covered in small dots to reveal symbols. Typical ones include arrows like this - here's a water hole, and these are <strong>animal tracks</strong> <em>(Q3)</em>. You get to see both the abstract dot paintings and more naturalistic art... you get both in rock art of various ages." },
+                { id: "tr_1_47", start: 107, end: 120, text: "As the ancient Aborigines didn't have a written language, the key purpose of much of this rock art was <strong>storytelling</strong> <em>(Q4)</em>, which has had a great significance for younger generations." },
+                { id: "tr_2_00", start: 120, end: 133, text: "Let's move on to look at the materials. Er, whatever they were painting, traditionally Aboriginal people all over Australia used pigment, such as ochre, to make paint." },
+                { id: "tr_2_13", start: 133, end: 168, text: "Ochre's very finely textured natural rock and, um, well, they used this because ochre is plentiful across most of Australia. It's coloured by <strong>iron oxide</strong> <em>(Q5)</em>, which is the mineral that makes a lot of Australian outback soil-in places such as Ayers Rock - what is known as 'Uluru red', Uluru being the Aboriginal name for Ayers Rock. However, depending on the exact conditions under which it formed, the shade can be anything from yellow to orange, red, purple or dark brown." },
+                { id: "tr_2_48", start: 168, end: 186, text: "Today, ochre occurs in many archaeological sites, and archaeologists at one site have discovered what appears to be an artist's palette of ochres. dating back <strong>18,000 years</strong> <em>(Q6)</em>.<br><br>Preparing the ochre paints was time-consuming work." },
+                { id: "tr_3_06", start: 186, end: 199, text: "First, the appropriate rocks had to be found and collected. Then the rock had to be broken up and ground into a <strong>powder</strong> <em>(Q7)</em>, and that had to be mixed with some sort of fluid to bind it into paint." },
+                { id: "tr_3_19", start: 199, end: 224, text: "Nowadays, the binder most commonly used is professional artist's acrylic binder, but in the past, Aboriginal people used things like tree sap, or something similar like <strong>bush honey</strong> <em>(Q8)</em>. Other fluids must also have been used but wouldn't have held paint on rock or a piece of bark for thousands of years, so sadly those paintings would have been lost." },
+                { id: "tr_3_44", start: 224, end: 233, text: "So, how have things changed? Well, modern Aboriginal is a mixture of the old and the new." },
+                { id: "tr_3_53", start: 233, end: 248, text: "Things changed in the 1970s really when Aboriginal people from many different parts of Australia, particularly south Australia, central and northern Australia, took up acrylic painting and began to paint on <strong>canvas</strong> <em>(Q9)</em>." },
+                { id: "tr_4_08", start: 248, end: 287, text: "Taking a modern approach has had many advantages. It saves artists a great deal of time, and they can still choose to use the traditional yellowish-reddish-brownish colours if they wish to. But perhaps the most important fact is that, unlike bark and rock paintings, the modern paintings are easy to sell. In fact, painting on canvas has given Aboriginal people an opportunity to showcase their art to the world and keep their ancient culture alive. Modern Aboriginal art, particularly dot painting. has taken off and started selling on a big scale internationally." },
+                { id: "tr_4_47", start: 287, end: 9999, text: "Aboriginal art can also be found on pottery and various <strong>musical instruments</strong> <em>(Q10)</em> like didgeridoos and clapping sticks. Together, these have become some of the most popular souvenirs in Australia. Their artists, like other artists in the world, are now able to earn a living doing something they are passionate about." }
+            ]
+        };
+
+        // --- GLOBAL VARIABLES ---
+        let timerInterval;
+        let remainingSeconds = mockTestData.totalTimeSeconds;
+        let userAnswers = {};
+        let evaluationResults = {};
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const testView = document.getElementById('test-view');
+        const resultView = document.getElementById('result-view');
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const timerDisplay = document.getElementById('timer-display');
+        const questionsArea = document.getElementById('questions-area');
+        const testAudio = document.getElementById('test-audio');
+        const highlightTooltip = document.getElementById('highlight-tooltip');
+        
+        // Modal Elements
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+
+        // --- STREAMING_CHUNK:Initialization and Test Start Logic... ---
+        function init() {
+            document.getElementById('start-title').innerText = mockTestData.sectionTitle;
+            testAudio.src = mockTestData.audioUrl;
+            document.getElementById('review-audio').src = mockTestData.audioUrl;
+            renderTestQuestions();
+            setupHighlighting();
+        }
+
+        startBtn.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            testView.classList.remove('hidden');
+            timerDisplay.classList.remove('hidden');
+            
+            // Start Audio
+            testAudio.play().catch(e => console.log("Audio autoplay prevented. Needs user interaction."));
+            
+            // Start Timer
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+        });
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (remainingSeconds < 60) {
+                timerDisplay.classList.add('text-red-500');
+                timerDisplay.classList.remove('text-pastel-dark');
+            }
+        }
+
+        // --- STREAMING_CHUNK:Rendering Questions & Handling Input... ---
+        function renderTestQuestions() {
+            questionsArea.innerHTML = '';
+            mockTestData.questions.forEach(q => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'mb-6';
+                qDiv.innerHTML = q.text;
+                questionsArea.appendChild(qDiv);
+            });
+
+            // Attach listeners to save answers
+            const inputs = questionsArea.querySelectorAll('.ielts-input');
+            inputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const qid = e.target.getAttribute('data-qid');
+                    userAnswers[qid] = e.target.value.trim();
+                });
+            });
+        }
+
+        // --- STREAMING_CHUNK:Highlighting Tool Implementation... ---
+        function setupHighlighting() {
+            let currentSelection = null;
+
+            document.addEventListener('selectionchange', () => {
+                if (testView.classList.contains('hidden')) return; // Only active in test mode
+                
+                const selection = window.getSelection();
+                if (selection.toString().trim().length > 0) {
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+                    
+                    // Show tooltip above selection, adjusting for scroll
+                    highlightTooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                    highlightTooltip.style.top = `${rect.top + window.scrollY}px`;
+                    highlightTooltip.style.display = 'block';
+                    currentSelection = range;
+                } else {
+                    highlightTooltip.style.display = 'none';
+                    currentSelection = null;
+                }
+            });
+
+            highlightTooltip.addEventListener('click', () => {
+                if (currentSelection) {
+                    try {
+                        const span = document.createElement('span');
+                        span.className = 'highlighted-text';
+                        span.title = "Click to remove highlight";
+                        currentSelection.surroundContents(span);
+                        
+                        // Add click event to remove highlight
+                        span.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const parent = this.parentNode;
+                            while (this.firstChild) {
+                                parent.insertBefore(this.firstChild, this);
+                            }
+                            parent.removeChild(this);
+                        });
+
+                        window.getSelection().removeAllRanges();
+                        highlightTooltip.style.display = 'none';
+                    } catch (e) {
+                        console.warn("Could not highlight across complex HTML elements.");
+                    }
+                }
+            });
+
+            // Hide tooltip if clicked elsewhere
+            document.addEventListener('mousedown', (e) => {
+                if (e.target !== highlightTooltip && highlightTooltip.style.display === 'block') {
+                     // slight delay to allow tooltip click to register
+                    setTimeout(() => { highlightTooltip.style.display = 'none'; }, 100);
+                }
+            });
+        }
+
+        // --- STREAMING_CHUNK:Evaluation & Transition to Result View... ---
+        submitBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('hidden');
+        });
+
+        cancelSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        confirmSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            submitTest();
+        });
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            testAudio.pause();
+            evaluateAnswers();
+            renderResultView();
+            testView.classList.add('hidden');
+            timerDisplay.classList.add('hidden');
+            resultView.classList.remove('hidden');
+        }
+
+        function evaluateAnswers() {
+            let score = 0;
+            mockTestData.questions.forEach(q => {
+                const userAnswer = (userAnswers[q.id] || "").toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase() === userAnswer);
+                if (isCorrect) score++;
+                
+                evaluationResults[q.id] = {
+                    userAnswer: userAnswers[q.id] || "",
+                    isCorrect: isCorrect,
+                    correctAnswersList: q.correctAnswer
+                };
+            });
+            document.getElementById('score-display').innerText = `${score}/${mockTestData.questions.length}`;
+        }
+
+        // --- STREAMING_CHUNK:Rendering Review Mode & Audio Sync... ---
+        function renderResultView() {
+            const reviewArea = document.getElementById('review-questions-area');
+            const navBar = document.getElementById('result-nav-bar');
+            const transcriptArea = document.getElementById('transcript-content');
+            
+            reviewArea.innerHTML = '';
+            navBar.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            // 1. Render Transcript
+            mockTestData.transcript.forEach(line => {
+                const p = document.createElement('p');
+                p.id = line.id;
+                p.className = 'p-2 rounded transition-colors duration-300';
+                p.innerHTML = line.text;
+                transcriptArea.appendChild(p);
+            });
+
+            // 2. Render Questions and Nav Bar
+            mockTestData.questions.forEach((q, index) => {
+                const result = evaluationResults[q.id];
+                
+                // Create Nav Pill
+                const navPill = document.createElement('button');
+                navPill.className = `nav-pill flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-sm ${result.isCorrect ? 'bg-emerald-500' : 'bg-red-500'}`;
+                navPill.innerText = q.number;
+                navPill.onclick = () => {
+                    document.getElementById(`review-q-${q.id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                navBar.appendChild(navPill);
+
+                // Create Review Block
+                const block = document.createElement('div');
+                block.id = `review-q-${q.id}`;
+                block.className = 'mb-8 bg-gray-50 p-5 rounded-xl border border-gray-100 shadow-sm';
+                
+                // Clean HTML for review (replace inputs/selects with blanks)
+                let cleanText = q.text.replace(/<input[^>]*>/g, '___').replace(/<select[^>]*>.*?<\/select>/gs, '___');
+
+                block.innerHTML = `
+                    <div class="mb-4">${cleanText}</div>
+                    <div class="mt-4 p-4 rounded-lg bg-white border ${result.isCorrect ? 'border-emerald-200' : 'border-red-200'}">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-3">
+                            <div class="flex-1">
+                                <span class="text-sm text-gray-500 block">Your Answer:</span>
+                                <span class="font-bold text-lg ${result.isCorrect ? 'text-emerald-600' : 'text-red-600'}">
+                                    ${result.userAnswer || '<i class="text-gray-400">No answer provided</i>'}
+                                </span>
+                                ${!result.isCorrect ? `<span class="ml-2 text-red-500"><i class="fa-solid fa-xmark"></i></span>` : `<span class="ml-2 text-emerald-500"><i class="fa-solid fa-check"></i></span>`}
+                            </div>
+                            ${!result.isCorrect ? `
+                            <div class="flex-1 border-l pl-4 border-gray-200">
+                                <span class="text-sm text-gray-500 block">Correct Answer(s):</span>
+                                <span class="font-bold text-emerald-600">${result.correctAnswersList.join(' / ')}</span>
+                            </div>` : ''}
+                        </div>
+                        
+                        <!-- Explanation Button -->
+                        <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}')" class="mt-2 bg-pastel-light hover:bg-pastel-blush text-pastel-dark font-semibold py-2 px-4 rounded-full text-sm transition-colors border border-pastel-pink flex items-center gap-2">
+                            <i class="fa-solid fa-circle-play text-lg"></i> View Explanation & Play Audio
+                        </button>
+                        
+                        <!-- Explanation Text -->
+                        <div id="exp-${q.id}" class="hidden mt-3 text-sm text-gray-700 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                            ${q.explanation}
+                        </div>
+                    </div>
+                `;
+                reviewArea.appendChild(block);
+            });
+        }
+
+        // --- STREAMING_CHUNK:Audio Playback and Sync Logic... ---
+        window.playExplanation = function(timestamp, transcriptId) {
+            const reviewAudio = document.getElementById('review-audio');
+            
+            // Show explanation text for the clicked button's parent
+            const allExpDivs = document.querySelectorAll('[id^="exp-q"]');
+            allExpDivs.forEach(div => div.classList.add('hidden')); // hide others
+            const specificExpDiv = document.getElementById(`exp-${transcriptId.replace('tr_', 'q').split('_')[0]}`); // hacky id matching based on standard format, better to pass q.id directly
+            
+            // Fix: pass q.id instead of just transcript ID for easier targeting. 
+            // In the HTML string above: <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}', '${q.id}')"
+            // Let's implement a quick DOM search to show the sibling explanation div.
+            const btn = event.currentTarget;
+            const expDiv = btn.nextElementSibling;
+            expDiv.classList.remove('hidden');
+
+            // Play audio
+            reviewAudio.currentTime = timestamp;
+            reviewAudio.play();
+
+            // Scroll transcript
+            const transcriptLine = document.getElementById(transcriptId);
+            if (transcriptLine) {
+                // Remove previous highlights
+                document.querySelectorAll('#transcript-content p').forEach(p => p.classList.remove('bg-yellow-100', 'border-l-4', 'border-yellow-400'));
+                
+                // Add highlight
+                transcriptLine.classList.add('bg-yellow-100', 'border-l-4', 'border-yellow-400');
+                transcriptLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        };
+
+        // Sync transcript with audio playback
+        document.getElementById('review-audio').addEventListener('timeupdate', (e) => {
+            const currentTime = e.target.currentTime;
+            let activeLineFound = false;
+
+            for (let i = 0; i < mockTestData.transcript.length; i++) {
+                const line = mockTestData.transcript[i];
+                const element = document.getElementById(line.id);
+                
+                if (currentTime >= line.start && currentTime < line.end) {
+                    if (!element.classList.contains('bg-pastel-blush')) {
+                        // Clear old active lines
+                        document.querySelectorAll('#transcript-content p').forEach(p => {
+                            p.classList.remove('bg-pastel-blush', 'font-medium', 'text-pastel-dark');
+                        });
+                        
+                        // Set new active line
+                        element.classList.add('bg-pastel-blush', 'font-medium', 'text-pastel-dark');
+                        
+                        // Auto-scroll if it's playing normally (not jumping via explanation)
+                        // Simple check: if the element is out of view, scroll to it
+                        const container = document.getElementById('transcript-area');
+                        if (element.offsetTop < container.scrollTop || element.offsetTop > container.scrollTop + container.clientHeight) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                    activeLineFound = true;
+                    break;
+                }
+            }
+        });
+
+        // Initialize the app on load
+        window.onload = init;
+
+    </script>
+</body>
+</html>
