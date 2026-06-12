@@ -30,14 +30,19 @@
         header { text-align: center; margin-bottom: 2rem; }
         h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
 
-        /* Topic Filter Controls */
-        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
         .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .filter-btn:hover:not(.active) { background: var(--primary-light); }
 
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
         /* View Toggles */
-        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; }
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
         .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
         .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
@@ -48,7 +53,7 @@
         .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(67, 56, 202, 0.15); border-color: var(--border); }
         .vocab-card.hidden { display: none; }
         .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
-        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
         .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
         .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
         .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
@@ -116,10 +121,18 @@
 
     <!-- Topic Filter -->
     <div class="filter-controls" id="topic-filters">
-        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
-        <button class="filter-btn" onclick="filterTopic('Literature & Biographies')">Literature & Biographies</button>
-        <button class="filter-btn" onclick="filterTopic('Science & Medicine')">Science & Medicine</button>
-        <button class="filter-btn" onclick="filterTopic('Education & Psychology')">Education & Psychology</button>
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Katherine Mansfield')">Passage 1: Katherine Mansfield</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Herbal Medicines')">Passage 2: Herbal Medicines</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Teaching Styles')">Passage 3: Teaching Styles</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
     </div>
 
     <div class="view-controls">
@@ -133,8 +146,8 @@
             <div class="flashcard-inner">
                 <div class="flashcard-face flashcard-front">
                     <h2 class="word" id="fc-word">Word</h2>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
                     <div class="meta-row">
-                        <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
                         <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
                     </div>
                     <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
@@ -155,7 +168,7 @@
 
         <div class="flashcard-controls">
             <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
-            <span class="fc-counter" id="fc-counter">1 / 32</span>
+            <span class="fc-counter" id="fc-counter">1 / 65</span>
             <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
             <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
             <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
@@ -173,44 +186,114 @@
     // Vocabulary Bank (PET Reading Mock Test 5)
     // ---------------------------------------------------------
     const vocabBank = [
-        // --- CATEGORY 1: Literature & Biographies ---
-        { topic: "Literature & Biographies", word: "Prominent", phonetic: "/ˈprɒm.ɪ.nənt/", form: "Adjective", forms: "N: Prominence | Adv: Prominently", def: "Important, famous, or noticeable.", translation: "Nổi bật, xuất chúng", example: "...born in 1888, into a prominent family in Wellington, New Zealand.", extraExample: "She played a prominent role in the successful election campaign." },
-        { topic: "Literature & Biographies", word: "Distinguished", phonetic: "/dɪˈstɪŋ.ɡwɪʃt/", form: "Adjective", forms: "V: Distinguish", def: "Successful, authoritative, and commanding great respect.", translation: "Lỗi lạc, xuất sắc", example: "...a first cousin of Countess Elizabeth von Arnim, a distinguished novelist in her time.", extraExample: "He had a long and distinguished career as a diplomat." },
-        { topic: "Literature & Biographies", word: "Inspiration", phonetic: "/ˌɪn.spɪˈreɪ.ʃən/", form: "Noun", forms: "V: Inspire | Adj: Inspirational", def: "The process of being mentally stimulated to do or feel something, especially to do something creative.", translation: "Nguồn cảm hứng", example: "...she later used her memories of this time as an inspiration for her Prelude story.", extraExample: "The artist drew his inspiration from the stunning coastal landscapes." },
-        { topic: "Literature & Biographies", word: "Accomplished", phonetic: "/əˈkʌm.plɪʃt/", form: "Adjective", forms: "V: Accomplish | N: Accomplishment", def: "Highly trained or skilled in a particular activity.", translation: "Tài năng, cừ khôi", example: "Mansfield herself was an accomplished cellist...", extraExample: "He is an accomplished pianist who has won several international competitions." },
-        { topic: "Literature & Biographies", word: "Portray", phonetic: "/pɔːˈtreɪ/", form: "Verb", forms: "N: Portrayal, Portrait", def: "Depict (someone or something) in a work of art or literature.", translation: "Khắc họa, miêu tả", example: "...who were often portrayed in a sympathetic light in her later stories...", extraExample: "The movie portrays the challenges faced by immigrants in the 1920s." },
-        { topic: "Literature & Biographies", word: "Recommence", phonetic: "/ˌriː.kəˈmens/", form: "Verb", forms: "N: Recommencement", def: "Begin or cause to begin again.", translation: "Bắt đầu lại, tiếp tục lại", example: "Mansfield recommenced playing the cello, an occupation that she believed...", extraExample: "Classes will recommence in September after the summer holidays." },
-        { topic: "Literature & Biographies", word: "Charismatic", phonetic: "/ˌkær.ɪzˈmæt.ɪk/", form: "Adjective", forms: "N: Charisma", def: "Exercising a compelling charm which inspires devotion in others.", translation: "Cuốn hút, có uy tín", example: "...appreciated amongst fellow students... for her lively and charismatic approach to life...", extraExample: "The charismatic leader easily convinced the crowd to support his vision." },
-        { topic: "Literature & Biographies", word: "Pseudonym", phonetic: "/ˈsjuː.də.nɪm/", form: "Noun", forms: "Adj: Pseudonymous", def: "A fictitious name, especially one used by an author.", translation: "Bút danh, biệt hiệu", example: "It was also the first occasion on which she used the pseudonym 'K. Mansfield'.", extraExample: "Mark Twain is the pseudonym of the American writer Samuel Langhorne Clemens." },
-        { topic: "Literature & Biographies", word: "Discontented", phonetic: "/ˌdɪs.kənˈten.tɪd/", form: "Adjective", forms: "N: Discontent", def: "Dissatisfied, especially with one's circumstances.", translation: "Bất mãn, không hài lòng", example: "Mansfield rapidly grew discontented with the provincial New Zealand lifestyle...", extraExample: "The discontented workers decided to go on strike demanding better pay." },
-        { topic: "Literature & Biographies", word: "Subsidy", phonetic: "/ˈsʌb.sɪ.di/", form: "Noun", forms: "V: Subsidize", def: "A sum of money granted by the state or a public body to help an industry or business (or given as support).", translation: "Tiền trợ cấp", example: "Her father sent her an annual subsidy of £100 for the rest of her life.", extraExample: "The government provides a subsidy to farmers to keep food prices stable." },
-        { topic: "Literature & Biographies", word: "Disdain", phonetic: "/dɪsˈdeɪn/", form: "Noun", forms: "Adj: Disdainful", def: "The feeling that someone or something is unworthy of one's consideration or respect.", translation: "Sự khinh miệt, khinh thường", example: "In later years, she would express both admiration and disdain for New Zealand...", extraExample: "She glared at the waiter with obvious disdain after he spilled her drink." },
-        { topic: "Literature & Biographies", word: "Solidify", phonetic: "/səˈlɪd.ɪ.faɪ/", form: "Verb", forms: "N: Solidification | Adj: Solid", def: "Make or become hard or solid; make stronger or more certain.", translation: "Củng cố, làm vững chắc", example: "It was the publication of Bliss and Other Stories... that was to solidify Mansfield’s reputation...", extraExample: "The treaty was designed to solidify the alliance between the two nations." },
+        // --- PASSAGE 1: Katherine Mansfield ---
+        { topic: "Katherine Mansfield", level: "C1", word: "Prominent", form: "Adjective", phonetic: "/ˈprɒmɪnənt/", forms: "N: Prominence", def: "Important, famous, or noticeable.", translation: "Nổi bật, xuất chúng", example: "Katherine was born into a prominent family in Wellington, New Zealand.", extraExample: "She played a prominent role in the successful election campaign." },
+        { topic: "Katherine Mansfield", level: "B2", word: "Pen name", form: "Noun Phrase", phonetic: "/ˈpen neɪm/", forms: "N/A", def: "A name used by a writer instead of their real name.", translation: "Bút danh", example: "She is better known by her pen name, Katherine Mansfield.", extraExample: "George Orwell was the pen name of Samuel Langhorne Clemens." },
+        { topic: "Katherine Mansfield", level: "C1", word: "Distinguished", form: "Adjective", phonetic: "/dɪˈstɪŋɡwɪʃt/", forms: "V: Distinguish", def: "Successful, authoritative, and commanding great respect.", translation: "Lỗi lạc, xuất sắc", example: "She was a first cousin of Countess Elizabeth von Arnim, a distinguished novelist.", extraExample: "He had a long and distinguished career as a diplomat." },
+        { topic: "Katherine Mansfield", level: "C1", word: "Commence", form: "Verb", phonetic: "/kəˈmens/", forms: "N: Commencement", def: "Begin or start.", translation: "Bắt đầu", example: "In 1908, her father allowed her to commence living independently.", extraExample: "The construction work is scheduled to commence next week." },
+        { topic: "Katherine Mansfield", level: "B2", word: "Take up", form: "Phrasal Verb", phonetic: "/teɪk ʌp/", forms: "N/A", def: "To start doing a particular job or activity.", translation: "Bắt đầu (một sở thích/công việc)", example: "She decided to take up writing as a full-time profession.", extraExample: "He has taken up golf since he retired." },
+        { topic: "Katherine Mansfield", level: "C1", word: "Charismatic", form: "Adjective", phonetic: "/ˌkærɪzˈmætɪk/", forms: "N: Charisma", def: "Exercising a compelling charm which inspires devotion in others.", translation: "Cuốn hút, có uy tín", example: "She was appreciated for her lively and charismatic approach to life.", extraExample: "The charismatic leader easily convinced the crowd to support his vision." },
+        { topic: "Katherine Mansfield", level: "C2", word: "Suffragette", form: "Noun", phonetic: "/ˌsʌfrəˈdʒet/", forms: "N: Suffrage", def: "A woman seeking the right to vote through organized protest.", translation: "Người đấu tranh cho quyền bầu cử của phụ nữ", example: "She became involved with the bohemian and suffragette movements in London.", extraExample: "The suffragettes fought bravely for women's voting rights." },
+        { topic: "Katherine Mansfield", level: "C2", word: "Pseudonym", form: "Noun", phonetic: "/ˈsjuːdənɪm/", forms: "Adj: Pseudonymous", def: "A fictitious name, especially one used by an author.", translation: "Bút danh, biệt hiệu", example: "It was the first occasion on which she used the pseudonym 'K. Mansfield'.", extraExample: "He wrote his controversial articles under a pseudonym." },
+        { topic: "Katherine Mansfield", level: "C2", word: "Disdain", form: "Noun", phonetic: "/dɪsˈdeɪn/", forms: "Adj: Disdainful", def: "The feeling that someone or something is unworthy of one's consideration or respect.", translation: "Sự khinh miệt", example: "In later years, she would express both admiration and disdain for New Zealand.", extraExample: "She glared at the waiter with obvious disdain." },
+        { topic: "Katherine Mansfield", level: "C1", word: "Discontented", form: "Adjective", phonetic: "/ˌdɪskənˈtentɪd/", forms: "N: Discontent", def: "Dissatisfied, especially with one's circumstances.", translation: "Bất mãn", example: "Mansfield rapidly grew discontented with the provincial New Zealand lifestyle.", extraExample: "The discontented workers decided to go on strike." },
+        { topic: "Katherine Mansfield", level: "C1", word: "Bankruptcy", form: "Noun", phonetic: "/ˈbæŋkrʌptsi/", forms: "Adj/V: Bankrupt", def: "The state of being completely lacking in a particular quality or value (or financially ruined).", translation: "Sự phá sản", example: "She wrote critically about the spiritual bankruptcy of her home country.", extraExample: "The company faced bankruptcy after a series of bad investments." },
+        { topic: "Katherine Mansfield", level: "B2", word: "Diagnose", form: "Verb", phonetic: "/ˈdaɪəɡnəʊz/", forms: "N: Diagnosis", def: "Identify the nature of an illness or other problem by examination of the symptoms.", translation: "Chẩn đoán", example: "In December 1917, she was diagnosed with the disease.", extraExample: "The mechanic diagnosed the problem with the car's engine." },
+        { topic: "Katherine Mansfield", level: "C2", word: "Tuberculosis", form: "Noun", phonetic: "/tjuːˌbɜːkjuˈləʊsɪs/", forms: "N/A", def: "An infectious bacterial disease characterized by the growth of nodules in the tissues, especially the lungs.", translation: "Bệnh lao", example: "She suffered a severe hemorrhage and was diagnosed with tuberculosis.", extraExample: "Tuberculosis was a very common cause of death in the 19th century." },
+        { topic: "Katherine Mansfield", level: "C2", word: "Sanatorium", form: "Noun", phonetic: "/ˌsænəˈtɔːriəm/", forms: "N/A", def: "A medical facility for long-term illness, most typically associated with treatment of tuberculosis before antibiotics.", translation: "Viện điều dưỡng", example: "She rejected the idea of staying in a sanatorium to recover.", extraExample: "He spent a year in a Swiss sanatorium recovering from his lung condition." },
+        { topic: "Katherine Mansfield", level: "B2", word: "Take on", form: "Phrasal Verb", phonetic: "/teɪk ɒn/", forms: "N/A", def: "To accept a particular job or responsibility; to acquire a new meaning or quality.", translation: "Đảm nhận, gánh vác", example: "Her writing took on a new urgency as her health declined.", extraExample: "I can't take on any more projects at work right now." },
+        { topic: "Katherine Mansfield", level: "C1", word: "Consolidate", form: "Verb", phonetic: "/kənˈsɒlɪdeɪt/", forms: "N: Consolidation", def: "Make (something) physically stronger or more solid; to combine into a single, more effective whole.", translation: "Củng cố", example: "The publication of her stories was to consolidate her reputation as a writer.", extraExample: "The two companies consolidated to form a larger corporation." },
+        { topic: "Katherine Mansfield", level: "B2", word: "Restrict", form: "Verb", phonetic: "/rɪˈstrɪkt/", forms: "N: Restriction", def: "Put a limit on; keep under control.", translation: "Hạn chế", example: "Her illness severely restricted her ability to travel.", extraExample: "The new laws severely restrict the sale of firearms." },
 
-        // --- CATEGORY 2: Science & Medicine ---
-        { topic: "Science & Medicine", word: "Expertise", phonetic: "/ˌek.spɜːˈtiːz/", form: "Noun", forms: "N/Adj: Expert", def: "Expert skill or knowledge in a particular field.", translation: "Chuyên môn, sự thành thạo", example: "...huge potential for New Zealand to develop a herb industry based on the excellent growing conditions and expertise there...", extraExample: "Software engineering is an area where we lack the necessary expertise." },
-        { topic: "Science & Medicine", word: "Cultivate", phonetic: "/ˈkʌl.tɪ.veɪt/", form: "Verb", forms: "N: Cultivation | Adj: Cultivated", def: "Prepare and use (land) for crops or gardening; grow or maintain (plants).", translation: "Trồng trọt, canh tác", example: "...concluded that New Zealand has a good opportunity to cultivate arnica flowers and roots...", extraExample: "The indigenous tribe has been cultivating corn in these valleys for centuries." },
-        { topic: "Science & Medicine", word: "Abruptly", phonetic: "/əˈbrʌpt.li/", form: "Adverb", forms: "Adj: Abrupt | N: Abruptness", def: "Suddenly and unexpectedly.", translation: "Một cách đột ngột", example: "...when the government abruptly halted funding for the research programme.", extraExample: "The meeting ended abruptly when the fire alarm started ringing." },
-        { topic: "Science & Medicine", word: "Unjustified", phonetic: "/ʌnˈdʒʌs.tɪ.faɪd/", form: "Adjective", forms: "V: Justify | N: Justification", def: "Not shown to be right or reasonable.", translation: "Vô lý, phi lý", example: "It was an unjustified move, according to agronomist Malcolm Douglas...", extraExample: "The media criticized the police for their unjustified use of force." },
-        { topic: "Science & Medicine", word: "Obsolete", phonetic: "/ˈɒb.səl.iːt/", form: "Adjective", forms: "N: Obsolescence", def: "No longer produced or used; out of date.", translation: "Lỗi thời, cổ lỗ sĩ", example: "...summed up the opposing position by claiming that herbalism 'is obsolete'.", extraExample: "Typewriters have become largely obsolete with the advent of computers." },
-        { topic: "Science & Medicine", word: "Shun", phonetic: "/ʃʌn/", form: "Verb", forms: "N/A", def: "Persistently avoid, ignore, or reject (someone or something) through antipathy or caution.", translation: "Xa lánh, lảng tránh", example: "...herbal medicine was largely ignored, shunned by the majority of the medical profession...", extraExample: "After the scandal, the famous actor was completely shunned by the industry." },
-        { topic: "Science & Medicine", word: "Undermine", phonetic: "/ˌʌn.dəˈmaɪn/", form: "Verb", forms: "N/A", def: "Lessen the effectiveness, power, or ability of, especially gradually or insidiously.", translation: "Làm suy yếu, phá hoại dần", example: "...the limited evidence... was undermined by lack of interest among general practitioners...", extraExample: "Constant criticism will eventually undermine a child's self-confidence." },
-        { topic: "Science & Medicine", word: "Robust", phonetic: "/rəʊˈbʌst/", form: "Adjective", forms: "N: Robustness", def: "Strong and healthy; vigorous; able to withstand or overcome adverse conditions.", translation: "Mạnh mẽ, vững chắc", example: "What’s more, according to Rasmussen, robust clinical trials show that herbal medicine is generally safe...", extraExample: "The company reported robust profits despite the ongoing economic recession." },
-        { topic: "Science & Medicine", word: "Streamlined", phonetic: "/ˈstriːm.laɪnd/", form: "Adjective", forms: "V: Streamline", def: "Having been made simpler and more efficient or effective.", translation: "Được tinh giản, hợp lý hóa", example: "...to regulate herbal remedies under a single, streamlined licensing process...", extraExample: "The new streamlined manufacturing process reduced production costs by 20%." },
-        { topic: "Science & Medicine", word: "Prohibitively", phonetic: "/prəˈhɪb.ɪ.tɪv.li/", form: "Adverb", forms: "Adj: Prohibitive | V: Prohibit", def: "In a way that prevents people from doing something (often by being too expensive).", translation: "Mức giá quá đắt (ngăn cấm người mua)", example: "...others argue that more regulation would be prohibitively expensive for all but the largest manufacturers...", extraExample: "Property prices in the city center have become prohibitively high for young couples." },
+        // --- PASSAGE 2: Herbal Medicines ---
+        { topic: "Herbal Medicines", level: "B2", word: "Bruise", form: "Noun / Verb", phonetic: "/bruːz/", forms: "Adj: Bruised", def: "An injury appearing as an area of discoloured skin on the body, caused by a blow or impact rupturing underlying blood vessels.", translation: "Vết bầm tím / làm bầm tím", example: "Arnica is traditionally used to treat sprains and bruises.", extraExample: "He suffered a few cuts and bruises in the accident." },
+        { topic: "Herbal Medicines", level: "B2", word: "Joint", form: "Noun", phonetic: "/dʒɔɪnt/", forms: "N/A", def: "A point at which parts of an artificial structure are joined.", translation: "Khớp xương", example: "Herbal medicines are often used for stiff joints.", extraExample: "As he got older, his joints started to ache." },
+        { topic: "Herbal Medicines", level: "C1", word: "Cultivate", form: "Verb", phonetic: "/ˈkʌltɪveɪt/", forms: "N: Cultivation", def: "Prepare and use (land) for crops or gardening; grow or maintain (plants).", translation: "Trồng trọt, canh tác", example: "New Zealand has a good opportunity to cultivate arnica flowers and roots.", extraExample: "The indigenous tribe has been cultivating corn in these valleys for centuries." },
+        { topic: "Herbal Medicines", level: "C1", word: "Abruptly", form: "Adverb", phonetic: "/əˈbrʌptli/", forms: "Adj: Abrupt | N: Abruptness", def: "Suddenly and unexpectedly.", translation: "Một cách đột ngột", example: "The government abruptly halted funding for the research programme.", extraExample: "The meeting ended abruptly when the fire alarm started ringing." },
+        { topic: "Herbal Medicines", level: "B2", word: "Halt", form: "Verb / Noun", phonetic: "/hɔːlt/", forms: "N/A", def: "Bring or come to an abrupt stop.", translation: "Tạm dừng, ngưng lại", example: "The government abruptly halted funding for the research programme.", extraExample: "Construction on the new building was halted due to lack of funds." },
+        { topic: "Herbal Medicines", level: "C1", word: "Initiative", form: "Noun", phonetic: "/ɪˈnɪʃətɪv/", forms: "V: Initiate", def: "An act or strategy intended to resolve a difficulty or improve a situation; a fresh approach to something.", translation: "Sáng kiến, kế hoạch mới", example: "This initiative aims to improve public health using natural remedies.", extraExample: "The peace initiative was welcomed by both sides of the conflict." },
+        { topic: "Herbal Medicines", level: "C2", word: "Agronomist", form: "Noun", phonetic: "/əˈɡrɒnəmɪst/", forms: "N: Agronomy", def: "An expert in the science of soil management and crop production.", translation: "Nhà nông học", example: "It was an unjustified move, according to agronomist Malcolm Douglas.", extraExample: "The agronomist advised the farmers on how to increase their crop yield." },
+        { topic: "Herbal Medicines", level: "C1", word: "Invasion", form: "Noun", phonetic: "/ɪnˈveɪʒn/", forms: "V: Invade | Adj: Invasive", def: "An instance of invading a country or region with an armed force; an unwelcome intrusion into another's domain.", translation: "Sự xâm phạm, sự tràn ngập", example: "The market saw a massive invasion of cheap, unregulated supplements.", extraExample: "The invasion of privacy by the press was heavily criticized." },
+        { topic: "Herbal Medicines", level: "C1", word: "Rely", form: "Verb", phonetic: "/rɪˈlaɪ/", forms: "Adj: Reliable | N: Reliance", def: "Depend on with full trust or confidence.", translation: "Dựa vào, tin cậy vào", example: "Many people still rely on traditional herbal remedies for minor ailments.", extraExample: "We shouldn't rely solely on one source of income." },
+        { topic: "Herbal Medicines", level: "C2", word: "Detractor", form: "Noun", phonetic: "/dɪˈtræktə/", forms: "V: Detract", def: "A person who disparages someone or something.", translation: "Người gièm pha, người phản đối", example: "Herbal medicine has its detractors, but many still believe in its efficacy.", extraExample: "Even his detractors had to admit that he gave a brilliant speech." },
+        { topic: "Herbal Medicines", level: "C1", word: "Petition", form: "Noun / Verb", phonetic: "/pəˈtɪʃn/", forms: "N/A", def: "A formal written request, typically one signed by many people, appealing to authority with respect to a particular cause.", translation: "Bản kiến nghị", example: "They signed a petition to keep herbal medicines readily available.", extraExample: "The residents presented a petition to the local council." },
+        { topic: "Herbal Medicines", level: "C1", word: "Parliament", form: "Noun", phonetic: "/ˈpɑːləmənt/", forms: "Adj: Parliamentary", def: "The highest legislature, consisting of the sovereign, the House of Lords, and the House of Commons (in the UK).", translation: "Nghị viện, quốc hội", example: "The petition was presented to Parliament for consideration.", extraExample: "The new laws were debated in Parliament for several weeks." },
+        { topic: "Herbal Medicines", level: "C2", word: "Shun", form: "Verb", phonetic: "/ʃʌn/", forms: "N/A", def: "Persistently avoid, ignore, or reject (someone or something) through antipathy or caution.", translation: "Xa lánh, lảng tránh", example: "Herbal medicine was largely shunned by the majority of the medical profession.", extraExample: "After the scandal, the famous actor was completely shunned by the industry." },
+        { topic: "Herbal Medicines", level: "B2", word: "Revive", form: "Verb", phonetic: "/rɪˈvaɪv/", forms: "N: Revival", def: "Restore to life or consciousness; give new strength or energy to.", translation: "Hồi sinh, phục hồi", example: "There is an attempt to revive the local herbal medicine industry.", extraExample: "A cup of strong coffee helped to revive him." },
+        { topic: "Herbal Medicines", level: "C1", word: "Undermine", form: "Verb", phonetic: "/ˌʌndəˈmaɪn/", forms: "N/A", def: "Lessen the effectiveness, power, or ability of, especially gradually or insidiously.", translation: "Làm suy yếu, phá hoại dần", example: "The limited evidence was undermined by lack of interest among doctors.", extraExample: "Constant criticism will eventually undermine a child's self-confidence." },
+        { topic: "Herbal Medicines", level: "B2", word: "General practitioner", form: "Noun Phrase", phonetic: "/ˌdʒenrəl prækˈtɪʃənə/", forms: "N/A", def: "A community doctor who treats patients with minor or chronic illnesses.", translation: "Bác sĩ đa khoa", example: "There was a lack of interest among general practitioners regarding herbal medicine.", extraExample: "You should visit your general practitioner before seeing a specialist." },
+        { topic: "Herbal Medicines", level: "B2", word: "Supplement", form: "Noun / Verb", phonetic: "/ˈsʌplɪmənt/", forms: "Adj: Supplementary", def: "Something that completes or enhances something else when added to it.", translation: "Thực phẩm bổ sung", example: "Many people take vitamin supplements during the winter.", extraExample: "He uses a protein supplement to help build muscle." },
+        { topic: "Herbal Medicines", level: "C1", word: "Robust", form: "Adjective", phonetic: "/rəʊˈbʌst/", forms: "N: Robustness", def: "Strong and healthy; vigorous; able to withstand or overcome adverse conditions.", translation: "Mạnh mẽ, vững chắc", example: "Robust clinical trials show that herbal medicine is generally safe.", extraExample: "The company reported robust profits despite the ongoing economic recession." },
+        { topic: "Herbal Medicines", level: "C1", word: "Clinical trial", form: "Noun Phrase", phonetic: "/ˌklɪnɪkl ˈtraɪəl/", forms: "N/A", def: "Research studies performed in people that are aimed at evaluating a medical, surgical, or behavioral intervention.", translation: "Thử nghiệm lâm sàng", example: "Robust clinical trials are needed to prove the medicine's effectiveness.", extraExample: "The new vaccine is currently undergoing rigorous clinical trials." },
+        { topic: "Herbal Medicines", level: "B2", word: "Launch", form: "Verb / Noun", phonetic: "/lɔːntʃ/", forms: "N/A", def: "Start or set in motion (an activity or enterprise).", translation: "Ra mắt, khởi chạy", example: "The government plans to launch a new scheme to regulate herbal products.", extraExample: "The tech company will launch its new smartphone next month." },
+        { topic: "Herbal Medicines", level: "B2", word: "Remedy", form: "Noun", phonetic: "/ˈremədi/", forms: "Adj: Remedial", def: "A medicine or treatment for a disease or injury.", translation: "Phương thuốc", example: "The directive aimed to regulate traditional herbal remedies.", extraExample: "Hot tea with honey is an effective remedy for a sore throat." },
+        { topic: "Herbal Medicines", level: "B2", word: "Prescription", form: "Noun", phonetic: "/prɪˈskrɪpʃn/", forms: "V: Prescribe", def: "An instruction written by a medical practitioner that authorizes a patient to be provided a medicine or treatment.", translation: "Đơn thuốc", example: "Many of these natural products can be bought without a prescription.", extraExample: "These antibiotics are only available by prescription." },
+        { topic: "Herbal Medicines", level: "C2", word: "Prohibitively expensive", form: "Phrase", phonetic: "/prəˈhɪbɪtɪvli ɪkˈspensɪv/", forms: "N/A", def: "So expensive as to prevent people from buying it.", translation: "Đắt đỏ đến mức không thể mua được", example: "More regulation would be prohibitively expensive for all but the largest manufacturers.", extraExample: "Property prices in the city center have become prohibitively expensive for young couples." },
+        { topic: "Herbal Medicines", level: "B2", word: "Provide", form: "Verb", phonetic: "/prəˈvaɪd/", forms: "N: Provision", def: "Make available for use; supply.", translation: "Cung cấp", example: "The new legislation will provide better protection for consumers.", extraExample: "The hotel will provide fresh towels every morning." },
+        { topic: "Herbal Medicines", level: "B2", word: "Corporation", form: "Noun", phonetic: "/ˌkɔːpəˈreɪʃn/", forms: "Adj: Corporate", def: "A large company or group of companies authorized to act as a single entity and recognized as such in law.", translation: "Tập đoàn", example: "This regulation might only benefit large multinational corporations.", extraExample: "He works for a large American telecommunications corporation." },
 
-        // --- CATEGORY 3: Education & Psychology ---
-        { topic: "Education & Psychology", word: "Quest", phonetic: "/kwest/", form: "Noun", forms: "N/A", def: "A long or arduous search for something.", translation: "Sự tìm kiếm, cuộc truy tìm", example: "Studies of teachers were largely a quest for criteria of effectiveness...", extraExample: "His quest for the truth led him to uncover a massive conspiracy." },
-        { topic: "Education & Psychology", word: "Contradictory", phonetic: "/ˌkɒn.trəˈdɪk.tər.i/", form: "Adjective", forms: "N: Contradiction | V: Contradict", def: "Mutually opposed or inconsistent.", translation: "Mâu thuẫn, trái ngược", example: "Secondly, there were numerous conflicting and contradictory findings.", extraExample: "The witnesses gave contradictory accounts of the accident." },
-        { topic: "Education & Psychology", word: "Correlation", phonetic: "/ˌkɒr.əˈleɪ.ʃən/", form: "Noun", forms: "V: Correlate", def: "A mutual relationship or connection between two or more things.", translation: "Sự tương quan", example: "Rolfe, however, found no correlation between intelligence and teaching efficiency...", extraExample: "There is a strong correlation between poverty and poor academic performance." },
-        { topic: "Education & Psychology", word: "Predominantly", phonetic: "/prɪˈdɒm.ɪ.nənt.li/", form: "Adverb", forms: "Adj: Predominant | V: Predominate", def: "Mainly; for the most part.", translation: "Phần lớn, chủ yếu", example: "...asked questions which predominantly required factual recall...", extraExample: "The town's population is predominantly elderly, as many young people have moved away." },
-        { topic: "Education & Psychology", word: "Scrutiny", phonetic: "/ˈskruː.tɪ.ni/", form: "Noun", forms: "V: Scrutinize", def: "Critical observation or examination.", translation: "Sự giám sát, sự xem xét kỹ lưỡng", example: "...away from attentiveness... and towards a scrutiny of authoritarianism itself.", extraExample: "The government's new policies have come under intense public scrutiny." },
-        { topic: "Education & Psychology", word: "Momentum", phonetic: "/məˈmen.təm/", form: "Noun", forms: "N/A", def: "The impetus gained by a moving object; the driving force gained by the development of a process.", translation: "Đà, trớn, đà phát triển", example: "The movement towards what was becoming known as child-centred education was gathering momentum...", extraExample: "The campaign is really gathering momentum as more celebrities show their support." },
-        { topic: "Education & Psychology", word: "Harmoniously", phonetic: "/hɑːˈməʊ.ni.əs.li/", form: "Adverb", forms: "N: Harmony | Adj: Harmonious", def: "In a way that is free from disagreement or dissent; peacefully.", translation: "Một cách hòa hợp, hòa thuận", example: "...children's integrative acts included sharing facilities and playing harmoniously...", extraExample: "The two very different cultures have lived harmoniously in this region for centuries." },
-        { topic: "Education & Psychology", word: "Pioneering", phonetic: "/ˌpaɪəˈnɪə.rɪŋ/", form: "Adjective", forms: "N/V: Pioneer", def: "Involving new ideas or methods.", translation: "Tiên phong, đi đầu", example: "...and this important pioneering work in the development of classroom observation methodology...", extraExample: "The university is known for its pioneering research in renewable energy." },
-        { topic: "Education & Psychology", word: "Neglect", phonetic: "/nɪˈɡlekt/", form: "Noun", forms: "V: Neglect | Adj: Neglectful", def: "The state or fact of being uncared for.", translation: "Sự xao nhãng, bỏ bê", example: "...partly because of the general neglect in earlier work of the variables of actual classroom behavior...", extraExample: "The building fell into a state of ruin after years of neglect." },
-        { topic: "Education & Psychology", word: "Reliability", phonetic: "/rɪˌlaɪ.əˈbɪl.ə.ti/", form: "Noun", forms: "Adj: Reliable | V: Rely", def: "The quality of being trustworthy or of performing consistently well.", translation: "Độ tin cậy", example: "Withall also made efforts towards increasing the reliability of analyses...", extraExample: "The reliability of this brand's cars makes them very popular with families." }
+        // --- PASSAGE 3: Teaching Styles ---
+        { topic: "Teaching Styles", level: "C1", word: "Investigator", form: "Noun", phonetic: "/ɪnˈvestɪɡeɪtə/", forms: "V: Investigate | N: Investigation", def: "A person who carries out a formal inquiry or investigation.", translation: "Điều tra viên, người nghiên cứu", example: "Early investigators focused on trying to define effective teaching.", extraExample: "The lead investigator published his findings in a major journal." },
+        { topic: "Teaching Styles", level: "C1", word: "Constitute", form: "Verb", phonetic: "/ˈkɒnstɪtjuːt/", forms: "N: Constitution", def: "Be (a part) of a whole; make up.", translation: "Cấu thành, tạo thành", example: "They tried to decide what characteristics constitute an effective teacher.", extraExample: "Women constitute roughly half of the country's population." },
+        { topic: "Teaching Styles", level: "C1", word: "Correlation", form: "Noun", phonetic: "/ˌkɒrəˈleɪʃn/", forms: "V: Correlate", def: "A mutual relationship or connection between two or more things.", translation: "Sự tương quan", example: "Rolfe found no correlation between intelligence and teaching efficiency.", extraExample: "There is a strong correlation between poverty and poor academic performance." },
+        { topic: "Teaching Styles", level: "B2", word: "Underline", form: "Verb", phonetic: "/ˌʌndəˈlaɪn/", forms: "N/A", def: "Draw a line under (a word or phrase) to give emphasis or indicate special type.", translation: "Nhấn mạnh, gạch dưới", example: "This study served to underline the difficulty of defining teaching effectiveness.", extraExample: "The recent accidents underline the need for stricter safety regulations." },
+        { topic: "Teaching Styles", level: "C1", word: "Chaos", form: "Noun", phonetic: "/ˈkeɪɒs/", forms: "Adj: Chaotic", def: "Complete disorder and confusion.", translation: "Sự hỗn loạn", example: "Without proper methodology, the research results were just a mass of chaos.", extraExample: "The sudden cancellation of the trains caused absolute chaos at the station." },
+        { topic: "Teaching Styles", level: "B2", word: "Administrator", form: "Noun", phonetic: "/ədˈmɪnɪstreɪtə/", forms: "V: Administrate | N: Administration", def: "A person responsible for running a business, organization, etc.", translation: "Nhà quản trị, người quản lý", example: "The findings were confusing for school administrators trying to evaluate staff.", extraExample: "She works as a hospital administrator." },
+        { topic: "Teaching Styles", level: "B2", word: "Recall", form: "Verb / Noun", phonetic: "/rɪˈkɔːl/", forms: "N/A", def: "Bring (a fact, event, or situation) back into one's mind; remember.", translation: "Nhớ lại, hồi tưởng", example: "Teachers predominantly asked questions which required factual recall.", extraExample: "I can clearly recall the day we first met." },
+        { topic: "Teaching Styles", level: "C1", word: "Attentiveness", form: "Noun", phonetic: "/əˈtentɪvnəs/", forms: "Adj: Attentive", def: "The action of paying close attention to something.", translation: "Sự chăm chú, sự chú ý", example: "The research shifted away from measuring student attentiveness.", extraExample: "Her lack of attentiveness in class led to poor test results." },
+        { topic: "Teaching Styles", level: "B2", word: "Technique", form: "Noun", phonetic: "/tekˈniːk/", forms: "Adj: Technical", def: "A way of carrying out a particular task, especially the execution or performance of an artistic work or a scientific procedure.", translation: "Kỹ thuật, phương pháp", example: "The study looked at different teaching techniques used in classrooms.", extraExample: "The chef demonstrated his special technique for chopping vegetables." },
+        { topic: "Teaching Styles", level: "B2", word: "Employ", form: "Verb", phonetic: "/ɪmˈplɔɪ/", forms: "N: Employment", def: "Make use of.", translation: "Sử dụng, áp dụng", example: "Researchers recorded the kinds of statements teachers employed in the classroom.", extraExample: "The author employs a very unique style of writing." },
+        { topic: "Teaching Styles", level: "C1", word: "Competence", form: "Noun", phonetic: "/ˈkɒmpɪtəns/", forms: "Adj: Competent", def: "The ability to do something successfully or efficiently.", translation: "Năng lực, khả năng", example: "They focused on the overall competence of the teachers.", extraExample: "The company doubts his competence to handle such a large project." },
+        { topic: "Teaching Styles", level: "C1", word: "Superior", form: "Adjective", phonetic: "/suːˈpɪəriə/", forms: "N: Superiority", def: "Higher in rank, status, or quality.", translation: "Vượt trội, ưu việt hơn", example: "The democratic style produced results that were superior in many ways.", extraExample: "This model is vastly superior to its predecessor." },
+        { topic: "Teaching Styles", level: "C1", word: "Inferior", form: "Adjective", phonetic: "/ɪnˈfɪəriə/", forms: "N: Inferiority", def: "Lower in rank, status, or quality.", translation: "Thua kém, thấp kém hơn", example: "The authoritarian approach yielded inferior long-term learning outcomes.", extraExample: "He always felt inferior to his older, more successful brother." },
+        { topic: "Teaching Styles", level: "C1", word: "Regime", form: "Noun", phonetic: "/reɪˈʒiːm/", forms: "N/A", def: "A system or ordered way of doing things.", translation: "Chế độ, chế độ quản lý", example: "Under a democratic regime, the children behaved better.", extraExample: "The new management regime introduced stricter working hours." },
+        { topic: "Teaching Styles", level: "B2", word: "Democracy", form: "Noun", phonetic: "/dɪˈmɒkrəsi/", forms: "Adj: Democratic", def: "A system of government by the whole population or all the eligible members of a state.", translation: "Nền dân chủ", example: "Lewin experimented with three groups using autocracy, democracy, and laissez-faire.", extraExample: "Freedom of speech is a fundamental pillar of any democracy." },
+        { topic: "Teaching Styles", level: "C1", word: "Dictatorship", form: "Noun", phonetic: "/ˌdɪkˈteɪtəʃɪp/", forms: "N: Dictator", def: "Government by a dictator; absolute authority in any sphere.", translation: "Chế độ độc tài", example: "He compared the classroom environment to a form of dictatorship.", extraExample: "The country suffered for decades under a brutal dictatorship." },
+        { topic: "Teaching Styles", level: "C2", word: "Authoritarianism", form: "Noun", phonetic: "/ɔːˌθɒrɪˈteəriənɪzəm/", forms: "Adj: Authoritarian", def: "The enforcement or advocacy of strict obedience to authority at the expense of personal freedom.", translation: "Chủ nghĩa độc đoán", example: "The focus shifted towards a scrutiny of authoritarianism itself.", extraExample: "The new laws were criticized for reflecting a shift towards authoritarianism." },
+        { topic: "Teaching Styles", level: "C1", word: "Integration", form: "Noun", phonetic: "/ˌɪntɪˈɡreɪʃn/", forms: "V: Integrate", def: "The action or process of integrating.", translation: "Sự hội nhập, tích hợp", example: "Anderson studied the integration of children in the classroom.", extraExample: "The successful integration of the two databases is critical." },
+        { topic: "Teaching Styles", level: "C2", word: "In earnest", form: "Idiom", phonetic: "/ɪn ˈɜːnɪst/", forms: "N/A", def: "Occurring to a greater extent or more intensely than before.", translation: "Thực sự, nghiêm túc", example: "Research into classroom interactions began in earnest in the 1930s.", extraExample: "The search for the missing hikers will begin in earnest at dawn." },
+        { topic: "Teaching Styles", level: "C1", word: "Snatch", form: "Verb", phonetic: "/snætʃ/", forms: "N/A", def: "Quickly seize (something) in a rude or eager way.", translation: "Giật, vồ lấy", example: "Children's dominative acts included snatching toys from each other.", extraExample: "The thief snatched the bag from her hands and ran away." },
+        { topic: "Teaching Styles", level: "C1", word: "Harmonious", form: "Adjective", phonetic: "/hɑːˈməʊniəs/", forms: "N: Harmony | Adv: Harmoniously", def: "Free from disagreement or dissent.", translation: "Hòa hợp, hài hòa", example: "Integrative acts involved children playing together in a harmonious way.", extraExample: "The two very different cultures have lived in harmonious existence for centuries." },
+        { topic: "Teaching Styles", level: "C1", word: "Methodology", form: "Noun", phonetic: "/ˌmeθəˈdɒlədʒi/", forms: "Adj: Methodological", def: "A system of methods used in a particular area of study or activity.", translation: "Phương pháp luận", example: "This was pioneering work in the development of classroom observation methodology.", extraExample: "The researchers had to carefully explain their methodology in the report." },
+        { topic: "Teaching Styles", level: "C1", word: "Variable", form: "Noun / Adjective", phonetic: "/ˈveəriəbl/", forms: "V: Vary | N: Variance", def: "An element, feature, or factor that is liable to vary or change.", translation: "Biến số / có thể thay đổi", example: "Earlier work neglected the variables of actual classroom behavior.", extraExample: "Temperature is a crucial variable in this scientific experiment." }
     ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            if (matchTopic && matchLevel) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
 
     // --- DOM Injection ---
     function renderGrid() {
@@ -220,11 +303,13 @@
             const article = document.createElement('article');
             article.className = 'vocab-card';
             article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
             
             article.innerHTML = `
                 <div class="word-header">
                     <div class="word-main">
                         <span class="word">${item.word}</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
                         <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
                     </div>
                     <div class="meta-info">
@@ -269,28 +354,6 @@
         playAudio(word);
     }
 
-    // --- Topic Filtering ---
-    function filterTopic(topicName) {
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-
-        const allCards = document.querySelectorAll('.vocab-card');
-        allCards.forEach(card => {
-            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
-        });
-
-        if(document.getElementById('flashcard-view').style.display === 'flex') {
-             extractDataFromGrid(topicName);
-             currentCardIndex = 0;
-             updateFlashcardUI();
-        }
-    }
-
     // --- View Toggling ---
     function switchView(viewName) {
         const gridView = document.getElementById('grid-view');
@@ -309,13 +372,7 @@
             btnFlashcards.classList.add('active');
             btnGrid.classList.remove('active');
             
-            const activeFilter = document.querySelector('.filter-btn.active').textContent;
-            let topicName = 'all';
-            if (activeFilter.includes('Literature')) topicName = 'Literature & Biographies';
-            if (activeFilter.includes('Science')) topicName = 'Science & Medicine';
-            if (activeFilter.includes('Education')) topicName = 'Education & Psychology';
-            
-            extractDataFromGrid(topicName);
+            extractDataFromGrid();
             currentCardIndex = 0;
             updateFlashcardUI();
         }
@@ -326,32 +383,48 @@
     let currentCardIndex = 0;
     const flashcardScene = document.getElementById('flashcard-scene');
 
-    function extractDataFromGrid(topicName = 'all') {
+    function extractDataFromGrid() {
         flashcardData = [];
         vocabBank.forEach(item => {
-            if (topicName === 'all' || item.topic === topicName) {
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            if (matchTopic && matchLevel) {
                 flashcardData.push(item);
             }
         });
     }
 
     function updateFlashcardUI() {
-        if (flashcardData.length === 0) return;
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
         const data = flashcardData[currentCardIndex];
-        
         flashcardScene.classList.remove('is-flipped');
         
         setTimeout(() => {
             document.getElementById('fc-word').textContent = data.word;
-            document.getElementById('fc-phonetic').textContent = data.phonetic;
-            document.getElementById('fc-topic').textContent = data.topic;
             
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
             document.getElementById('fc-definition').textContent = data.def;
             document.getElementById('fc-translation').textContent = data.translation;
             
             const examplesHTML = `
-                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
-                    <strong style="color: #312e81;">Word Forms:</strong> ${data.forms}
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #a5b4fc; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #312e81;">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: #312e81;">Word Forms:</strong> ${data.forms}
                 </div>
                 <div class="example-box" style="margin-bottom: 0.5rem; background-color: #e0e7ff; padding: 1rem; border-left: 4px solid #312e81; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
                     <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #312e81; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
