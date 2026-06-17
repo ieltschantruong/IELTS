@@ -29,7 +29,7 @@
         .explanation-box {
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
         }
-        .explanation-box.open { max-height: 500px; opacity: 1; margin-top: 0.5rem; }
+        .explanation-box.open { max-height: 1200px; opacity: 1; margin-top: 0.5rem; }
 
         /* Tooltip */
         #vocab-tooltip {
@@ -1315,6 +1315,7 @@
                                 }
 
                                 const expBtn = document.createElement('button');
+                                expBtn.type = 'button';
                                 expBtn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-100 transition-colors';
                                 expBtn.innerHTML = `
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -1427,6 +1428,7 @@
                             if (state.mode === 'RESULT') {
                                 if (opt.isCorrect || isSelected) {
                                     const expBtn = document.createElement('button');
+                                    expBtn.type = 'button';
                                     expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
                                     expBtn.innerHTML = `
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -1524,6 +1526,7 @@
                             
                             q.blanks.forEach(blank => {
                                 const btn = document.createElement('button');
+                                btn.type = 'button';
                                 btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
                                 btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p1_q','').replace('p2_q','').replace('p3_q','')}`;
                                 
@@ -1616,6 +1619,7 @@
                             
                             q.blanks.forEach(blank => {
                                 const btn = document.createElement('button');
+                                btn.type = 'button';
                                 btn.className = 'text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-pink-50 px-4 py-2 rounded-xl border border-pink-100 transition-colors w-full text-left';
                                 btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> View Explanation for Question ${blank.id.replace('p3_q','')}`;
                                 
@@ -1719,6 +1723,7 @@
 
                                 if (state.mode === 'RESULT' && (opt.isCorrect || state.answers[q.id] === opt.id)) {
                                     const expBtn = document.createElement('button');
+                                    expBtn.type = 'button';
                                     expBtn.className = 'mt-3 text-sm text-pink-600 hover:text-pink-800 font-bold flex items-center gap-1.5 focus:outline-none bg-white px-3 py-1.5 rounded-lg border border-pink-100 transition-colors shadow-sm';
                                     expBtn.innerHTML = `
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -1902,7 +1907,7 @@
                     } else if (q.displayType !== 'instruction') {
                         const userAns = state.answers[q.id];
                         const correctOpt = q.options.find(o => o.isCorrect);
-                        if (userAns === correctOpt.id) correctCount++;
+                        if (correctOpt && userAns === correctOpt.id) correctCount++;
                     }
                 });
             });
@@ -1922,8 +1927,20 @@
 
             updateNavigator();
 
+            // Clear ONLY cachedQuestions so explanations render, but keep cachedPassages to preserve user highlights
+            cachedQuestions = {};
+            
+            // Make sure vocab words in all existing cached passages become clickable
+            Object.values(cachedPassages).forEach(pane => {
+                pane.querySelectorAll('.vocab-word').forEach(word => {
+                    if (!word.classList.contains('mode-result')) {
+                        word.classList.add('mode-result');
+                        word.addEventListener('click', handleVocabClick);
+                    }
+                });
+            });
+
             // Reload current part to show explanation UI
-            state._forceRebuild = true;
             state._preventScrollReset = true;
             loadPart(state.currentPart);
             state._preventScrollReset = false;
