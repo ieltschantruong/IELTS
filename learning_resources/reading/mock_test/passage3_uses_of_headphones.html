@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   // Very light blush
+                            100: '#fce8eb',  // Pale pink
+                            200: '#f7cdd5',  // Pastel pink
+                            300: '#f0a8b6',  // Soft pink
+                            400: '#e67c91',  // Muted dark pink
+                            500: '#d75872',  // Primary elegant pink (pastel/dusty rose)
+                            600: '#bf3f58',  // Deeper elegant pink
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Custom Radio Button styling for MCQs */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-label-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+            pointer-events: none;
+        }
+        #toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        <div id="left-pane" class="w-1/2 h-full overflow-y-auto bg-white border-r border-gray-200 p-8 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Some views on the use of headphones</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">Whether wearing headphones at work, or in other areas of everyday life, is a good thing or a bad thing has generated a lot of research and opinion</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[17px] text-justify space-y-6">
+                    <p>To visit a typical modern office today is to walk into a room with possibly a dozen songs playing simultaneously but to hear none of them. Up to half of younger workers listen to music on their headphones, and nearly all of them think it makes them better at their jobs. In survey after survey, people report with confidence that music makes them happier, better at concentrating, and more productive.</p>
+
+                    <p>Scientists do not share this belief; they maintain that listening to music hurts people's ability to recall other things they should be doing, and any pop song, loud or soft, reduces overall performance for both extroverts and introverts. <span id="exp-q28" class="explanation-target">A Taiwanese study linked music that has lyrics to lower marks on concentration tests for college students, and other research has shown music with lyrics scrambles our brains' verbal-processing skills. "As silence has the best overall performance, it would still be advisable that people work in silence," another reporter dryly concluded.</span></p>
+
+                    <p>The question is therefore: if headphones are so bad for productivity, why do so many people at work have them? One factor to consider is that countries like the USA have moved from a farming and manufacturing economy to a service economy, with an emphasis on <span id="exp-q32" class="explanation-target">jobs in offices that require higher levels of concentration, reflection and creativity</span>. As an estimated 70 percent of office workers work in open-plan office spaces, it is more important to create one's own enclosing bubble of sound. Lending strength to the argument for headphones at work is evidence that music relaxes our muscles, improves our mood, and may even moderately reduce blood pressure, heart rate and anxiety.</p>
+
+                    <p>The story of headphones began in 1910, when the US Navy received an odd letter written in purple ink on blue-and-pink paper. The letter writer, <span id="exp-q30" class="explanation-target">an eccentric inventor and repairman named Nathaniel Baldwin</span>, from the US state of Utah, made what at the time was an astonishing claim: he had built, in his kitchen, a new kind of headset that could amplify sound. This was an opportune invention for the Navy, which asked for a sound test and then enthusiastically adopted the headsets, later called headphones, and used them in World War I for naval radio communication.</p>
+
+                    <p>The purpose of headphones is to concentrate a quiet and private sound in the ear of the listener, which is a radical departure from music's social purpose in history. "<span id="exp-q33" class="explanation-target">Music, together with dance, co-evolved biologically and culturally to serve as a technology of social bonding</span>," Nils L. Wallin and Björn Merker wrote in The Origins of Music. Songs don't leave behind bones, but evidence of musical notation dates back to Sumeria, 3,500 years ago, and in 1995 archaeologists discovered a bone flute in southern Europe estimated to be 44,000 years old. <span id="exp-q34" class="explanation-target"><span id="exp-q31" class="explanation-target">If music evolved as a social glue for the species, as a way to make groups and keep them together, headphones have done what writing and literacy did for language – they made music private.</span></span></p>
+
+                    <p>Author and columnist Stephen Marche wrote that separation from other people is one of the first things ordinary Americans spend their money achieving. It is "a by-product of a long-standing national appetite for independence," he said. Americans are not alone in their desire for personal independence and privacy. Marche is right; <span id="exp-q35" class="explanation-target">wealth can buy – and modern technology can deliver – personal independence</span>, and it is this that people have always sought.</p>
+
+                    <p>Dr Michael Bull, an expert on personal music devices from the University of Sussex in the UK, has repeatedly made the larger point that personal music devices <span id="exp-q37" class="explanation-target">change how we relate to public spaces</span>. Controlling our public spaces is more important now that more people are <span id="exp-q38" class="explanation-target">moving from the edges of cities to live in urban centres</span>. "With the urban space, the more it's inhabited, the safer you feel," Bull says. "You feel safe if you can feel people there, but you don't want to interact with them." <span id="exp-q39" class="explanation-target">Headphones create shields for wearers</span>, separating them from other people and their surroundings. Headphones have their own rules of good manners; they are like wearing a "Do not disturb" sign. <span id="exp-q40" class="explanation-target">We assume that people wearing them are busy and we should respect their privacy</span>, so now people wear them to appear busy. In fact, it is now becoming quite common for people not to listen to anything at all, but just to wear headphones.</p>
+
+                    <p>However, as pointed out at the beginning of this piece, although scientists have stated that headphones are bad for productivity, people still wear them at work. It is not just that headphones create privacy out of public areas, but also that music causes people to relax and reflect and pause. The outcome of relaxation, reflection and pausing at work won't be captured in minute-to-minute productivity metrics. What must be considered is that in moments of extreme focus, our attention radiates outward, toward the problem, rather than inward, on how to solve the problem. <span id="exp-q36" class="explanation-target">However, with music "When our minds are at ease, we're more likely to direct the spotlight of attention inward," Jonah Lehrer wrote in his book Imagine: How Creativity Works. "The answers have been there all along. We just weren't listening."</span> In a crowded world, real estate is the ultimate scarce resource, and a headphone is a small invisible fence around our minds – making space, creating separation, and helping us listen to ourselves.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-1/2 h-full overflow-y-auto bg-gray-50 p-8 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Hidden initially) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-8 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-3xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-5">
+                        <span class="text-6xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-2xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-gray-700 mb-4 bg-brand-50 p-4 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: YES/NO/NOT GIVEN -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-5 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg">Questions 27-31</h3>
+                        <p class="text-sm text-gray-800 mb-2">Do the following statements agree with the claims of the writer in Reading Passage 3?</p>
+                        <ul class="text-sm text-gray-700 font-medium space-y-1 list-none ml-2">
+                            <li><strong class="text-brand-700">YES</strong> if the statement agrees with the claims of the writer</li>
+                            <li><strong class="text-brand-700">NO</strong> if the statement contradicts the claims of the writer</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Q27 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="27">
+                            <div class="flex gap-3 mb-1">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">27</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">Young people are easily persuaded by surveys that listening to music is beneficial.</p>
+                            </div>
+                            <div class="ml-10 flex flex-wrap gap-3 text-sm text-gray-700 font-medium">
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q27" value="YES" onchange="updateAnswer(27, this.value)"> YES
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q27" value="NO" onchange="updateAnswer(27, this.value)"> NO
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q27" value="NOT GIVEN" onchange="updateAnswer(27, this.value)"> NOT GIVEN
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q27'], true)">View Explanation</button>
+                        </div>
+
+                        <!-- Q28 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="28">
+                            <div class="flex gap-3 mb-1">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">28</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">Different studies share the same conclusions about the desirability of working in silence.</p>
+                            </div>
+                            <div class="ml-10 flex flex-wrap gap-3 text-sm text-gray-700 font-medium">
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q28" value="YES" onchange="updateAnswer(28, this.value)"> YES
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q28" value="NO" onchange="updateAnswer(28, this.value)"> NO
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q28" value="NOT GIVEN" onchange="updateAnswer(28, this.value)"> NOT GIVEN
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q28'])">View Explanation</button>
+                        </div>
+
+                        <!-- Q29 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="29">
+                            <div class="flex gap-3 mb-1">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">29</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">Some doctors recommend wearing headphones to lower blood pressure.</p>
+                            </div>
+                            <div class="ml-10 flex flex-wrap gap-3 text-sm text-gray-700 font-medium">
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q29" value="YES" onchange="updateAnswer(29, this.value)"> YES
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q29" value="NO" onchange="updateAnswer(29, this.value)"> NO
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q29" value="NOT GIVEN" onchange="updateAnswer(29, this.value)"> NOT GIVEN
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q29'], true)">View Explanation</button>
+                        </div>
+
+                        <!-- Q30 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="30">
+                            <div class="flex gap-3 mb-1">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">30</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">Nathaniel Baldwin was a respected government researcher.</p>
+                            </div>
+                            <div class="ml-10 flex flex-wrap gap-3 text-sm text-gray-700 font-medium">
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q30" value="YES" onchange="updateAnswer(30, this.value)"> YES
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q30" value="NO" onchange="updateAnswer(30, this.value)"> NO
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q30" value="NOT GIVEN" onchange="updateAnswer(30, this.value)"> NOT GIVEN
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q30'])">View Explanation</button>
+                        </div>
+
+                        <!-- Q31 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="31">
+                            <div class="flex gap-3 mb-1">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">31</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">The effect of the invention of headphones is comparable to the effect of the invention of writing.</p>
+                            </div>
+                            <div class="ml-10 flex flex-wrap gap-3 text-sm text-gray-700 font-medium">
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q31" value="YES" onchange="updateAnswer(31, this.value)"> YES
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q31" value="NO" onchange="updateAnswer(31, this.value)"> NO
+                                </label>
+                                <label class="radio-label-wrapper flex-1 min-w-[100px] flex items-center justify-center gap-2 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q31" value="NOT GIVEN" onchange="updateAnswer(31, this.value)"> NOT GIVEN
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q31'])">View Explanation</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-5 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg">Questions 32-36</h3>
+                        <p class="text-sm text-gray-800">Choose the correct letter, <strong>A, B, C or D</strong>.</p>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <!-- Q32 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="32">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">32</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">What does the writer suggest about a service economy?</p>
+                            </div>
+                            <div class="ml-10 space-y-2 text-sm text-gray-700 font-medium flex flex-col">
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q32" value="A" onchange="updateAnswer(32, this.value)" class="mt-0.5"> A. The work is mentally demanding
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q32" value="B" onchange="updateAnswer(32, this.value)" class="mt-0.5"> B. It provides employment for younger workers
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q32" value="C" onchange="updateAnswer(32, this.value)" class="mt-0.5"> C. It is a small part of a country's economy
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q32" value="D" onchange="updateAnswer(32, this.value)" class="mt-0.5"> D. Workers have to live in urban centres
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q32'])">View Explanation</button>
+                        </div>
+
+                        <!-- Q33 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="33">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">33</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">When the writer mentions the historical evidence for early music, he is</p>
+                            </div>
+                            <div class="ml-10 space-y-2 text-sm text-gray-700 font-medium flex flex-col">
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q33" value="A" onchange="updateAnswer(33, this.value)" class="mt-0.5"> A. emphasizing the diversity of musical forms
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q33" value="B" onchange="updateAnswer(33, this.value)" class="mt-0.5"> B. expressing his frustration with the limited archaeological evidence uncovered
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q33" value="C" onchange="updateAnswer(33, this.value)" class="mt-0.5"> C. lending support to the view that music has been important in human history
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q33" value="D" onchange="updateAnswer(33, this.value)" class="mt-0.5"> D. creating a geographical map of the evolution of music
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q33'])">View Explanation</button>
+                        </div>
+
+                        <!-- Q34 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="34">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">34</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">What does the writer say about the social effects of listening to music through headphones?</p>
+                            </div>
+                            <div class="ml-10 space-y-2 text-sm text-gray-700 font-medium flex flex-col">
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q34" value="A" onchange="updateAnswer(34, this.value)" class="mt-0.5"> A. It has caused a reduction in the number of people who listen to music
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q34" value="B" onchange="updateAnswer(34, this.value)" class="mt-0.5"> B. It has increased people's participation in music events
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q34" value="C" onchange="updateAnswer(34, this.value)" class="mt-0.5"> C. It has reduced the global variation of music styles
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q34" value="D" onchange="updateAnswer(34, this.value)" class="mt-0.5"> D. It has changed the traditional role of music in society
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q34'])">View Explanation</button>
+                        </div>
+
+                        <!-- Q35 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="35">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">35</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">What does the writer say about personal independence?</p>
+                            </div>
+                            <div class="ml-10 space-y-2 text-sm text-gray-700 font-medium flex flex-col">
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q35" value="A" onchange="updateAnswer(35, this.value)" class="mt-0.5"> A. Americans are unique in their desire for personal independence
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q35" value="B" onchange="updateAnswer(35, this.value)" class="mt-0.5"> B. Personal independence is something that can be purchased
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q35" value="C" onchange="updateAnswer(35, this.value)" class="mt-0.5"> C. Striving for personal independence is a recent phenomenon
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q35" value="D" onchange="updateAnswer(35, this.value)" class="mt-0.5"> D. Personal independence destroys social connections
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q35'])">View Explanation</button>
+                        </div>
+
+                        <!-- Q36 -->
+                        <div class="q-row flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="36">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-7 h-7 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm shadow-sm mt-0.5">36</span>
+                                <p class="text-gray-800 font-medium text-sm leading-relaxed mt-1">Why does the writer quote Jonah Lehrer in the last paragraph?</p>
+                            </div>
+                            <div class="ml-10 space-y-2 text-sm text-gray-700 font-medium flex flex-col">
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q36" value="A" onchange="updateAnswer(36, this.value)" class="mt-0.5"> A. To support the writer's own view
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q36" value="B" onchange="updateAnswer(36, this.value)" class="mt-0.5"> B. To draw attention to an authoritative book about music
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q36" value="C" onchange="updateAnswer(36, this.value)" class="mt-0.5"> C. To raise awareness of people's loss of listening skills
+                                </label>
+                                <label class="radio-label-wrapper flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="q36" value="D" onchange="updateAnswer(36, this.value)" class="mt-0.5"> D. To illustrate how music brings people closer to each other
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden self-end mt-2 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q36'])">View Explanation</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-5 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg">Questions 37-40</h3>
+                        <p class="text-sm text-gray-800 mb-2">Complete the summary using the list of words, A-I, below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2">Drag and drop, or click a word from the bank below, then click a dashed box to apply it. Click a filled box to clear.</p>
+                        
+                        <!-- Word Bank -->
+                        <div class="bg-white p-4 rounded-lg border border-brand-200 shadow-sm mt-4">
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 text-sm text-gray-700 font-medium">
+                                <div draggable="true" data-type="word" data-val="A" data-display="A. courtesy" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">A</span> courtesy
+                                </div>
+                                <div draggable="true" data-type="word" data-val="B" data-display="B. relationship" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">B</span> relationship
+                                </div>
+                                <div draggable="true" data-type="word" data-val="C" data-display="C. difficulty" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">C</span> difficulty
+                                </div>
+                                <div draggable="true" data-type="word" data-val="D" data-display="D. countryside" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">D</span> countryside
+                                </div>
+                                <div draggable="true" data-type="word" data-val="E" data-display="E. suburbs" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">E</span> suburbs
+                                </div>
+                                <div draggable="true" data-type="word" data-val="F" data-display="F. language" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">F</span> language
+                                </div>
+                                <div draggable="true" data-type="word" data-val="G" data-display="G. barriers" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">G</span> barriers
+                                </div>
+                                <div draggable="true" data-type="word" data-val="H" data-display="H. obstacles" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">H</span> obstacles
+                                </div>
+                                <div draggable="true" data-type="word" data-val="I" data-display="I. disapproval" class="draggable-word flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                    <span class="font-bold text-brand-600 bg-brand-50 px-2 rounded">I</span> disapproval
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-gray-800 leading-loose text-justify text-[15px]">
+                        <h4 class="font-bold mb-4 text-center">Headphones and city living</h4>
+                        <p>
+                            Dr Michael Bull believes that listening to music through headphones has changed the 
+                            <span class="inline-flex items-center mx-1 gap-1 q-row flex-col" data-q="37">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-sm bg-gray-200 w-5 h-5 flex items-center justify-center rounded-full">37</strong>
+                                    <span class="drop-zone min-w-[3rem] px-2 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 text-sm transition-all duration-200 cursor-pointer" data-type="word" data-q="37"></span>
+                                </span>
+                                <button class="exp-btn hidden mt-1 text-[10px] text-brand-600 font-bold bg-brand-50 px-2 py-1 rounded border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" onclick="showExplanation(['exp-q37'])">Explanation</button>
+                            </span> 
+                            the wearers of headphones have with public spaces. Living in the centre of cities is becoming popular, as people become less keen on living in the 
+                            <span class="inline-flex items-center mx-1 gap-1 q-row flex-col" data-q="38">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-sm bg-gray-200 w-5 h-5 flex items-center justify-center rounded-full">38</strong>
+                                    <span class="drop-zone min-w-[3rem] px-2 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 text-sm transition-all duration-200 cursor-pointer" data-type="word" data-q="38"></span>
+                                </span>
+                                <button class="exp-btn hidden mt-1 text-[10px] text-brand-600 font-bold bg-brand-50 px-2 py-1 rounded border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" onclick="showExplanation(['exp-q38'])">Explanation</button>
+                            </span>.
+                            In densely populated city centres, headphones form 
+                            <span class="inline-flex items-center mx-1 gap-1 q-row flex-col" data-q="39">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-sm bg-gray-200 w-5 h-5 flex items-center justify-center rounded-full">39</strong>
+                                    <span class="drop-zone min-w-[3rem] px-2 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 text-sm transition-all duration-200 cursor-pointer" data-type="word" data-q="39"></span>
+                                </span>
+                                <button class="exp-btn hidden mt-1 text-[10px] text-brand-600 font-bold bg-brand-50 px-2 py-1 rounded border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" onclick="showExplanation(['exp-q39'])">Explanation</button>
+                            </span>
+                            that isolate people from fellow citizens and from their environment. Wearers of headphones are treated with 
+                            <span class="inline-flex items-center mx-1 gap-1 q-row flex-col" data-q="40">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-sm bg-gray-200 w-5 h-5 flex items-center justify-center rounded-full">40</strong>
+                                    <span class="drop-zone min-w-[3rem] px-2 h-8 border-2 border-dashed border-gray-400 bg-gray-100 rounded inline-flex items-center justify-center font-bold text-brand-700 text-sm transition-all duration-200 cursor-pointer" data-type="word" data-q="40"></span>
+                                </span>
+                                <button class="exp-btn hidden mt-1 text-[10px] text-brand-600 font-bold bg-brand-50 px-2 py-1 rounded border border-brand-200 hover:bg-brand-100 transition-colors whitespace-nowrap" onclick="showExplanation(['exp-q40'])">Explanation</button>
+                            </span>
+                            that other people do not receive. This is because if we see someone wearing headphones, we believe they must be occupied in some way and should not be interrupted.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Toast Notification for NOT GIVEN -->
+    <div id="toast-notification" class="bg-gray-800 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 max-w-md border border-gray-700">
+        <div class="bg-gray-700 p-2 rounded-full text-yellow-400 shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div>
+            <h4 class="font-bold text-sm">Explanation (NOT GIVEN)</h4>
+            <p class="text-xs text-gray-300 mt-1">There is no specific text in the passage that supports or contradicts this statement. The writer does not provide information about this.</p>
+        </div>
+    </div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            27: "NOT GIVEN", 28: "YES", 29: "NOT GIVEN", 30: "NO", 31: "YES", // YES/NO/NOT GIVEN
+            32: "A", 33: "C", 34: "D", 35: "B", 36: "A", // Multiple Choice
+            37: "B", 38: "E", 39: "G", 40: "A" // Summary Completion
+        };
+
+        const DRAG_DISPLAYS = {
+            "A": "A. courtesy",
+            "B": "B. relationship",
+            "C": "C. difficulty",
+            "D": "D. countryside",
+            "E": "E. suburbs",
+            "F": "F. language",
+            "G": "G. barriers",
+            "H": "H. obstacles",
+            "I": "I. disapproval"
+        };
+
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+        let toastTimeout;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=27; i<=40; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    const el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateAnswer(qNum, value) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = value.trim();
+            updateMapStatus(qNum, value && value.trim() !== '');
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) { // 5 mins warning
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            let score = 0;
+            
+            // Disable Inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            // Disable Drag and Drop
+            document.querySelectorAll('.draggable-word').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing', 'hover:bg-brand-50', 'hover:border-brand-400', 'hover:text-brand-700');
+                el.classList.add('cursor-default', 'opacity-50');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => {
+                el.classList.remove('cursor-pointer');
+                el.style.pointerEvents = 'none';
+            });
+
+            // Evaluate and Annotate (27 to 40)
+            for(let i=27; i<=40; i++) {
+                let uAnsRaw = userAnswers[i] || '';
+                let uAns = uAnsRaw.trim();
+                let displayKey = ANSWER_KEYS[i];
+                let isCorrect = (uAns === displayKey); 
+
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const mapBox = document.getElementById(`map-q${i}`);
+                
+                // Show Explanation Buttons
+                const expBtn = qRow.querySelector('.exp-btn');
+                if(expBtn) expBtn.classList.remove('hidden');
+
+                // Map Box UI
+                mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+
+                if(uAnsRaw === '') { // Blank
+                    mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if(isCorrect) { // Correct
+                    score++;
+                    mapBox.classList.add('bg-green-500', 'border-green-600');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else { // Incorrect
+                    mapBox.classList.add('bg-red-500', 'border-red-600');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+
+                // Append Correct Answer Badge
+                const correctMarker = document.createElement('div');
+                correctMarker.className = `text-sm text-green-800 font-bold bg-green-100 py-2 px-4 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+                
+                let displayFormat = displayKey;
+                if(i >= 37 && i <= 40) displayFormat = DRAG_DISPLAYS[displayKey] || displayKey;
+                
+                correctMarker.innerHTML = `<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct Answer: ${displayFormat}`;
+                qRow.appendChild(correctMarker);
+
+                // Highlight chosen incorrect radio explicitly for Radio-based questions
+                if(i >= 27 && i <= 36) {
+                    if (!isCorrect && uAns !== '') {
+                        const wrongRadio = qRow.querySelector(`input[value="${uAnsRaw}"]`);
+                        if(wrongRadio) wrongRadio.parentElement.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                    }
+                    const correctRadio = qRow.querySelector(`input[value="${displayKey}"]`);
+                    if(correctRadio) correctRadio.parentElement.classList.add('bg-green-100', 'border-green-400', 'font-bold', 'text-green-900');
+                }
+            }
+
+            // Update UI State
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            // Scroll to top of results
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        // Custom Highlighting Feature for Students
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    // Ensure selection is within the passage text
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast-notification');
+            clearTimeout(toastTimeout);
+            toast.classList.add('show');
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        function showExplanation(targetIds, isNotGiven = false) {
+            // Remove previous active highlights
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (isNotGiven) {
+                showToast();
+                return;
+            }
+
+            if (targetIds && targetIds.length > 0) {
+                // Highlight and scroll to the first target
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                // Apply highlight class to all targets associated with the question
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.classList.add('active-explanation');
+                    }
+                });
+            }
+        }
+
+        // Drag and Drop & Click-to-Apply Logic
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-word');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-word') && !e.target.closest('.drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => {
+                    e.preventDefault(); 
+                    if (zone.style.pointerEvents !== 'none') {
+                        zone.classList.add('ring-4', 'ring-brand-300');
+                    }
+                });
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault(); 
+                    if (zone.style.pointerEvents !== 'none') {
+                        zone.classList.add('ring-4', 'ring-brand-300');
+                    }
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                    if (zone.style.pointerEvents === 'none') return;
+
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        
+                        if (data.type === zone.dataset.type) {
+                            zone.textContent = data.display;
+                            zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            
+                            const qNum = zone.dataset.q;
+                            updateAnswer(qNum, data.val);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (zone.style.pointerEvents === 'none') return;
+
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            zone.textContent = activeSelection.display;
+                            zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            
+                            const qNum = zone.dataset.q;
+                            updateAnswer(qNum, activeSelection.val);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        if (zone.textContent) {
+                            zone.textContent = '';
+                            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            
+                            const qNum = zone.dataset.q;
+                            updateAnswer(qNum, '');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Start App
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
