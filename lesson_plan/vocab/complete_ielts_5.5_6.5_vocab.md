@@ -1,0 +1,673 @@
+# Unit 1: Starting Somewhere new
+## Reading
+ - conduct (v)
+ - resent (v)
+ - reckon
+ - adapt
+ - seek
+ - perceive
+ - orient
+ - reject
+ - interpret
+ - inevitable
+ - adequate
+ - mistaken
+ - initial
+ - critical
+ - intrigued
+ - accustomed to
+ - irritable
+ - withdrawn
+ - subtle
+ - circumstance
+ - expatriate (n)
+ - immigrant (n)
+ - soldier
+ - refugee
+ - adopter
+ - overseas
+ - communual
+ - exponential
+ - relevant
+ - recognize
+ - overlook
+ - offer
+ - phenomenon
+ - mobility
+ - come down to a clash (n)
+ - think outside the box
+ - a good deal of
+
+## Speaking
+ - currently
+ - professional
+ - aspire to do something
+ - qualified
+ - make up one's mind to do st
+ - pursue
+ - have a knack for
+ - stressful
+ - demanding
+ - meticulousness
+ - have a burning passion for st
+ - recreational
+ - recharge
+ - wander off the beaten track
+ - discerning
+ - savor local delicacies
+ - travel on a limited budget
+ - yearn
+ - accommodation
+ - single-storey house
+ - a bedsit
+ - balcony
+ - penthouse
+ - spacious
+ - a house-warming party
+ - open-plan
+ - cozy
+ - spring-clean
+ - airy
+ - residential area
+ - Feng Shui
+ - minimalism
+ - real estate prices
+ - decor
+ - rural area
+ - urban area
+ - gridlock
+ - slum
+ - the standard of living
+ - the rat race
+ - metropolis
+ - urbanite
+ - cunning
+ - laid-back
+ - sincere
+ - pretentious
+ - nosy
+ - diligent
+ - materialistic
+
+
+# Unit 2: It's Good For You
+## Reading
+ - yield (n)
+ - blister
+ - trait
+ - crop rotation
+ - antibiotic
+ - GM crop
+ - notion
+ - additive (n)
+ - compensate for
+ - reject
+ - starve
+ - regulate
+ - contradict
+ - irrelevant
+ - artificial
+ - misleading
+ - conventional
+ - obsessed
+ - a closed book
+ - come up with
+ - come into play
+ - pay homage to somebody
+ - take something into account
+ - cautious
+ - mushy
+ - precise
+ - optimum
+ - impoverished
+ - saliva
+ - spoilage
+ - photosynthesis
+ - membrane
+ - foodstuffs
+ - determine
+ - manufacture
+ - contaminate
+ - evolve
+ - decay
+ - release
+ 
+## Speaking
+ - hit the gym
+ - strenuous
+ - take up st
+ - moderate
+ - well-being
+ - immnue
+ - enhance
+ - get into shape
+ - do a workout
+ - do wonders for st/sb
+ - priority
+ - early/late riser
+ - night owl
+ - early bird
+ - productive
+ - have a tight schedule
+ - have time on my hands
+ - stick to a routine
+ - a typical day
+ - arrange time wisely
+ - organized person
+ - take a siesta
+ - a sound sleep
+ - toss and turn
+ - sleep-deprived
+ - calorific foods
+ - pitch-black
+ - awake and alert
+ - beneficial to 
+ - recharge my batteries
+ - speeping pattern
+ - function (v)
+ - sleep-conscious
+ - fussy eater
+ - calorie-conscious
+ - crave for st
+ - culinary skills
+ - have a sweet tooth
+ - takeaways
+ - nibbles
+ - grab a bite
+ - teetotal
+ - spicy
+ - sour
+ - sweet
+ - salty
+ - bitter
+ - bland
+ - flavorful
+ - wholesome
+ - greasy
+ - essential (a)
+ - sufficient
+ - dehydration
+ - alertness
+ - lethargic
+ - fatigued
+ - detoxify
+ - have a habit of doing st
+
+# Unit 3: Getting the message across
+## Reading
+ - imitate
+ - dominate st
+ - handle
+ - suspect 
+ - master (v)
+ - proceed
+ - justify
+ - albeit
+ - at a fast clip
+ - trial and error
+ - hypothesis
+ - threshold
+ - befeft of hope
+ - more or less
+ - linguistic development
+ - critical
+ - amused
+ - literate
+ - language acquisition
+ - toddler
+ - reverse (n)
+ - neuroscientist
+ 
+## Speaking
+ - profound story
+ - blockbuster
+ - gripping
+ - moving
+ - evocative
+ - cinema buff
+ - portrayal
+ - get round to
+ - transport s.o to another world
+ - convey
+ - have what it takes
+ - put s.o at ease
+ - action films
+ - comedies
+ - romantic films
+ - adventure films
+ - musicals
+ - dramas
+ - horror films
+ - science fiction
+ - a closed book
+ - visual art
+ - portrait
+ - still life painting
+ - real life painting
+ - an art form
+ - perspective
+ - depict
+ - dazzling
+ - arts literate
+ - composition
+ - exquisite
+ - embellish
+ - impenetrable
+ - vivid
+ - creamy
+ - matching
+ - pastel
+ - greenish
+ - neutral
+ - somber
+ - fluorescent
+ - calmness, and tranquility 
+ - simplicity, purity, and innocence
+ - royalty, majesty, and nobility
+ - happiness, wellbeing, good fortune, and passion
+ - growth, vitality, and renewal
+ - power, luxury, and mystery
+ - femininity, romance, and youthfulness
+ - cheerfulness, joy, and energy
+ - take up
+ - tone-deaf
+ - a diverse taste in 
+ - massive hit
+ - sweet singing voice
+ - catchy tune
+ - soothing ambience
+ - curriculum
+ - compulsory
+ - coordinate
+ - elixir
+ - rendition
+ - engraved
+ - recollection
+ - torch
+ - recall
+ 
+ # Unit 4: New Media
+ ## Reading
+ - collaborate
+ - recruit
+ - launch
+ - reveal
+ - modest
+ - bland
+ - anonymous
+ - peer
+ - bring about
+ - keep track of
+ - to the point
+ - turn out to
+ - bear in mind
+ - pay off
+ - growing phenomenon
+ - transform
+ - permit
+ - evolve
+ - refine
+ - amateur
+ - instinct
+ - successor
+ - incentive
+ - statistics
+ - dent
+ - immerse in st
+ - get involved in
+ - supervise
+ - disperse
+ - digest
+ - assume
+ - superficial
+ - simultaneously
+ - eye-catching
+ - dormant
+ - bottom line
+ - chronological order
+ - consume one's life
+ - constant exposure to 
+ - rewarding offline social life
+ - myth
+ - cursory
+ - shallow
+ - narrative
+ - prerequisite
+ - give way to
+ 
+## Speaking
+ - brand new
+ - renowned for
+ - tech giant
+ - high-speed
+ - lightweight
+ - facilitate
+ - browse
+ - computer-literate
+ - personal touch
+ - express affection
+ - distracting
+ - spam messages
+ - substitute
+ - be fed up with 
+ - bombarded with
+ - jot down
+ - pop into your head
+ - manifest itself
+ - stay in touch
+ - be deceived
+ - platform
+ - regardless of
+ - misleading
+ - interface
+ - grave (problem)
+ - virtual world
+ - user-friendly
+ - primacy
+ - proliferate
+ - accomplish
+ - emergency
+
+# Unit 5: The World In Our Hands
+## Reading
+ - lush (trees)
+ - gigantic
+ - lengthy
+ - astonished
+ - skeptical
+ - generate
+ - stagger
+ - specify
+ - utilize
+ - purify
+ - proponent
+ - subsidy
+ - infrastructure
+ - oasis
+ - combat (v)
+ - practicable
+ - arable
+ - release (toxic waste)
+ - long-standing (belief)
+ - vulnerable
+ - exhausted
+ - former
+ - irreverible
+ - substanntial
+ - abandon
+ - offset
+ - accummulate
+ - substitute
+ - disturb
+ - cite (v)
+ 
+## Speaking
+ - boiling
+ - downpour
+ - freezing
+ - breezy
+ - drizzly
+ - urban flooding
+ - warm weather person
+ - dismal (day)
+ - monsoon
+ - drenched
+ - favorable
+ - heatwave
+ - heatstroke
+ - stately
+ - deciduous
+ - evergreen
+ - tropical
+ - ornamental
+ - shady (providing shade)
+ - in full blossom
+ - orchard
+ - flora and fauna
+ - have a green thumb
+ - vegetation
+ - claw
+ - paw
+ - feather
+ - fur
+ - beak
+ - horn
+ - tail
+ - animal lover
+ - companion animal
+ - arthropods
+ - mammals
+ - amphibians
+ - reptiles
+ - fish
+ - birds
+ - adorable
+ - affectionate
+ - domestic
+ - omnivore
+ - carnivore
+ - herbivore
+
+# Unit 6: Making Money Speaning Money
+## Reading 
+ - promotion
+ - bargain
+ - shoplifting
+ - trick
+ - aisle
+ - regular
+ - visibility
+ - retailer
+ - tempt (v)
+ - manipulate
+ - persuade
+ - browse
+ - boost
+ - select
+ - decompress
+ - unplanned purchase
+ - appetites
+ - decoy items
+ - branded
+ - own-label
+ - asset
+ - turnover
+ - revenue
+ - tempo
+ - anathema
+ - disposable
+ - intrepid
+ - desperate
+ - intrigued
+ - deter s.o from st
+ - eschew (avoid)
+ - amend (improve)
+ - get lumbered
+ - pay lip service to (an idea)
+ - in excess of
+ - to no avail
+ - come across
+ 
+## Speaking
+ - a piggy bank
+ - save money for a rainy day
+ - spend money wisely
+ - broke (a)
+ - get into debt
+ - crucial
+ - money management skills
+ - pocket money/ allowance
+ - recall
+ - be occupied with
+ - crash
+ - be struck by
+ - blazing-fast
+ - cost a fortune
+ - squander
+ - exorbitant
+ - in retrospect
+ 
+# Unit 7: Relationships
+## Reading
+ - attempt to do st
+ - display
+ - emerge
+ - devise
+ - detect
+ - haunt
+ - confess
+ - deceive
+ - rip (paper)
+ - toss (a coin)
+ - peak at st
+ - avert (eyes)
+ - deceit
+ - incident
+ - profound
+ - consistent
+ - intentional
+ - compelling
+ - entire
+ - high achiever
+ - mediator
+ - negotiator
+ - take the lead
+ - diplomacy
+ - entitlement
+ - authoritative
+ - be driven
+ - naughty
+ - rebel
+ - be extroverted
+ - be cerebral
+ - be unyielding
+ - be spoilt
+ - hamper
+ - pamper
+ - nurture
+ - reiterate
+ - confront
+ - attribute st to st
+ - appoint sb to st
+ - entitle sb to st
+
+## Speaking
+ - quarrel (v)
+ - take after
+ - run in one's family
+ - inherit
+ - on the same wavelength
+ - trait
+ - upbringing
+ - reunion
+ - gathering
+ - treatment
+ - methodical
+ - conscientious
+ - diligent
+ - supportive
+ - approachable
+ - tactful
+ - in late twenties
+ - interactive
+ - student-centered
+ - arouse one's interest
+ - be on good terms
+ - role model
+ - rise to stardom
+ - versatile
+ - A-lister
+ - household name
+ - untarnished reputation
+ - come in for
+ - gossip (v)
+ - invade
+ - under tremendous pressure
+ - magnetic personality
+ - resilient
+ 
+# Unit 8: Fashion & Design
+## Reading
+ - cultivate
+ - grace
+ - glisten
+ - stitch (v)
+ - launch (v)
+ - collective
+ - extravagant
+ - stretchy
+ - ruthless
+ - intricate
+ - daring
+ - the masses
+ - no exception
+ - in the limelight/spotlight
+ - draw a gasp
+ - a glint of
+ - stain
+ - masterpiece
+ - garment
+ - signs of wear
+ - workmanship
+ - craftsmanship
+ - bizarre
+ - outraged
+ - prevailing
+ - surreal
+ - peculiar
+ - exclusive
+ - resist
+ - assure
+ - halve
+ - roll (out)
+ - bouyancy
+ - on a whim
+ - prosperity
+ - fragrance
+ - outcry
+ - haute couture
+ - topsy-turvy world
+ - set something in motion
+ - in practice
+ - a marketing device
+
+## Speaking
+ - high heels
+ - sandals
+ - sneakers/ trainers
+ - flats
+ - boots
+ - flip flops
+ - slip-ons
+ - analogue watch
+ - digital watch
+ - smart watch
+ - dial (n)
+ - watch strap
+ - gown
+ - suit
+ - vest
+ - swim suit
+ - T-shirt
+ - polo shirt
+ - sweater
+ - cardigan
+ - trench coat
+ - earnings
+ - ring
+ - bracelet
+ - necklace
+ - scarf
+ - purse
+ - wallet
+ - handbag
+ - socks
+ - tie
+ - bow
+ - bowtie
+ - all-purpose
+ - resistant
+ - chic
+ - slave (to fashion)
+ - outfit
+ - flattering
