@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - IELTS Chan Truong</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Radio Button Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+        
+        /* Toast Notification for NOT GIVEN */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 80px;
+            transform: translateX(-50%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.4s, bottom 0.4s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 100px;
+        }
+
+        /* Drag and Drop Styles */
+        .drop-zone {
+            min-width: 3rem;
+            min-height: 2.5rem;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        .word-selected {
+            background-color: #fce8eb !important;
+            border-color: #d75872 !important;
+            color: #852b3d !important;
+            font-weight: bold;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <!-- Left Pane: Passage -->
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">How Green is your PlanIT Valley?</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p>The first thing to say about the people running new European company Living PlanIT is that they are ambitious. Not only are they planning to build a smart green city from scratch at a site in northern Portugal, but <span id="exp-q1" class="explanation-target">they also hope to establish their PlanIT Valley development as both a genuine European alternative to the USA's Silicon Valley, and a working model that will inspire the next generation of low carbon cities.</span> These will combine real environmental sustainability with a quality of IT-enhanced urban living almost unrecognisable from the crowded, polluted and disorganised reality that is city life for most people.</p>
+
+                    <p>Many are sceptical about the company's plans for a brand-new smart city packed with cutting-edge green technology which can house 225,000 people while producing 'negligible' greenhouse gas emissions. <span id="exp-q2" class="explanation-target">To them, the technical challenges, combined with the $10 billion that the company needs to raise to see the project through from beginning to end, make Living PlanIT's plans sound more like an admirable experiment rather than a viable construction project.</span> <span id="exp-q6" class="explanation-target">Their scepticism is not helped by the company's use of marketing language that, in order to understand it, requires a degree in Public Relations.</span> For example, the company's claim that its 'design and manufacturing platforms enable the convergence of computing, network and sensing technologies with the fabric of buildings and places, demonstrated at urban scale in the development and operations of PlanIT Valley' does not really explain what it does.</p>
+
+                    <p><span id="exp-q7" class="explanation-target">However, when you listen to chief executive Steve Lewis outline his plans for the company, it becomes possible to believe that they might just deliver on their absurdly ambitious promises.</span> His rationale for the company is admirably simple. <span id="exp-q3" class="explanation-target">He argues that the construction industry remains the last sector of the economy to resist the IT revolution that has enhanced efficiencies across every other industry, from car manufacturing to food production. Their line 39 existing techniques are inadequate, he says, for today's technology-rich and environmentally-aware requirements.</span> Here, therefore, is an opportunity to entirely update the building process. Taking lessons from other manufacturing industries, including aerospace, automotive and shipbuilding, project leaders identified a number of elements that feature in modern manufacturing processes and which could be applied to modern buildings from the very start of the construction process.</p>
+
+                    <p>Living PlanIT plans to integrate IT into the fabric of the city. It is installing many thousands of sensors that allow an urban operating system to deliver intelligent buildings that are constantly optimised to enhance comfort, productivity and environmental sustainability. Meanwhile, the latest renewable energy technologies and green building techniques will allow the city to operate with a virtually non-existent carbon footprint. <span id="exp-q9" class="explanation-target">Of course, such techniques are not new, but they are rarely put into practice.</span> <span id="exp-q11" class="explanation-target">In fact, the IT industry has been complaining for a long time that the construction sector has failed to make adequate (if any) use of IT in its buildings.</span></p>
+
+                    <p>So, what makes PlanIT Valley different? For a start, the company has considerable power and influence, both in terms of the team it has assembled and the financial backing it has already been promised. Lewis and many on the senior management team have served as senior executives with other major IT companies. <span id="exp-q4" class="explanation-target">This means that they not only have the right experience, but also the essential 'anything is possible' mentality that is a feature of such companies.</span> In addition, Lewis claims that the company has already invested $300 million in putting together its team of engineers and developing its technology portfolio. As a result, the project is establishing a degree of credibility that far exceeds that of other similar projects.</p>
+
+                    <p><span id="exp-q12" class="explanation-target">More importantly, however, almost all of the technology the company is planning to deploy in PlanIT Valley either already exists or is viable from a technical point of view.</span> Intelligent buildings that know to turn the air-conditioning on before you even realise you are hot may sound like something out of a science-fiction novel, but we are increasingly living in a science-fiction age. You do not need to invent anything new to develop a zero-carbon smart city, you just have to put all the right technologies together in the right place.</p>
+
+                    <p>If Living PlanIT achieve this integration, it will hopefully be able to prove the final part of Lewis' claim. <span id="exp-q13" class="explanation-target">Namely, that cost concerns surrounding green developments are ill-founded.</span> A more automated approach to construction coupled with long-term efficiency gains delivered by intelligent infrastructure more than cancel out the extra money required to build the development in the first place. And if it can win the economic argument, future opportunities are enormous. As Lewis points out, projected world population growth means that the world has to deliver between 9,500 and 10,000 new cities over the next forty years to house everyone. There is no chance of avoiding dangerous levels of climate change unless this expansion is delivered in an environmentally-sustainable manner. That would provide quite a business opportunity for the company that can deliver the solution.</p>
+
+                    <p><span id="exp-q14" class="explanation-target">The PlanIT Valley project presents many problems in terms of project management and coordination, and there is a huge amount of work to be done before the first residents are able to move in.</span> <span id="exp-q5" class="explanation-target">Whatever the outcome, it is hard not to admire a project that will put so many theories about smart cities to the test all in one go.</span> First, it is challenging accepted assumptions on how cities should be designed and constructed. Secondly, it will show what can be done if connectivity and intelligence are built into the design from the beginning. Thirdly, it will be a pilot project for a whole range of new services and, equally important, new types of collaboration.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Questions -->
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth relative">
+            
+            <!-- Floating Score Banner (Hidden initially) -->
+            <div id="results-banner" class="hidden sticky top-0 z-20 mb-6 bg-white border border-brand-200 rounded-2xl p-4 shadow-lg text-center transform transition-all overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                <h2 class="text-xl font-black text-gray-800 mb-1 mt-1">Test Completed</h2>
+                <div class="flex justify-center items-end gap-2 mb-2">
+                    <span class="text-4xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                    <span class="text-lg font-bold text-gray-400 mb-0.5">/ 14</span>
+                </div>
+                <p class="text-xs text-gray-600 bg-brand-50 p-2 rounded-lg border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800">Choose the correct letter, <strong>A, B, C</strong> or <strong>D</strong>.</p>
+                    </div>
+
+                    <div class="space-y-6" id="q-section-1">
+                        <script>
+                            const mcQuestions = [
+                                { 
+                                    q: 1, 
+                                    text: "What do we learn about the people running the company Living PlanIT in the first paragraph?",
+                                    options: [
+                                        "A. They are going to build the world's first green smart city.",
+                                        "B. They want to build a replica of Silicon Valley in Europe.",
+                                        "C. They want their new city to be the first of other similar cities.",
+                                        "D. They think that the quality of life in most other cities is unacceptable."
+                                    ],
+                                    exp: 'exp-q1' 
+                                },
+                                { 
+                                    q: 2, 
+                                    text: "Why are a lot of people sceptical about PlanIT Valley?",
+                                    options: [
+                                        "A. They do not think that the plans are practical or possible.",
+                                        "B. They do not understand how the technology works.",
+                                        "C. They have misunderstood the reasons why Living PlanIT is building a new city.",
+                                        "D. They have not read the marketing information clearly enough."
+                                    ],
+                                    exp: 'exp-q2' 
+                                },
+                                { 
+                                    q: 3, 
+                                    text: "Who or what does 'Their' in 'Their existing techniques' refer to in line 39?",
+                                    options: [
+                                        "A. Living PlanIT",
+                                        "B. The construction industry",
+                                        "C. Car manufacturers",
+                                        "D. Food producers"
+                                    ],
+                                    exp: 'exp-q3' 
+                                },
+                                { 
+                                    q: 4, 
+                                    text: "The senior management team at Living PlanIT",
+                                    options: [
+                                        "A. have more power and influence than teams working on other, similar projects.",
+                                        "B. have raised enough money to build PlanIT Valley.",
+                                        "C. work elsewhere when they are not working on the PlanIT Valley project.",
+                                        "D. possess the right attitude required to undertake such a major project."
+                                    ],
+                                    exp: 'exp-q4' 
+                                },
+                                { 
+                                    q: 5, 
+                                    text: "Why, according to the author, is the PlanIT Valley project so admirable?",
+                                    options: [
+                                        "A. It shows how good working practices can have a successful outcome.",
+                                        "B. It presents such a challenge to its creators.",
+                                        "C. It is putting several theories into practice simultaneously.",
+                                        "D. It demonstrates why collaboration between builders and IT experts is so important."
+                                    ],
+                                    exp: 'exp-q5' 
+                                }
+                            ];
+                            
+                            mcQuestions.forEach(item => {
+                                let optionsHtml = '';
+                                item.options.forEach(opt => {
+                                    const letter = opt.charAt(0);
+                                    optionsHtml += `
+                                        <label class="radio-wrapper flex items-start gap-3 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer bg-white mb-2">
+                                            <input type="radio" name="q${item.q}" value="${letter}" class="mt-1 shrink-0" onchange="handleRadioSelect(${item.q}, '${letter}')"> 
+                                            <span class="text-sm leading-relaxed">${opt}</span>
+                                        </label>
+                                    `;
+                                });
+
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-4">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <p class="text-sm font-bold text-gray-800 leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="pl-9">
+                                            ${optionsHtml}
+                                        </div>
+                                        <div class="pl-9 mt-3">
+                                            <button class="exp-btn hidden text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider shadow-sm" onclick="showExplanation('${item.exp}')">View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-10</h3>
+                        <p class="text-sm text-gray-800 mb-2">Do the following statements agree with the claims of the writer in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 space-y-1 font-medium bg-white p-3 rounded border border-brand-100">
+                            <li><strong class="text-brand-700">YES</strong> if the statement agrees with the claims of the writer</li>
+                            <li><strong class="text-brand-700">NO</strong> if the statement contradicts the claims of the writer</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-6" id="q-section-2">
+                        <script>
+                            const tfngQuestions = [
+                                { q: 6, text: "Living PlanIT's marketing information is unclear and confusing for many people.", exp: 'exp-q6' },
+                                { q: 7, text: "Steve Lewis presents a convincing argument that suggests PlanIT Valley might succeed.", exp: 'exp-q7' },
+                                { q: 8, text: "Some of the buildings in PlanIT Valley have features that can be found in aircraft, cars or ships.", exp: 'not-given' },
+                                { q: 9, text: "Living PlanIT's idea of building a smart, environmentally-friendly city is original and unique.", exp: 'exp-q9' },
+                                { q: 10, text: "Some of the technology in PlanIT Valley was probably inspired by science fiction stories.", exp: 'not-given' }
+                            ];
+                            
+                            tfngQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <p class="text-sm font-medium text-gray-800 leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2 pl-9">
+                                            <label class="radio-wrapper flex-1 min-w-[100px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                                                <input type="radio" name="q${item.q}" value="YES" onchange="handleRadioSelect(${item.q}, 'YES')"> <span class="text-sm">YES</span>
+                                            </label>
+                                            <label class="radio-wrapper flex-1 min-w-[100px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                                                <input type="radio" name="q${item.q}" value="NO" onchange="handleRadioSelect(${item.q}, 'NO')"> <span class="text-sm">NO</span>
+                                            </label>
+                                            <label class="radio-wrapper flex-1 min-w-[120px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="handleRadioSelect(${item.q}, 'NOT GIVEN')"> <span class="text-sm">NOT GIVEN</span>
+                                            </label>
+                                        </div>
+                                        <div class="pl-9 mt-3">
+                                            <button class="exp-btn hidden text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider shadow-sm" onclick="showExplanation('${item.exp}')">View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 11-14</h3>
+                        <p class="text-sm text-gray-800 mb-2">Complete each sentence with the correct ending, A-G, below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white p-2 rounded border border-brand-100">
+                            <strong>How to answer:</strong> Click a letter from the Bank below, then click an empty box to place it. Alternatively, Drag and Drop the letter into the box. Click a filled box to remove the answer.
+                        </p>
+                    </div>
+
+                    <!-- Sentence Endings Word Bank -->
+                    <div class="flex flex-col gap-2 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium select-none" id="ending-bank">
+                        <div draggable="true" data-val="A" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">A.</strong> <span>technically possible</span>
+                        </div>
+                        <div draggable="true" data-val="B" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">B.</strong> <span>underused</span>
+                        </div>
+                        <div draggable="true" data-val="C" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">C.</strong> <span>difficult to avoid</span>
+                        </div>
+                        <div draggable="true" data-val="D" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">D.</strong> <span>not valid</span>
+                        </div>
+                        <div draggable="true" data-val="E" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">E.</strong> <span>inefficient</span>
+                        </div>
+                        <div draggable="true" data-val="F" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">F.</strong> <span>too ambitious</span>
+                        </div>
+                        <div draggable="true" data-val="G" class="draggable-word p-2.5 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 shadow-sm transition-all duration-200 flex items-start gap-2 text-left">
+                            <strong class="shrink-0 text-brand-600">G.</strong> <span>extremely challenging</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5" id="q-section-3">
+                        <script>
+                            const endingQuestions = [
+                                { q: 11, text: "The IT industry believes that, when it comes to putting up new buildings, IT is currently", exp: 'exp-q11' },
+                                { q: 12, text: "Creating new technology for PlanIT Valley is", exp: 'exp-q12' },
+                                { q: 13, text: "Steve Lewis believes that the economic arguments against green developments are", exp: 'exp-q13' },
+                                { q: 14, text: "Some organisational aspects of the PlanIT Valley project are", exp: 'exp-q14' }
+                            ];
+                            
+                            endingQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-start gap-3">
+                                            <span class="w-6 h-6 mt-1 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-800 leading-relaxed mb-3">${item.text} ...</p>
+                                                <div class="drop-zone w-full min-h-[44px] border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg inline-flex items-center px-3 py-2 font-medium text-sm text-brand-700 transition-all duration-200 cursor-pointer" data-q="${item.q}">
+                                                    <span class="text-gray-400 italic text-xs">Click or drop answer here</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pl-9 mt-3">
+                                            <button class="exp-btn hidden text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider shadow-sm" onclick="showExplanation('${item.exp}')">View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript generates map boxes here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Toast Notification for NOT GIVEN explanations -->
+    <div id="toast">No specific text to highlight. The passage does not contain this information.</div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: "C",
+            2: "A",
+            3: "B",
+            4: "D",
+            5: "C",
+            6: "YES",
+            7: "YES",
+            8: "NOT GIVEN",
+            9: "NO",
+            10: "NOT GIVEN",
+            11: "B",
+            12: "A",
+            13: "D",
+            14: "G"
+        };
+
+        const TOTAL_QS = 14;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+        let activeSelectedWord = null;
+
+        // Initialize Navigation Map
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    const el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        // Update Map Status when answering
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Handle Radio Selection
+        function handleRadioSelect(qNum, val) {
+            if (isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, true);
+        }
+
+        // Handle Answer Updates for Interactive fields
+        function updateAnswer(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, val !== "");
+        }
+
+        // Drag and Drop + Click to Apply Logic
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-word');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            // --- CLICK TO SELECT LOGIC ---
+            draggables.forEach(word => {
+                word.addEventListener('click', () => {
+                    if (isSubmitted) return;
+                    
+                    if (activeSelectedWord === word) {
+                        word.classList.remove('word-selected');
+                        activeSelectedWord = null;
+                        return;
+                    }
+                    
+                    draggables.forEach(w => w.classList.remove('word-selected'));
+                    word.classList.add('word-selected');
+                    activeSelectedWord = word;
+                });
+
+                // --- DRAG LOGIC ---
+                word.addEventListener('dragstart', (e) => {
+                    if (isSubmitted) { e.preventDefault(); return; }
+                    e.dataTransfer.setData('text/plain', word.dataset.val);
+                    word.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                    
+                    if(activeSelectedWord) {
+                        activeSelectedWord.classList.remove('word-selected');
+                        activeSelectedWord = null;
+                    }
+                });
+                word.addEventListener('dragend', () => {
+                    word.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+            });
+
+            // --- DROP & CLICK-TO-APPLY LOGIC ---
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => {
+                    e.preventDefault(); 
+                    if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300', 'scale-105');
+                });
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault(); 
+                    if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300', 'scale-105');
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('ring-4', 'ring-brand-300', 'scale-105');
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300', 'scale-105');
+                    if (isSubmitted) return;
+
+                    const val = e.dataTransfer.getData('text/plain');
+                    applyAnswerToZone(zone, val);
+                });
+                
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+
+                    if (activeSelectedWord) {
+                        const val = activeSelectedWord.dataset.val;
+                        applyAnswerToZone(zone, val);
+                        activeSelectedWord.classList.remove('word-selected');
+                        activeSelectedWord = null;
+                    } else if (zone.dataset.hasAnswer === 'true') {
+                        clearZone(zone);
+                    }
+                });
+            });
+        }
+
+        function getFullTextForValue(val) {
+            const el = document.querySelector(`.draggable-word[data-val="${val}"]`);
+            return el ? el.innerHTML : val;
+        }
+
+        function applyAnswerToZone(zone, val) {
+            const validOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+            const finalVal = val.trim().toUpperCase();
+
+            if (validOptions.includes(finalVal)) {
+                zone.innerHTML = getFullTextForValue(finalVal);
+                zone.dataset.hasAnswer = 'true';
+                
+                zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                
+                const qNum = zone.dataset.q;
+                updateAnswer(qNum, finalVal);
+            }
+        }
+
+        function clearZone(zone) {
+            zone.innerHTML = '<span class="text-gray-400 italic text-xs">Click or drop answer here</span>';
+            zone.dataset.hasAnswer = 'false';
+            
+            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+            
+            const qNum = zone.dataset.q;
+            updateAnswer(qNum, '');
+        }
+
+        // Custom Highlighting Feature for Students
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => { e.preventDefault(); });
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        // Timer Functionality
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-3 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct Ans: ${text}`;
+            return el;
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-50', 'hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-word').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.remove('cursor-pointer', 'hover:bg-brand-50', 'hover:border-brand-400', 'hover:text-brand-700');
+                el.classList.add('opacity-50', 'cursor-default');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => {
+                el.classList.remove('cursor-pointer');
+            });
+            if(activeSelectedWord) {
+                activeSelectedWord.classList.remove('word-selected');
+            }
+
+            // Grade All Questions
+            for (let i = 1; i <= TOTAL_QS; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                let status = 'blank';
+                if (uAns !== '') {
+                    if (uAns === key) {
+                        score++;
+                        status = 'correct';
+                    } else {
+                        status = 'incorrect';
+                    }
+                }
+
+                styleMapBox(i, status);
+                
+                if (status === 'correct') {
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else if (status === 'incorrect') {
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                    qRow.querySelector('.pl-9').appendChild(createCorrectMarker(key));
+                } else {
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                    qRow.querySelector('.pl-9').appendChild(createCorrectMarker(key));
+                }
+                
+                qRow.querySelector('.exp-btn').classList.remove('hidden');
+            }
+
+            // Final UI Updates
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3500);
+        }
+
+        // Explanation Highlight Logic
+        function showExplanation(targetId) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetId === 'not-given') {
+                showToast();
+                return;
+            }
+
+            const targetEl = document.getElementById(targetId);
+            if(targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetEl.classList.add('active-explanation');
+                setTimeout(() => targetEl.classList.remove('active-explanation'), 3000);
+            }
+        }
+
+        // Boot up
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
