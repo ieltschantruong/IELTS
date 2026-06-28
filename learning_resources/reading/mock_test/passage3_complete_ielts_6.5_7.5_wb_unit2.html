@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   // Very light blush
+                            100: '#fce8eb',  // Pale pink
+                            200: '#f7cdd5',  // Pastel pink
+                            300: '#f0a8b6',  // Soft pink
+                            400: '#e67c91',  // Muted dark pink
+                            500: '#d75872',  // Primary elegant pink (pastel/dusty rose)
+                            600: '#bf3f58',  // Deeper elegant pink
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Checkbox Styling */
+        input[type="checkbox"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .checkbox-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+        }
+        
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            width: 160px;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 2</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">An invention to dye for: the colour purple</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">A 19th century research chemist was trying to make medicine when, instead, he came up with a coloured dye that has ensured the world is a brighter place.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><strong>A.</strong> <span id="exp-q1" class="explanation-target">Of all the colours, purple has perhaps the most powerful connotations. From the earliest cultures to the present day, people have sought to harness its visual power to mark themselves out as better than those around them.</span> From bishops to kings, pop stars to fashion models, its wearing has been a calculated act of showing off. In ancient Rome, for example, purple was such a revered colour that only the emperor was allowed to wear it. Indeed, an emperor who was referred to as porphyrogenitus, ('born to the purple') was especially important, since this meant that he had inherited his position through family connections rather than seizing power through military force.</p>
+
+                    <p><strong>B.</strong> But why purple? <span id="exp-q78a" class="explanation-target">At that time, purple dye was an expensive substance produced in a complicated, foul-smelling and time-consuming process.</span> This involved boiling thousands of molluscs in water in order to harvest their glandular juices. <span id="exp-q2" class="explanation-target">The technique had originally been developed by the Phoenicians over a thousand years previously, and it hadn't changed since.</span> <span id="exp-q78b" class="explanation-target">Cheaper but poorer quality purple dyes could be made from lichens using an equally messy and unpleasant procedure, but they were not as bright, and the colour quickly faded.</span> It was no surprise, therefore, that good purple dye was a rare and precious thing, and clothes dyed purple were beyond the financial means of most people.</p>
+
+                    <p><strong>C.</strong> However, times have changed. In the great consumer democracy of the 21st century, even the most humble citizen can choose it as the colour of their latest outfit. For that privilege, we must thank a young 19th century research chemist, William Perkin. A talented 15-year-old when he entered the Royal College of Chemistry in London in 1853, Perkin was immediately appointed as laboratory assistant to his tutor, August Wilhelm von Hofmann. <span id="exp-q910a" class="explanation-target">He became determined to prove Hofmann's claim that quinine, a drug used to treat fevers such as malaria, could be synthesised in a laboratory.</span> However, rather than the cure desperately needed for people dying from malaria in tropical countries, he produced little more than a black, sticky mess that turned purple when dissolved in industrial alcohol. <span id="exp-q3" class="explanation-target">Perkin's experiments could have been a complete waste of time, but to his surprise and, ultimately, financial benefit, his purple liquid turned out to be a long-lasting dye that was to transform fashion.</span></p>
+
+                    <p><strong>D.</strong> Perkin repeated his experiments in an improvised laboratory in his garden shed, perfecting the process for making the substance he had called mauveine after the French mallow plant. It was, says Simon Garfield, the author of Mauve which details Perkin's life and work, an astonishing breakthrough. '<span id="exp-q4a" class="explanation-target">Once you could do that you could make colour in a factory from chemicals rather than insects or plants. It opened up the prospect of mass-produced artificial dyes and made Perkin one of the first scientists to bridge the gap between pure chemistry and its industrial applications.</span>' <span id="exp-q910b" class="explanation-target">It didn't take long for the chemist, still only 18, to capitalise on his creation, patenting the product, convincing his father and brother to back it with savings, and finding a manufacturer who could help him bring it rapidly to the market.</span> <span id="exp-q4b" class="explanation-target">The buying public loved it, and clothes coloured with purple started appearing in shops up and down the country.</span></p>
+
+                    <p>Appropriately, considering the origins of Perkins' colour, he was to receive a helping hand from the two most important women of the day. Queen Victoria caused a sensation when she stepped out at the Royal Exhibition in 1862 wearing a silk gown dyed with mauveine. In Paris, Napoleon III's wife, Empress Eugenie, amazed the court when she was seen wearing it. To propel the scientist further on the way to a great fortune, the fashion of the time was for broad skirts that, happily for him, needed a lot of his revolutionary new dye.</p>
+
+                    <p><strong>E.</strong> Perkins, ever the serious scientist, would have been among the first to point out that his mauve is just one of a range of colours described in everyday language as purple. Not itself a true colour of the spectrum - that position is given to indigo and violet - purple normally refers to those colours which inhabit the limits of human perception in the area between red and violet. Newton excluded the colour from his colour wheel. <span id="exp-q5" class="explanation-target">Scientists today talk about the 'line of purples' which include violet, mauve, magenta, indigo and lilac.</span></p>
+
+                    <p><strong>F.</strong> <span id="exp-q11" class="explanation-target">In the alternative medical practice of colour therapy</span>, <span id="exp-q12" class="explanation-target">which practitioners say can trace its origins back to ancient India</span>, the 'purple range' colours of indigo and violet are vital. They refer to spiritual energy centres known as chakras and are situated in the head. <span id="exp-q6" class="explanation-target">The colours and their 'medical' qualities were first officially listed by the Swiss scientist Dr Max Luscher, who said that appropriately coloured lights, applied to specific chakras, could treat ailments from depression to grief.</span> Julia Kubler is one of Britain's leading colour therapists and <span id="exp-q13" class="explanation-target">has been using colours to treat patients</span> at her clinic at Manningtree, Essex, for 15 years. Purple, she says, 'is consistent with intuition and higher understanding, with spirituality and meditation. <span id="exp-q14" class="explanation-target">It combines the coolness of blue with a bit of red</span> that makes it not just passive but active.' It is hardly the most outlandish of claims for this most enigmatic of colours. Variously touted as the colour of everything from insanity to equality, it is enjoying a new role as the symbol of political compromise. Purple may have had its origins in the ancient world, but thanks to a young chemist, it still has a brilliant future.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Hidden initially) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: Matching Headings -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-6</h3>
+                        <p class="text-sm text-gray-800 mb-2">The reading passage has six sections, A-F. Choose the correct heading for each section from the list of headings below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a heading, OR click a heading then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Headings Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <h4 class="font-bold text-sm text-gray-700 mb-3 text-center uppercase tracking-wider">List of Headings</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm font-medium" id="headings-bank">
+                            <div draggable="true" data-type="heading" data-val="i" data-display="i. From the laboratory to the High Street" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">i</span> <span class="leading-tight">From the laboratory to the High Street</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="ii" data-display="ii. Seeking royal support" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">ii</span> <span class="leading-tight">Seeking royal support</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="iii" data-display="iii. An unexpected but fortunate side result" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">iii</span> <span class="leading-tight">An unexpected but fortunate side result</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="iv" data-display="iv. The healing power of purple" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">iv</span> <span class="leading-tight">The healing power of purple</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="v" data-display="v. An old problem" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">v</span> <span class="leading-tight">An old problem</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="vi" data-display="vi. Standing out from the crowd" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">vi</span> <span class="leading-tight">Standing out from the crowd</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="vii" data-display="vii. Finding an alternative cure for a common illness" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">vii</span> <span class="leading-tight">Finding an alternative cure for a common illness</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="viii" data-display="viii. Part of a larger family" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">viii</span> <span class="leading-tight">Part of a larger family</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="ix" data-display="ix. An ancient manufacturing practice" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">ix</span> <span class="leading-tight">An ancient manufacturing practice</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Q1-Q6 Drop Zones -->
+                        <script>
+                            const questions = [
+                                { q: 1, text: "Section A", exp: ['exp-q1'] },
+                                { q: 2, text: "Section B", exp: ['exp-q2'] },
+                                { q: 3, text: "Section C", exp: ['exp-q3'] },
+                                { q: 4, text: "Section D", exp: ['exp-q4a', 'exp-q4b'] },
+                                { q: 5, text: "Section E", exp: ['exp-q5'] },
+                                { q: 6, text: "Section F", exp: ['exp-q6'] }
+                            ];
+                            questions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-center gap-3 w-32 shrink-0">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <span class="text-sm font-bold text-gray-700">${item.text}</span>
+                                        </div>
+                                        <div class="flex-1 flex flex-col">
+                                            <div class="drop-zone w-full min-h-[40px] px-3 py-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="heading" data-q="${item.q}"></div>
+                                            <button class="exp-btn hidden self-start mt-2 text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick="showExplanation(${JSON.stringify(item.exp)})">View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Choose TWO Letters -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 7-10</h3>
+                        <p class="text-sm text-gray-800">Choose <strong class="text-brand-700">TWO</strong> letters, A-E.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Select exactly two checkboxes per group.</p>
+                    </div>
+
+                    <!-- Q7-8 -->
+                    <div class="mb-8">
+                        <div class="q-row-group p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-qgroup="7-8">
+                            <div class="flex gap-3 mb-3 border-b border-gray-200 pb-3">
+                                <div class="flex flex-col gap-1 shrink-0">
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-7">7</span>
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-8">8</span>
+                                </div>
+                                <p class="text-gray-800 font-bold text-sm leading-relaxed mt-1">What TWO points does the writer make about of the colour purple and purple dye before William Perkin's creation?</p>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-700 font-medium pl-2">
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q78" value="A" onchange="handleChooseTwo(this, '7-8', [7, 8])" class="mt-0.5"> A. It was only used to colour clothes.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q78" value="B" onchange="handleChooseTwo(this, '7-8', [7, 8])" class="mt-0.5"> B. It was originally produced for Roman emperors.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q78" value="C" onchange="handleChooseTwo(this, '7-8', [7, 8])" class="mt-0.5"> C. It was not easy to make.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q78" value="D" onchange="handleChooseTwo(this, '7-8', [7, 8])" class="mt-0.5"> D. There were many different techniques used to make it.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q78" value="E" onchange="handleChooseTwo(this, '7-8', [7, 8])" class="mt-0.5"> E. Some purple dyes were inferior to others.
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden mt-3 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q78a', 'exp-q78b'])">View Explanation</button>
+                        </div>
+                    </div>
+
+                    <!-- Q9-10 -->
+                    <div>
+                        <div class="q-row-group p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-qgroup="9-10">
+                            <div class="flex gap-3 mb-3 border-b border-gray-200 pb-3">
+                                <div class="flex flex-col gap-1 shrink-0">
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-9">9</span>
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-10">10</span>
+                                </div>
+                                <p class="text-gray-800 font-bold text-sm leading-relaxed mt-1">What TWO things about William Perkin are true, according to the passage?</p>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-700 font-medium pl-2">
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q910" value="A" onchange="handleChooseTwo(this, '9-10', [9, 10])" class="mt-0.5"> A. He taught Chemistry at a college in London.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q910" value="B" onchange="handleChooseTwo(this, '9-10', [9, 10])" class="mt-0.5"> B. He believed that quinine could be artificially produced.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q910" value="C" onchange="handleChooseTwo(this, '9-10', [9, 10])" class="mt-0.5"> C. He extracted the substance for his dye from a common plant.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q910" value="D" onchange="handleChooseTwo(this, '9-10', [9, 10])" class="mt-0.5"> D. He quickly realised the financial benefits of his new creation.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q910" value="E" onchange="handleChooseTwo(this, '9-10', [9, 10])" class="mt-0.5"> E. He set a new fashion trend for large skirts.
+                                </label>
+                            </div>
+                            <button class="exp-btn hidden mt-3 text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors" onclick="showExplanation(['exp-q910a', 'exp-q910b'])">View Explanation</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Summary Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 11-14</h3>
+                        <p class="text-sm text-gray-800">Complete the summary below. Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="text-gray-800 leading-loose text-justify text-[15px] space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <p>
+                            The purple range of colours plays an essential role in colour therapy, a form of 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="11">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">11</strong>
+                                    <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off">
+                                </span>
+                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50" onclick="showExplanation(['exp-q11'])">Explanation</button>
+                            </span>. 
+                            Colour therapy is said to have originated many years ago in 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="12">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">12</strong>
+                                    <input type="text" id="input-q12" onkeyup="updateTextInput(12, this.value)" autocomplete="off">
+                                </span>
+                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50" onclick="showExplanation(['exp-q12'])">Explanation</button>
+                            </span> 
+                            and is still used by colour therapists such as Julia Kubler, who uses it to 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="13">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">13</strong>
+                                    <input type="text" id="input-q13" onkeyup="updateTextInput(13, this.value)" autocomplete="off">
+                                </span>
+                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50" onclick="showExplanation(['exp-q13'])">Explanation</button>
+                            </span> 
+                            with various health issues. According to Kubler, purple 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="14">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">14</strong>
+                                    <input type="text" id="input-q14" onkeyup="updateTextInput(14, this.value)" autocomplete="off">
+                                </span>
+                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50" onclick="showExplanation(['exp-q14'])">Explanation</button>
+                            </span> 
+                            aspects of two colours, making it both active and passive.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            // Drag and Drop (Headings)
+            1: "vi", 2: "ix", 3: "iii", 4: "i", 5: "viii", 6: "iv",
+            // Choose TWO (Order does not matter)
+            group78: ["C", "E"],
+            group910: ["B", "D"],
+            // Text Input (Multiple acceptable variations)
+            11: ["medical practice"],
+            12: ["ancient india", "india"],
+            13: ["treat patients"],
+            14: ["combines"]
+        };
+
+        const HEADING_DISPLAYS = {
+            "i": "i. From the laboratory to the High Street",
+            "ii": "ii. Seeking royal support",
+            "iii": "iii. An unexpected but fortunate side result",
+            "iv": "iv. The healing power of purple",
+            "v": "v. An old problem",
+            "vi": "vi. Standing out from the crowd",
+            "vii": "vii. Finding an alternative cure for a common illness",
+            "viii": "viii. Part of a larger family",
+            "ix": "ix. An ancient manufacturing practice"
+        };
+
+        let userAnswers = {};
+        for(let i=1; i<=14; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=14; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    // Find correct element to scroll to
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.getElementById(`map-marker-${i}`);
+                    if(!el) el = document.querySelector(`.q-row-text[data-q="${i}"]`);
+                    
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Interactive Mechanics: Drag & Drop + Click-to-Apply
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300'); });
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300'); });
+                zone.addEventListener('dragleave', () => { zone.classList.remove('ring-4', 'ring-brand-300'); });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                    if (isSubmitted) return;
+
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        if (zone.textContent) {
+                            zone.textContent = '';
+                            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            
+                            const qNum = zone.dataset.q;
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        // Mechanics: Choose TWO
+        function handleChooseTwo(checkbox, groupName, qIndices) {
+            if (isSubmitted) return;
+            const container = document.querySelector(`.q-row-group[data-qgroup="${groupName}"]`);
+            const checkedBoxes = container.querySelectorAll(`input[type="checkbox"]:checked`);
+            
+            // Limit to max 2
+            if (checkedBoxes.length > 2) {
+                checkbox.checked = false;
+                return;
+            }
+
+            // Extract values
+            let selectedVals = Array.from(checkedBoxes).map(cb => cb.value);
+            
+            // Assign to global answers array sequentially based on indices
+            userAnswers[qIndices[0]] = selectedVals[0] || "";
+            userAnswers[qIndices[1]] = selectedVals[1] || "";
+
+            updateMapStatus(qIndices[0], !!selectedVals[0]);
+            updateMapStatus(qIndices[1], !!selectedVals[1]);
+        }
+
+        // Mechanics: Text Input
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        // Mechanics: Custom Highlighting Feature
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // 1. Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'checkbox') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // 2. Grade Q1-Q6 (Matching)
+            for (let i = 1; i <= 6; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                qRow.querySelector('.flex-1').appendChild(createCorrectMarker(HEADING_DISPLAYS[key]));
+                qRow.querySelector('.exp-btn').classList.remove('hidden');
+            }
+
+            // 3. Grade Q7-10 (Choose TWO)
+            const gradeChooseTwo = (groupName, indices, keys) => {
+                const uAns1 = userAnswers[indices[0]];
+                const uAns2 = userAnswers[indices[1]];
+                
+                const userVals = [uAns1, uAns2].filter(v => v !== "");
+                let groupScore = 0;
+                
+                // Check answers against keys (order independent)
+                let remainingKeys = [...keys];
+                let results = []; // Store result for each map box sequentially
+                
+                userVals.forEach(val => {
+                    const keyIndex = remainingKeys.indexOf(val);
+                    if(keyIndex > -1) {
+                        groupScore++;
+                        remainingKeys.splice(keyIndex, 1);
+                        results.push('correct');
+                    } else {
+                        results.push('incorrect');
+                    }
+                });
+
+                // Pad results for blanks
+                while(results.length < 2) results.push('blank');
+
+                score += groupScore;
+
+                // Update Map Boxes
+                styleMapBox(indices[0], results[0]);
+                styleMapBox(indices[1], results[1]);
+
+                // UI Updates
+                const qGroup = document.querySelector(`.q-row-group[data-qgroup="${groupName}"]`);
+                if(groupScore === 2) {
+                    qGroup.classList.replace('border-gray-200', 'border-green-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-green-50');
+                } else if (groupScore === 1) {
+                    qGroup.classList.replace('border-gray-200', 'border-yellow-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (userVals.length > 0) {
+                    qGroup.classList.replace('border-gray-200', 'border-red-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-red-50');
+                } else {
+                    qGroup.classList.replace('border-gray-200', 'border-yellow-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-yellow-50');
+                }
+
+                // Highlight correct/incorrect checkboxes
+                const checkboxes = qGroup.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => {
+                    const val = cb.value;
+                    const wrapper = cb.parentElement;
+                    if (keys.includes(val)) {
+                        wrapper.classList.add('bg-green-100', 'border-green-400', 'font-bold', 'text-green-900');
+                    } else if (cb.checked) {
+                        wrapper.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                    }
+                });
+                qGroup.querySelector('.exp-btn').classList.remove('hidden');
+            };
+
+            gradeChooseTwo('7-8', [7, 8], ANSWER_KEYS.group78);
+            gradeChooseTwo('9-10', [9, 10], ANSWER_KEYS.group910);
+
+            // 4. Grade Q11-Q14 (Text Inputs)
+            for (let i = 11; i <= 14; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i];
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qRowText = document.querySelector(`.q-row-text[data-q="${i}"]`);
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                    
+                    // Show correct answer below
+                    const corrBadge = document.createElement('div');
+                    corrBadge.className = 'text-[10px] text-green-700 font-bold mt-1 bg-green-100 px-2 py-0.5 rounded border border-green-300';
+                    corrBadge.innerText = `Ans: ${acceptableKeys[0]}`;
+                    qRowText.appendChild(corrBadge);
+                }
+                
+                qRowText.querySelector('.exp-btn').classList.remove('hidden');
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
