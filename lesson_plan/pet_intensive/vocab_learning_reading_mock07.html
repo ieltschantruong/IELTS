@@ -17,7 +17,7 @@
             --border: #99f6e4;
             --badge-bg: #a7f3d0;
             --badge-text: #064e3b;
-            --success: #0284c7; /* Blue for translation */
+            --success: #0284c7; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -48,7 +48,7 @@
         .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(15, 118, 110, 0.15); border-color: var(--border); }
         .vocab-card.hidden { display: none; }
         .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
-        .word-main { display: flex; align-items: center; gap: 0.5rem; }
+        .word-main { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;}
         .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
         .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
         .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
@@ -70,7 +70,6 @@
         .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
         .extra-example span { color: #475569; }
 
-        /* Flashcard View Styles */
         #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
         .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
         .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
@@ -95,6 +94,11 @@
         .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
 
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
         @media (max-width: 768px) { 
             h1 { font-size: 1.8rem; } 
             #grid-view { grid-template-columns: 1fr; } 
@@ -116,10 +120,18 @@
 
     <!-- Topic Filter -->
     <div class="filter-controls" id="topic-filters">
-        <button class="filter-btn active" onclick="filterTopic('all')">All Terms</button>
-        <button class="filter-btn" onclick="filterTopic('Psychology of Music')">Psychology of Music</button>
-        <button class="filter-btn" onclick="filterTopic('Architecture & Environment')">Architecture & Environment</button>
-        <button class="filter-btn" onclick="filterTopic('Risk & Society')">Risk & Society</button>
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Terms</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Mind Music')">Passage 1: Mind Music</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Ideal Homes')">Passage 2: Ideal Homes</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Risk Taking')">Passage 3: Risk Taking</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
     </div>
 
     <div class="view-controls">
@@ -133,6 +145,7 @@
             <div class="flashcard-inner">
                 <div class="flashcard-face flashcard-front">
                     <h2 class="word" id="fc-word">Word</h2>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
                     <div class="meta-row">
                         <span class="phonetic" id="fc-phonetic">/wɜːd/</span>
                         <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
@@ -155,7 +168,7 @@
 
         <div class="flashcard-controls">
             <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
-            <span class="fc-counter" id="fc-counter">1 / 32</span>
+            <span class="fc-counter" id="fc-counter">1 / 51</span>
             <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
             <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
             <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
@@ -173,44 +186,62 @@
     // Vocabulary Bank (PET Reading Mock Test 7)
     // ---------------------------------------------------------
     const vocabBank = [
-        // --- CATEGORY 1: Psychology of Music ---
-        { topic: "Psychology of Music", word: "Involuntary", phonetic: "/ɪnˈvɒləntri/", form: "Adjective", forms: "N/A", def: "Done without will or conscious control.", translation: "Tự động, không tự chủ", example: "Scientists call them 'involuntary musical images', or 'earworms'...", extraExample: "Breathing is an involuntary reflex of the human body." },
-        { topic: "Psychology of Music", word: "Unpredictably", phonetic: "/ˌʌnprɪˈdɪktəbli/", form: "Adverb", forms: "Adj: Unpredictable | V: Predict", def: "In a way that cannot be foreseen or known beforehand.", translation: "Một cách không thể đoán trước", example: "Researchers haven't been able to watch what happens... because they happen unpredictably.", extraExample: "The weather in the mountains can change unpredictably." },
-        { topic: "Psychology of Music", word: "Intrusive", phonetic: "/ɪnˈtruːsɪv/", form: "Adjective", forms: "V: Intrude | N: Intrusion", def: "Causing disruption or annoyance through being unwelcome.", translation: "Xâm nhập, gây khó chịu", example: "...people who report hearing earworms often, and find them most intrusive, have slightly different brain structures...", extraExample: "The paparazzi's constant questions became highly intrusive." },
-        { topic: "Psychology of Music", word: "Fixate on", phonetic: "/fɪkˈseɪt ɒn/", form: "Phrasal Verb", forms: "N: Fixation", def: "Acquire an obsessive attachment to someone or something.", translation: "Tập trung ám ảnh vào", example: "Songs the brain fixates on are usually those it has been exposed to recently...", extraExample: "He tends to fixate on small mistakes rather than his overall success." },
-        { topic: "Psychology of Music", word: "Entrenched", phonetic: "/ɪnˈtrentʃt/", form: "Adjective", forms: "V: Entrench | N: Entrenchment", def: "(Of an attitude, habit, or belief) firmly established and difficult or unlikely to change.", translation: "Bám rễ sâu, cố hữu", example: "That could make an earworm even more entrenched, Dr Hyman says.", extraExample: "Sexism is still deeply entrenched in some corporate cultures." },
-        { topic: "Psychology of Music", word: "Yield", phonetic: "/jiːld/", form: "Verb", forms: "N/A", def: "Produce or provide (a natural, agricultural, or industrial product, or a result).", translation: "Mang lại, sinh ra (kết quả)", example: "...although experiments exposing students to interrupted songs have yielded mixed results.", extraExample: "The new farming methods yielded a much larger harvest this year." },
-        { topic: "Psychology of Music", word: "Deliberately", phonetic: "/dɪˈlɪbərətli/", form: "Adverb", forms: "Adj: Deliberate | N: Deliberation", def: "Consciously and intentionally; on purpose.", translation: "Một cách có chủ ý, cố tình", example: "...deliberately imagining music and actually listening to music activate many of the same neurological networks.", extraExample: "I believe he deliberately ignored my email." },
-        { topic: "Psychology of Music", word: "Anticipation", phonetic: "/ænˌtɪsɪˈpeɪʃn/", form: "Noun", forms: "V: Anticipate | Adj: Anticipatory", def: "The action of anticipating something; expectation or prediction.", translation: "Sự mong đợi, sự dự đoán", example: "'Repetition leads to familiarity which leads to anticipation, which is satisfied by hearing the song...'", extraExample: "The crowd waited in eager anticipation for the band to appear." },
-        { topic: "Psychology of Music", word: "Assess", phonetic: "/əˈses/", form: "Verb", forms: "N: Assessment", def: "Evaluate or estimate the nature, ability, or quality of.", translation: "Đánh giá, định giá", example: "The researchers are comparing the melodic structure... to assess the difference.", extraExample: "The consultant was hired to assess the company's financial health." },
-        { topic: "Psychology of Music", word: "Recruit", phonetic: "/rɪˈkruːt/", form: "Verb", forms: "N: Recruitment", def: "Enlist (someone) in the armed forces or a company/study.", translation: "Tuyển dụng, chiêu mộ", example: "Drs Stewart and Halper are now working together to recruit survey participants...", extraExample: "The tech firm plans to recruit 50 new engineers this year." },
+        // --- PASSAGE 1: Mind Music ---
+        { topic: "Mind Music", level: "C1", word: "Earworm", form: "Noun", phonetic: "/ˈɪə.wɜːm/", forms: "N/A", def: "A catchy song or tune that runs continually through a person's mind.", translation: "Giai điệu lặp đi lặp lại trong đầu", example: "Scientists call them 'involuntary musical images', or 'earworms'...", extraExample: "That new pop song is a real earworm; I can't stop humming it." },
+        { topic: "Mind Music", level: "C2", word: "Neuroscientist", form: "Noun", phonetic: "/ˌnjʊə.rəʊˈsaɪən.tɪst/", forms: "N: Neuroscience", def: "An expert in the science that deals with the structure or function of the nervous system and brain.", translation: "Nhà khoa học thần kinh", example: "Music psychologists and neuroscientists have recently begun to study earworms...", extraExample: "The neuroscientist published a paper on how memory works." },
+        { topic: "Mind Music", level: "B2", word: "Wrist", form: "Noun", phonetic: "/rɪst/", forms: "N/A", def: "The joint connecting the hand with the forearm.", translation: "Cổ tay", example: "Some researchers asked participants to tap their wrists to the beat of the song.", extraExample: "He sprained his wrist while playing tennis." },
+        { topic: "Mind Music", level: "B2", word: "Tempo", form: "Noun", phonetic: "/ˈtem.pəʊ/", forms: "Plural: Tempos / Tempi", def: "The speed at which a passage of music is or should be played.", translation: "Nhịp độ (âm nhạc)", example: "Songs with an upbeat tempo are more likely to become earworms.", extraExample: "The tempo of the music gradually increased towards the end." },
+        { topic: "Mind Music", level: "C1", word: "Intrusive", form: "Adjective", phonetic: "/ɪnˈtruː.sɪv/", forms: "N: Intrusion | V: Intrude", def: "Causing disruption or annoyance through being unwelcome or uninvited.", translation: "Gây khó chịu, xâm nhập", example: "People who find these songs most intrusive have slightly different brain structures.", extraExample: "The journalist asked highly intrusive questions about her personal life." },
+        { topic: "Mind Music", level: "C2", word: "Gray matter", form: "Noun Phrase", phonetic: "/ˌɡreɪ ˈmæt.ər/", forms: "N/A", def: "The darker tissue of the brain and spinal cord, consisting mainly of nerve cell bodies.", translation: "Chất xám", example: "The amount of gray matter in certain areas of the brain varies.", extraExample: "Reading complex books is a great way to exercise your gray matter." },
+        { topic: "Mind Music", level: "C1", word: "Chore", form: "Noun", phonetic: "/tʃɔːr/", forms: "N/A", def: "A routine task, especially a household one.", translation: "Việc vặt (thường nhàm chán)", example: "Earworms often occur when doing a repetitive chore like washing dishes.", extraExample: "I find ironing clothes to be a really tedious chore." },
+        { topic: "Mind Music", level: "B2", word: "Idle", form: "Adjective", phonetic: "/ˈaɪ.dəl/", forms: "N: Idleness", def: "(Of a person) avoiding work; lazy. Or (of time) not spent doing anything.", translation: "Nhàn rỗi, không làm gì", example: "When the mind is idle, the brain will often fill the space with a song.", extraExample: "He spent an idle afternoon just watching the clouds." },
+        { topic: "Mind Music", level: "B2", word: "Upbeat", form: "Adjective", phonetic: "/ˈʌp.biːt/", forms: "N/A", def: "Cheerful; optimistic.", translation: "Sôi nổi, lạc quan", example: "Pop songs with an upbeat rhythm easily get stuck in our heads.", extraExample: "Despite the bad news, she managed to maintain an upbeat attitude." },
+        { topic: "Mind Music", level: "C1", word: "Fixate", form: "Verb", phonetic: "/fɪkˈseɪt/", forms: "N: Fixation", def: "To think about something too much and find it difficult to stop.", translation: "Tập trung ám ảnh vào", example: "Songs the brain fixates on are usually those we have heard recently.", extraExample: "He tends to fixate on small details rather than the big picture." },
+        { topic: "Mind Music", level: "B2", word: "Fragment", form: "Noun", phonetic: "/ˈfræɡ.mənt/", forms: "Adj: Fragmented", def: "A small part broken or separated off something.", translation: "Mảnh vỡ, đoạn ngắn", example: "Usually, we only remember a small fragment of the song.", extraExample: "I could only hear fragments of their conversation through the wall." },
+        { topic: "Mind Music", level: "C1", word: "Supplementary", form: "Adjective", phonetic: "/ˌsʌp.lɪˈmen.tər.i/", forms: "N/V: Supplement", def: "Completing or enhancing something.", translation: "Bổ sung, phụ trợ", example: "Listening to supplementary music might help to get rid of the earworm.", extraExample: "The teacher provided supplementary reading materials for the students." },
+        { topic: "Mind Music", level: "C1", word: "Punchy", form: "Adjective", phonetic: "/ˈpʌn.tʃi/", forms: "N/A", def: "Having an immediate impact; forceful.", translation: "Mạnh mẽ, có sức cuốn hút", example: "A punchy rhythm is a common feature of these songs.", extraExample: "Her presentation was short, clear, and very punchy." },
+        { topic: "Mind Music", level: "C1", word: "Justification", form: "Noun", phonetic: "/ˌdʒʌs.tɪ.fɪˈkeɪ.ʃən/", forms: "V: Justify", def: "The action of showing something to be right or reasonable.", translation: "Sự biện minh, lý do chính đáng", example: "There is some justification for the belief that chewing gum helps stop earworms.", extraExample: "There is no justification for his rude behavior." },
+        { topic: "Mind Music", level: "B2", word: "Rhythm", form: "Noun", phonetic: "/ˈrɪð.əm/", forms: "Adj: Rhythmic", def: "A strong, regular, repeated pattern of movement or sound.", translation: "Nhịp điệu", example: "The rhythm of the music made everyone want to dance.", extraExample: "I can't dance because I have no sense of rhythm." },
+        { topic: "Mind Music", level: "B2", word: "Occurrence", form: "Noun", phonetic: "/əˈkʌr.əns/", forms: "V: Occur", def: "An incident or event.", translation: "Sự xuất hiện, biến cố", example: "The occurrence of earworms is very common among musicians.", extraExample: "Flooding is a rare occurrence in this part of the country." },
+        { topic: "Mind Music", level: "B2", word: "Accidental", form: "Adjective", phonetic: "/ˌæk.sɪˈden.təl/", forms: "Adv: Accidentally", def: "Happening by chance, unintentionally, or unexpectedly.", translation: "Tình cờ, ngẫu nhiên", example: "Some researchers believe an earworm is just an accidental memory loop.", extraExample: "The damage to the car was completely accidental." },
+        { topic: "Mind Music", level: "C1", word: "Persistent", form: "Adjective", phonetic: "/pəˈsɪs.tənt/", forms: "V: Persist | N: Persistence", def: "Continuing firmly or obstinately in a course of action in spite of difficulty.", translation: "Dai dẳng, kiên trì", example: "If the song is very persistent, try solving a difficult puzzle.", extraExample: "He suffered from a persistent cough all winter." },
 
-        // --- CATEGORY 2: Architecture & Environment ---
-        { topic: "Architecture & Environment", word: "Ventilation", phonetic: "/ˌventɪˈleɪʃn/", form: "Noun", forms: "V: Ventilate", def: "The provision of fresh air to a room, building, etc.", translation: "Sự thông gió", example: "Built on stilts and with steep roofs, they have year-round ventilation.", extraExample: "Proper ventilation is crucial in a busy commercial kitchen." },
-        { topic: "Architecture & Environment", word: "Sophistication", phonetic: "/səˌfɪstɪˈkeɪʃn/", form: "Noun", forms: "Adj: Sophisticated", def: "The quality of being advanced, complex, or refined.", translation: "Sự tinh vi, sự phức tạp", example: "This story of ancient architectural sophistication and modern insanity is repeated around the world.", extraExample: "The new smartphone offers a high level of technological sophistication." },
-        { topic: "Architecture & Environment", word: "Emission", phonetic: "/ɪˈmɪʃn/", form: "Noun", forms: "V: Emit", def: "The production and discharge of something, especially gas or radiation.", translation: "Sự phát thải, khí thải", example: "Much is made of the contribution of transportation to global warming, through its emissions of greenhouse gases.", extraExample: "The government has promised to cut carbon emissions by 20%." },
-        { topic: "Architecture & Environment", word: "Exception", phonetic: "/ɪkˈsepʃn/", form: "Noun", forms: "Adj: Exceptional", def: "A person or thing that is excluded from a general statement or does not follow a rule.", translation: "Ngoại lệ", example: "Throughout the Middle East today, wind towers are often little more than museum pieces. But there are exceptions.", extraExample: "Usually I don't work on weekends, but I'll make an exception this time." },
-        { topic: "Architecture & Environment", word: "Conserve", phonetic: "/kənˈsɜːv/", form: "Verb", forms: "N: Conservation", def: "Protect (something, especially an environmentally or culturally important place or thing) from harm or destruction.", translation: "Bảo tồn, tiết kiệm", example: "...a village on the shores of the Red Sea, which is designed to conserve energy.", extraExample: "We need to conserve water during the dry season." },
-        { topic: "Architecture & Environment", word: "Insulation", phonetic: "/ˌɪnsjuˈleɪʃn/", form: "Noun", forms: "V: Insulate | N: Insulator", def: "Material used to insulate something, especially a building.", translation: "Sự cách nhiệt, vật liệu cách nhiệt", example: "...combines the ventilation system... with up-to-date heating and floor insulation...", extraExample: "Adding better insulation to the roof can significantly reduce your heating bills." },
-        { topic: "Architecture & Environment", word: "Revive", phonetic: "/rɪˈvaɪv/", form: "Verb", forms: "N: Revival", def: "Restore to life or consciousness; give new strength or energy to.", translation: "Hồi sinh, phục hồi", example: "But although traditional methods and materials can be revived in appropriate settings...", extraExample: "The government is trying to revive the failing economy." },
-        { topic: "Architecture & Environment", word: "Optimum", phonetic: "/ˈɒptɪməm/", form: "Adjective", forms: "N: Optima", def: "Most conducive to a favorable outcome; best.", translation: "Tối ưu, tốt nhất", example: "Buildings with large expanses of window... can be designed to achieve optimum temperatures.", extraExample: "This plant requires optimum conditions of moisture and sunlight to thrive." },
-        { topic: "Architecture & Environment", word: "Renewable", phonetic: "/rɪˈnjuːəbl/", form: "Adjective", forms: "V: Renew | N: Renewal", def: "(Of a natural resource or source of energy) not depleted when used.", translation: "Có thể tái tạo", example: "As well as more efficient use of energy, the world also needs new sources of renewable power.", extraExample: "Wind and solar power are forms of renewable energy." },
-        { topic: "Architecture & Environment", word: "Commence", phonetic: "/kəˈmens/", form: "Verb", forms: "N: Commencement", def: "Begin; start.", translation: "Bắt đầu, khởi đầu", example: "...where a project commenced to install solar panels for 400,000 people in 150 villages.", extraExample: "The graduation ceremony will commence at exactly 10:00 AM." },
-        { topic: "Architecture & Environment", word: "Adopt", phonetic: "/əˈdɒpt/", form: "Verb", forms: "N: Adoption", def: "Choose to take up, follow, or use.", translation: "Áp dụng, tiếp nhận", example: "...people have thrown away architecture... and adopted house designs originating from cold, northern environments...", extraExample: "The school has decided to adopt a new teaching methodology." },
+        // --- PASSAGE 2: Ideal Homes ---
+        { topic: "Ideal Homes", level: "B2", word: "Ventilation", form: "Noun", phonetic: "/ˌven.tɪˈleɪ.ʃən/", forms: "V: Ventilate", def: "The provision of fresh air to a room, building, etc.", translation: "Sự thông gió", example: "Traditional houses were built with excellent natural ventilation.", extraExample: "Make sure the bathroom has good ventilation to prevent mold." },
+        { topic: "Ideal Homes", level: "B2", word: "Breeze", form: "Noun", phonetic: "/briːz/", forms: "Adj: Breezy", def: "A gentle wind.", translation: "Cơn gió nhẹ", example: "The design allows a cool breeze to flow through the living room.", extraExample: "A warm summer breeze blew through the open window." },
+        { topic: "Ideal Homes", level: "B2", word: "Chimney", form: "Noun", phonetic: "/ˈtʃɪm.ni/", forms: "N/A", def: "A vertical channel or pipe which conducts smoke and combustion gases up from a fire or furnace.", translation: "Ống khói", example: "A solar chimney can pull hot air out of a building.", extraExample: "Smoke was pouring out of the factory chimney." },
+        { topic: "Ideal Homes", level: "C1", word: "Airtight", form: "Adjective", phonetic: "/ˈeə.taɪt/", forms: "N/A", def: "Not allowing air to escape or pass through.", translation: "Kín gió", example: "Modern buildings are often completely airtight and rely on air conditioning.", extraExample: "Keep the cookies in an airtight container so they don't go soft." },
+        { topic: "Ideal Homes", level: "B2", word: "Come up with", form: "Phrasal Verb", phonetic: "/kʌm ʌp wɪð/", forms: "N/A", def: "To suggest or think of an idea or plan.", translation: "Nghĩ ra (ý tưởng)", example: "Architects have come up with several innovative solutions to this problem.", extraExample: "We need to come up with a better way to save money." },
+        { topic: "Ideal Homes", level: "C1", word: "Paving", form: "Noun", phonetic: "/ˈpeɪ.vɪŋ/", forms: "V: Pave", def: "A surface made up of flat stones or bricks.", translation: "Lớp lát đường", example: "The paving around the house absorbs heat during the day.", extraExample: "The uneven paving stones make it difficult to walk here." },
+        { topic: "Ideal Homes", level: "B2", word: "Principle", form: "Noun", phonetic: "/ˈprɪn.sə.pəl/", forms: "Adj: Principled", def: "A fundamental truth or proposition that serves as the foundation for a system of belief or behavior.", translation: "Nguyên lý, nguyên tắc", example: "The new eco-homes are built on the principle of sustainability.", extraExample: "He is a man of strong moral principles." },
+        { topic: "Ideal Homes", level: "B2", word: "Rough", form: "Adjective", phonetic: "/rʌf/", forms: "Adv: Roughly | N: Roughness", def: "Having an uneven or irregular surface; not smooth or level.", translation: "Thô ráp", example: "They used rough stone to build the outer walls.", extraExample: "The road was very rough and full of potholes." },
+        { topic: "Ideal Homes", level: "C1", word: "Fortress", form: "Noun", phonetic: "/ˈfɔː.trəs/", forms: "N/A", def: "A military stronghold, especially a strongly fortified town fit for a large garrison.", translation: "Pháo đài", example: "From the outside, the house looks like a solid, impenetrable fortress.", extraExample: "The ancient fortress sits on top of the hill." },
+        { topic: "Ideal Homes", level: "C1", word: "Expanse", form: "Noun", phonetic: "/ɪkˈspæns/", forms: "Adj: Expansive", def: "An area of something, typically land or sea, presenting a wide continuous surface.", translation: "Dải rộng, khoảng rộng", example: "Buildings with large expanses of glass heat up very quickly.", extraExample: "We looked out over a vast expanse of ocean." },
+        { topic: "Ideal Homes", level: "C1", word: "Superior", form: "Adjective", phonetic: "/suːˈpɪə.ri.ər/", forms: "N: Superiority", def: "Higher in rank, status, or quality.", translation: "Vượt trội, tốt hơn", example: "Traditional designs are often superior when it comes to cooling a house naturally.", extraExample: "This new model is vastly superior to the older version." },
+        { topic: "Ideal Homes", level: "C1", word: "Inferior", form: "Adjective", phonetic: "/ɪnˈfɪə.ri.ər/", forms: "N: Inferiority", def: "Lower in rank, status, or quality.", translation: "Thua kém, kém hơn", example: "Modern, sealed buildings can provide an inferior living environment if the power fails.", extraExample: "He always felt inferior to his older, smarter brother." },
 
-        // --- CATEGORY 3: Risk & Society ---
-        { topic: "Risk & Society", word: "Collectively", phonetic: "/kəˈlektɪvli/", form: "Adverb", forms: "Adj: Collective | N: Collection", def: "As a group; as a whole.", translation: "Cùng nhau, tập thể", example: "Acting collectively, we make similar trade-offs.", extraExample: "The employees decided collectively to ask for a pay raise." },
-        { topic: "Risk & Society", word: "Minuscule", phonetic: "/ˈmɪnəskjuːl/", form: "Adjective", forms: "N/A", def: "Extremely small; tiny.", translation: "Cực kỳ nhỏ, nhỏ bé", example: "...recognizing the minuscule likelihood of becoming ill from a flu shot...", extraExample: "The chance of winning the lottery is minuscule." },
-        { topic: "Risk & Society", word: "Irrationally", phonetic: "/ɪˈræʃənəli/", form: "Adverb", forms: "Adj: Irrational | N: Irrationality", def: "In an illogical or unreasonable manner.", translation: "Một cách phi lý, thiếu lý trí", example: "But some, fearfully but irrationally, go to the extreme and stay at home...", extraExample: "He acted irrationally out of fear during the crisis." },
-        { topic: "Risk & Society", word: "Unfulfilling", phonetic: "/ˌʌnfʊlˈfɪlɪŋ/", form: "Adjective", forms: "V: Fulfill | N: Fulfillment", def: "Not causing someone to feel satisfied or happy.", translation: "Không làm thỏa mãn, nhàm chán", example: "...many people won't even risk pursuing an exciting job, if the current job, though unfulfilling, remains comfortable.", extraExample: "She quit her unfulfilling corporate job to start her own bakery." },
-        { topic: "Risk & Society", word: "Status quo", phonetic: "/ˌsteɪtəs ˈkwəʊ/", form: "Noun", forms: "N/A", def: "The existing state of affairs, especially regarding social or political issues.", translation: "Hiện trạng", example: "That psychological mechanism, a desire to maintain the status quo, helps explain...", extraExample: "People who are comfortable with the status quo rarely seek out change." },
-        { topic: "Risk & Society", word: "Perceptive", phonetic: "/pəˈseptɪv/", form: "Adjective", forms: "N: Perception | V: Perceive", def: "Having or showing sensitive insight.", translation: "Sâu sắc, nhạy bén", example: "...Andrew S. Grove gives a perceptive account of a crisis that took place...", extraExample: "It was a very perceptive comment that got straight to the heart of the issue." },
-        { topic: "Risk & Society", word: "Deterioration", phonetic: "/dɪˌtɪəriəˈreɪʃn/", form: "Noun", forms: "V: Deteriorate", def: "The process of becoming progressively worse.", translation: "Sự suy giảm, sự tồi tệ đi", example: "...will be willing to risk the resources needed to prevent further deterioration.", extraExample: "The doctor noticed a rapid deterioration in the patient's health." },
-        { topic: "Risk & Society", word: "Oblivious", phonetic: "/əˈblɪviəs/", form: "Adjective", forms: "N: Oblivion", def: "Not aware of or not concerned about what is happening around one.", translation: "Lơ đãng, không nhận thức được", example: "Some governmental leaders are oblivious to the risks posed by social underinvestment...", extraExample: "She was so engrossed in her book that she was completely oblivious to the noise." },
-        { topic: "Risk & Society", word: "Precedence", phonetic: "/ˈpresɪdəns/", form: "Noun", forms: "V: Precede", def: "The condition of being considered more important than someone or something else; priority.", translation: "Sự ưu tiên, quyền ưu tiên", example: "...because the urgent needs of the present take precedence over actions that would give rise to even more substantial gains...", extraExample: "Safety must always take precedence over speed in this factory." },
-        { topic: "Risk & Society", word: "Temperament", phonetic: "/ˈtemprəmənt/", form: "Noun", forms: "Adj: Temperamental", def: "A person's or animal's nature, especially as it permanently affects their behavior.", translation: "Khí chất, tính khí", example: "Whether one's temperament is optimistic or pessimistic...", extraExample: "He has a calm temperament, which makes him a great teacher." },
-        { topic: "Risk & Society", word: "Modify", phonetic: "/ˈmɒdɪfaɪ/", form: "Verb", forms: "N: Modification", def: "Make partial or minor changes to (something), typically so as to improve it.", translation: "Điều chỉnh, sửa đổi", example: "Furthermore, too few people pay full attention to the best evidence, much less modify their behaviors as a result.", extraExample: "You may need to modify your diet to include more vegetables." },
-        { topic: "Risk & Society", word: "Disregard", phonetic: "/ˌdɪsrɪˈɡɑːd/", form: "Verb", forms: "N: Disregard", def: "Pay no attention to; ignore.", translation: "Phớt lờ, không để ý đến", example: "...precisely because it is so easy for executives to try to disregard it or misinterpret the mounting evidence...", extraExample: "He chose to disregard the warning signs and drove into the storm." }
+        // --- PASSAGE 3: Risk Taking ---
+        { topic: "Risk Taking", level: "B2", word: "Arise", form: "Verb", phonetic: "/əˈraɪz/", forms: "Past: Arose | PP: Arisen", def: "To happen; to emerge.", translation: "Phát sinh, nảy sinh", example: "Many problems arise when people fail to calculate risks correctly.", extraExample: "If any complications arise, please contact the doctor immediately." },
+        { topic: "Risk Taking", level: "C1", word: "Collectively", form: "Adverb", phonetic: "/kəˈlek.tɪv.li/", forms: "Adj: Collective | N: Collection", def: "As a group; as a whole.", translation: "Cùng nhau, mang tính tập thể", example: "Acting collectively, we make similar trade-offs when dealing with global issues.", extraExample: "The employees decided collectively to ask for a pay raise." },
+        { topic: "Risk Taking", level: "C1", word: "Trade-off", form: "Noun", phonetic: "/ˈtreɪd.ɒf/", forms: "N/A", def: "A balance achieved between two desirable but incompatible features; a compromise.", translation: "Sự đánh đổi", example: "Every financial decision involves a trade-off between risk and reward.", extraExample: "For this car, the trade-off is between fuel efficiency and speed." },
+        { topic: "Risk Taking", level: "B2", word: "Assess", form: "Verb", phonetic: "/əˈses/", forms: "N: Assessment", def: "Evaluate or estimate the nature, ability, or quality of.", translation: "Đánh giá", example: "It is difficult for humans to accurately assess long-term risks.", extraExample: "The consultant was hired to assess the company's financial health." },
+        { topic: "Risk Taking", level: "C2", word: "Minuscule", form: "Adjective", phonetic: "/ˈmɪn.ə.skjuːl/", forms: "N/A", def: "Extremely small; tiny.", translation: "Cực kỳ nhỏ", example: "They worry about the minuscule chance of dying in a plane crash.", extraExample: "The risk of infection from the procedure is minuscule." },
+        { topic: "Risk Taking", level: "C1", word: "Likelihood", form: "Noun", phonetic: "/ˈlaɪ.kli.hʊd/", forms: "Adj: Likely", def: "The state or fact of something's being likely; probability.", translation: "Khả năng xảy ra", example: "People often overestimate the likelihood of rare, catastrophic events.", extraExample: "There is a high likelihood that it will rain tomorrow." },
+        { topic: "Risk Taking", level: "B2", word: "Flu shot", form: "Noun Phrase", phonetic: "/ˈfluː ʃɒt/", forms: "N/A", def: "An injection of a vaccine to protect against influenza.", translation: "Mũi tiêm phòng cúm", example: "Recognizing the benefits, many people still refuse to get a simple flu shot.", extraExample: "The doctor recommended that everyone over 65 get a flu shot." },
+        { topic: "Risk Taking", level: "C1", word: "Rational", form: "Adjective", phonetic: "/ˈræʃ.ən.əl/", forms: "Adv: Rationally | N: Rationality", def: "Based on or in accordance with reason or logic.", translation: "Có lý trí, hợp lý", example: "We like to think we make rational decisions regarding our health.", extraExample: "Please try to be calm and make a rational choice." },
+        { topic: "Risk Taking", level: "B2", word: "Gain", form: "Noun", phonetic: "/ɡeɪn/", forms: "V: Gain", def: "An increase in wealth or resources.", translation: "Lợi ích, phần đạt được", example: "The potential gain from the investment was too good to ignore.", extraExample: "He exercises daily for the gain of better health." },
+        { topic: "Risk Taking", level: "C1", word: "Mechanism", form: "Noun", phonetic: "/ˈmek.ə.nɪ.zəm/", forms: "Adj: Mechanical", def: "A natural or established process by which something takes place or is brought about.", translation: "Cơ chế", example: "That psychological mechanism helps explain why people resist change.", extraExample: "We need to understand the underlying mechanism of the disease." },
+        { topic: "Risk Taking", level: "C2", word: "The status quo", form: "Noun Phrase", phonetic: "/ˌsteɪ.təs ˈkwəʊ/", forms: "N/A", def: "The existing state of affairs, especially regarding social or political issues.", translation: "Hiện trạng, tình trạng hiện tại", example: "That psychological desire to maintain the status quo helps explain why people resist change.", extraExample: "People who are comfortable with the status quo rarely seek out new opportunities." },
+        { topic: "Risk Taking", level: "B2", word: "Executive", form: "Noun", phonetic: "/ɪɡˈzek.jə.tɪv/", forms: "N/A", def: "A person with senior managerial responsibility in a business organization.", translation: "Người điều hành, giám đốc", example: "Company executives often fail to plan for long-term ecological risks.", extraExample: "The marketing executive presented the new advertising strategy." },
+        { topic: "Risk Taking", level: "C1", word: "Catastrophic", form: "Adjective", phonetic: "/ˌkæt.əˈstrɒf.ɪk/", forms: "N: Catastrophe", def: "Involving or causing sudden great damage or suffering.", translation: "Thảm khốc, thảm họa", example: "Climate change could lead to catastrophic environmental damage.", extraExample: "The failure of the dam had catastrophic consequences for the town." },
+        { topic: "Risk Taking", level: "C1", word: "Likewise", form: "Adverb", phonetic: "/ˈlaɪk.waɪz/", forms: "N/A", def: "In the same way; also.", translation: "Tương tự như vậy", example: "If you don't save money now, you will struggle later; likewise, a society must invest in its future.", extraExample: "Water these plants twice a week, and do likewise for the ones in the bedroom." },
+        { topic: "Risk Taking", level: "C1", word: "Decay", form: "Noun", phonetic: "/dɪˈkeɪ/", forms: "V: Decay", def: "The state or process of rotting or decomposition.", translation: "Sự suy tàn, sự phân hủy", example: "Ecological decay is a slow process that is easy for governments to ignore.", extraExample: "Sugar is a major cause of tooth decay." },
+        { topic: "Risk Taking", level: "C2", word: "Leverage point", form: "Noun Phrase", phonetic: "/ˈliː.vər.ɪdʒ pɔɪnt/", forms: "N/A", def: "A place in a system where making a small change can lead to a large shift in behavior.", translation: "Điểm đòn bẩy, điểm mấu chốt", example: "Identifying the correct leverage point is essential for solving complex social issues.", extraExample: "Education is a strong leverage point for reducing poverty." },
+        { topic: "Risk Taking", level: "C2", word: "Leverage", form: "Verb", phonetic: "/ˈliː.vər.ɪdʒ/", forms: "N: Leverage", def: "Use (something) to maximum advantage.", translation: "Tận dụng", example: "We must leverage modern technology to prevent future crises.", extraExample: "The company needs to leverage its resources better to compete." },
+        { topic: "Risk Taking", level: "C1", word: "Deterioration", form: "Noun", phonetic: "/dɪˌtɪə.ri.əˈreɪ.ʃən/", forms: "V: Deteriorate", def: "The process of becoming progressively worse.", translation: "Sự suy giảm, sự tồi tệ đi", example: "...will be willing to risk the resources needed to prevent further deterioration.", extraExample: "The doctor noticed a rapid deterioration in the patient's health." },
+        { topic: "Risk Taking", level: "C2", word: "Take precedence over", form: "Phrase", phonetic: "/teɪk ˈpres.ɪ.dəns ˈəʊ.vər/", forms: "N/A", def: "To be considered more important than someone or something else.", translation: "Ưu tiên hơn, quan trọng hơn", example: "Urgent daily tasks often take precedence over long-term strategic planning.", extraExample: "Safety must always take precedence over speed in this factory." },
+        { topic: "Risk Taking", level: "C1", word: "Give rise to", form: "Phrase", phonetic: "/ɡɪv raɪz tuː/", forms: "N/A", def: "To cause or produce something.", translation: "Gây ra, dẫn đến", example: "These small errors can collectively give rise to a major disaster.", extraExample: "The new law gave rise to widespread protests across the country." },
+        { topic: "Risk Taking", level: "C2", word: "Temperament", form: "Noun", phonetic: "/ˈtem.prə.mənt/", forms: "Adj: Temperamental", def: "A person's or animal's nature, especially as it permanently affects their behavior.", translation: "Khí chất, tính khí", example: "Whether one's temperament is optimistic or pessimistic affects how they perceive risk.", extraExample: "He has a calm temperament, which makes him a great teacher." }
     ];
 
     // --- DOM Injection ---
@@ -221,11 +252,13 @@
             const article = document.createElement('article');
             article.className = 'vocab-card';
             article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
             
             article.innerHTML = `
                 <div class="word-header">
                     <div class="word-main">
                         <span class="word">${item.word}</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
                         <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
                     </div>
                     <div class="meta-info">
@@ -270,15 +303,30 @@
         playAudio(word);
     }
 
-    // --- Topic Filtering ---
-    function filterTopic(topicName) {
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
 
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
         const allCards = document.querySelectorAll('.vocab-card');
         allCards.forEach(card => {
-            if (topicName === 'all' || card.getAttribute('data-topic') === topicName) {
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            if (matchTopic && matchLevel) {
                 card.classList.remove('hidden');
             } else {
                 card.classList.add('hidden');
@@ -286,7 +334,7 @@
         });
 
         if(document.getElementById('flashcard-view').style.display === 'flex') {
-             extractDataFromGrid(topicName);
+             extractDataFromGrid();
              currentCardIndex = 0;
              updateFlashcardUI();
         }
@@ -310,13 +358,7 @@
             btnFlashcards.classList.add('active');
             btnGrid.classList.remove('active');
             
-            const activeFilter = document.querySelector('.filter-btn.active').textContent;
-            let topicName = 'all';
-            if (activeFilter.includes('Music')) topicName = 'Psychology of Music';
-            if (activeFilter.includes('Architecture')) topicName = 'Architecture & Environment';
-            if (activeFilter.includes('Risk')) topicName = 'Risk & Society';
-            
-            extractDataFromGrid(topicName);
+            extractDataFromGrid();
             currentCardIndex = 0;
             updateFlashcardUI();
         }
@@ -327,31 +369,48 @@
     let currentCardIndex = 0;
     const flashcardScene = document.getElementById('flashcard-scene');
 
-    function extractDataFromGrid(topicName = 'all') {
+    function extractDataFromGrid() {
         flashcardData = [];
         vocabBank.forEach(item => {
-            if (topicName === 'all' || item.topic === topicName) {
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            if (matchTopic && matchLevel) {
                 flashcardData.push(item);
             }
         });
     }
 
     function updateFlashcardUI() {
-        if (flashcardData.length === 0) return;
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
         const data = flashcardData[currentCardIndex];
-        
         flashcardScene.classList.remove('is-flipped');
         
         setTimeout(() => {
             document.getElementById('fc-word').textContent = data.word;
             document.getElementById('fc-phonetic').textContent = data.phonetic;
-            document.getElementById('fc-topic').textContent = data.topic;
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
             
             document.getElementById('fc-definition').textContent = data.def;
             document.getElementById('fc-translation').textContent = data.translation;
             
             const examplesHTML = `
-                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #99f6e4; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
                     <strong style="color: #115e59;">Word Forms:</strong> ${data.forms}
                 </div>
                 <div class="example-box" style="margin-bottom: 0.5rem; background-color: #ccfbf1; padding: 1rem; border-left: 4px solid #115e59; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
