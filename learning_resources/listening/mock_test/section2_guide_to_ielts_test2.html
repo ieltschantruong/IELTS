@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Sea Life Centre</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            blush: '#fdf2f8', // Very light pink bg
+                            pink: '#fbcfe8',  // Soft pink borders/accents
+                            accent: '#f472b6', // Primary pink (buttons, active states)
+                            dark: '#9d174d',   // Deep pink/magenta for text
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom IELTS Input Styling */
+        .ielts-input { 
+            border: none; 
+            border-bottom: 2px solid #cbd5e1; 
+            background: transparent; 
+            padding: 2px 8px; 
+            transition: all 0.2s;
+            display: inline-block;
+            font-weight: 600;
+            color: #9d174d; 
+        }
+        .ielts-input:focus { 
+            outline: none; 
+            border-bottom-color: #f472b6; 
+            background: #fdf2f8; 
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Highlight Tool Styling */
+        .highlighted-text {
+            background-color: #fef08a;
+            border-radius: 2px;
+            padding: 0 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .highlighted-text:hover {
+            background-color: #fde047;
+        }
+        .transcript-highlight {
+            background-color: #fbcfe8; 
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 0 0 2px #f472b6;
+        }
+
+        /* Tooltip button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background-color: #1f2937;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateX(-50%);
+            margin-top: -45px;
+            transition: background-color 0.2s;
+        }
+        #highlight-tooltip:hover {
+            background-color: #374151;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <header class="bg-white border-b border-gray-200 shadow-sm z-20 h-16 flex-none flex items-center justify-between px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-pastel-accent rounded-xl flex items-center justify-center text-white font-bold shadow-sm">CT</div>
+            <h1 class="font-bold text-lg text-gray-800 tracking-tight">IELTS Chan Truong</h1>
+        </div>
+        <div id="timer-display" class="hidden font-mono text-xl font-bold text-pastel-dark bg-pastel-blush border border-pastel-pink px-4 py-1.5 rounded-lg shadow-sm">
+            10:00
+        </div>
+    </header>
+
+    <main class="flex-1 relative overflow-hidden flex flex-col">
+        
+        <div id="start-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-gray-50 p-4 overflow-y-auto">
+            <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-10 border border-gray-100">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-pastel-blush text-pastel-accent rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm border border-pastel-pink">
+                        <i class="fa-solid fa-desktop"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Computer-Delivered IELTS</h2>
+                    <h3 class="text-xl font-medium text-pastel-dark" id="intro-section-title">Loading Section...</h3>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-xl mb-8 shadow-inner">
+                    <h4 class="font-bold text-blue-800 mb-3 text-lg"><i class="fa-solid fa-circle-info mr-2"></i>Important Instructions</h4>
+                    <ul class="list-disc pl-5 space-y-3 text-blue-900 font-medium">
+                        <li>The audio will play <strong>automatically</strong> once you click start.</li>
+                        <li>You <strong>cannot pause or replay</strong> the audio during the test.</li>
+                        <li>Read the instructions for each question carefully before answering.</li>
+                        <li>You can highlight text in the questions area to help you focus by selecting it with your mouse.</li>
+                    </ul>
+                </div>
+                <button id="start-btn" class="bg-pastel-accent text-white font-bold text-lg py-4 px-8 rounded-full shadow-lg hover:bg-pink-500 hover:shadow-xl hover:-translate-y-0.5 w-full transition-all duration-200">
+                    <i class="fa-solid fa-headphones mr-2"></i> Start Test Now
+                </button>
+            </div>
+        </div>
+
+        <div id="test-view" class="hidden h-full flex flex-col overflow-y-auto p-4 md:p-8">
+            <audio id="test-audio" preload="auto"></audio>
+
+            <div class="max-w-4xl w-full mx-auto flex-1">
+                <div class="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-200 mb-6 relative" id="questions-container">
+                    
+                    <div class="mb-8 text-center border-b-2 border-pastel-pink pb-4">
+                        <h2 class="text-2xl font-bold text-gray-800 tracking-wider mb-2" id="test-main-title">Test Section</h2>
+                        <p class="text-gray-500 italic" id="test-instructions">Read the instructions carefully.</p>
+                    </div>
+
+                    <!-- Questions Area -->
+                    <div id="questions-area" class="text-gray-800 text-lg leading-relaxed">
+                        <!-- Content Injected via JS -->
+                    </div>
+                </div>
+
+                <div class="text-right pb-10">
+                    <button id="submit-btn" class="bg-gray-800 hover:bg-black text-white font-bold py-3 px-10 rounded-xl shadow-md transition-colors text-lg">
+                        Submit Section <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-view" class="hidden h-full flex flex-col">
+            
+            <div class="bg-white border-b border-gray-200 px-6 py-4 flex-none flex items-center justify-between z-10 shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Test Review</h2>
+                    <p class="text-gray-500">Review your answers and check the transcript.</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500 font-medium uppercase tracking-wider mb-1">Your Score</div>
+                    <div class="text-3xl font-bold text-pastel-dark bg-pastel-blush px-4 py-1 rounded-lg border border-pastel-pink inline-block">
+                        <span id="score-display">0</span> / 10
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Navigation Bar -->
+            <div class="bg-gray-50 border-b border-gray-200 px-6 py-3 flex gap-2 overflow-x-auto whitespace-nowrap z-10 shadow-inner">
+                <span class="text-sm font-bold text-gray-500 flex items-center mr-3 uppercase tracking-wide">Jump to:</span>
+                <div id="result-nav" class="flex gap-2 pb-1">
+                    <!-- Nav pills injected here -->
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-gray-100">
+                
+                <!-- Left Pane: Transcript -->
+                <div class="w-full md:w-1/2 flex flex-col border-r border-gray-200 bg-white shadow-[4px_0_15px_rgba(0,0,0,0.03)] z-0">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex-none shadow-sm z-10">
+                        <h3 class="font-bold text-gray-700 mb-3 flex items-center"><i class="fa-solid fa-file-lines text-pastel-accent mr-2"></i> Audio Transcript</h3>
+                        <audio id="review-audio" controls class="w-full h-10 outline-none rounded-full bg-pastel-blush">
+                        </audio>
+                    </div>
+                    <div id="transcript-area" class="flex-1 overflow-y-auto p-6 text-gray-700 leading-relaxed space-y-4">
+                        <!-- Transcript injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Pane: Questions Review -->
+                <div class="w-full md:w-1/2 flex flex-col bg-gray-50 z-0">
+                    <div class="p-4 border-b border-gray-200 bg-white flex-none shadow-sm z-10">
+                        <h3 class="font-bold text-gray-700 flex items-center text-lg"><i class="fa-solid fa-list-check text-pastel-accent mr-2"></i> Review Answers</h3>
+                    </div>
+                    <div id="review-area" class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <!-- Review items injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Modal for Submission Confirmation -->
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity">
+        <div class="bg-white p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform transition-transform scale-100">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 border-2 border-red-100">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2 text-gray-800">Submit Section?</h3>
+            <p class="text-gray-500 mb-8 leading-relaxed">Are you sure you want to finish this section? You cannot change your answers after submitting.</p>
+            <div class="flex gap-4">
+                <button id="cancel-submit-btn" class="flex-1 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition">Cancel</button>
+                <button id="confirm-submit-btn" class="flex-1 py-3.5 bg-pastel-accent hover:bg-pink-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highlight Tooltip -->
+    <div id="highlight-tooltip"><i class="fa-solid fa-highlighter mr-1"></i> Highlight</div>
+
+    <script>
+        const mockTestData = {
+            sectionTitle: "Section 2: Sea Life Centre – Information",
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: "http://ieltschantruong.github.io/IELTS/src/listening_audios/guide_to_ielts_test2_section2.mp3",
+            instructions: "Complete the question below. Write NO MORE THAN THREE WORDS for each answer.",
+            questions: [
+                {
+                    id: "q11", type: "fill-in", number: 11,
+                    text: `<div class="mb-4"><strong>11.</strong> What was the Sea Life Centre previously called? <input type="text" class="ielts-input w-64" data-qid="q11" autocomplete="off"></div>`,
+                    correctAnswer: ["world of water", "World of water", "World of Water"],
+                    timestamp: 79, transcriptRef: "tr_11",
+                    explanation: "The speaker says, 'We are not called World of Water anymore', revealing its previous name."
+                },
+                {
+                    id: "q12", type: "fill-in", number: 12,
+                    text: `<div class="mb-4"><strong>12.</strong> What is the newest attraction called? <input type="text" class="ielts-input w-48" data-qid="q12" autocomplete="off"></div>`,
+                    correctAnswer: ["the splash ride", "splash ride"],
+                    timestamp: 98, transcriptRef: "tr_12",
+                    explanation: "The guide mentions, 'the latest thing that we have - and it was only finished last week - is the splash ride'."
+                },
+                {
+                    id: "q13", type: "fill-in", number: 13,
+                    text: `<div class="mb-4"><strong>13.</strong> When is the main feeding time? <input type="text" class="ielts-input w-40" data-qid="q13" autocomplete="off"></div>`,
+                    correctAnswer: ["at noon", "noon", "12", "12pm", "12 pm"],
+                    timestamp: 138, transcriptRef: "tr_13",
+                    explanation: "The guide states they used to have feeding time at 3 pm, but 'we now have it at noon'."
+                },
+                {
+                    id: "q14", type: "fill-in", number: 14,
+                    text: `<div class="mb-4"><strong>14.</strong> What can you do with a VIP ticket? <input type="text" class="ielts-input w-56" data-qid="q14" autocomplete="off"></div>`,
+                    correctAnswer: ["feed the sharks", "feed sharks"],
+                    timestamp: 182, transcriptRef: "tr_14",
+                    explanation: "She explains that with a VIP ticket, 'you'll be allowed to feed the sharks'."
+                },
+                {
+                    id: "q15", type: "fill-in", number: 15,
+                    text: `<div class="mb-4"><strong>15.</strong> What special event will the Sea Life Centre arrange for you? <input type="text" class="ielts-input w-48" data-qid="q15" autocomplete="off"></div>`,
+                    correctAnswer: ["a birthday party", "birthday party"],
+                    timestamp: 210, transcriptRef: "tr_15",
+                    explanation: "The guide reminds visitors that the Centre will be happy to 'organise a birthday party for you'."
+                },
+                {
+                    id: "q16", type: "fill-in", number: 16,
+                    text: `<div class="mb-4"><strong>16.</strong> Where will the petition for animal conservation be sent to? <input type="text" class="ielts-input w-48" data-qid="q16" autocomplete="off"></div>`,
+                    correctAnswer: ["the government", "government"],
+                    timestamp: 252, transcriptRef: "tr_16",
+                    explanation: "Once they have over 5,000 signatures, they plan to 'send it to the government'."
+                },
+                {
+                    id: "q17", type: "fill-in", number: 17,
+                    text: `<div class="mb-6 pb-6 border-b border-gray-200"><strong>17.</strong> What can you use to test what you have learnt? <input type="text" class="ielts-input w-40" data-qid="q17" autocomplete="off"></div>`,
+                    correctAnswer: ["the quiz", "quiz", "a quiz"],
+                    timestamp: 281, transcriptRef: "tr_17",
+                    explanation: "She suggests that if you want to see what you've remembered, 'please do the quiz after your visit'."
+                },
+                {
+                    id: "q18", type: "fill-in", number: 18,
+                    text: `
+                        <div class="bg-pastel-blush border border-pastel-pink p-5 rounded-xl mb-6 shadow-sm mt-6">
+                            <p class="font-bold text-pastel-dark mb-3 text-lg">Choose THREE answers from the box and write the correct letter, A-E, next to Question 18-20</p>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700 font-medium">
+                                <li><strong>A</strong> Aquarium</li>
+                                <li><strong>B</strong> Crocodile Cave</li>
+                                <li><strong>C</strong> Penguin Park</li>
+                                <li><strong>D</strong> Seal Centre</li>
+                                <li><strong>E</strong> Turtle Town</li>
+                            </ul>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3">
+                           <span class="w-12 font-bold">18.</span> 
+                           <span class="w-48 font-medium">must not miss</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q18">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["E", "e"],
+                    timestamp: 342, transcriptRef: "tr_18",
+                    explanation: "The guide says, 'if you don't have time to see everything make sure you visit Turtle Town (E)'."
+                },
+                {
+                    id: "q19", type: "fill-in", number: 19,
+                    text: `
+                        <div class="flex items-center gap-4 mb-3">
+                           <span class="w-12 font-bold">19.</span> 
+                           <span class="w-48 font-medium">temporarily closed</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q19">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["C", "c"],
+                    timestamp: 371, transcriptRef: "tr_19",
+                    explanation: "She apologizes for the Penguin Park (C), which 'has needed some urgent work to be done and so will not be open for the next week'."
+                },
+                {
+                    id: "q20", type: "fill-in", number: 20,
+                    text: `
+                        <div class="flex items-center gap-4 mb-3">
+                           <span class="w-12 font-bold">20.</span> 
+                           <span class="w-48 font-medium">large queues</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-24 text-center font-bold text-pastel-dark" data-qid="q20">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["B", "b"],
+                    timestamp: 395, transcriptRef: "tr_20",
+                    explanation: "She expects delays (large queues) because 'we're expecting a lot of people to want to see the Crocodile Cave (B) as a couple of eggs have hatched out'."
+                }
+            ],
+            transcript: [
+                { id: "tr_00", start: 0, end: 79, text: "<strong>Guide:</strong> OK - so hi everybody and welcome to the Sea Life Centre. Before you start on your tour I'd just like to give you some information about things to look out for as you go. Well first of all, I guess some of you may have been here before and may be surprised to see the name has changed." },
+                { id: "tr_11", start: 79, end: 98, text: "We are not called World of Water <em>(Q11)</em> anymore, since the beginning of this summer we've been renamed, and we've also made a few other changes. However, the main attractions like the aquarium, the crocodiles, the penguins and so on are still here." },
+                { id: "tr_12", start: 98, end: 138, text: "But we have a new restaurant and picnic area and the latest thing that we have - and it was only finished last week - is the splash ride <em>(Q12)</em>. This is an exciting new area of the centre and is pretty scary and of course you do get a bit wet so make sure you're not wearing your best clothes! As I said, the main attractions are still here and the most popular thing that everyone wants to see is feeding time, especially for the crocodiles and the seals." },
+                { id: "tr_13", start: 138, end: 182, text: "We used to have the main feeding time in the afternoon at around 3 pm but we found that some of the animals got a bit hungry waiting until then and so we now have it at noon <em>(Q13)</em>. They seem much happier with the new time - although it's a bit difficult to know what they're thinking! Now - I'd like to mention something new that we've introduced this year that we're very excited about. It's called a VIP ticket. The VIP ticket costs an extra £2 per person and you will be amazed at what it allows you to do." },
+                { id: "tr_14", start: 182, end: 210, text: "With this you'll be allowed to feed the sharks <em>(Q14)</em>. Now I know that for some people this might be quite a frightening thing to do, but it is perfectly safe. For those of you who are a bit unsure, we do have a video you can watch to see what happens. It's a great experience and your friends will be very impressed!" },
+                { id: "tr_15", start: 210, end: 252, text: "Speaking of friends, I'd just like to remind you that the Sea Life Centre will be more than happy to organise a birthday party <em>(Q15)</em> for you and your family and friends. If you need more details you can speak to me afterwards and there are also forms at the entrance that you can fill in. I'd also like to bring your attention to the good work that the Sea Life Centre is doing in support of animal conservation, I am sure you're all aware of the worrying situation with a large number of species facing extinction." },
+                { id: "tr_16", start: 252, end: 281, text: "Here at the SeaLife Centre we're taking action by asking as many people as possible to sign a petition. Once we have over 5,000 signatures we are planning to send it to the government <em>(Q16)</em> in the hope that more people will begin to take it seriously. Right - well there's obviously a lot going on at the Centre, and a lot of things to discover." },
+                { id: "tr_17", start: 281, end: 342, text: "At all the attractions there is helpful information so please read as much as you can and, if you want to see what you've remembered, please do the quiz <em>(Q17)</em> after your visit. There are no prizes of course, but I'm sure you'll be surprised by how much you've learnt. So before I leave you all to start your tour, I've just got a few tips. There are a large number of attractions and you have time to see them all." },
+                { id: "tr_18", start: 342, end: 371, text: "Of course, there are the old favourites like the Aquarium and the Crocodile Cave but if you don't have time to see everything make sure you visit Turtle Town <em>(Q18)</em>, which is beyond the Aquarium and the Seal Centre. This is very special and has a large number of endangered species, and as it's at the far corner of the Sea Life Centre it often gets overlooked." },
+                { id: "tr_19", start: 371, end: 395, text: "I also have to apologise for the Penguin Park. This has needed some urgent work to be done and so will not be open for the next week <em>(Q19)</em>. We are very sorry about this but I'm sure you'll find the Seal Centre which is directly opposite it will keep you entertained just as much - if not more!" },
+                { id: "tr_20", start: 395, end: 9999, text: "We're also very busy today as you may have noticed on your way in. Everyone starts here at the Aquarium but as it's so big, there's no waiting to get in. But today we're expecting a lot of people to want to see the Crocodile Cave as a couple of eggs have hatched out <em>(Q20)</em>. So expect delays there and, if you like, move on to the Seal Centre first and then go back when things are quieter, towards the end of the day. So I'll leave you now but if you have any questions I won't be far away and have a great time at the Sea Life Centre!" }
+            ]
+        };
+
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = mockTestData.totalTimeSeconds;
+        
+        const audioElement = document.getElementById('test-audio');
+        const reviewAudioElement = document.getElementById('review-audio');
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+
+        function initTest() {
+            document.getElementById('intro-section-title').innerText = mockTestData.sectionTitle;
+            document.getElementById('test-main-title').innerText = mockTestData.sectionTitle;
+            document.getElementById('test-instructions').innerText = mockTestData.instructions;
+            
+            audioElement.src = mockTestData.audioUrl;
+            reviewAudioElement.src = mockTestData.audioUrl;
+
+            const questionsArea = document.getElementById('questions-area');
+            questionsArea.innerHTML = ''; // Clear previous
+            
+            mockTestData.questions.forEach(q => {
+                questionsArea.insertAdjacentHTML('beforeend', `<div class="mb-2" id="q-container-${q.id}">${q.text}</div>`);
+            });
+
+            // Bind inputs and dropdowns
+            document.querySelectorAll('.ielts-input').forEach(input => {
+                input.addEventListener('input', (e) => { userAnswers[e.target.dataset.qid] = e.target.value; });
+                input.addEventListener('change', (e) => { userAnswers[e.target.dataset.qid] = e.target.value; });
+            });
+        }
+
+        startBtn.addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('timer-display').classList.remove('hidden');
+            
+            audioElement.play().catch(e => console.log("Auto-play blocked", e));
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60);
+                const s = timeRemaining % 60;
+                document.getElementById('timer-display').innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                if (timeRemaining <= 0) {
+                    handleFinalSubmit(); 
+                }
+            }, 1000);
+        });
+
+        submitBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('hidden');
+        });
+
+        cancelSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        confirmSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            handleFinalSubmit();
+        });
+
+        function handleFinalSubmit() {
+            clearInterval(timerInterval);
+            audioElement.pause();
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('timer-display').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            
+            renderResultView();
+        }
+
+        function renderResultView() {
+            let score = 0;
+            const reviewArea = document.getElementById('review-area');
+            const navArea = document.getElementById('result-nav');
+            const transcriptArea = document.getElementById('transcript-area');
+            
+            reviewArea.innerHTML = '';
+            navArea.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            mockTestData.transcript.forEach(tr => {
+                transcriptArea.insertAdjacentHTML('beforeend', `<div id="${tr.id}" class="mb-3 transition-colors duration-300 p-3 rounded-lg">${tr.text}</div>`);
+            });
+
+            mockTestData.questions.forEach((q) => {
+                const userAns = (userAnswers[q.id] || "").toString().toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase().trim() === userAns);
+                if (isCorrect) score++;
+
+                // Strip HTML inputs/selects for clean display in review
+                let cleanText = q.text.replace(/<input[^>]*>/gi, `<span class="font-bold text-gray-800 tracking-widest px-2 border-b-2 border-gray-400">___</span>`);
+                cleanText = cleanText.replace(/<select[^>]*>[\s\S]*?<\/select>/gi, `<span class="font-bold text-gray-800 tracking-widest px-2 border-b-2 border-gray-400">___</span>`);
+
+                const pillColor = isCorrect ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200' : 'bg-red-100 text-red-700 border-red-300 hover:bg-red-200';
+                navArea.insertAdjacentHTML('beforeend', `
+                    <button onclick="document.getElementById('review-q-${q.id}').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                            class="w-10 h-10 shrink-0 rounded-full border-2 font-bold flex items-center justify-center transition-all shadow-sm ${pillColor}">
+                        ${q.number}
+                    </button>
+                `);
+
+                reviewArea.insertAdjacentHTML('beforeend', `
+                    <div id="review-q-${q.id}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 scroll-mt-24 transition-all">
+                        <div class="flex items-start justify-between mb-4">
+                            <span class="font-bold text-gray-500 bg-gray-100 px-4 py-1.5 rounded-lg text-sm uppercase tracking-wide">Question ${q.number}</span>
+                            ${isCorrect 
+                                ? `<span class="text-green-600 bg-green-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm"><i class="fa-solid fa-check mr-2"></i>Correct</span>` 
+                                : `<span class="text-red-600 bg-red-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm"><i class="fa-solid fa-xmark mr-2"></i>Incorrect</span>`
+                            }
+                        </div>
+                        
+                        <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-100 text-gray-800 text-lg leading-relaxed shadow-inner">
+                            ${cleanText}
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                                <p class="text-xs text-red-500 font-bold uppercase tracking-wider mb-1">Your Answer</p>
+                                <p class="font-medium text-lg ${!userAns ? 'text-gray-400 italic' : 'text-gray-800'}">${userAns || 'No answer provided'}</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                                <p class="text-xs text-green-600 font-bold uppercase tracking-wider mb-1">Correct Answer</p>
+                                <p class="font-bold text-gray-800 text-lg">${q.correctAnswer[0]}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-pastel-blush border border-pastel-pink rounded-xl p-5 shadow-sm">
+                            <div class="flex justify-between items-center mb-3">
+                                <p class="font-bold text-pastel-dark flex items-center text-lg"><i class="fa-regular fa-lightbulb mr-2"></i> Explanation</p>
+                                <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}')" class="bg-white hover:bg-pastel-accent hover:text-white text-pastel-dark border border-pastel-pink font-bold py-2 px-5 rounded-full text-sm transition-all flex items-center shadow-sm">
+                                    <i class="fa-solid fa-circle-play mr-2 text-lg"></i> Play Audio
+                                </button>
+                            </div>
+                            <p class="text-gray-700 text-base leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('score-display').innerText = score;
+        }
+
+        function playExplanation(time, trId) {
+            reviewAudioElement.currentTime = time;
+            reviewAudioElement.play();
+
+            document.querySelectorAll('.transcript-highlight').forEach(el => {
+                el.classList.remove('transcript-highlight');
+            });
+
+            const trElement = document.getElementById(trId);
+            if (trElement) {
+                trElement.classList.add('transcript-highlight');
+                trElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        const tooltip = document.getElementById('highlight-tooltip');
+        let currentSelection = null;
+
+        document.getElementById('questions-container').addEventListener('mouseup', (e) => {
+            const selection = window.getSelection();
+            if (selection.toString().trim().length > 0 && !e.target.closest('input') && !e.target.closest('select')) {
+                currentSelection = selection.getRangeAt(0);
+                const rect = currentSelection.getBoundingClientRect();
+                
+                tooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                tooltip.style.top = `${rect.top + window.scrollY}px`;
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target !== tooltip) tooltip.style.display = 'none';
+        });
+
+        tooltip.addEventListener('click', () => {
+            if (currentSelection) {
+                try {
+                    const span = document.createElement('span');
+                    span.className = 'highlighted-text';
+                    span.title = "Click to remove highlight";
+                    span.onclick = function(e) {
+                        e.stopPropagation();
+                        const parent = this.parentNode;
+                        while (this.firstChild) { parent.insertBefore(this.firstChild, this); }
+                        parent.removeChild(this);
+                    };
+                    currentSelection.surroundContents(span);
+                } catch (e) {
+                    console.log("Cannot highlight across multiple HTML elements.", e);
+                }
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Initialize on load
+        initTest();
+    </script>
+</body>
+</html>
