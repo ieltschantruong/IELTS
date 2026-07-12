@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking Vocab | Technology & Media - IELTS Chan Truong</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #334155;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 6rem;
+        }
+
+        .exam-paper {
+            background-color: #fff;
+            width: 100%;
+            max-width: 900px;
+            padding: 4rem 5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+                              linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 0; background: #fff; padding-bottom: 6rem; }
+            .exam-paper { padding: 2rem 1.5rem; box-shadow: none; }
+        }
+
+        .blank-input {
+            border: none;
+            border-bottom: 1.5px dotted #000;
+            background: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #1e3a8a;
+            text-align: center;
+            outline: none;
+            padding: 0 5px;
+            margin: 0 5px;
+            border-radius: 0;
+            transition: all 0.2s;
+        }
+        
+        .blank-input:focus {
+            background-color: rgba(253, 253, 150, 0.3);
+            border-bottom: 1.5px solid #2563eb;
+        }
+
+        .blank-input.graded-correct {
+            color: #16a34a;
+            border-bottom: 1.5px solid #16a34a;
+        }
+
+        .blank-input.graded-incorrect {
+            color: #dc2626;
+            border-bottom: 1.5px solid #dc2626;
+            text-decoration: line-through;
+        }
+
+        .mcq-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        @media (max-width: 640px) {
+            .mcq-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+        }
+
+        .mcq-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+        .mcq-option input[type="radio"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #000;
+            border-radius: 50%;
+            outline: none;
+            position: relative;
+        }
+
+        .mcq-option input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: #1e3a8a;
+            border-radius: 50%;
+        }
+
+        .correction-text {
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 1rem;
+            font-style: italic;
+            margin-left: 0.5rem;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+        
+        .mark-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin-left: 5px;
+            transform: translateY(-2px);
+        }
+
+        p, li, .q-item { line-height: 1.8; font-size: 1.05rem; }
+        .section-title { font-weight: bold; margin-top: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-size: 1.1rem;}
+        
+        .word-bank { 
+            text-align: center; 
+            font-style: italic; 
+            margin: 1.5rem 0; 
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            row-gap: 1rem;
+            column-gap: 2rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0;
+            background: #fafafa;
+        }
+        
+        .word-bank span { white-space: nowrap; }
+
+        .submit-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid #cbd5e1;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            flex-wrap: wrap;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .hide-print { display: flex; gap: 0.5rem; }
+        @media print {
+            .hide-print, .submit-bar { display: none !important; }
+            body { background: white; padding: 0; }
+            .exam-paper { padding: 0; box-shadow: none; max-width: 100%; }
+            .word-bank { gap: 1.5rem; padding: 1rem; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="exam-paper" id="test-container">
+        
+        <div class="flex justify-between items-start text-sm mb-8 border-b-2 border-black pb-4">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-end gap-2">
+                    <span class="font-bold">Name:</span>
+                    <input type="text" class="blank-input w-48" placeholder="Student Name">
+                </div>
+                <div class="flex items-end gap-2">
+                    <span class="font-bold">Date:</span>
+                    <input type="text" class="blank-input w-32">
+                </div>
+            </div>
+            <div class="text-right italic font-bold">
+                IELTS Chan Truong 2026<br>
+                Target Band: 6.5 - 7.5+
+            </div>
+        </div>
+
+        <div class="text-center mb-10">
+            <h1 class="text-2xl font-bold uppercase tracking-widest mb-1">Speaking Vocab Test</h1>
+            <h2 class="text-lg font-bold italic text-slate-600">Technology & Media (Comprehensive Review)</h2>
+        </div>
+
+        <!-- Grade Display -->
+        <div id="grade-display" class="hidden absolute top-12 right-12 w-28 h-28 border-[5px] border-red-600 rounded-full flex flex-col items-center justify-center text-red-600 transform rotate-12 bg-white/90 backdrop-blur-sm z-10 shadow-xl">
+            <span class="text-4xl font-black font-sans leading-none" id="final-score">0</span>
+            <span class="text-sm font-bold border-t-[3px] border-red-600 w-16 text-center mt-1 pt-1 font-sans">/40</span>
+        </div>
+
+        <form id="vocab-form" onsubmit="event.preventDefault(); gradeTest();">
+
+            <div class="section">
+                <div class="section-title flex gap-4">
+                    <span>I.</span>
+                    <span>Core Vocabulary (Context Gap-Fill)</span>
+                </div>
+                <div class="italic text-sm mb-4">Fill in each blank with one suitable word from the list below.</div>
+                
+                <div class="word-bank font-bold text-base" id="shufflable-bank-1">
+                    <span>algorithm</span>
+                    <span>cutting-edge</span>
+                    <span>cyberbullying</span>
+                    <span>e-commerce</span>
+                    <span>gadget</span>
+                    <span>glitch</span>
+                    <span>interface</span>
+                    <span>breakthrough</span>
+                    <span>telecommuting</span>
+                    <span>bandwidth</span>
+                </div>
+
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="1">1. Social media platforms use a complex <input type="text" class="blank-input w-32" id="q1" autocomplete="off"> to determine what content appears on your feed.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="2">2. This new smartphone is equipped with <input type="text" class="blank-input w-32" id="q2" autocomplete="off"> technology.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="3">3. Schools need to implement stricter policies to combat <input type="text" class="blank-input w-36" id="q3" autocomplete="off"> among students.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="4">4. The rapid growth of <input type="text" class="blank-input w-32" id="q4" autocomplete="off"> has completely transformed the retail industry.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="5">5. He loves buying the latest electronic <input type="text" class="blank-input w-32" id="q5" autocomplete="off"> as soon as they hit the market.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="6">6. Due to a minor software <input type="text" class="blank-input w-28" id="q6" autocomplete="off">, the website was down for a few hours.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="7">7. The new app has a very user-friendly <input type="text" class="blank-input w-32" id="q7" autocomplete="off"> that is easy to navigate.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="8">8. The development of the microchip was a major <input type="text" class="blank-input w-32" id="q8" autocomplete="off"> in computer science.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="9">9. <input type="text" class="blank-input w-36" id="q9" autocomplete="off"> became the norm for millions of office workers during the global pandemic.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="10">10. We need to upgrade our internet package because we don't have enough <input type="text" class="blank-input w-32" id="q10" autocomplete="off"> for video streaming.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>II.</span>
+                    <span>Word Formation</span>
+                </div>
+                <div class="italic text-sm mb-4">Fill in each blank with the <span class="font-bold underline">suitable form</span> of the word in brackets.</div>
+                
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="11">11. End-to-end <input type="text" class="blank-input w-32" id="q11" autocomplete="off"> ensures that your private messages remain secure. <span class="font-bold italic">(ENCRYPT)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="12">12. Companies often pay popular <input type="text" class="blank-input w-32" id="q12" autocomplete="off"> to promote their products on Instagram. <span class="font-bold italic">(INFLUENCE)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="13">13. With the rise of digital streaming, physical CDs are rapidly approaching <input type="text" class="blank-input w-32" id="q13" autocomplete="off">. <span class="font-bold italic">(OBSOLETE)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="14">14. Many users are deeply concerned about data <input type="text" class="blank-input w-32" id="q14" autocomplete="off"> on social networking sites. <span class="font-bold italic">(PRIVATE)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="15">15. My grandfather suffers from <input type="text" class="blank-input w-36" id="q15" autocomplete="off"> and refuses to use a smartphone or computer. <span class="font-bold italic">(TECHNOPHOBE)</span><span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>III.</span>
+                    <span>Pronunciation: Word Stress</span>
+                </div>
+                <div class="italic text-sm mb-4">Choose the word which has a <span class="font-bold underline">different stress pattern</span> from the others.</div>
+
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="16">
+                        <div class="flex items-center gap-2"><span>16.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q16" value="a"> a) algorithm</label>
+                            <label class="mcq-option"><input type="radio" name="q16" value="b"> b) privacy</label>
+                            <label class="mcq-option"><input type="radio" name="q16" value="c"> c) influencer</label>
+                            <label class="mcq-option"><input type="radio" name="q16" value="d"> d) encryption</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="17">
+                        <div class="flex items-center gap-2"><span>17.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q17" value="a"> a) interface</label>
+                            <label class="mcq-option"><input type="radio" name="q17" value="b"> b) telecommute</label>
+                            <label class="mcq-option"><input type="radio" name="q17" value="c"> c) cyberbully</label>
+                            <label class="mcq-option"><input type="radio" name="q17" value="d"> d) technophile</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="18">
+                        <div class="flex items-center gap-2"><span>18.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q18" value="a"> a) obsolete</label>
+                            <label class="mcq-option"><input type="radio" name="q18" value="b"> b) viral</label>
+                            <label class="mcq-option"><input type="radio" name="q18" value="c"> c) gadget</label>
+                            <label class="mcq-option"><input type="radio" name="q18" value="d"> d) bandwidth</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="19">
+                        <div class="flex items-center gap-2"><span>19.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q19" value="a"> a) reality</label>
+                            <label class="mcq-option"><input type="radio" name="q19" value="b"> b) geographical</label>
+                            <label class="mcq-option"><input type="radio" name="q19" value="c"> c) security</label>
+                            <label class="mcq-option"><input type="radio" name="q19" value="d"> d) technology</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="20">
+                        <div class="flex items-center gap-2"><span>20.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q20" value="a"> a) efficiency</label>
+                            <label class="mcq-option"><input type="radio" name="q20" value="b"> b) artificial</label>
+                            <label class="mcq-option"><input type="radio" name="q20" value="c"> c) intelligence</label>
+                            <label class="mcq-option"><input type="radio" name="q20" value="d"> d) entertainment</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>IV.</span>
+                    <span>Idioms & Expressions (Context)</span>
+                </div>
+                <div class="italic text-sm mb-4">Choose the correct idiom to complete the sentence.</div>
+
+                <div class="space-y-6 ml-6">
+                    <div class="q-item" data-q="21">
+                        <div class="flex items-start gap-2"><span>21.</span> <div>Teenagers nowadays seem to be ________ from the moment they wake up.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q21" value="a"> a) glued to the screen</label>
+                            <label class="mcq-option"><input type="radio" name="q21" value="b"> b) behind the times</label>
+                            <label class="mcq-option"><input type="radio" name="q21" value="c"> c) a click away</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="22">
+                        <div class="flex items-start gap-2"><span>22.</span> <div>Artificial intelligence is ________; it increases efficiency but threatens certain jobs.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q22" value="a"> a) not rocket science</label>
+                            <label class="mcq-option"><input type="radio" name="q22" value="b"> b) tech-savvy</label>
+                            <label class="mcq-option"><input type="radio" name="q22" value="c"> c) a double-edged sword</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="23">
+                        <div class="flex items-start gap-2"><span>23.</span> <div>If you spend too much time playing VR games, you might ________.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q23" value="a"> a) lose touch with reality</label>
+                            <label class="mcq-option"><input type="radio" name="q23" value="b"> b) go viral</label>
+                            <label class="mcq-option"><input type="radio" name="q23" value="c"> c) keep in touch</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="24">
+                        <div class="flex items-start gap-2"><span>24.</span> <div>On weekends, I try to completely ________ from all digital devices to clear my mind.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q24" value="a"> a) scroll mindlessly</label>
+                            <label class="mcq-option"><input type="radio" name="q24" value="b"> b) unplug</label>
+                            <label class="mcq-option"><input type="radio" name="q24" value="c"> c) stay up to date</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="25">
+                        <div class="flex items-start gap-2"><span>25.</span> <div>Video calling apps have successfully ________ between remote workers.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q25" value="a"> a) invaded privacy</label>
+                            <label class="mcq-option"><input type="radio" name="q25" value="b"> b) jumped on the bandwagon</label>
+                            <label class="mcq-option"><input type="radio" name="q25" value="c"> c) bridged the geographical gap</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>V.</span>
+                    <span>Idioms & Expressions (Meaning)</span>
+                </div>
+                <div class="italic text-sm mb-4">Choose the correct expression that matches the definition.</div>
+
+                <div class="space-y-6 ml-6">
+                    <div class="q-item" data-q="26">
+                        <div class="flex items-start gap-2"><span>26.</span> <div>Which expression means "to find information quickly and easily on the internet"?<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q26" value="a"> a) be a click away</label>
+                            <label class="mcq-option"><input type="radio" name="q26" value="b"> b) reinvent the wheel</label>
+                            <label class="mcq-option"><input type="radio" name="q26" value="c"> c) go viral</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="27">
+                        <div class="flex items-start gap-2"><span>27.</span> <div>Which expression describes "exposure to or provision of too much data or news"?<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q27" value="a"> a) digital footprint</label>
+                            <label class="mcq-option"><input type="radio" name="q27" value="b"> b) information overload</label>
+                            <label class="mcq-option"><input type="radio" name="q27" value="c"> c) behind the times</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="28">
+                        <div class="flex items-start gap-2"><span>28.</span> <div>What does it mean to be "tech-savvy"?<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q28" value="a"> a) To be addicted to social media.</label>
+                            <label class="mcq-option"><input type="radio" name="q28" value="b"> b) To be highly knowledgeable and skilled with modern technology.</label>
+                            <label class="mcq-option"><input type="radio" name="q28" value="c"> c) To fear or avoid using computers.</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="29">
+                        <div class="flex items-start gap-2"><span>29.</span> <div>Which phrase means "to waste time solving a problem that has already been solved by others"?<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q29" value="a"> a) jump on the bandwagon</label>
+                            <label class="mcq-option"><input type="radio" name="q29" value="b"> b) scroll mindlessly</label>
+                            <label class="mcq-option"><input type="radio" name="q29" value="c"> c) reinvent the wheel</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="30">
+                        <div class="flex items-start gap-2"><span>30.</span> <div>"Not rocket science" is used to describe something that is:<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q30" value="a"> a) Very easy to understand or do.</label>
+                            <label class="mcq-option"><input type="radio" name="q30" value="b"> b) Incredibly dangerous or risky.</label>
+                            <label class="mcq-option"><input type="radio" name="q30" value="c"> c) Highly advanced and state-of-the-art.</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>VI.</span>
+                    <span>Idioms (Direct Recall)</span>
+                </div>
+                <div class="italic text-sm mb-4">Complete the idioms by filling in <span class="font-bold underline">exactly ONE word</span>. (No word bank provided).</div>
+
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="31">31. Targeted advertising often feels like it can invade someone's <input type="text" class="blank-input w-24" id="q31" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="32">32. Following reliable news apps helps me stay up to <input type="text" class="blank-input w-24" id="q32" autocomplete="off"> with global events.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="33">33. Social networking sites make it incredibly easy to keep in <input type="text" class="blank-input w-24" id="q33" autocomplete="off"> with old friends.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="34">34. Whenever a new social media challenge appears, thousands of people quickly jump on the <input type="text" class="blank-input w-28" id="q34" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="35">35. Any company that doesn't utilize digital marketing is severely behind the <input type="text" class="blank-input w-24" id="q35" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="36">36. Instead of going to sleep, I often catch myself scrolling <input type="text" class="blank-input w-28" id="q36" autocomplete="off"> through short videos.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="37">37. It is important to manage your digital <input type="text" class="blank-input w-28" id="q37" autocomplete="off"> carefully, as employers often check your online history.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="38">38. I usually spend a few hours browsing the <input type="text" class="blank-input w-24" id="q38" autocomplete="off"> for news and entertainment in the evening.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="39">39. The university's new computer lab is equipped with state-of-the-<input type="text" class="blank-input w-20" id="q39" autocomplete="off"> technology.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="40">40. It's incredible how quickly a simple meme can go <input type="text" class="blank-input w-24" id="q40" autocomplete="off"> on the internet.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="submit-bar">
+        <div class="text-sm text-slate-500 italic hidden md:block">Export or Submit</div>
+        
+        <div class="flex gap-2 hide-print">
+            <button type="button" onclick="window.print()" class="px-4 py-2 border-2 border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2" title="Print as PDF">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                PDF
+            </button>
+            <button type="button" onclick="exportWord()" class="px-4 py-2 border-2 border-blue-200 rounded-lg text-blue-700 font-bold hover:bg-blue-50 transition-colors flex items-center gap-2" title="Export as MS Word">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Word
+            </button>
+            <button type="button" onclick="exportMarkdown()" class="px-4 py-2 border-2 border-slate-800 rounded-lg text-slate-800 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2" title="Export as Markdown">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                .MD
+            </button>
+        </div>
+
+        <button type="button" onclick="gradeTest()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg shadow-blue-500/30 transition-colors text-lg flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Submit for Grading
+        </button>
+    </div>
+
+    <script>
+        // Dynamically shuffle word banks on page load
+        function shuffleWordBanks() {
+            document.querySelectorAll('.word-bank').forEach(bank => {
+                const words = Array.from(bank.children);
+                for (let i = words.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [words[i], words[j]] = [words[j], words[i]];
+                }
+                words.forEach(word => bank.appendChild(word));
+            });
+        }
+        
+        shuffleWordBanks();
+
+        const answerKey = {
+            // Part 1: Core Gap Fill
+            q1: ["algorithm"], q2: ["cutting-edge", "cutting edge"], q3: ["cyberbullying"], q4: ["e-commerce", "ecommerce"], q5: ["gadgets", "gadget"],
+            q6: ["glitch"], q7: ["interface"], q8: ["breakthrough"], q9: ["telecommuting"], q10: ["bandwidth"],
+            
+            // Part 2: Word Forms
+            q11: ["encryption"], q12: ["influencers", "influencer"], q13: ["obsolescence"], q14: ["privacy"], q15: ["technophobia"],
+            
+            // Part 3: Stress Pattern MCQ
+            q16: "d", q17: "b", q18: "a", q19: "b", q20: "a",
+            
+            // Part 4: Idioms MCQ Context
+            q21: "a", q22: "c", q23: "a", q24: "b", q25: "c",
+            
+            // Part 5: Idiom Meaning
+            q26: "a", q27: "b", q28: "b", q29: "c", q30: "a",
+            
+            // Part 6: Idiom Completion
+            q31: ["privacy"], q32: ["date"], q33: ["touch"], q34: ["bandwagon"], q35: ["times"], 
+            q36: ["mindlessly"], q37: ["footprint"], q38: ["web"], q39: ["art"], q40: ["viral"]
+        };
+
+        const explanations = {
+            q16: "'encryption' is stressed on the 2nd syllable (en-CRYP-tion), others are on the 1st.",
+            q17: "'telecommute' is stressed on the 3rd syllable (te-le-com-MUTE), others are on the 1st.",
+            q18: "'obsolete' is stressed on the 3rd syllable (ob-so-LETE), others are on the 1st.",
+            q19: "'geographical' is stressed on the 3rd syllable (ge-o-GRAPH-i-cal), others are on the 2nd.",
+            q20: "'efficiency' is stressed on the 2nd syllable (ef-FI-cien-cy), others are on the 3rd."
+        };
+
+        const tickSVG = `<svg class="mark-icon text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+        const crossSVG = `<svg class="mark-icon text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+        function exportWord() {
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                 "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                 "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                 "<head><meta charset='utf-8'><title>Export HTML to Word</title></head><body>";
+            const footer = "</body></html>";
+            
+            const clone = document.getElementById('test-container').cloneNode(true);
+            
+            const gradeDisplay = clone.querySelector('#grade-display');
+            if(gradeDisplay) gradeDisplay.remove();
+            clone.querySelectorAll('.correction-area').forEach(el => el.remove());
+            
+            clone.querySelectorAll('input[type="text"]').forEach(input => {
+                const blank = document.createTextNode(' __________________ ');
+                input.parentNode.replaceChild(blank, input);
+            });
+            
+            clone.querySelectorAll('input[type="radio"]').forEach(input => {
+                const box = document.createTextNode('○ ');
+                input.parentNode.replaceChild(box, input);
+            });
+
+            clone.querySelectorAll('.word-bank').forEach(wb => {
+                wb.style.border = "1px solid black";
+                wb.style.padding = "10px";
+                wb.style.textAlign = "center";
+                wb.style.lineHeight = "2";
+            });
+
+            const html = header + clone.innerHTML + footer;
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Speaking_Vocab_Tech_Media.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportMarkdown() {
+            let md = "# Speaking Vocab | Technology & Media\n\n";
+            md += "**Name:** __________________\n";
+            md += "**Date:** __________________\n\n";
+            md += "---\n\n";
+
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const titleEl = section.querySelector('.section-title');
+                if(titleEl) md += "### " + titleEl.innerText.replace(/\s+/g, ' ').trim() + "\n\n";
+
+                const wordBank = section.querySelector('.word-bank');
+                if(wordBank) {
+                    const words = Array.from(wordBank.querySelectorAll('span')).map(s => s.innerText);
+                    md += "**Word Bank:** " + words.join(', ') + "\n\n";
+                }
+
+                const questions = section.querySelectorAll('.q-item');
+                questions.forEach(q => {
+                    const qClone = q.cloneNode(true);
+                    const corr = qClone.querySelector('.correction-area');
+                    if(corr) corr.remove();
+
+                    qClone.querySelectorAll('input[type="text"]').forEach(input => {
+                        const blank = document.createTextNode(' ________ ');
+                        input.parentNode.replaceChild(blank, input);
+                    });
+
+                    const mcqGrid = qClone.querySelector('.mcq-grid');
+                    if (mcqGrid) {
+                        const qTextEl = qClone.querySelector('.flex.items-start > div:last-child, .flex.items-center');
+                        let qText = qClone.innerText.split('\n')[0].trim();
+                        if(qTextEl) qText = qTextEl.innerText.trim();
+                        
+                        md += qText + "\n";
+                        
+                        const options = mcqGrid.querySelectorAll('.mcq-option');
+                        options.forEach(opt => md += "- [ ] " + opt.innerText.trim() + "\n");
+                        md += "\n";
+                    } else {
+                        md += qClone.innerText.replace(/\s+/g, ' ').trim() + "\n\n";
+                    }
+                });
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Speaking_Vocab_Tech_Media.md';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function gradeTest() {
+            let score = 0;
+            let totalQuestions = Object.keys(answerKey).length;
+
+            for (let id in answerKey) {
+                let isCorrect = false;
+                let userAnswer = "";
+                let expectedAnswer = "";
+                const container = document.querySelector(`.q-item[data-q="${id.replace('q', '')}"]`);
+                if(!container) continue; 
+                
+                const correctionArea = container.querySelector('.correction-area');
+                correctionArea.innerHTML = '';
+                
+                // Handle Text Inputs
+                if (Array.isArray(answerKey[id])) {
+                    const inputEl = document.getElementById(id);
+                    inputEl.classList.remove('graded-correct', 'graded-incorrect');
+                    
+                    userAnswer = inputEl.value.trim().toLowerCase().replace(/[.,]/g, '');
+                    expectedAnswer = answerKey[id][0]; 
+                    
+                    if (answerKey[id].includes(userAnswer)) {
+                        isCorrect = true;
+                        inputEl.classList.add('graded-correct');
+                        correctionArea.innerHTML = tickSVG;
+                    } else {
+                        inputEl.classList.add('graded-incorrect');
+                        correctionArea.innerHTML = crossSVG + ` <span class="correction-text">${expectedAnswer}</span>`;
+                    }
+                    inputEl.readOnly = true;
+                } 
+                // Handle Radio Buttons
+                else {
+                    const radios = document.getElementsByName(id);
+                    expectedAnswer = answerKey[id];
+                    
+                    for (let radio of radios) {
+                        radio.disabled = true;
+                        if (radio.checked) userAnswer = radio.value;
+                    }
+
+                    let explanationHTML = "";
+                    if (explanations[id]) {
+                        explanationHTML = ` <span class="text-[0.95rem] text-slate-500 font-normal italic ml-2">(${explanations[id]})</span>`;
+                    }
+
+                    if (userAnswer === expectedAnswer) {
+                        isCorrect = true;
+                        correctionArea.innerHTML = tickSVG + explanationHTML;
+                    } else {
+                        correctionArea.innerHTML = crossSVG + ` <span class="correction-text">Correct answer: ${expectedAnswer.toUpperCase()}</span>` + explanationHTML;
+                    }
+                }
+
+                if (isCorrect) score++;
+            }
+
+            // Display Final Score
+            const gradeDisplay = document.getElementById('grade-display');
+            document.getElementById('final-score').textContent = score;
+            
+            // Calculate percentage for styling
+            const percentage = (score / totalQuestions) * 100;
+            if(percentage >= 80) {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-green-600 rounded-full flex flex-col items-center justify-center text-green-600 transform rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-green-600 w-16 text-center mt-1 pt-1 font-sans";
+            } else if (percentage >= 60) {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-blue-600 rounded-full flex flex-col items-center justify-center text-blue-600 transform -rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-blue-600 w-16 text-center mt-1 pt-1 font-sans";
+            } else {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-red-600 rounded-full flex flex-col items-center justify-center text-red-600 transform rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-red-600 w-16 text-center mt-1 pt-1 font-sans";
+            }
+            
+            gradeDisplay.querySelector('.border-t-[3px]').innerHTML = `/${totalQuestions}`;
+            gradeDisplay.classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const submitBar = document.querySelector('.submit-bar');
+            submitBar.innerHTML = `
+                <button type="button" onclick="location.reload()" class="px-8 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold shadow-lg transition-colors text-lg flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Clear Answers & Retake
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>
