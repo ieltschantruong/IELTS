@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   // Very light blush
+                            100: '#fce8eb',  // Pale pink
+                            200: '#f7cdd5',  // Pastel pink
+                            300: '#f0a8b6',  // Soft pink
+                            400: '#e67c91',  // Muted dark pink
+                            500: '#d75872',  // Primary elegant pink (pastel/dusty rose)
+                            600: '#bf3f58',  // Deeper elegant pink
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Radio Button Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            width: 140px;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+        /* Toast Notification for NOT GIVEN */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 80px;
+            transform: translateX(-50%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.4s, bottom 0.4s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 100px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 1</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">The history of the poster</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">The appearance of the poster has changed continuously over the past two centuries.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p>The first posters were known as 'broadsides' and were used for public and commercial announcements. Printed on one side only using metal type, they were quickly and crudely produced in large quantities. As they were meant to be read at a distance, they required large lettering.</p>
+
+                    <p>There were a number of negative aspects of large metal type. <span id="exp-q1" class="explanation-target">It was expensive, required a large amount of storage space and was extremely heavy.</span> If a printer did have a collection of large metal type, it was likely that there were not enough letters. So printers did their best by mixing and matching styles.</p>
+
+                    <p>Commercial pressure for large type was answered with the invention of a system for wood type production. In 1827, Darius Wells invented a special wood drill - the lateral router - capable of cutting letters on wood blocks. <span id="exp-q2" class="explanation-target">The router was used in combination with William Leavenworth's pantograph (1834)</span> to create decorative wooden letters of all shapes and sizes. <span id="exp-q3" class="explanation-target">The first posters began to appear, but they had little colour and design;</span> often wooden type was mixed with metal type in a conglomeration of styles.</p>
+
+                    <p>A major development in poster design was the application of lithography, invented by Alois Senefelder in 1796, which allowed artists to hand-draw letters, opening the field of type design to endless styles. <span id="exp-q4" class="explanation-target">The method involved drawing with a greasy crayon onto finely surfaced Bavarian limestone</span> and offsetting that image onto paper. This direct process captured the artist's true intention; however, the final printed image was in reverse. <span id="exp-q5" class="explanation-target">The images and lettering needed to be drawn backwards, often reflected in a mirror or traced on transfer paper.</span></p>
+
+                    <p>As a result of this technical difficulty, the invention of the lithographic process had little impact on posters until the 1860s, when Jules Cheret came up with his 'three-stone lithographic process'. This gave artists the opportunity to experiment with a wide spectrum of colours. Although the process was difficult, the result was remarkable, with nuances of colour impossible in other media even to this day. <span id="exp-q6" class="explanation-target">The ability to mix words and images in such an attractive and economical format</span> finally made the lithographic poster a powerful innovation.</p>
+
+                    <p>Starting in the 1870s, <span id="exp-q7" class="explanation-target">posters became the main vehicle for advertising prior to the magazine era and the dominant means of mass communication</span> in the rapidly growing cities of Europe and America. Yet in the streets of Paris, Milan and Berlin, these artistic prints were so popular that they were stolen off walls almost as soon as they were hung. Cheret, later known as 'the father of the modern poster', <span id="exp-q8" class="explanation-target">organised the first exhibition of posters in 1884</span> and two years later published the first book on poster art. He quickly took advantage of the public interest by arranging for artists to create posters, at a reduced size, that were suitable for in-home display.</p>
+
+                    <p>Thanks to Cheret, the poster slowly took hold in other countries in the 1890s and <span id="exp-q9" class="explanation-target">came to celebrate each society's unique cultural institutions:</span> the café in France, the opera and fashion in Italy, festivals in Spain, literature in Holland and trade fairs in Germany. The first poster shows were held in Great Britain and Italy in 1894, Germany in 1896 and Russia in 1897. The most important poster show ever, to many observers, was held in Reims, France, in 1896 and featured an unbelievable 1,690 posters arranged by country.</p>
+
+                    <p>In the early 20th century, the poster continued to play a large communication role and to go through a range of styles. By the 1950s, however, it had begun to share the spotlight with other media, mainly radio and print. By this time, most posters were printed using the mass production technique of photo offset, which resulted in the familiar dot pattern seen in newspapers and magazines. <span id="exp-q10" class="explanation-target">In addition, the use of photography in posters, begun in Russia in the twenties, started to become as common as illustration.</span></p>
+
+                    <p>In the late fifties, a new graphic style that had strong reliance on typographic elements in black and white appeared. The new style came to be known as the International Typographic Style. It made use of a mathematical grid, strict graphic rules and black-and-white photography to provide a clear and logical structure. <span id="exp-q11" class="explanation-target">It became the predominant style in the world in the 1970s and continues to exert its influence today.</span></p>
+
+                    <p><span id="exp-q12" class="explanation-target">It was perfectly suited to the increasingly international post-war marketplace, where there was a strong demand for clarity.</span> This meant that the accessibility of words and symbols had to be taken into account. Corporations wanted international identification, and events such as the Olympics called for universal solutions, which the Typographic Style could provide.</p>
+
+                    <p>However, the International Typographic Style began to lose its energy in the late 1970s. Many criticised it for being cold, formal and dogmatic. A young teacher in Basel, Wolfgang Weingart, experimented with the offset printing process to produce posters that appeared complex and chaotic, playful and spontaneous - all in stark contrast to what had gone before. Weingart's liberation of typography was an important foundation for several new styles. These ranged from Memphis and Retro to the advances now being made in computer graphics.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth relative">
+            
+            <!-- Results Banner -->
+            <div id="results-banner" class="hidden relative mb-6 bg-white border border-brand-200 rounded-2xl p-4 shadow-lg text-center transform transition-all overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                <h2 class="text-xl font-black text-gray-800 mb-1 mt-1">Test Completed</h2>
+                <div class="flex justify-center items-end gap-2 mb-2">
+                    <span class="text-4xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                    <span class="text-lg font-bold text-gray-400 mb-0.5">/ 13</span>
+                </div>
+                <p class="text-xs text-gray-600 bg-brand-50 p-2 rounded-lg border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800">Complete the table below. Choose <strong class="text-brand-700">NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left border-collapse border border-gray-200 rounded-lg shadow-sm">
+                            <thead class="bg-brand-100 text-brand-900 font-bold">
+                                <tr>
+                                    <th class="border border-brand-200 p-3 w-1/3">Early Printing Methods</th>
+                                    <th class="border border-brand-200 p-3 w-1/3">Features</th>
+                                    <th class="border border-brand-200 p-3 w-1/3">Problems</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700 leading-relaxed align-top">
+                                <tr>
+                                    <td class="border border-gray-200 p-4 font-semibold">Metal type</td>
+                                    <td class="border border-gray-200 p-4">
+                                        <ul class="list-disc pl-4 space-y-2">
+                                            <li>produce large print</li>
+                                        </ul>
+                                    </td>
+                                    <td class="border border-gray-200 p-4 bg-gray-50">
+                                        <ul class="list-disc pl-4 space-y-2">
+                                            <li>cost, weight and <span class="q-row-text inline-flex flex-col items-center gap-1" data-q="1">
+                                                <span class="flex items-center gap-1"><strong>1</strong><input type="text" id="input-q1" onkeyup="updateTextInput(1, this.value)" class="w-24 px-1 py-0.5 text-xs"></span>
+                                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200" onclick="showExplanation('exp-q1')">Explanation</button>
+                                            </span> difficulties</li>
+                                            <li>mixed styles</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-200 p-4 font-semibold">Wood type</td>
+                                    <td class="border border-gray-200 p-4 bg-gray-50">
+                                        <ul class="list-disc pl-4 space-y-2">
+                                            <li>Darius's wood drill used in connection with another <span class="q-row-text inline-flex flex-col items-center gap-1" data-q="2">
+                                                <span class="flex items-center gap-1"><strong>2</strong><input type="text" id="input-q2" onkeyup="updateTextInput(2, this.value)" class="w-24 px-1 py-0.5 text-xs"></span>
+                                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200" onclick="showExplanation('exp-q2')">Explanation</button>
+                                            </span></li>
+                                            <li>produced a range of letters</li>
+                                        </ul>
+                                    </td>
+                                    <td class="border border-gray-200 p-4 bg-gray-50">
+                                        <ul class="list-disc pl-4 space-y-2">
+                                            <li>laced both <span class="q-row-text inline-flex flex-col items-center gap-1" data-q="3">
+                                                <span class="flex items-center gap-1"><strong>3</strong><input type="text" id="input-q3" onkeyup="updateTextInput(3, this.value)" class="w-24 px-1 py-0.5 text-xs"></span>
+                                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200" onclick="showExplanation('exp-q3')">Explanation</button>
+                                            </span></li>
+                                            <li>mixed type</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-200 p-4 font-semibold">Lithography</td>
+                                    <td class="border border-gray-200 p-4 bg-gray-50">
+                                        <ul class="list-disc pl-4 space-y-2">
+                                            <li>letters drawn by hand</li>
+                                            <li>design tool - a <span class="q-row-text inline-flex flex-col items-center gap-1" data-q="4">
+                                                <span class="flex items-center gap-1"><strong>4</strong><input type="text" id="input-q4" onkeyup="updateTextInput(4, this.value)" class="w-24 px-1 py-0.5 text-xs"></span>
+                                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200" onclick="showExplanation('exp-q4')">Explanation</button>
+                                            </span></li>
+                                        </ul>
+                                    </td>
+                                    <td class="border border-gray-200 p-4 bg-gray-50">
+                                        <ul class="list-disc pl-4 space-y-2">
+                                            <li>had to use a mirror or <span class="q-row-text inline-flex flex-col items-center gap-1" data-q="5">
+                                                <span class="flex items-center gap-1"><strong>5</strong><input type="text" id="input-q5" onkeyup="updateTextInput(5, this.value)" class="w-24 px-1 py-0.5 text-xs"></span>
+                                                <button class="exp-btn hidden text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200" onclick="showExplanation('exp-q5')">Explanation</button>
+                                            </span> to achieve correct image</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-9</h3>
+                        <p class="text-sm text-gray-800">Complete the flow chart below. Choose <strong class="text-brand-700">NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="flex flex-col items-center space-y-3 bg-gray-50 p-6 rounded-xl border border-gray-200 text-sm font-medium">
+                        <div class="font-bold text-brand-900 text-base mb-2 underline decoration-brand-300 decoration-2">Jules Cheret</div>
+                        
+                        <div class="bg-white border-2 border-brand-200 p-3 rounded-lg shadow-sm w-full sm:w-3/4 text-center text-gray-700">
+                            1860s - invention of 'three-stone lithographic process'
+                        </div>
+                        
+                        <div class="text-brand-400">↓</div>
+                        
+                        <div class="bg-white border-2 border-brand-200 p-3 rounded-lg shadow-sm w-full sm:w-3/4 text-center text-gray-700 q-row-text flex flex-col items-center" data-q="6">
+                            <span>combination of both <strong class="text-[11px] bg-brand-100 text-brand-800 px-1 rounded ml-1">6</strong> <input type="text" id="input-q6" onkeyup="updateTextInput(6, this.value)" class="w-32 px-1 py-0.5 mx-1"> on coloured posters</span>
+                            <button class="exp-btn hidden mt-2 text-[10px] text-brand-600 font-bold bg-gray-50 px-3 py-1 rounded border border-brand-200" onclick="showExplanation('exp-q6')">View Explanation</button>
+                        </div>
+
+                        <div class="text-brand-400">↓</div>
+
+                        <div class="bg-white border-2 border-brand-200 p-3 rounded-lg shadow-sm w-full sm:w-3/4 text-center text-gray-700 q-row-text flex flex-col items-center" data-q="7">
+                            <span>1870s - posters used for advertising and <strong class="text-[11px] bg-brand-100 text-brand-800 px-1 rounded ml-1">7</strong> <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" class="w-32 px-1 py-0.5 mx-1"> in Europe</span>
+                            <button class="exp-btn hidden mt-2 text-[10px] text-brand-600 font-bold bg-gray-50 px-3 py-1 rounded border border-brand-200" onclick="showExplanation('exp-q7')">View Explanation</button>
+                        </div>
+
+                        <div class="text-brand-400">↓</div>
+
+                        <div class="bg-white border-2 border-brand-200 p-3 rounded-lg shadow-sm w-full sm:w-3/4 text-center text-gray-700 q-row-text flex flex-col items-center" data-q="8">
+                            <span>1884-86 - Cheret's poster <strong class="text-[11px] bg-brand-100 text-brand-800 px-1 rounded ml-1">8</strong> <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" class="w-32 px-1 py-0.5 mx-1"> and book on poster art</span>
+                            <button class="exp-btn hidden mt-2 text-[10px] text-brand-600 font-bold bg-gray-50 px-3 py-1 rounded border border-brand-200" onclick="showExplanation('exp-q8')">View Explanation</button>
+                        </div>
+
+                        <div class="text-brand-400">↓</div>
+
+                        <div class="bg-white border-2 border-brand-200 p-3 rounded-lg shadow-sm w-full sm:w-3/4 text-center text-gray-700 q-row-text flex flex-col items-center" data-q="9">
+                            <span>1890s - posters represent <strong class="text-[11px] bg-brand-100 text-brand-800 px-1 rounded ml-1">9</strong> <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" class="w-32 px-1 py-0.5 mx-1"> around the world</span>
+                            <button class="exp-btn hidden mt-2 text-[10px] text-brand-600 font-bold bg-gray-50 px-3 py-1 rounded border border-brand-200" onclick="showExplanation('exp-q9')">View Explanation</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-13</h3>
+                        <p class="text-sm text-gray-800 mb-2">Do the following statements agree with the information in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 space-y-1 font-medium bg-white p-3 rounded border border-brand-100">
+                            <li><strong class="text-brand-700">TRUE</strong> if the statement agrees with the information</li>
+                            <li><strong class="text-brand-700">FALSE</strong> if the statement contradicts the information</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if there is no information on this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-6">
+                        <script>
+                            const tfngQuestions = [
+                                { q: 10, text: "By the 1950s, photographs were more widely seen than artists' illustrations on posters.", exp: 'exp-q10' },
+                                { q: 11, text: "Features of the Typographic Style can be seen in modern-day posters.", exp: 'exp-q11' },
+                                { q: 12, text: "The Typographic Style met a global need at a particular time in history.", exp: 'exp-q12' },
+                                { q: 13, text: "Weingart got many of his ideas from his students in Basel.", exp: 'not-given' }
+                            ];
+                            
+                            tfngQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <p class="text-sm font-medium text-gray-800 leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2 pl-9">
+                                            <label class="radio-wrapper flex-1 min-w-[100px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                                                <input type="radio" name="q${item.q}" value="TRUE" onchange="handleRadioSelect(${item.q}, 'TRUE')"> <span class="text-sm">TRUE</span>
+                                            </label>
+                                            <label class="radio-wrapper flex-1 min-w-[100px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                                                <input type="radio" name="q${item.q}" value="FALSE" onchange="handleRadioSelect(${item.q}, 'FALSE')"> <span class="text-sm">FALSE</span>
+                                            </label>
+                                            <label class="radio-wrapper flex-1 min-w-[120px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="handleRadioSelect(${item.q}, 'NOT GIVEN')"> <span class="text-sm">NOT GIVEN</span>
+                                            </label>
+                                        </div>
+                                        <div class="pl-9 mt-3">
+                                            <button class="exp-btn hidden text-xs text-brand-600 font-bold bg-brand-50 px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider shadow-sm" onclick="showExplanation('${item.exp}')">View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript generates map boxes here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Toast Notification for NOT GIVEN explanations -->
+    <div id="toast">No specific text to highlight. The passage does not contain this information.</div>
+
+    <script>
+        // Answer Keys Configuration (Lowercased for text comparison)
+        const ANSWER_KEYS = {
+            1: ["storage", "storage space", "space"],
+            2: ["invention"],
+            3: ["colour and design", "color and design"],
+            4: ["crayon", "greasy crayon", "a greasy crayon"],
+            5: ["transfer paper"],
+            6: ["words and images"],
+            7: ["mass communication"],
+            8: ["exhibition"],
+            9: ["cultural institutions", "unique cultural institutions"],
+            10: "FALSE",
+            11: "TRUE",
+            12: "TRUE",
+            13: "NOT GIVEN"
+        };
+
+        const TOTAL_QS = 13;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    const el = document.querySelector(`.q-row[data-q="${i}"]`) || document.querySelector(`.q-row-text[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function handleRadioSelect(qNum, val) {
+            if (isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, true);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold mt-2 bg-green-100 px-2 py-1 rounded border border-green-300 w-fit`;
+            el.innerHTML = `Correct Ans: ${text}`;
+            return el;
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            // Grade Q1-Q9 (Text Inputs)
+            for (let i = 1; i <= 9; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qRowText = document.querySelector(`.q-row-text[data-q="${i}"]`);
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRowText.appendChild(createCorrectMarker(ANSWER_KEYS[i][0]));
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                    qRowText.appendChild(createCorrectMarker(ANSWER_KEYS[i][0]));
+                }
+                
+                qRowText.querySelector('.exp-btn').classList.remove('hidden');
+            }
+
+            // Grade Q10-Q13 (Radio Buttons)
+            for (let i = 10; i <= 13; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                    qRow.querySelector('.pl-9').appendChild(createCorrectMarker(key));
+                } else if (uAns === key) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                    qRow.querySelector('.pl-9').appendChild(createCorrectMarker(key));
+                }
+                
+                qRow.querySelector('.exp-btn').classList.remove('hidden');
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3500);
+        }
+
+        function showExplanation(targetId) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetId === 'not-given') {
+                showToast();
+                return;
+            }
+
+            const targetEl = document.getElementById(targetId);
+            if(targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetEl.classList.add('active-explanation');
+                setTimeout(() => targetEl.classList.remove('active-explanation'), 3000);
+            }
+        }
+
+        // Boot up
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
