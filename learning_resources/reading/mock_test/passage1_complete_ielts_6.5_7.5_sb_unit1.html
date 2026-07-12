@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Radio Button Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            width: 160px;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+        /* Toast Notification for NOT GIVEN */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 80px;
+            transform: translateX(-50%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.4s, bottom 0.4s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 100px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 1</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">The MIT factor: celebrating 150 years of maverick genius</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">by Ed Pilkington</p>
+                    <p class="text-gray-500 mt-1 font-medium italic">The Massachusetts Institute of Technology has led the world into the future for 150 years with scientific innovations.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p>The musician Yo-Yo Ma's cello may not be the obvious starting point for a journey into one of the world's great universities. But, as you quickly realise when you step inside the Massachusetts Institute of Technology, <span id="exp-q1" class="explanation-target">there's precious little going on that you would normally see on a university campus.</span> The cello, resting in a corner of MIT's celebrated media laboratory - a hub of creativity - looks like any other electric classical instrument. But it is much more. Machover, the composer, teacher and inventor responsible for its creation, calls it a 'hyperinstrument', a sort of thinking machine that allows Ma and his cello to interact with one another and make music together. "The aim is to build an instrument worthy of a great musician like Yo-Yo Ma that can understand what he is trying to do and respond to it,' Machover says. The cello has numerous sensors across its body and by measuring the pressure, speed and angle of the virtuoso's performance it can interpret his mood and engage with it, producing extraordinary new sounds. The virtuoso cellist frequently performs on the instrument as he tours around the world.</p>
+
+                    <p>Machover's passion for pushing at the boundaries of the existing world to extend and unleash human potential is not a bad description of MIT as a whole. This unusual community brings highly gifted, highly motivated individuals together from a vast range of disciplines, united by a common desire: to leap into the dark and reach for the unknown.</p>
+
+                    <p>The result of that single unifying ambition is visible all around. For the past 150 years, MIT has been leading the world into the future. The discoveries of its teachers and students have become the common everyday objects that we now all take for granted. The telephone, electromagnets, radars, high-speed photography, office photocopiers, cancer treatments, pocket calculators, computers, the Internet, the decoding of the human genome, lasers, space travel... the list of innovations that involved essential contributions from MIT and its faculty goes on and on.</p>
+
+                    <p>From the moment MIT was founded by William Barton Rogers in 1861, it was clear what it was not. <span id="exp-q2" class="explanation-target">While Harvard stuck to the English model of a classical education, with its emphasis on Latin and Greek, MIT looked to the German system of learning based on research and hands-on experimentation.</span> Knowledge was at a premium, but it had to be useful.</p>
+
+                    <p>This down-to-earth quality is enshrined in the school motto, Mens et manus - Mind and hand - as well as <span id="exp-q4" class="explanation-target">its logo, which shows a gowned scholar standing beside an ironmonger bearing a hammer and anvil. That symbiosis of intellect and craftsmanship still suffuses the institute's classrooms</span>, where students are not so much taught as engaged and inspired.</p>
+
+                    <p><span id="exp-q6" class="explanation-target">Take Christopher Merrill, 21, a third-year undergraduate in computer science.</span> He is spending most of his time on a competition set in his robotics class. <span id="exp-q7" class="explanation-target">The contest is to see which student can most effectively program a robot to build a house out of blocks in under ten minutes.</span> Merrill says he could have gone for the easiest route - designing a simple robot that would build the house quickly. <span id="exp-q8" class="explanation-target">But he wanted to try to master an area of robotics that remains unconquered - adaptability</span>, the ability of the robot to rethink its plans as the environment around it changes, as would a human. 'I like to take on things that have never been done before rather than to work in an iterative way just making small steps forward,' he explains.</p>
+
+                    <p>Merrill is already planning the start-up he wants to set up when he graduates in a year's time. <span id="exp-q9" class="explanation-target">He has an idea for an original version of a contact lens that would augment reality</span> by allowing consumers to see additional visual information. He is fearful that he might be just too late in taking his concept to market, as he has heard that a Silicon Valley firm is already developing something similar. As such, he might become one of many MIT graduates who go on to form companies that fail. Alternatively, he might become one of those who go on to succeed in spectacular fashion. And there are many of them. A survey of living MIT alumni* found that they have formed 25,800 companies, <span id="exp-q10" class="explanation-target">employing more than three million people, including about a quarter of the workforce of Silicon Valley.</span></p>
+
+                    <p>What MIT delights in is taking brilliant minds from around the world in vastly diverse disciplines and putting them together. You can see that in its sparkling new David Koch Institute for Integrative Cancer Research, which brings scientists, engineers and clinicians under one roof. Or in its Energy Initiative, which acts as a bridge for MIT's combined work across all its five schools, <span id="exp-q11" class="explanation-target">channelling huge resources into the search for a solution to global warming.</span> It works to improve the efficiency of existing energy sources, including nuclear power. It is also forging ahead with alternative energies from solar to wind and geothermal, and <span id="exp-q12" class="explanation-target">has recently developed the use of viruses to synthesise batteries that could prove crucial in the advancement of electric cars.</span></p>
+
+                    <p>In the words of Tim Berners-Lee, the Briton who invented the World Wide Web, 'It's not just another university. Even though I spend my time with my head buried in the details of web technology, the nice thing is that <span id="exp-q13" class="explanation-target">when I do walk the corridors, I bump into people who are working in other fields</span> with their students that are fascinating, and that keeps me intellectually alive.'</p>
+
+                    <div class="mt-8 text-sm text-gray-500 border-t border-gray-200 pt-4">
+                        <p>adapted from the Guardian</p>
+                        <p>*people who have left a university or college after completing their studies there</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth relative">
+            
+            <!-- Non-Sticky Results Banner -->
+            <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                <div class="flex justify-center items-end gap-2 mb-4">
+                    <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                    <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                </div>
+                <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Section 1: True / False / Not Given -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800 mb-2">Do the following statements agree with the information in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 space-y-1 font-medium bg-white p-3 rounded border border-brand-100">
+                            <li><strong class="text-brand-700">TRUE</strong> if the statement agrees with the information</li>
+                            <li><strong class="text-brand-700">FALSE</strong> if the statement contradicts the information</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if there is no information on this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-6" id="tfng-container">
+                        <!-- Questions injected by JS below -->
+                    </div>
+                </div>
+
+                <!-- Section 2: Notes Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-9</h3>
+                        <p class="text-sm text-gray-800">Complete the notes below. Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 text-[15px] space-y-6">
+                        <h4 class="font-bold text-gray-800 border-b border-gray-300 pb-2 mb-2">Christopher Merrill - student at MIT</h4>
+                        
+                        <div class="q-block" data-q="6">
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-2 leading-loose">
+                                <span class="font-medium text-gray-700">Degree subject:</span>
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">6</strong>
+                                    <input type="text" id="input-q6" onkeyup="updateTextInput(6, this.value)" autocomplete="off">
+                                </span>
+                            </div>
+                            <div class="feedback-container hidden flex-wrap gap-2 items-center mt-2 pl-1" data-q="6">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-2 py-1 rounded border border-brand-200 hover:bg-brand-50 shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q6'])">View Explanation</button>
+                            </div>
+                        </div>
+                        
+                        <div class="q-block" data-q="7">
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-2 leading-loose">
+                                <span class="font-medium text-gray-700">Competition: to</span>
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">7</strong>
+                                    <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off">
+                                </span>
+                                <span class="font-medium text-gray-700">the automated construction of a house</span>
+                            </div>
+                            <div class="feedback-container hidden flex-wrap gap-2 items-center mt-2 pl-1" data-q="7">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-2 py-1 rounded border border-brand-200 hover:bg-brand-50 shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q7'])">View Explanation</button>
+                            </div>
+                        </div>
+
+                        <div class="q-block" data-q="8">
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-2 leading-loose">
+                                <span class="font-medium text-gray-700">Special focus on: the</span>
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">8</strong>
+                                    <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off">
+                                </span>
+                                <span class="font-medium text-gray-700">of robots</span>
+                            </div>
+                            <div class="feedback-container hidden flex-wrap gap-2 items-center mt-2 pl-1" data-q="8">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-2 py-1 rounded border border-brand-200 hover:bg-brand-50 shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q8'])">View Explanation</button>
+                            </div>
+                        </div>
+
+                        <div class="q-block" data-q="9">
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-2 leading-loose">
+                                <span class="font-medium text-gray-700">Future plans: to develop new type of</span>
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">9</strong>
+                                    <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off">
+                                </span>
+                            </div>
+                            <div class="feedback-container hidden flex-wrap gap-2 items-center mt-2 pl-1" data-q="9">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-2 py-1 rounded border border-brand-200 hover:bg-brand-50 shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q9'])">View Explanation</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Section 3: Short Answer Questions -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-13</h3>
+                        <p class="text-sm text-gray-800">Answer the questions below. Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Q10 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="10">
+                            <div class="flex gap-3 mb-3">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">10</span>
+                                <p class="text-sm font-medium text-gray-800">What proportion of workers at Silicon Valley are employed in companies set up by MIT graduates?</p>
+                            </div>
+                            <div class="pl-9 flex flex-col gap-2">
+                                <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off" class="w-full max-w-[250px] !text-left">
+                                <div class="feedback-container hidden flex-wrap gap-2 items-center mt-1" data-q="10">
+                                    <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q10'])">View Explanation</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q11 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="11">
+                            <div class="flex gap-3 mb-3">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">11</span>
+                                <p class="text-sm font-medium text-gray-800">What problem does MIT's Energy Initiative aim to solve?</p>
+                            </div>
+                            <div class="pl-9 flex flex-col gap-2">
+                                <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off" class="w-full max-w-[250px] !text-left">
+                                <div class="feedback-container hidden flex-wrap gap-2 items-center mt-1" data-q="11">
+                                    <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q11'])">View Explanation</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q12 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="12">
+                            <div class="flex gap-3 mb-3">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">12</span>
+                                <p class="text-sm font-medium text-gray-800">Which 'green' innovation might MIT's work with viruses help improve?</p>
+                            </div>
+                            <div class="pl-9 flex flex-col gap-2">
+                                <input type="text" id="input-q12" onkeyup="updateTextInput(12, this.value)" autocomplete="off" class="w-full max-w-[250px] !text-left">
+                                <div class="feedback-container hidden flex-wrap gap-2 items-center mt-1" data-q="12">
+                                    <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q12'])">View Explanation</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q13 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="13">
+                            <div class="flex gap-3 mb-3">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">13</span>
+                                <p class="text-sm font-medium text-gray-800">In which part of the university does Tim Berners-Lee enjoy stimulating conversations with other MIT staff?</p>
+                            </div>
+                            <div class="pl-9 flex flex-col gap-2">
+                                <input type="text" id="input-q13" onkeyup="updateTextInput(13, this.value)" autocomplete="off" class="w-full max-w-[250px] !text-left">
+                                <div class="feedback-container hidden flex-wrap gap-2 items-center mt-1" data-q="13">
+                                    <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick="showExplanation(['exp-q13'])">View Explanation</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Toast Notification for NOT GIVEN explanations -->
+    <div id="toast">No specific text to highlight. The passage does not contain this information.</div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: "FALSE",
+            2: "FALSE",
+            3: "NOT GIVEN",
+            4: "TRUE",
+            5: "NOT GIVEN",
+            6: ["computer science"],
+            7: ["program"],
+            8: ["adaptability"],
+            9: ["contact lens"],
+            10: ["a quarter", "one quarter"],
+            11: ["global warming"],
+            12: ["electric cars"],
+            13: ["corridors", "the corridors"]
+        };
+
+        const TOTAL_QS = 13;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        // Render TFNG Questions Dynamically
+        const tfngQuestions = [
+            { q: 1, text: "The activities going on at the MIT campus are like those at any other university.", exp: ['exp-q1'] },
+            { q: 2, text: "Harvard and MIT shared a similar approach to education when they were founded.", exp: ['exp-q2'] },
+            { q: 3, text: "The school motto was suggested by a former MIT student.", exp: ['not-given'] },
+            { q: 4, text: "MIT's logo reflects the belief that intellect and craftsmanship go together.", exp: ['exp-q4'] },
+            { q: 5, text: "Silicon Valley companies pay higher salaries to graduates from MIT.", exp: ['not-given'] }
+        ];
+
+        const tfngContainer = document.getElementById('tfng-container');
+        tfngQuestions.forEach(item => {
+            tfngContainer.innerHTML += `
+                <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                    <div class="flex gap-3 mb-3">
+                        <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                        <p class="text-sm font-medium text-gray-800 leading-relaxed">${item.text}</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pl-9">
+                        <label class="radio-wrapper flex-1 min-w-[100px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                            <input type="radio" name="q${item.q}" value="TRUE" onchange="handleRadioSelect(${item.q}, 'TRUE')"> <span class="text-sm">TRUE</span>
+                        </label>
+                        <label class="radio-wrapper flex-1 min-w-[100px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                            <input type="radio" name="q${item.q}" value="FALSE" onchange="handleRadioSelect(${item.q}, 'FALSE')"> <span class="text-sm">FALSE</span>
+                        </label>
+                        <label class="radio-wrapper flex-1 min-w-[120px] flex items-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-white">
+                            <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="handleRadioSelect(${item.q}, 'NOT GIVEN')"> <span class="text-sm">NOT GIVEN</span>
+                        </label>
+                    </div>
+                    <div class="pl-9 mt-3">
+                        <button class="exp-btn hidden text-xs text-brand-600 font-bold bg-white px-4 py-2 rounded-lg border border-brand-200 hover:bg-brand-50 transition-colors uppercase tracking-wider shadow-sm" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Initialize Navigation Map
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`) || document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function handleRadioSelect(qNum, val) {
+            if (isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, true);
+        }
+
+        // Student Text Highlighting
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[11px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300 w-fit shadow-sm`;
+            el.innerHTML = `Ans: ${text}`;
+            return el;
+        }
+        
+        function createCorrectMarkerRadio(text) {
+            const el = document.createElement('div');
+            el.className = `text-[12px] text-green-700 font-bold mt-2 bg-green-100 px-3 py-1.5 rounded-lg border border-green-300 w-fit shadow-sm`;
+            el.innerHTML = `<svg class="w-3 h-3 inline mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct Answer: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable all inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            // Grade Q1-Q5 (Radio Buttons)
+            for (let i = 1; i <= 5; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                    qRow.querySelector('.pl-9').appendChild(createCorrectMarkerRadio(key));
+                } else if (uAns === key) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                    qRow.querySelector('.pl-9').appendChild(createCorrectMarkerRadio(key));
+                }
+                qRow.querySelector('.exp-btn').classList.remove('hidden');
+            }
+
+            // Grade Q6-Q13 (Text Inputs)
+            for (let i = 6; i <= 13; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const feedbackContainer = document.querySelector(`.feedback-container[data-q="${i}"]`);
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    feedbackContainer.appendChild(createCorrectMarker(ANSWER_KEYS[i][0]));
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                    feedbackContainer.appendChild(createCorrectMarker(ANSWER_KEYS[i][0]));
+                }
+                
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+            }
+
+            // Reveal Results UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3500);
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                if (targetIds[0] === 'not-given') {
+                    showToast();
+                    return;
+                }
+
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.classList.add('active-explanation');
+                        setTimeout(() => el.classList.remove('active-explanation'), 3500);
+                    }
+                });
+            }
+        }
+
+        // Boot Application
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Care for the Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            blush: '#fdf2f8', // Very light pink bg
+                            pink: '#fbcfe8',  // Soft pink borders/accents
+                            accent: '#f472b6', // Primary pink (buttons, active states)
+                            dark: '#9d174d',   // Deep pink/magenta for text
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom IELTS Input Styling */
+        .ielts-input { 
+            border: none; 
+            border-bottom: 2px solid #cbd5e1; 
+            background: transparent; 
+            padding: 2px 8px; 
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .ielts-input:focus { 
+            outline: none; 
+            border-bottom-color: #f472b6; 
+            background: #fdf2f8; 
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Highlight Tool Styling */
+        .highlighted-text {
+            background-color: #fef08a; /* Yellow highlight */
+            border-radius: 2px;
+            padding: 0 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .highlighted-text:hover {
+            background-color: #fde047;
+        }
+        .transcript-highlight {
+            background-color: #fbcfe8; /* Pastel pink highlight for active audio */
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Tooltip button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background-color: #1f2937;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateX(-50%);
+            margin-top: -40px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <header class="bg-white border-b border-gray-200 shadow-sm z-20 h-16 flex-none flex items-center justify-between px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-pastel-accent rounded-xl flex items-center justify-center text-white font-bold shadow-sm">CT</div>
+            <h1 class="font-bold text-lg text-gray-800 tracking-tight">IELTS Chan Truong</h1>
+        </div>
+        <div id="timer-display" class="hidden font-mono text-xl font-bold text-pastel-dark bg-pastel-blush border border-pastel-pink px-4 py-1.5 rounded-lg shadow-sm">
+            10:00
+        </div>
+    </header>
+
+    <main class="flex-1 relative overflow-hidden flex flex-col">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-gray-50 p-4 overflow-y-auto">
+            <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-10 border border-gray-100">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-pastel-blush text-pastel-accent rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm border border-pastel-pink">
+                        <i class="fa-solid fa-headphones"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Listening Test</h2>
+                    <h3 class="text-xl font-medium text-pastel-dark">Section 1: Care for the Community</h3>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-xl mb-8">
+                    <h4 class="font-bold text-blue-800 mb-3 text-lg"><i class="fa-solid fa-circle-info mr-2"></i>Important Instructions</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-blue-900">
+                        <li>The audio will play <strong>automatically</strong> once you click start.</li>
+                        <li>You cannot pause or replay the audio during the test.</li>
+                        <li>Write <strong>NO MORE THAN THREE WORDS AND/OR A NUMBER</strong> for each answer.</li>
+                        <li>You can highlight text in the questions area to help you focus.</li>
+                    </ul>
+                </div>
+                <button id="start-btn" class="bg-pastel-accent text-white font-bold text-lg py-4 px-8 rounded-full shadow-lg hover:bg-pink-500 hover:shadow-xl hover:-translate-y-0.5 w-full transition-all duration-200">
+                    <i class="fa-solid fa-play mr-2"></i> Start Test Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Test View -->
+        <div id="test-view" class="hidden h-full flex flex-col overflow-y-auto p-4 md:p-8">
+            <!-- Audio Element (Hidden controls) -->
+            <audio id="test-audio" preload="auto">
+                <source src="http://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_workbook_unit1.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+
+            <div class="max-w-4xl w-full mx-auto flex-1">
+                <div class="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-200 mb-6 relative" id="questions-container">
+                    
+                    <div class="mb-8 text-center border-b-2 border-pastel-pink pb-4">
+                        <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-wider mb-2">Care for the Community</h2>
+                        <p class="text-gray-500 italic">Complete the form below. Write NO MORE THAN THREE WORDS AND/OR A NUMBER.</p>
+                    </div>
+
+                    <!-- Questions Area -->
+                    <div id="questions-area" class="space-y-6 text-gray-800 text-lg leading-relaxed">
+                        <!-- Questions will be injected here -->
+                    </div>
+                </div>
+
+                <div class="text-right pb-10">
+                    <button id="submit-btn" class="bg-gray-800 hover:bg-black text-white font-bold py-3 px-10 rounded-xl shadow-md transition-colors text-lg">
+                        Submit Section <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result View -->
+        <div id="result-view" class="hidden h-full flex flex-col">
+            
+            <!-- Result Header -->
+            <div class="bg-white border-b border-gray-200 px-6 py-4 flex-none flex items-center justify-between z-10 shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Test Review</h2>
+                    <p class="text-gray-500">Review your answers and check the transcript.</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500 font-medium uppercase tracking-wider mb-1">Your Score</div>
+                    <div class="text-3xl font-bold text-pastel-dark bg-pastel-blush px-4 py-1 rounded-lg border border-pastel-pink inline-block">
+                        <span id="score-display">0</span> / 12
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Navigation Bar -->
+            <div class="bg-gray-50 border-b border-gray-200 px-6 py-3 flex gap-2 overflow-x-auto whitespace-nowrap z-10">
+                <span class="text-sm font-bold text-gray-500 flex items-center mr-2">Jump to:</span>
+                <div id="result-nav" class="flex gap-2 pb-1">
+                    <!-- Nav pills injected here -->
+                </div>
+            </div>
+
+            <!-- Result Split Layout -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-gray-100">
+                
+                <!-- Left Pane: Transcript -->
+                <div class="w-full md:w-1/2 flex flex-col border-r border-gray-200 bg-white">
+                    <!-- Custom Audio Player for Review -->
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex-none sticky top-0 z-10 shadow-sm">
+                        <h3 class="font-bold text-gray-700 mb-3 flex items-center"><i class="fa-solid fa-file-lines text-pastel-accent mr-2"></i> Audio Transcript</h3>
+                        <audio id="review-audio" controls class="w-full h-10 outline-none">
+                            <source src="http://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_workbook_unit1.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    <!-- Transcript Text -->
+                    <div id="transcript-area" class="flex-1 overflow-y-auto p-6 text-gray-700 leading-relaxed space-y-4">
+                        <!-- Transcript injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Pane: Questions Review -->
+                <div class="w-full md:w-1/2 flex flex-col bg-gray-50">
+                    <div class="p-4 border-b border-gray-200 bg-white flex-none sticky top-0 z-10 shadow-sm">
+                        <h3 class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-list-check text-pastel-accent mr-2"></i> Review Answers</h3>
+                    </div>
+                    <div id="review-area" class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <!-- Review items injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Submit Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity">
+        <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl transform transition-transform scale-100">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto text-2xl mb-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2 text-gray-800">Submit Section?</h3>
+            <p class="text-gray-500 mb-6">Are you sure you want to finish this section? You cannot change your answers after submitting.</p>
+            <div class="flex gap-4">
+                <button id="cancel-submit-btn" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition">Cancel</button>
+                <button id="confirm-submit-btn" class="flex-1 py-3 bg-pastel-accent hover:bg-pink-600 text-white font-bold rounded-xl shadow-md transition">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highlight Tooltip -->
+    <div id="highlight-tooltip"><i class="fa-solid fa-highlighter mr-1"></i> Highlight</div>
+
+    <script>
+        // --- MOCK DATA: Care for the Community ---
+        const testData = {
+            totalTimeSeconds: 600, // 10 mins
+            audioUrl: "http://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_workbook_unit1.mp3",
+            questions: [
+                {
+                    id: "q1", number: 1, type: "fill-in",
+                    text: `<h3 class="font-bold text-pastel-dark mb-4 mt-6 border-b border-pastel-pink pb-1">Applicant details</h3>
+                           <div class="flex flex-wrap items-end gap-2 mb-3">
+                               <span class="font-semibold w-24">Name:</span> 
+                               <span class="font-bold mr-2 text-pastel-accent">1</span>
+                               <input type="text" class="ielts-input flex-1 min-w-[200px]" data-qid="q1" autocomplete="off">
+                           </div>`,
+                    correctAnswer: ["philippa tailor"],
+                    timestamp: 46, transcriptRef: "tr_0_46",
+                    explanation: "She states her name is Philippa Tailor and spells it out."
+                },
+                {
+                    id: "q2", number: 2, type: "fill-in",
+                    text: `<div class="flex items-center gap-2 mb-3"><span class="font-semibold w-24">Sex:</span> <span>Female</span></div>
+                           <div class="flex flex-wrap items-center gap-2 mb-3 leading-loose">
+                               <span class="font-semibold w-24">Occupation:</span> 
+                               <span class="font-bold mr-2 text-pastel-accent">2</span>
+                               <input type="text" class="ielts-input w-32 text-center" data-qid="q2" autocomplete="off"> 
+                               <span>student at Brookfields University studying on</span>`,
+                    correctAnswer: ["third", "3rd", "third year", "3rd year"],
+                    timestamp: 65, transcriptRef: "tr_1_05",
+                    explanation: "She corrects herself saying she has just started her 'third year'."
+                },
+                {
+                    id: "q3", number: 3, type: "fill-in",
+                    text: `    <span class="font-bold mx-2 text-pastel-accent">3</span>
+                               <input type="text" class="ielts-input w-48 text-center" data-qid="q3" autocomplete="off"> 
+                               <span>Course (BA).</span>
+                           </div>`,
+                    correctAnswer: ["social care studies"],
+                    timestamp: 75, transcriptRef: "tr_1_15",
+                    explanation: "When asked what course she is doing, she replies 'A BA in Social Care Studies'."
+                },
+                {
+                    id: "q4", number: 4, type: "fill-in",
+                    text: `<h3 class="font-bold text-pastel-dark mb-4 mt-8 border-b border-pastel-pink pb-1">Contact details</h3>
+                           <div class="flex flex-wrap items-end gap-2 mb-3">
+                               <span class="font-semibold w-24">Phone:</span> 
+                               <span class="font-bold mr-2 text-pastel-accent">4</span>
+                               <input type="text" class="ielts-input flex-1 min-w-[200px]" data-qid="q4" autocomplete="off">
+                           </div>`,
+                    correctAnswer: ["0878 643 9884", "08786439884"],
+                    timestamp: 80, transcriptRef: "tr_1_20",
+                    explanation: "She provides her mobile number and clarifies the ending is 'double eight four'."
+                },
+                {
+                    id: "q5", number: 5, type: "fill-in",
+                    text: `<div class="flex flex-wrap items-end gap-2 mb-3">
+                               <span class="font-semibold w-24">Email:</span> 
+                               <span class="font-bold mr-2 text-pastel-accent">5</span>
+                               <input type="text" class="ielts-input w-48 text-right" data-qid="q5" autocomplete="off">
+                               <span>@chatbox.co.uk</span>
+                           </div>`,
+                    correctAnswer: ["flipt14"],
+                    timestamp: 96, transcriptRef: "tr_1_36",
+                    explanation: "She spells her email as F L I P T and the number 14."
+                },
+                {
+                    id: "q6", number: 6, type: "fill-in",
+                    text: `<div class="flex flex-wrap items-center gap-2 mb-3 leading-loose">
+                               <span class="font-semibold w-24">Availability:</span> 
+                               <span>Up to</span>
+                               <span class="font-bold mx-2 text-pastel-accent">6</span>
+                               <input type="text" class="ielts-input w-40 text-center" data-qid="q6" autocomplete="off">
+                               <span>per week.</span>
+                           </div>`,
+                    correctAnswer: ["three evenings", "3 evenings"],
+                    timestamp: 122, transcriptRef: "tr_2_02",
+                    explanation: "She mentions 'maybe a couple of evenings a week or maybe three but no more than that'."
+                },
+                {
+                    id: "q7", number: 7, type: "fill-in",
+                    text: `<h3 class="font-bold text-pastel-dark mb-4 mt-8 border-b border-pastel-pink pb-1">Other information</h3>
+                           <div class="flex flex-wrap items-center gap-2 mb-3 leading-loose">
+                               <span class="font-semibold w-[160px]">Reason for applying:</span> 
+                               <span>Would like</span>
+                               <span class="font-bold mx-2 text-pastel-accent">7</span>
+                               <input type="text" class="ielts-input flex-1 min-w-[200px]" data-qid="q7" autocomplete="off">
+                           </div>`,
+                    correctAnswer: ["work experience", "some work experience"],
+                    timestamp: 147, transcriptRef: "tr_2_27",
+                    explanation: "She states this would give her 'some work experience in this field'."
+                },
+                {
+                    id: "q8", number: 8, type: "fill-in",
+                    text: `<div class="flex flex-wrap items-center gap-2 mb-3 leading-loose">
+                               <span class="font-semibold w-[160px]">Area of interest:</span> 
+                               <span>Children with</span>
+                               <span class="font-bold mx-2 text-pastel-accent">8</span>
+                               <input type="text" class="ielts-input flex-1 min-w-[200px]" data-qid="q8" autocomplete="off">
+                           </div>`,
+                    correctAnswer: ["learning difficulties"],
+                    timestamp: 160, transcriptRef: "tr_2_40",
+                    explanation: "She is particularly interested in helping teenagers who have 'learning difficulties'."
+                },
+                {
+                    id: "q9", number: 9, type: "fill-in",
+                    text: `<div class="flex flex-wrap items-center gap-2 mb-3 leading-loose">
+                               <span class="font-semibold w-[160px]">Experience:</span> 
+                               <span>Has recently done similar work at a</span>
+                               <span class="font-bold mx-2 text-pastel-accent">9</span>
+                               <input type="text" class="ielts-input w-48 text-center" data-qid="q9" autocomplete="off"><span>.</span>`,
+                    correctAnswer: ["summer camp"],
+                    timestamp: 174, transcriptRef: "tr_2_54",
+                    explanation: "She says she just spent the holiday working at a 'summer camp'."
+                },
+                {
+                    id: "q10", number: 10, type: "fill-in",
+                    text: `    <span class="ml-2">Found it</span>
+                               <span class="font-bold mx-2 text-pastel-accent">10</span>
+                               <input type="text" class="ielts-input flex-1 min-w-[200px]" data-qid="q10" autocomplete="off">
+                           </div>`,
+                    correctAnswer: ["challenging but rewarding"],
+                    timestamp: 183, transcriptRef: "tr_3_03",
+                    explanation: "When asked if she enjoyed it, she replied 'it was challenging but rewarding'."
+                },
+                {
+                    id: "q11", number: 11, type: "fill-in",
+                    text: `<div class="flex flex-wrap items-center gap-2 mb-8 leading-loose">
+                               <span class="font-semibold w-[160px]">Perceived strengths:</span> 
+                               <span>Has excellent</span>
+                               <span class="font-bold mx-2 text-pastel-accent">11</span>
+                               <input type="text" class="ielts-input w-56 text-center" data-qid="q11" autocomplete="off"><span>.</span>
+                               <span class="ml-2">Also listens to people.</span>
+                           </div>`,
+                    correctAnswer: ["communication skills"],
+                    timestamp: 193, transcriptRef: "tr_3_13",
+                    explanation: "She reckons her strongest point is having very good 'communication skills'."
+                },
+                {
+                    id: "q12", number: 12, type: "fill-in",
+                    text: `<div class="bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-wrap items-center gap-2 leading-loose">
+                               <span class="font-bold mr-2 text-pastel-accent">12</span>
+                               <input type="text" class="ielts-input w-40 text-center font-semibold" data-qid="q12" autocomplete="off">
+                               <span>arranged for Wednesday 10th September.</span>
+                           </div>`,
+                    correctAnswer: ["appointment"],
+                    timestamp: 210, transcriptRef: "tr_3_30",
+                    explanation: "The interviewer says 'what I'd like to do... is fix an appointment'."
+                }
+            ],
+            transcript: [
+                { id: "tr_0_20", start: 0, end: 46, text: "<strong>Interviewer:</strong> Hello, Care for the Community, how can I help?<br><strong>Applicant:</strong> Oh, good morning, I’m interested in doing some part-time work for your organization. Am I speaking to the right person?<br><strong>Interviewer:</strong> You are. I’m Alan Carpenter, Head of Human Resources.<br><strong>Applicant:</strong> Hello my name's Philippa Tailor<br><strong>Interviewer:</strong> Hang on, sorry, let me just get a pen so I can take this down. Okay far away" },
+                { id: "tr_0_46", start: 46, end: 65, text: "<strong>Applicant:</strong> My name's Philippa Tailor <em>(Q1)</em><br><strong>Interviewer:</strong> F I L<br><strong>Applicant:</strong> No, P H I double P A<br><strong>Interviewer:</strong> Got that. And is it Taylor with a Y?<br><strong>Applicant:</strong> No an I. T A I L O R like the job<br><strong>Interviewer:</strong> Right and what do you do at the moment Philippa?" },
+                { id: "tr_1_05", start: 65, end: 75, text: "<strong>Applicant:</strong> I’m a student. I’ve just started my second, sorry I mean my third year <em>(Q2)</em> at Brookfields University<br><strong>Interviewer:</strong> Alright, what course are you doing?" },
+                { id: "tr_1_15", start: 75, end: 80, text: "<strong>Applicant:</strong> A BA in Social Care Studies <em>(Q3)</em><br><strong>Interviewer:</strong> And have you got a number we can get you on?" },
+                { id: "tr_1_20", start: 80, end: 96, text: "<strong>Applicant:</strong> Sure, I’ll give you my mobile. It's 0878 643 9884 <em>(Q4)</em><br><strong>Interviewer:</strong> 0878-643-9844<br><strong>Applicant:</strong> No that's double eight four at the end, not eight double four" },
+                { id: "tr_1_36", start: 96, end: 122, text: "<strong>Interviewer:</strong> Sorry, right. What’s next… oh yes your email address if you have one<br><strong>Applicant:</strong> I do it's flipt14 at chatbox.co.uk <em>(Q5)</em> that's F L I P T and the number 14, all written as one word, at chatbox.co.uk<br><strong>Interviewer:</strong> Thanks, okay and when would you be available to work? Days? Evenings?" },
+                { id: "tr_2_02", start: 122, end: 147, text: "<strong>Applicant:</strong> Well, days would be difficult as I have classes then so it would have to be evenings I guess. I was thinking maybe a couple of evenings a week or maybe three but no more than that <em>(Q6)</em>. Oh and not Saturday or Sunday, if possible. Would that be any good?<br><strong>Interviewer:</strong> Oh that would be fine, and would you be able to start immediately if we had anything for you?<br><strong>Applicant:</strong> Yes, I would" },
+                { id: "tr_2_27", start: 147, end: 160, text: "<strong>Interviewer:</strong> Right, Philippa. So could you tell me why you're interested in working for us?<br><strong>Applicant:</strong> Well I’m hoping to apply for a career in social care when I graduate, and this would give me some work experience <em>(Q7)</em> in this field." },
+                { id: "tr_2_40", start: 160, end: 174, text: "<strong>Interviewer:</strong> Any particular area?<br><strong>Applicant:</strong> Yes, I’m particularly interested in helping young people, teenagers who have learning difficulties <em>(Q8)</em>, you know, providing them with the extra care and support they might not get at school or home." },
+                { id: "tr_2_54", start: 174, end: 183, text: "<strong>Interviewer:</strong> And have you done anything like this before?<br><strong>Applicant:</strong> Yes, in fact I’ve just spent the holiday working at a summer camp <em>(Q9)</em> for children from disadvantaged backgrounds." },
+                { id: "tr_3_03", start: 183, end: 193, text: "<strong>Interviewer:</strong> Did you enjoy it?<br><strong>Applicant:</strong> Oh yes, it was challenging but rewarding <em>(Q10)</em>. That's the sort of thing I like really, and I’d like to do more of that if possible" },
+                { id: "tr_3_13", start: 193, end: 210, text: "<strong>Interviewer:</strong> Great, and what makes you suitable for this kind of work do you think?<br><strong>Applicant:</strong> Well, I have very good communication skills <em>(Q11)</em>, that's my strongest point I reckon, and I’m a good listener. Sometimes you can help by just listening you know." },
+                { id: "tr_3_30", start: 210, end: 999, text: "<strong>Interviewer:</strong> I agree. Um right…what I’d like to do if it's okay with you is fix an appointment <em>(Q12)</em> so we can meet and talk about this some more. It wouldn't be anything formal not an interview or anything like that um how are you fixed for Tuesday the 9th of September at 4:30.<br><strong>Applicant:</strong> Oh, I’m sorry I have a tutorial then. Would Wednesday be possible, the 10th?<br><strong>Interviewer:</strong> Yes that will be fine so we'll say Wednesday the 10th at 4:30. Now do you know where we are…" }
+            ]
+        };
+
+        // --- STREAMING_CHUNK:State variables and DOM Elements... ---
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = testData.totalTimeSeconds;
+        
+        const audioElement = document.getElementById('test-audio');
+        const reviewAudioElement = document.getElementById('review-audio');
+        
+        // Modal Elements
+        const submitBtn = document.getElementById('submit-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+
+        // --- STREAMING_CHUNK:Initialization and Test Flow Logic... ---
+        function initTest() {
+            const questionsArea = document.getElementById('questions-area');
+            testData.questions.forEach(q => {
+                questionsArea.insertAdjacentHTML('beforeend', `<div class="mb-2" id="q-container-${q.id}">${q.text}</div>`);
+            });
+
+            // Save answers as user types
+            document.querySelectorAll('.ielts-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    userAnswers[e.target.dataset.qid] = e.target.value;
+                });
+            });
+        }
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('timer-display').classList.remove('hidden');
+            
+            audioElement.play().catch(e => console.log("Auto-play blocked", e));
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60);
+                const s = timeRemaining % 60;
+                document.getElementById('timer-display').innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    handleFinalSubmit(); // Auto submit on timeout
+                }
+            }, 1000);
+        });
+
+        // --- STREAMING_CHUNK:Submit Logic via Modal... ---
+        // Open Modal
+        submitBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('hidden');
+        });
+
+        // Close Modal on Cancel
+        cancelSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        // Execute Submit
+        confirmSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            handleFinalSubmit();
+        });
+
+        function handleFinalSubmit() {
+            clearInterval(timerInterval);
+            audioElement.pause();
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('timer-display').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            
+            renderResultView();
+        }
+
+        // --- STREAMING_CHUNK:Result View Logic (Grading & Rendering)... ---
+        function renderResultView() {
+            let score = 0;
+            const reviewArea = document.getElementById('review-area');
+            const navArea = document.getElementById('result-nav');
+            const transcriptArea = document.getElementById('transcript-area');
+            
+            reviewArea.innerHTML = '';
+            navArea.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            // 1. Render Transcript
+            testData.transcript.forEach(tr => {
+                transcriptArea.insertAdjacentHTML('beforeend', `<div id="${tr.id}" class="mb-2 transition-colors duration-300 p-2 rounded">${tr.text}</div>`);
+            });
+
+            // 2. Grade & Render Questions
+            testData.questions.forEach((q, index) => {
+                const userAns = (userAnswers[q.id] || "").toString().toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase().trim() === userAns);
+                if (isCorrect) score++;
+
+                // Strip inputs from question text for clean display
+                let cleanText = q.text.replace(/<input[^>]*data-qid=['"]q\d+['"][^>]*>/g, `<span class="font-bold underline text-gray-800 tracking-widest px-2">___</span>`);
+
+                // Create Nav Pill
+                const pillColor = isCorrect ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300';
+                navArea.insertAdjacentHTML('beforeend', `
+                    <button onclick="document.getElementById('review-q-${q.id}').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                            class="w-10 h-10 shrink-0 rounded-full border-2 font-bold flex items-center justify-center transition-transform hover:scale-110 ${pillColor}">
+                        ${q.number}
+                    </button>
+                `);
+
+                // Create Review Card
+                reviewArea.insertAdjacentHTML('beforeend', `
+                    <div id="review-q-${q.id}" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 scroll-mt-20">
+                        <div class="flex items-start justify-between mb-4">
+                            <span class="font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">Question ${q.number}</span>
+                            ${isCorrect 
+                                ? `<span class="text-green-600 bg-green-50 px-3 py-1 rounded-lg font-bold flex items-center"><i class="fa-solid fa-check mr-2"></i>Correct</span>` 
+                                : `<span class="text-red-600 bg-red-50 px-3 py-1 rounded-lg font-bold flex items-center"><i class="fa-solid fa-xmark mr-2"></i>Incorrect</span>`
+                            }
+                        </div>
+                        
+                        <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-800">
+                            ${cleanText}
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                <p class="text-xs text-red-500 font-bold uppercase mb-1">Your Answer</p>
+                                <p class="font-medium ${!userAns ? 'text-gray-400 italic' : 'text-gray-800'}">${userAns || 'No answer provided'}</p>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                <p class="text-xs text-green-600 font-bold uppercase mb-1">Correct Answer(s)</p>
+                                <p class="font-bold text-gray-800">${q.correctAnswer.join(" / ")}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-pastel-blush border border-pastel-pink rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="font-bold text-pastel-dark flex items-center"><i class="fa-regular fa-lightbulb mr-2"></i> Explanation</p>
+                                <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}')" class="bg-white hover:bg-pastel-accent hover:text-white text-pastel-dark border border-pastel-pink font-bold py-1.5 px-4 rounded-full text-sm transition-colors flex items-center shadow-sm">
+                                    <i class="fa-solid fa-circle-play mr-2"></i> Play Audio Segment
+                                </button>
+                            </div>
+                            <p class="text-gray-700 text-sm leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('score-display').innerText = score;
+        }
+
+        // --- STREAMING_CHUNK:Audio Sync and Highlighting Logic... ---
+        function playExplanation(time, trId) {
+            reviewAudioElement.currentTime = time;
+            reviewAudioElement.play();
+
+            // Clear previous highlights
+            document.querySelectorAll('.transcript-highlight').forEach(el => {
+                el.classList.remove('transcript-highlight');
+            });
+
+            // Add highlight and scroll
+            const trElement = document.getElementById(trId);
+            if (trElement) {
+                trElement.classList.add('transcript-highlight');
+                trElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Text Highlight Tool (For Test View)
+        const tooltip = document.getElementById('highlight-tooltip');
+        let currentSelection = null;
+
+        document.getElementById('questions-container').addEventListener('mouseup', (e) => {
+            const selection = window.getSelection();
+            if (selection.toString().trim().length > 0) {
+                currentSelection = selection.getRangeAt(0);
+                const rect = currentSelection.getBoundingClientRect();
+                const containerRect = document.getElementById('questions-container').getBoundingClientRect();
+                
+                tooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                tooltip.style.top = `${rect.top + window.scrollY - 10}px`;
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target !== tooltip) tooltip.style.display = 'none';
+        });
+
+        tooltip.addEventListener('click', () => {
+            if (currentSelection) {
+                try {
+                    const span = document.createElement('span');
+                    span.className = 'highlighted-text';
+                    span.title = "Click to remove highlight";
+                    span.onclick = function() {
+                        const parent = this.parentNode;
+                        while (this.firstChild) { parent.insertBefore(this.firstChild, this); }
+                        parent.removeChild(this);
+                    };
+                    currentSelection.surroundContents(span);
+                } catch (e) {
+                    console.log("Cannot highlight across multiple HTML elements.", e);
+                }
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Initialize on load
+        initTest();
+    </script>
+</body>
+</html>

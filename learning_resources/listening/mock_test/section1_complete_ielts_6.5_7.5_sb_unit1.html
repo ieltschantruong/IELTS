@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Section 1</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#F9A8D4',
+                            blush: '#FCE7F3',
+                            accent: '#F472B6',
+                            dark: '#DB2777',
+                            light: '#FDF2F8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Input Styles */
+        .ielts-input {
+            border: none;
+            border-bottom: 2px solid #9CA3AF;
+            background-color: transparent;
+            outline: none;
+            padding: 2px 5px;
+            transition: border-color 0.3s;
+            font-weight: 600;
+            color: #DB2777; /* pastel-dark */
+        }
+        .ielts-input:focus {
+            border-bottom: 2px solid #DB2777;
+        }
+
+        /* Highlight tool styles */
+        .highlighted-text {
+            background-color: #FDF2F8; /* pastel-light */
+            border-bottom: 2px solid #F9A8D4; /* pastel-pink */
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+        .highlighted-text:hover {
+            background-color: #FCE7F3;
+        }
+        #highlight-tooltip {
+            position: absolute;
+            background: #DB2777;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+            white-space: nowrap;
+            align-items: center;
+            gap: 6px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #DB2777 transparent transparent transparent;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #F9A8D4; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #F472B6; }
+
+        /* Review modes */
+        .status-correct { border-bottom: 2px solid #10B981 !important; color: #10B981 !important; }
+        .status-incorrect { border-bottom: 2px solid #EF4444 !important; color: #EF4444 !important; text-decoration: line-through; }
+        
+        .nav-pill { transition: all 0.2s ease; }
+        .nav-pill:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-pastel-pink p-4 flex justify-between items-center shrink-0 z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-pastel-pink text-white p-2 rounded-lg">
+                <i class="fa-solid fa-headphones-simple text-xl"></i>
+            </div>
+            <h1 class="font-bold text-2xl text-gray-800 tracking-tight">IELTS <span class="text-pastel-dark">Chan Truong</span></h1>
+        </div>
+        <div id="timer-display" class="hidden font-mono text-xl font-bold text-pastel-dark bg-pastel-blush px-4 py-2 rounded-lg shadow-inner">
+            10:00
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-20">
+            <div class="max-w-2xl w-full p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" id="start-title">Listening Test</h2>
+                    <p class="text-gray-500 font-medium tracking-wide uppercase">Computer-Delivered Format</p>
+                </div>
+                
+                <div class="bg-pastel-light border-l-4 border-pastel-accent p-6 rounded-r-lg mb-8">
+                    <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-pastel-dark"></i> Important Instructions
+                    </h3>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                        <li>The audio will start playing <b>automatically</b> when you click "Start Test".</li>
+                        <li>You cannot pause or replay the audio during the test.</li>
+                        <li>You can select text and click the highlighter icon to mark keywords.</li>
+                        <li>Read the instructions for each question carefully before answering.</li>
+                    </ul>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="start-btn" class="bg-pastel-dark hover:bg-pink-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-lg">
+                        <i class="fa-solid fa-play"></i> Start Test
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST VIEW -->
+        <div id="test-view" class="hidden h-full flex flex-col overflow-hidden">
+            <!-- Highlight Tooltip -->
+            <div id="highlight-tooltip"><i class="fa-solid fa-highlighter"></i> Highlight</div>
+
+            <!-- Audio Player -->
+            <audio id="test-audio" class="hidden">
+                Your browser does not support the audio element.
+            </audio>
+
+            <!-- Question Container -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-32" id="question-container">
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <div id="questions-area" class="text-lg leading-relaxed">
+                        <!-- Questions injected here via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="absolute bottom-0 w-full bg-white border-t border-gray-200 p-4 flex justify-end shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button id="submit-btn" class="bg-gray-800 hover:bg-black text-white font-bold py-2 px-8 rounded-lg transition-colors">
+                    Submit Section
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULT VIEW -->
+        <div id="result-view" class="hidden h-full flex flex-col overflow-hidden bg-gray-50">
+            
+            <!-- Result Header Banner -->
+            <div class="bg-white border-b border-gray-200 p-4 shrink-0 flex flex-col justify-center items-center relative shadow-sm z-10">
+                <h2 class="text-2xl font-bold text-gray-800">Section Review</h2>
+                <p class="text-lg mt-1 text-gray-600">Your Score: <span id="score-display" class="font-bold text-pastel-dark text-xl">0/0</span></p>
+            </div>
+
+            <!-- Result Navigation Bar -->
+            <div class="bg-white border-b border-gray-200 py-3 px-6 shrink-0 flex overflow-x-auto gap-3 items-center justify-start md:justify-center z-10 shadow-sm" id="result-nav-bar">
+                <!-- Nav pills injected here via JS -->
+            </div>
+
+            <!-- Split Layout -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                
+                <!-- Left Pane: Audio & Transcript -->
+                <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col bg-gray-50 border-b md:border-b-0 md:border-r border-gray-200">
+                    <!-- Audio Controls -->
+                    <div class="p-4 bg-white border-b border-gray-200 shrink-0">
+                        <audio id="review-audio" controls class="w-full rounded-md outline-none">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <!-- Transcript text -->
+                    <div class="flex-1 overflow-y-auto p-6 relative" id="transcript-area">
+                        <h3 class="font-bold text-lg mb-4 pb-2 text-gray-700 border-b border-gray-200">Audio Transcript</h3>
+                        <div id="transcript-content" class="space-y-4 text-gray-700 leading-relaxed">
+                            <!-- Transcript injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Questions Review -->
+                <div class="w-full md:w-1/2 h-1/2 md:h-full bg-white overflow-y-auto p-6" id="review-questions-area">
+                    <!-- Review content injected here -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Custom Confirm Modal -->
+        <div id="confirm-modal" class="hidden absolute inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-pastel-blush text-pastel-dark p-3 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">Submit Section?</h3>
+                </div>
+                <p class="text-gray-600 mb-6">Are you sure you want to submit your answers? You cannot return to the test once submitted.</p>
+                <div class="flex justify-end gap-3">
+                    <button id="cancel-submit-btn" class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                    <button id="confirm-submit-btn" class="px-4 py-2 bg-pastel-dark hover:bg-pink-700 text-white font-bold rounded-lg transition-colors shadow-md">Yes, Submit</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA PAYLOAD ---
+        const AUDIO_URL = "http://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_studentbook_unit1.mp3"; 
+        
+        const mockTestData = {
+            sectionTitle: "Section 1: Graduate Fair Registration",
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: AUDIO_URL,
+            questions: [
+                {
+                    id: "q1",
+                    type: "fill-in",
+                    number: 1,
+                    text: `
+                        <div class="mb-8 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                            <div class="bg-pastel-dark text-white text-center py-3 font-bold text-xl tracking-wide uppercase">
+                                Graduate Fair Registration <br><span class="text-pastel-blush text-sm">TGS Global</span>
+                            </div>
+                            
+                            <!-- Graduate Details Section -->
+                            <div class="bg-gray-100 border-b border-gray-300 py-2 px-4 font-bold text-gray-700 uppercase tracking-wider text-sm">
+                                Graduate details
+                            </div>
+                            <div class="p-4 space-y-4 bg-white">
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600">Area of work:</span>
+                                    <span class="text-gray-800 italic">Example: Marketing</span>
+                                </div>
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Name: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">1</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-800">Dominika</span>
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">1</span>
+                                        <input type="text" class="ielts-input w-48 font-semibold text-pastel-dark" data-qid="q1" autocomplete="off">
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["alexandrovna"],
+                    timestamp: 68,
+                    transcriptRef: "tr_1_08",
+                    explanation: "Dominika spells her surname exactly as A-L-E-X-A-N-D-R-O-V-N-A."
+                },
+                {
+                    id: "q2",
+                    type: "fill-in",
+                    number: 2,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Nationality: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">2</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">2</span>
+                                        <input type="text" class="ielts-input w-48 font-semibold text-pastel-dark" data-qid="q2" autocomplete="off">
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["russian", "she is russian", "is russian"],
+                    timestamp: 85,
+                    transcriptRef: "tr_1_25",
+                    explanation: "She states: 'Well, I was born in Poland actually, and my mum's Polish, but I'm Russian because we moved to Moscow when I was very small...'"
+                },
+                {
+                    id: "q3",
+                    type: "fill-in",
+                    number: 3,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Email address: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">3</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">3</span>
+                                        <input type="text" class="ielts-input w-32 font-semibold text-pastel-dark" data-qid="q3" autocomplete="off">
+                                        <span class="text-gray-800">@qmail.com</span>
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["dom54", "dom 54"],
+                    timestamp: 122,
+                    transcriptRef: "tr_2_02",
+                    explanation: "She provides her email address clearly as: 'Dom, D-O-M 54 at qmail.com'."
+                },
+                {
+                    id: "q4",
+                    type: "fill-in",
+                    number: 4,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600">University:</span>
+                                    <span class="text-gray-800">London</span>
+                                </div>
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Type of course: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">4</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">4</span>
+                                        <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q4" autocomplete="off">
+                                        <span class="text-gray-800">BA</span>
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["full-time", "a full-time", "full time", "a full time"],
+                    timestamp: 155,
+                    transcriptRef: "tr_2_35",
+                    explanation: "When asked if she is studying part-time, she corrects the interviewer by saying: 'No - I'm a full-time student'."
+                },
+                {
+                    id: "q5",
+                    type: "fill-in",
+                    number: 5,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Date available: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">5</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">5</span>
+                                        <input type="text" class="ielts-input w-48 font-semibold text-pastel-dark" data-qid="q5" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                    `,
+                    correctAnswer: ["21 july", "21/7", "7/21", "21st of july", "july 21", "21st july"],
+                    timestamp: 199,
+                    transcriptRef: "tr_3_19",
+                    explanation: "When asked about availability for an interview, she responds: 'Well, I think the 21st of July. I'm taking a holiday on the 12th...'"
+                },
+                {
+                    id: "q6",
+                    type: "fill-in",
+                    number: 6,
+                    text: `
+                            <!-- Personal Information Section -->
+                            <div class="bg-gray-100 border-y border-gray-300 py-2 px-4 font-bold text-gray-700 uppercase tracking-wider text-sm">
+                                Personal information
+                            </div>
+                            <div class="p-4 space-y-4 bg-white">
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Other activities: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">6</span></span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-gray-800">organised a</span>
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">6</span>
+                                        <input type="text" class="ielts-input w-40 font-semibold text-pastel-dark" data-qid="q6" autocomplete="off">
+                                        <span class="text-gray-800">for charity</span>
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["competition", "a competition"],
+                    timestamp: 227,
+                    transcriptRef: "tr_3_47",
+                    explanation: "Dominika states: 'Um - well, I did run a competition last year for the charity 'Save the Children'.'"
+                },
+                {
+                    id: "q7",
+                    type: "fill-in",
+                    number: 7,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 mt-1 flex items-center justify-between md:block">Interests: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">7</span></span>
+                                    <div class="flex items-center gap-2 flex-wrap flex-1">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs mt-1">7</span>
+                                        <input type="text" class="ielts-input w-full md:w-64 font-semibold text-pastel-dark" data-qid="q7" placeholder="Write both activities (e.g. A and B)" autocomplete="off">
+                                    </div>
+                                </div>
+                    `,
+                    // We generate permutations to handle the "must have both" logic seamlessly within strict matching system.
+                    correctAnswer: ["cooking and swimming", "swimming and cooking", "cookery and swimming", "swimming and cookery", "cooking, swimming", "swimming, cooking", "cooking & swimming", "swimming & cooking", "cookery & swimming", "swimming & cookery"],
+                    timestamp: 243,
+                    transcriptRef: "tr_4_03",
+                    explanation: "She mentions two interests: 'I'm quite good at cooking' and later 'I do go swimming at least twice a week'."
+                },
+                {
+                    id: "q8",
+                    type: "fill-in",
+                    number: 8,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Previous job(s): <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">8</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">8</span>
+                                        <input type="text" class="ielts-input w-48 font-semibold text-pastel-dark" data-qid="q8" autocomplete="off">
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["children's tutor", "tutor", "a children's tutor", "a tutor"],
+                    timestamp: 270,
+                    transcriptRef: "tr_4_30",
+                    explanation: "Regarding previous paid work, she says: 'But I have been a children's tutor. I got that job through the people at my homestay.'"
+                },
+                {
+                    id: "q9",
+                    type: "fill-in",
+                    number: 9,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-dashed border-gray-200 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Career plans: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">9</span></span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-gray-800">wants to be a</span>
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">9</span>
+                                        <input type="text" class="ielts-input w-48 font-semibold text-pastel-dark" data-qid="q9" autocomplete="off">
+                                    </div>
+                                </div>
+                    `,
+                    correctAnswer: ["project manager"],
+                    timestamp: 295,
+                    transcriptRef: "tr_4_55",
+                    explanation: "Talking about her ambition, she says: 'I'd like to work my way up the ladder and end up as a project manager'."
+                },
+                {
+                    id: "q10",
+                    type: "fill-in",
+                    number: 10,
+                    text: `
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 pb-2">
+                                    <span class="w-48 font-semibold text-gray-600 flex items-center justify-between md:block">Heard about fair through: <span class="md:hidden font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">10</span></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden md:inline font-bold text-pastel-dark bg-pastel-blush px-2 rounded-full text-xs">10</span>
+                                        <input type="text" class="ielts-input w-48 font-semibold text-pastel-dark" data-qid="q10" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    correctAnswer: ["a friend", "friend"],
+                    timestamp: 311,
+                    transcriptRef: "tr_5_11",
+                    explanation: "When asked how she heard about the fair, she simply answers: 'Oh - from a friend. She told me about it last week...'"
+                }
+            ],
+            transcript: [
+                { id: "tr_0_25", start: 0, end: 68, text: "<strong>Interviewer:</strong> Hi there can I help you with anything?<br><strong>Dominika:</strong> Oh, hi... I'm interested in the possibility of a career with TGS when I graduate. So I thought I'd come here and see if there are any opportunities suitable for people like me.<br><strong>Interviewer:</strong> OK. I'll take a few details from you, and then we can contact you when we start our recruitment programme.<br><strong>Dominika:</strong> Oh great.<br><strong>Interviewer:</strong> So if you were to work with us, what area would you want to focus on?<br><strong>Dominika:</strong> I'm hoping to make a career in the field of marketing. I'm quite an outgoing person.<br><strong>Interviewer:</strong> OK. I'll just feed that into the computer. And what's your name?<br><strong>Dominika:</strong> It's Dominika Alexandrovna." },
+                { id: "tr_1_08", start: 68, end: 85, text: "<strong>Interviewer:</strong> OK... Can you just spell your surname for me?<br><strong>Dominika:</strong> Sure. It's A-L-E-X-A-N-D-R-O-V-N-A. <em>(Q1)</em><br><strong>Interviewer:</strong> Thanks - it's important to spell names correctly in business!<br><strong>Dominika:</strong> Yeah!" },
+                { id: "tr_1_25", start: 85, end: 122, text: "<strong>Interviewer:</strong> And where are you from. Dominika?<br><strong>Dominika:</strong> Well, I was born in Poland actually, and my mum's Polish, but I'm Russian <em>(Q2)</em> because we moved to Moscow when I was very small for my father's job.<br><strong>Interviewer:</strong> Well I must say, your English is very good.<br><strong>Dominika:</strong> Thanks. I've been here a couple of years now.<br><strong>Interviewer:</strong> OK. well, we usually get in touch with students a bit later on... and the easiest way for us to communicate with you is by email.<br><strong>Dominika:</strong> Oh yes I can give you my email address.<br><strong>Interviewer:</strong> Fine. Then we can send you any links that you need to read and attach the application forms." },
+                { id: "tr_2_02", start: 122, end: 155, text: "<strong>Dominika:</strong> Oh great... well, my email address is Dom, D-O-M 54 at qmail.com <em>(Q3)</em><br><strong>Interviewer:</strong> Right - thanks. As you know, we like to encourage young people to start working for us as soon as they graduate.<br><strong>Dominika:</strong> Uh-huh.<br><strong>Interviewer:</strong> Obviously our interest is related to the class of degree that you get.<br><strong>Dominika:</strong> Well, I'm hoping to get a 2:1. My tutors are all pretty confident that I will.<br><strong>Interviewer:</strong> That's good... So, which university are you studying at?" },
+                { id: "tr_2_35", start: 155, end: 199, text: "<strong>Dominika:</strong> I'm just finishing my course at London University.<br><strong>Interviewer:</strong> And I assume you're in the school of business...<br><strong>Dominika:</strong> Yes, I've been doing a BA.<br><strong>Interviewer:</strong> And is that part time?<br><strong>Dominika:</strong> No - I'm a full-time student <em>(Q4)</em>. I haven't actually had any experience of business yet. I want to concentrate on getting my qualifications first.<br><strong>Interviewer:</strong> OK. How have you found the course?<br><strong>Dominika:</strong> Oh-it's been really good. I've really improved my communication skills, and I've learned how to work in a team as well.<br><strong>Interviewer:</strong> Well, that's good if you want to work in a global company. So when do you finish?<br><strong>Dominika:</strong> Um - well, it's a 22-month course and I finish in two weeks' time." },
+                { id: "tr_3_19", start: 199, end: 227, text: "<strong>Interviewer:</strong> I see. So when would you be available for an interview?<br><strong>Dominika:</strong> Well, I think the 21st of July <em>(Q5)</em>. I'm taking a holiday on the 12th of July for a week and I'd need a couple of days to sort myself out after that.<br><strong>Interviewer:</strong> We're obviously interested in your business qualifications, but it also helps if you've done anything in your spare time that shows you have some business-related skills." },
+                { id: "tr_3_47", start: 227, end: 243, text: "<strong>Dominika:</strong> Um-well, I did run a competition <em>(Q6)</em> last year for the charity 'Save the Children'.<br><strong>Interviewer:</strong> That's just the sort of thing I mean... shows you have some management skills. Right... and, apart from work and study, what do you like to do in your free time?" },
+                { id: "tr_4_03", start: 243, end: 270, text: "<strong>Dominika:</strong> I'm quite good at cooking <em>(Q7)</em>. I make sure I eat well.... you know, when you're a student, it's easy to forget to eat or to eat a lot of junk food. I do things like watch some of the cookery programmes on TV and then I copy them.<br><strong>Interviewer:</strong> Great!<br><strong>Dominika:</strong> I'm not very sporty, but I do go swimming <em>(Q7)</em> at least twice a week. I like to keep in shape.<br><strong>Interviewer:</strong> Have you done any other work in the past that would be relevant to a marketing career?" },
+                { id: "tr_4_30", start: 270, end: 295, text: "<strong>Dominika:</strong> Um, I did help my father with his business, but it wasn't really a job. I didn't get paid... But I have been a children's tutor <em>(Q8)</em>. I got that job through the people at my homestay.<br><strong>Interviewer:</strong> That's good. So if you worked for us, how would you see your career developing?<br><strong>Dominika:</strong> What do you mean?<br><strong>Interviewer:</strong> Well, are you ambitious? Do you want to get to the top?" },
+                { id: "tr_4_55", start: 295, end: 311, text: "<strong>Dominika:</strong> I guess I'd like to get into management... you know... I'd like to work my way up the ladder and end up as a project manager <em>(Q9)</em>.<br><strong>Interviewer:</strong> Well, that's about all I need to ask you for now. I'll let you walk around and look at some of our displays.<br><strong>Dominika:</strong> Thanks." },
+                { id: "tr_5_11", start: 311, end: 9999, text: "<strong>Interviewer:</strong> Can I just ask how you first heard about the fair?<br><strong>Dominika:</strong> Oh-from a friend <em>(Q10)</em>. She told me about it last week, and then I looked it up on the Internet.<br><strong>Interviewer:</strong> OK, thanks." }
+            ]
+        };
+
+        // --- GLOBAL VARIABLES ---
+        let timerInterval;
+        let remainingSeconds = mockTestData.totalTimeSeconds;
+        let userAnswers = {};
+        let evaluationResults = {};
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const testView = document.getElementById('test-view');
+        const resultView = document.getElementById('result-view');
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const timerDisplay = document.getElementById('timer-display');
+        const questionsArea = document.getElementById('questions-area');
+        const testAudio = document.getElementById('test-audio');
+        const highlightTooltip = document.getElementById('highlight-tooltip');
+        
+        // Modal Elements
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+
+        function init() {
+            document.getElementById('start-title').innerText = mockTestData.sectionTitle;
+            testAudio.src = mockTestData.audioUrl;
+            document.getElementById('review-audio').src = mockTestData.audioUrl;
+            renderTestQuestions();
+            setupHighlighting();
+        }
+
+        startBtn.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            testView.classList.remove('hidden');
+            timerDisplay.classList.remove('hidden');
+            
+            // Start Audio
+            testAudio.play().catch(e => console.log("Audio autoplay prevented. Needs user interaction."));
+            
+            // Start Timer
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+        });
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (remainingSeconds < 60) {
+                timerDisplay.classList.add('text-red-500');
+                timerDisplay.classList.remove('text-pastel-dark');
+            }
+        }
+
+        function renderTestQuestions() {
+            questionsArea.innerHTML = '';
+            
+            // Render the questions. Because we used a continuous HTML block spread across the objects 
+            // for the elegant "Form" look, we just append them directly in order.
+            mockTestData.questions.forEach(q => {
+                // To avoid breaking the CSS flex/grid layout of the form, we inject straight HTML
+                // rather than wrapping each item in a block-level div.
+                questionsArea.insertAdjacentHTML('beforeend', q.text);
+            });
+
+            // Attach listeners to save answers dynamically for inputs and selects
+            const inputs = questionsArea.querySelectorAll('.ielts-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', (e) => { // change to 'input' for faster capture
+                    const qid = e.target.getAttribute('data-qid');
+                    userAnswers[qid] = e.target.value.trim();
+                });
+                // Handle select dropdowns as well
+                input.addEventListener('change', (e) => {
+                    const qid = e.target.getAttribute('data-qid');
+                    userAnswers[qid] = e.target.value.trim();
+                });
+            });
+        }
+
+        function setupHighlighting() {
+            let currentSelection = null;
+
+            document.addEventListener('selectionchange', () => {
+                if (testView.classList.contains('hidden')) return; // Only active in test mode
+                
+                const selection = window.getSelection();
+                if (selection.toString().trim().length > 0) {
+                    const range = selection.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+                    
+                    // Show tooltip above selection, adjusting for scroll
+                    highlightTooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                    highlightTooltip.style.top = `${rect.top + window.scrollY}px`;
+                    highlightTooltip.style.display = 'block';
+                    currentSelection = range;
+                } else {
+                    highlightTooltip.style.display = 'none';
+                    currentSelection = null;
+                }
+            });
+
+            highlightTooltip.addEventListener('click', () => {
+                if (currentSelection) {
+                    try {
+                        const span = document.createElement('span');
+                        span.className = 'highlighted-text';
+                        span.title = "Click to remove highlight";
+                        currentSelection.surroundContents(span);
+                        
+                        // Add click event to remove highlight
+                        span.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const parent = this.parentNode;
+                            while (this.firstChild) {
+                                parent.insertBefore(this.firstChild, this);
+                            }
+                            parent.removeChild(this);
+                        });
+
+                        window.getSelection().removeAllRanges();
+                        highlightTooltip.style.display = 'none';
+                    } catch (e) {
+                        console.warn("Could not highlight across complex HTML elements.");
+                    }
+                }
+            });
+
+            // Hide tooltip if clicked elsewhere
+            document.addEventListener('mousedown', (e) => {
+                if (e.target !== highlightTooltip && highlightTooltip.style.display === 'block') {
+                    setTimeout(() => { highlightTooltip.style.display = 'none'; }, 100);
+                }
+            });
+        }
+
+        submitBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('hidden');
+        });
+
+        cancelSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        confirmSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            submitTest();
+        });
+
+        function submitTest() {
+            clearInterval(timerInterval);
+            testAudio.pause();
+            evaluateAnswers();
+            renderResultView();
+            testView.classList.add('hidden');
+            timerDisplay.classList.add('hidden');
+            resultView.classList.remove('hidden');
+        }
+
+        function evaluateAnswers() {
+            let score = 0;
+            mockTestData.questions.forEach(q => {
+                const userAnswer = (userAnswers[q.id] || "").toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase() === userAnswer);
+                if (isCorrect) score++;
+                
+                evaluationResults[q.id] = {
+                    userAnswer: userAnswers[q.id] || "",
+                    isCorrect: isCorrect,
+                    correctAnswersList: q.correctAnswer
+                };
+            });
+            document.getElementById('score-display').innerText = `${score}/${mockTestData.questions.length}`;
+        }
+
+        function renderResultView() {
+            const reviewArea = document.getElementById('review-questions-area');
+            const navBar = document.getElementById('result-nav-bar');
+            const transcriptArea = document.getElementById('transcript-content');
+            
+            reviewArea.innerHTML = '';
+            navBar.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            // 1. Render Transcript
+            mockTestData.transcript.forEach(line => {
+                const p = document.createElement('p');
+                p.id = line.id;
+                p.className = 'p-2 rounded transition-colors duration-300';
+                p.innerHTML = line.text;
+                transcriptArea.appendChild(p);
+            });
+
+            // 2. Render Questions and Nav Bar
+            mockTestData.questions.forEach((q, index) => {
+                const result = evaluationResults[q.id];
+                
+                // Create Nav Pill for quick jumping
+                const navPill = document.createElement('button');
+                navPill.className = `nav-pill flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-sm border-2 ${result.isCorrect ? 'bg-emerald-500 border-emerald-600' : 'bg-red-500 border-red-600'}`;
+                navPill.innerText = q.number;
+                navPill.onclick = () => {
+                    document.getElementById(`review-q-${q.id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                navBar.appendChild(navPill);
+
+                // Create Review Block
+                const block = document.createElement('div');
+                block.id = `review-q-${q.id}`;
+                block.className = 'mb-8 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm';
+                
+                // Clean HTML for review (replace inputs/selects with neat underlines)
+                let cleanText = q.text.replace(/<input[^>]*>/g, ' <span class="border-b-2 border-gray-400 inline-block w-24 text-center">___</span> ')
+                                      .replace(/<select[^>]*>.*?<\/select>/gs, ' <span class="border-b-2 border-gray-400 inline-block w-24 text-center">___</span> ');
+
+                // Because of the continuous Form layout injected, we strip the large container divs for individual review layout.
+                // It is simpler to just show the question number and the clean text for review context.
+                block.innerHTML = `
+                    <div class="mb-4 font-medium text-gray-800 bg-white p-4 rounded border border-gray-100 shadow-sm">${cleanText}</div>
+                    <div class="mt-4 p-4 rounded-lg bg-white border ${result.isCorrect ? 'border-emerald-200' : 'border-red-200'}">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                            <div class="flex-1">
+                                <span class="text-sm text-gray-500 block uppercase tracking-wider font-semibold mb-1">Your Answer:</span>
+                                <span class="font-bold text-lg ${result.isCorrect ? 'text-emerald-600' : 'text-red-600'}">
+                                    ${result.userAnswer || '<i class="text-gray-400 font-normal">No answer provided</i>'}
+                                </span>
+                                ${!result.isCorrect ? `<span class="ml-2 text-red-500"><i class="fa-solid fa-xmark"></i></span>` : `<span class="ml-2 text-emerald-500"><i class="fa-solid fa-check"></i></span>`}
+                            </div>
+                            ${!result.isCorrect ? `
+                            <div class="flex-1 border-t md:border-t-0 md:border-l pt-3 md:pt-0 pl-0 md:pl-4 border-gray-200">
+                                <span class="text-sm text-gray-500 block uppercase tracking-wider font-semibold mb-1">Correct Answer(s):</span>
+                                <span class="font-bold text-emerald-600">${result.correctAnswersList.join(' / ')}</span>
+                            </div>` : ''}
+                        </div>
+                        
+                        <!-- Explanation Button -->
+                        <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}', this)" class="mt-2 bg-pastel-light hover:bg-pastel-blush text-pastel-dark font-semibold py-2 px-5 rounded-full text-sm transition-colors border border-pastel-pink flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-circle-play text-lg"></i> View Explanation & Play Audio
+                        </button>
+                        
+                        <!-- Explanation Text -->
+                        <div class="explanation-box hidden mt-4 text-sm text-gray-700 bg-blue-50 p-4 rounded-lg border border-blue-200 leading-relaxed shadow-inner">
+                            <i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i> ${q.explanation}
+                        </div>
+                    </div>
+                `;
+                reviewArea.appendChild(block);
+            });
+        }
+
+        window.playExplanation = function(timestamp, transcriptId, btnElement) {
+            const reviewAudio = document.getElementById('review-audio');
+            
+            // Hide all explanations, show the specific one
+            const allExpDivs = document.querySelectorAll('.explanation-box');
+            allExpDivs.forEach(div => div.classList.add('hidden')); 
+            
+            const expDiv = btnElement.nextElementSibling;
+            expDiv.classList.remove('hidden');
+
+            // Play audio
+            reviewAudio.currentTime = timestamp;
+            reviewAudio.play();
+
+            // Scroll transcript and highlight
+            const transcriptLine = document.getElementById(transcriptId);
+            if (transcriptLine) {
+                // Remove previous highlights
+                document.querySelectorAll('#transcript-content p').forEach(p => p.classList.remove('bg-yellow-100', 'border-l-4', 'border-yellow-400'));
+                
+                // Add highlight
+                transcriptLine.classList.add('bg-yellow-100', 'border-l-4', 'border-yellow-400');
+                transcriptLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        };
+
+        // Sync transcript with audio playback
+        document.getElementById('review-audio').addEventListener('timeupdate', (e) => {
+            const currentTime = e.target.currentTime;
+
+            for (let i = 0; i < mockTestData.transcript.length; i++) {
+                const line = mockTestData.transcript[i];
+                const element = document.getElementById(line.id);
+                
+                if (currentTime >= line.start && currentTime < line.end) {
+                    if (!element.classList.contains('bg-pastel-blush')) {
+                        // Clear old active lines
+                        document.querySelectorAll('#transcript-content p').forEach(p => {
+                            p.classList.remove('bg-pastel-blush', 'font-medium', 'text-pastel-dark');
+                        });
+                        
+                        // Set new active line
+                        element.classList.add('bg-pastel-blush', 'font-medium', 'text-pastel-dark');
+                        
+                        // Auto-scroll if it's playing normally
+                        const container = document.getElementById('transcript-area');
+                        if (element.offsetTop < container.scrollTop || element.offsetTop > container.scrollTop + container.clientHeight) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                    break;
+                }
+            }
+        });
+
+        // Initialize the app on load
+        window.onload = init;
+
+    </script>
+</body>
+</html>
