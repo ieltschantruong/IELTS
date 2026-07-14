@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Loch Affric & Wildlife Photography</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            blush: '#fdf2f8', 
+                            pink: '#fbcfe8',  
+                            accent: '#f472b6', 
+                            dark: '#9d174d',   
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom IELTS Input Styling */
+        .ielts-input { 
+            border: none; 
+            border-bottom: 2px solid #cbd5e1; 
+            background: transparent; 
+            padding: 2px 8px; 
+            transition: all 0.2s;
+            display: inline-block;
+            font-weight: 600;
+            color: #9d174d; 
+        }
+        .ielts-input:focus { 
+            outline: none; 
+            border-bottom-color: #f472b6; 
+            background: #fdf2f8; 
+            box-shadow: 0 2px 0 0 #f472b6;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Highlight Tool Styling */
+        .highlighted-text {
+            background-color: #fef08a;
+            border-radius: 2px;
+            padding: 0 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px dashed #eab308;
+        }
+        .highlighted-text:hover {
+            background-color: #fde047;
+            position: relative;
+        }
+        .highlighted-text:hover::after {
+            content: 'Click to remove';
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937; color: white;
+            font-size: 10px; padding: 2px 6px;
+            border-radius: 4px; white-space: nowrap;
+            pointer-events: none;
+            margin-bottom: 4px;
+        }
+        
+        .transcript-highlight {
+            background-color: #fbcfe8; 
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 0 0 2px #f472b6;
+        }
+
+        /* Tooltip button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background-color: #1f2937;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateX(-50%);
+            margin-top: -45px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        #highlight-tooltip:hover {
+            background-color: #374151;
+            transform: translateX(-50%) scale(1.05);
+        }
+        #highlight-tooltip::after {
+            content: ''; position: absolute;
+            top: 100%; left: 50%; margin-left: -6px;
+            border-width: 6px; border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <header class="bg-white border-b border-gray-200 shadow-sm z-20 h-16 flex-none flex items-center justify-between px-4 md:px-6 sticky top-0 w-full">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-pastel-accent rounded-xl flex items-center justify-center text-white font-bold shadow-sm shrink-0">CT</div>
+            <h1 class="font-bold text-base md:text-lg text-gray-800 tracking-tight hidden sm:block">IELTS Chan Truong</h1>
+        </div>
+        
+        <!-- Timer and Tablet-friendly Top Right Submit Button -->
+        <div class="flex items-center gap-3 md:gap-4">
+            <div id="timer-display" class="hidden font-mono text-lg md:text-xl font-bold text-pastel-dark bg-pastel-blush border border-pastel-pink px-3 py-1.5 md:px-4 rounded-lg shadow-sm">
+                10:00
+            </div>
+            <button id="header-submit-btn" class="hidden bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 md:px-6 rounded-xl shadow-md transition-all text-sm md:text-base border border-gray-700 hover:shadow-lg active:scale-95 flex items-center">
+                Submit <i class="fa-solid fa-paper-plane ml-2"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 relative overflow-hidden flex flex-col">
+        
+        <div id="start-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-gray-50 p-4 overflow-y-auto">
+            <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-10 border border-gray-100">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-pastel-blush text-pastel-accent rounded-full flex items-center justify-center mx-auto text-4xl mb-4 shadow-sm border border-pastel-pink">
+                        <i class="fa-solid fa-desktop"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Computer-Delivered IELTS</h2>
+                    <h3 class="text-xl font-medium text-pastel-dark" id="intro-section-title">Loading Section...</h3>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-xl mb-8 shadow-inner">
+                    <h4 class="font-bold text-blue-800 mb-3 text-lg"><i class="fa-solid fa-circle-info mr-2"></i>Important Instructions</h4>
+                    <ul class="list-disc pl-5 space-y-3 text-blue-900 font-medium">
+                        <li>The audio will play <strong>automatically</strong> once you click start.</li>
+                        <li>You <strong>cannot pause or replay</strong> the audio during the test.</li>
+                        <li>Read the instructions for each question carefully before answering.</li>
+                        <li>You can highlight text in the questions area to help you focus by selecting it with your mouse.</li>
+                    </ul>
+                </div>
+                <button id="start-btn" class="bg-pastel-accent text-white font-bold text-lg py-4 px-8 rounded-full shadow-lg hover:bg-pink-500 hover:shadow-xl hover:-translate-y-0.5 w-full transition-all duration-200">
+                    <i class="fa-solid fa-headphones mr-2"></i> Start Test Now
+                </button>
+            </div>
+        </div>
+
+        <div id="test-view" class="hidden h-full flex flex-col overflow-y-auto p-4 md:p-8 bg-gray-50 pb-20">
+            <audio id="test-audio" preload="auto"></audio>
+
+            <div class="max-w-4xl w-full mx-auto flex-1">
+                <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-200 mb-6 relative" id="questions-container">
+                    
+                    <div class="mb-8 text-center border-b-2 border-pastel-pink pb-4">
+                        <h2 class="text-2xl font-bold text-gray-800 tracking-wider mb-2" id="test-main-title">Test Section</h2>
+                        <p class="text-gray-500 italic" id="test-instructions">Read the instructions carefully.</p>
+                    </div>
+
+                    <!-- Questions Area -->
+                    <div id="questions-area" class="text-gray-800 text-lg leading-relaxed">
+                        <!-- Content Injected via JS -->
+                    </div>
+                </div>
+                <div class="text-center text-gray-400 text-sm mt-4">
+                    <p><i class="fa-solid fa-circle-info mr-1"></i> Submit your answers using the button in the top right corner.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-view" class="hidden h-full flex flex-col">
+            
+            <div class="bg-white border-b border-gray-200 px-6 py-4 flex-none flex items-center justify-between z-20 shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Test Review</h2>
+                    <p class="text-gray-500">Review your answers and check the transcript.</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500 font-medium uppercase tracking-wider mb-1">Your Score</div>
+                    <div class="text-3xl font-bold text-pastel-dark bg-pastel-blush px-4 py-1 rounded-lg border border-pastel-pink inline-block shadow-inner">
+                        <span id="score-display">0</span> / 10
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 border-b border-gray-200 px-6 py-3 flex gap-2 overflow-x-auto whitespace-nowrap z-20 shadow-inner">
+                <span class="text-sm font-bold text-gray-500 flex items-center mr-3 uppercase tracking-wide">Jump to:</span>
+                <div id="result-nav" class="flex gap-2 pb-1">
+                    <!-- Nav pills injected here -->
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-gray-100">
+                
+                <!-- Left Pane: Transcript -->
+                <div class="w-full md:w-1/2 flex flex-col border-r border-gray-200 bg-white shadow-[4px_0_15px_rgba(0,0,0,0.03)] z-10">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex-none shadow-sm z-10">
+                        <h3 class="font-bold text-gray-700 mb-3 flex items-center text-lg"><i class="fa-solid fa-file-lines text-pastel-accent mr-2"></i> Audio Transcript</h3>
+                        <audio id="review-audio" controls class="w-full h-10 outline-none rounded-full bg-pastel-blush">
+                        </audio>
+                    </div>
+                    <div id="transcript-area" class="flex-1 overflow-y-auto p-6 text-gray-700 leading-relaxed space-y-4">
+                        <!-- Transcript injected here -->
+                    </div>
+                </div>
+
+                <!-- Right Pane: Questions Review -->
+                <div class="w-full md:w-1/2 flex flex-col bg-gray-50 z-0">
+                    <div class="p-4 border-b border-gray-200 bg-white flex-none shadow-sm z-10">
+                        <h3 class="font-bold text-gray-700 flex items-center text-lg"><i class="fa-solid fa-list-check text-pastel-accent mr-2"></i> Review Answers</h3>
+                    </div>
+                    <div id="review-area" class="flex-1 overflow-y-auto p-6 space-y-6">
+                        <!-- Review items injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden bg-gray-900/40 backdrop-blur-sm flex items-center justify-center transition-opacity">
+        <div class="bg-white p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl transform transition-transform scale-100 border border-gray-100 mx-4">
+            <div class="w-16 h-16 bg-red-50 text-pastel-dark rounded-full flex items-center justify-center mx-auto text-3xl mb-4 border-2 border-red-100 shadow-sm">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2 text-gray-800">Submit Section?</h3>
+            <p class="text-gray-500 mb-8 leading-relaxed">Are you sure you want to finish this section? You cannot change your answers after submitting.</p>
+            <div class="flex gap-4">
+                <button id="cancel-submit-btn" class="flex-1 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition shadow-sm hover:shadow">Cancel</button>
+                <button id="confirm-submit-btn" class="flex-1 py-3.5 bg-gray-800 hover:bg-black text-white font-bold rounded-xl shadow-md hover:shadow-lg transition">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highlight Tooltip -->
+    <div id="highlight-tooltip"><i class="fa-solid fa-highlighter mr-1"></i> Highlight</div>
+
+    <script>
+        const mockTestData = {
+            sectionTitle: "Section 3: Loch Affric & Wildlife Photography",
+            totalTimeSeconds: 600, 
+            audioUrl: "https://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_6.5_7.5_studentbook_unit7.mp3",
+            instructions: "Listen to the audio and answer the questions below.",
+            questions: [
+                {
+                    id: "q_map_intro", type: "html-only", number: 0,
+                    text: `
+                        <div class="bg-pastel-blush border border-pastel-pink rounded-xl p-5 mb-8 shadow-sm">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 1-3</h3>
+                            <p class="text-gray-700 font-medium mb-4">Label the plan below. Write the correct letter, <strong>A-F</strong>, next to questions 1-3.</p>
+                            <div class="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex justify-center mb-6">
+                                <img src="https://ieltschantruong.github.io/IELTS/src/listening_diagrams/complete_itelts_6.5_7.5_studentbook_unit7.png" 
+                                     alt="Map of Loch Affric in Scotland" 
+                                     class="max-w-full h-auto rounded">
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: "q1", type: "fill-in", number: 1,
+                    text: `
+                        <div class="flex items-center gap-4 mb-3 pl-4 md:pl-8">
+                           <span class="w-8 font-bold text-pastel-dark">1.</span> 
+                           <span class="w-56 font-medium text-gray-700">Oldest Scots pine trees</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-20 text-center font-bold text-pastel-dark shadow-sm" data-qid="q1">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["C", "c"],
+                    timestamp: 32, transcriptRef: "tr_0_32",
+                    explanation: "The tutor points out that the oldest pines are found 'where the two lochs meet... where it narrows in the centre of the map', corresponding to location C."
+                },
+                {
+                    id: "q2", type: "fill-in", number: 2,
+                    text: `
+                        <div class="flex items-center gap-4 mb-3 pl-4 md:pl-8">
+                           <span class="w-8 font-bold text-pastel-dark">2.</span> 
+                           <span class="w-56 font-medium text-gray-700">Red deer</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-20 text-center font-bold text-pastel-dark shadow-sm" data-qid="q2">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["F", "f"],
+                    timestamp: 62, transcriptRef: "tr_1_02",
+                    explanation: "For the red deer, the tutor suggests looking 'between the woodland and the river', which is location F."
+                },
+                {
+                    id: "q3", type: "fill-in", number: 3,
+                    text: `
+                        <div class="flex items-center gap-4 mb-8 pl-4 md:pl-8 pb-8 border-b border-gray-200">
+                           <span class="w-8 font-bold text-pastel-dark">3.</span> 
+                           <span class="w-56 font-medium text-gray-700">Red squirrels</span>
+                           <select class="ielts-input bg-white border-b-2 border-gray-300 rounded-t p-1 cursor-pointer w-20 text-center font-bold text-pastel-dark shadow-sm" data-qid="q3">
+                               <option value=""></option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                           </select>
+                       </div>
+                    `,
+                    correctAnswer: ["A", "a"],
+                    timestamp: 84, transcriptRef: "tr_1_24",
+                    explanation: "Regarding the red squirrels, the tutor says to look 'in this slightly bigger patch of woodland behind it (the loch)... Just away from the water a bit', identifying location A."
+                },
+                {
+                    id: "q_sa_intro", type: "html-only", number: 0,
+                    text: `
+                        <div class="mb-4 mt-6">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 4-5</h3>
+                            <p class="text-gray-700 font-medium bg-gray-100 inline-block px-3 py-1 rounded">Answer the questions. Write <strong>ONE WORD ONLY</strong> for each answer.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: "q4", type: "fill-in", number: 4,
+                    text: `
+                        <div class="mb-4 flex flex-col md:flex-row md:items-center gap-2">
+                            <strong class="text-pastel-dark">4.</strong> 
+                            <span>What can cause someone to miss a good photograph?</span> 
+                            <input type="text" class="ielts-input w-48 font-semibold" data-qid="q4" autocomplete="off">
+                        </div>
+                    `,
+                    correctAnswer: ["hesitation", "hesitating", "waiting"],
+                    timestamp: 118, transcriptRef: "tr_1_58",
+                    explanation: "Brett states 'My problem's hesitation - I wait too long!' leading to missing the moment."
+                },
+                {
+                    id: "q5", type: "fill-in", number: 5,
+                    text: `
+                        <div class="mb-8 pb-8 border-b border-gray-200 flex flex-col md:flex-row md:items-center gap-2">
+                            <strong class="text-pastel-dark">5.</strong> 
+                            <span>What personal quality do wildlife photographers particularly need?</span> 
+                            <input type="text" class="ielts-input w-48 font-semibold" data-qid="q5" autocomplete="off">
+                        </div>
+                    `,
+                    correctAnswer: ["patience"],
+                    timestamp: 146, transcriptRef: "tr_2_26",
+                    explanation: "Brett mentions 'you've got to have patience', and the tutor confirms 'That's one of the most important qualities if you're a wildlife photographer.'"
+                },
+                {
+                    id: "q_sc_intro", type: "html-only", number: 0,
+                    text: `
+                        <div class="mb-4 mt-6">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 6-10</h3>
+                            <p class="text-gray-700 font-medium bg-gray-100 inline-block px-3 py-1 rounded">Complete the sentences. Write <strong>NO MORE THAN TWO WORDS</strong> for each answer.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: "q6", type: "fill-in", number: 6,
+                    text: `
+                        <div class="mb-5 leading-loose">
+                            <strong class="text-pastel-dark mr-2">6.</strong> In bad weather, think more carefully about the <input type="text" class="ielts-input w-40 text-center" data-qid="q6" autocomplete="off">.
+                        </div>
+                    `,
+                    correctAnswer: ["landscape"],
+                    timestamp: 195, transcriptRef: "tr_3_15",
+                    explanation: "The tutor advises that in bad weather like driving rain, 'you need to take the landscape into account. Perhaps to a greater degree than you would normally.'"
+                },
+                {
+                    id: "q7", type: "fill-in", number: 7,
+                    text: `
+                        <div class="mb-5 leading-loose">
+                            <strong class="text-pastel-dark mr-2">7.</strong> Take advantage of <input type="text" class="ielts-input w-40 text-center" data-qid="q7" autocomplete="off"> when photographing near water.
+                        </div>
+                    `,
+                    correctAnswer: ["reflection", "reflections", "a reflection", "the reflections"],
+                    timestamp: 211, transcriptRef: "tr_3_31",
+                    explanation: "Brett mentions he wants to 'make the most of all the stunning reflections in the water', and the tutor agrees."
+                },
+                {
+                    id: "q8", type: "fill-in", number: 8,
+                    text: `
+                        <div class="mb-5 leading-loose">
+                            <strong class="text-pastel-dark mr-2">8.</strong> Use a piece of equipment called an 'angle finder' to avoid <input type="text" class="ielts-input w-40 text-center" data-qid="q8" autocomplete="off">.
+                        </div>
+                    `,
+                    correctAnswer: ["neck pain", "pain"],
+                    timestamp: 245, transcriptRef: "tr_4_05",
+                    explanation: "Brett explains that an angle finder is great because 'it prevents neck pain... you can lie down and look through it without hurting your neck.'"
+                },
+                {
+                    id: "q9", type: "fill-in", number: 9,
+                    text: `
+                        <div class="mb-5 leading-loose">
+                            <strong class="text-pastel-dark mr-2">9.</strong> Use the work of both artists and <input type="text" class="ielts-input w-40 text-center" data-qid="q9" autocomplete="off"> to generate ideas.
+                        </div>
+                    `,
+                    correctAnswer: ["designers"],
+                    timestamp: 270, transcriptRef: "tr_4_30",
+                    explanation: "After Brett mentions Scottish artists, the tutor adds, 'Some designers can be helpful, too... they can help give you ideas...'"
+                },
+                {
+                    id: "q10", type: "fill-in", number: 10,
+                    text: `
+                        <div class="mb-5 leading-loose">
+                            <strong class="text-pastel-dark mr-2">10.</strong> Think about <input type="text" class="ielts-input w-40 text-center" data-qid="q10" autocomplete="off"> issues when deciding on what to photograph.
+                        </div>
+                    `,
+                    correctAnswer: ["conservation"],
+                    timestamp: 278, transcriptRef: "tr_4_38",
+                    explanation: "Mica recalls, 'I know you said we should consider matters related to conservation when we choose a scene to photograph.'"
+                }
+            ],
+            transcript: [
+                { id: "tr_0_00", start: 0, end: 32, text: "<strong>Narrator:</strong> You will hear two students talking to their tutor about a photography assignment. <br><strong>Tutor:</strong> So, you're off to Glen Affric next week in the Highlands of Scotland for your photography assignment. <br><strong>Brett:</strong> Yes, that's right. <br><strong>Tutor:</strong> So have you got the map I gave you of Loch Affric and the surrounding area? <br><strong>Brett:</strong> Yup - here's mine. <br><strong>Mica:</strong> ... and mine. Loch means 'lake', right? <br><strong>Tutor:</strong> Yes, that's right. Now, you've read up on it, so is there anything in particular that you want to look out for?" },
+                { id: "tr_0_32", start: 32, end: 62, text: "<strong>Brett:</strong> Well, as I said, I'd love to get some really good shots of the pine trees, particularly old ones. <br><strong>Mica:</strong> You're going to see them all over... Look, there's a particularly big area of forest to the south-east here and several smaller ones. <br><strong>Tutor:</strong> Yes, they're OK, but if you look at where the two lochs meet... <em>(Q1)</em> <br><strong>Brett:</strong> Um, where it narrows in the centre of the map? <br><strong>Tutor:</strong> That's right. You'll find some of the oldest pines there - up to 200 years old. <br><strong>Brett:</strong> Great - I'll mark that." },
+                { id: "tr_1_02", start: 62, end: 84, text: "<strong>Mica:</strong> What about red deer? Can we hope to see any? <br><strong>Brett:</strong> I guess they'd be more out in the open, in the non-wooded areas. <br><strong>Tutor:</strong> Well, they like an area near the edge of woodland. <br><strong>Mica:</strong> So perhaps this largest area of forest - here, in the corner of the map? <br><strong>Tutor:</strong> Yes they also need water, so between the woodland and the river - I'd try that spot. <em>(Q2)</em> What you should also look for are red squirrels." },
+                { id: "tr_1_24", start: 84, end: 118, text: "<strong>Brett:</strong> But they're so rare in Britain! <br><strong>Mica:</strong> Not here, though. You might get a good picture of one among the pine trees near the loch. <br><strong>Brett:</strong> Mm, close to the loch... um, perhaps this south side of Loch Affric. <br><strong>Tutor:</strong> Mmm. Not right on the edge, though - that's where you'd look for birds - but in this slightly bigger patch of woodland behind it. <em>(Q3)</em> <br><strong>Brett:</strong> Just away from the water a bit, then. <br><strong>Tutor:</strong> Yup. There's plenty of wildlife to tempt you. But remember to go for a good shot when you see it." },
+                { id: "tr_1_58", start: 118, end: 146, text: "<strong>Brett:</strong> Yes, I remember what you said in your lecture - if you're in a good spot, the light is good; if an animal is about to move into a great position, then be ready and go for it. My problem's hesitation <em>(Q4)</em> - I wait too long! <br><strong>Mica:</strong> You lose the moment. <br><strong>Tutor:</strong> Well, a lot of inexperienced photographers have that particular problem. <br><strong>Mica:</strong> What if you frighten your subject off? <br><strong>Tutor:</strong> If you do, it's like anything, you have to put it down to experience." },
+                { id: "tr_2_26", start: 146, end: 174, text: "<strong>Brett:</strong> So you shouldn't wait too long, but don't take the shot too soon either - sometimes you've got to have patience. <em>(Q5)</em> <br><strong>Tutor:</strong> That's one of the most important qualities if you're a wildlife photographer. You may have to sit for hours waiting for the perfect moment. But suddenly something will take your breath away and you'll realise it's all been worth it!" },
+                { id: "tr_2_54", start: 174, end: 195, text: "<strong>Tutor:</strong> Right, so do you have any further questions about the trip? <br><strong>Brett:</strong> Well, yeah - I was wondering about the weather - they're forecasting a lot of mist. <br><strong>Tutor:</strong> Well, yes, but I wouldn't worry - in the long run, you'll still get your pictures. <br><strong>Brett:</strong> But... <br><strong>Tutor:</strong> You just have to be careful. You know, experts say there's no such thing as bad weather when it comes to photography. <br><strong>Mica:</strong> What about driving rain?" },
+                { id: "tr_3_15", start: 195, end: 211, text: "<strong>Tutor:</strong> Well, yes, that doesn't make things easy, but it does mean that you need to take the landscape <em>(Q6)</em> into account. Perhaps to a greater degree than you would normally. <br><strong>Mica:</strong> Is that because of shadow and things like that? <br><strong>Tutor:</strong> Well, you get shadow in good weather. <br><strong>Mica:</strong> Yeah - I guess so." },
+                { id: "tr_3_31", start: 211, end: 227, text: "<strong>Brett:</strong> Um, I'm really looking forward to photographing the Scots pine trees. I want to make the most of all the stunning reflections <em>(Q7)</em> in the water. <br><strong>Tutor:</strong> Just take your time, and you might capture an amazing reflection - you really should profit from this with the water around you." },
+                { id: "tr_3_47", start: 227, end: 245, text: "<strong>Mica:</strong> You were talking last week in your lecture about a piece of equipment called an angle finder, and I've been checking them out on the Internet... <br><strong>Tutor:</strong> Ah-hah, it's a clever little device - particularly useful if you're down on your knees trying to get really close to something in the grass, like an insect or bird." },
+                { id: "tr_4_05", start: 245, end: 261, text: "<strong>Brett:</strong> I've got one actually - and what's great about it is that it prevents neck pain <em>(Q8)</em>, because it's like a periscope on a submarine - you can lie down and look through it without hurting your neck. <br><strong>Mica:</strong> Definitely worth buying, then! <br><strong>Tutor:</strong> Now, is there anything else?" },
+                { id: "tr_4_21", start: 261, end: 270, text: "<strong>Brett:</strong> Well, I've been looking at some wildlife paintings by Scottish artists. I thought they might help me get ideas. <br><strong>Mica:</strong> That's a good suggestion." },
+                { id: "tr_4_30", start: 270, end: 278, text: "<strong>Tutor:</strong> Some designers <em>(Q9)</em> can be helpful, too... they can help give you ideas about camera angles and how you use natural light." },
+                { id: "tr_4_38", start: 278, end: 9999, text: "<strong>Mica:</strong> Hmm, I'll look into that. One other thing... I know you said we should consider matters related to conservation <em>(Q10)</em> when we choose a scene to photograph. <br><strong>Tutor:</strong> I made that point because, well, images like the ones you're going to take can sometimes reveal some of the conservation problems faced by species and habitats. It's just something to bear in mind." }
+            ]
+        };
+
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = mockTestData.totalTimeSeconds;
+        
+        const audioElement = document.getElementById('test-audio');
+        const reviewAudioElement = document.getElementById('review-audio');
+        const startBtn = document.getElementById('start-btn');
+        const headerSubmitBtn = document.getElementById('header-submit-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+
+        function initTest() {
+            document.getElementById('intro-section-title').innerText = mockTestData.sectionTitle;
+            document.getElementById('test-main-title').innerText = mockTestData.sectionTitle;
+            document.getElementById('test-instructions').innerText = mockTestData.instructions;
+            
+            audioElement.src = mockTestData.audioUrl;
+            reviewAudioElement.src = mockTestData.audioUrl;
+
+            const questionsArea = document.getElementById('questions-area');
+            questionsArea.innerHTML = ''; 
+            
+            mockTestData.questions.forEach(q => {
+                questionsArea.insertAdjacentHTML('beforeend', `<div id="q-container-${q.id}">${q.text}</div>`);
+            });
+
+            document.querySelectorAll('.ielts-input').forEach(input => {
+                const updateAnswer = (e) => { userAnswers[e.target.dataset.qid] = e.target.value; };
+                input.addEventListener('input', updateAnswer);
+                input.addEventListener('change', updateAnswer);
+            });
+        }
+
+        startBtn.addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('timer-display').classList.remove('hidden');
+            document.getElementById('header-submit-btn').classList.remove('hidden');
+            
+            audioElement.play().catch(e => console.log("Auto-play blocked", e));
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60);
+                const s = timeRemaining % 60;
+                document.getElementById('timer-display').innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                if (timeRemaining <= 0) {
+                    handleFinalSubmit(); 
+                }
+            }, 1000);
+        });
+
+        headerSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('hidden');
+        });
+
+        cancelSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        confirmSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            handleFinalSubmit();
+        });
+
+        function handleFinalSubmit() {
+            clearInterval(timerInterval);
+            audioElement.pause();
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('timer-display').classList.add('hidden');
+            document.getElementById('header-submit-btn').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            
+            renderResultView();
+        }
+
+        function renderResultView() {
+            let score = 0;
+            const reviewArea = document.getElementById('review-area');
+            const navArea = document.getElementById('result-nav');
+            const transcriptArea = document.getElementById('transcript-area');
+            
+            reviewArea.innerHTML = '';
+            navArea.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            mockTestData.transcript.forEach(tr => {
+                transcriptArea.insertAdjacentHTML('beforeend', `<div id="${tr.id}" class="mb-3 transition-colors duration-300 p-3 rounded-lg hover:bg-gray-100">${tr.text}</div>`);
+            });
+
+            mockTestData.questions.forEach((q) => {
+                if(q.type === 'html-only') return; // Skip instruction blocks in review
+
+                const userAns = (userAnswers[q.id] || "").toString().toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase().trim() === userAns);
+                if (isCorrect) score++;
+
+                let cleanText = q.text.replace(/<input[^>]*>/gi, `<span class="font-bold text-gray-800 tracking-widest px-3 border-b-2 border-gray-400 mx-1">___</span>`);
+                cleanText = cleanText.replace(/<select[^>]*>[\s\S]*?<\/select>/gi, `<span class="font-bold text-gray-800 tracking-widest px-3 border-b-2 border-gray-400 mx-1">___</span>`);
+
+                const pillColor = isCorrect ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200' : 'bg-red-100 text-red-700 border-red-300 hover:bg-red-200';
+                navArea.insertAdjacentHTML('beforeend', `
+                    <button onclick="document.getElementById('review-q-${q.id}').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                            class="w-10 h-10 shrink-0 rounded-full border-2 font-bold flex items-center justify-center transition-all shadow-sm ${pillColor}">
+                        ${q.number}
+                    </button>
+                `);
+
+                reviewArea.insertAdjacentHTML('beforeend', `
+                    <div id="review-q-${q.id}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 scroll-mt-24 transition-all">
+                        <div class="flex items-start justify-between mb-4">
+                            <span class="font-bold text-gray-500 bg-gray-100 px-4 py-1.5 rounded-lg text-sm uppercase tracking-wide">Question ${q.number}</span>
+                            ${isCorrect 
+                                ? `<span class="text-green-600 bg-green-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm"><i class="fa-solid fa-check mr-2"></i>Correct</span>` 
+                                : `<span class="text-red-600 bg-red-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm"><i class="fa-solid fa-xmark mr-2"></i>Incorrect</span>`
+                            }
+                        </div>
+                        
+                        <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-100 text-gray-800 text-lg leading-relaxed shadow-inner overflow-hidden">
+                            ${cleanText}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                                <p class="text-xs text-red-500 font-bold uppercase tracking-wider mb-1">Your Answer</p>
+                                <p class="font-medium text-lg ${!userAns ? 'text-gray-400 italic' : 'text-gray-800'} break-words">${userAns || 'No answer provided'}</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                                <p class="text-xs text-green-600 font-bold uppercase tracking-wider mb-1">Correct Answer</p>
+                                <p class="font-bold text-gray-800 text-lg break-words">${q.correctAnswer[0]}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-pastel-blush border border-pastel-pink rounded-xl p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                                <p class="font-bold text-pastel-dark flex items-center text-lg"><i class="fa-regular fa-lightbulb mr-2"></i> Explanation</p>
+                                <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}')" class="bg-white hover:bg-pastel-accent hover:text-white text-pastel-dark border border-pastel-pink font-bold py-2 px-5 rounded-full text-sm transition-all flex items-center shadow-sm whitespace-nowrap">
+                                    <i class="fa-solid fa-circle-play mr-2 text-lg"></i> Play Audio
+                                </button>
+                            </div>
+                            <p class="text-gray-700 text-base leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('score-display').innerText = score;
+        }
+
+        function playExplanation(time, trId) {
+            reviewAudioElement.currentTime = time;
+            reviewAudioElement.play();
+
+            document.querySelectorAll('.transcript-highlight').forEach(el => {
+                el.classList.remove('transcript-highlight');
+            });
+
+            const trElement = document.getElementById(trId);
+            if (trElement) {
+                trElement.classList.add('transcript-highlight');
+                trElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        const tooltip = document.getElementById('highlight-tooltip');
+        let currentSelection = null;
+
+        document.getElementById('questions-container').addEventListener('mouseup', (e) => {
+            const selection = window.getSelection();
+            if (selection.toString().trim().length > 0 && !e.target.closest('input') && !e.target.closest('select')) {
+                currentSelection = selection.getRangeAt(0);
+                const rect = currentSelection.getBoundingClientRect();
+                
+                tooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                tooltip.style.top = `${rect.top + window.scrollY}px`;
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target !== tooltip) tooltip.style.display = 'none';
+        });
+
+        tooltip.addEventListener('click', () => {
+            if (currentSelection) {
+                try {
+                    const span = document.createElement('span');
+                    span.className = 'highlighted-text';
+                    span.title = "Click to remove highlight";
+                    span.onclick = function(e) {
+                        e.stopPropagation();
+                        const parent = this.parentNode;
+                        while (this.firstChild) { parent.insertBefore(this.firstChild, this); }
+                        parent.removeChild(this);
+                    };
+                    currentSelection.surroundContents(span);
+                } catch (e) {
+                    console.log("Cannot highlight across multiple HTML elements.", e);
+                }
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Initialize on load
+        initTest();
+    </script>
+</body>
+</html>
