@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Blogs and the History of Blogging</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#FAD4D4',
+                            blush: '#FFF0F0',
+                            accent: '#F4978E',
+                            dark: '#F08080',
+                            text: '#4A4A4A'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #FAFAFA; color: #333; }
+        
+        .ielts-input {
+            border: none;
+            border-bottom: 2px solid #cbd5e1;
+            background-color: transparent;
+            padding: 2px 8px;
+            transition: all 0.3s;
+            outline: none;
+            color: #F08080;
+        }
+        .ielts-input:focus { border-bottom-color: #F4978E; background-color: #FFF0F0; }
+        
+        /* Highlight Feature Styles */
+        .highlighted-text {
+            background-color: #fef08a; /* Yellow-200 */
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .highlighted-text:hover { background-color: #fde047; }
+        
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background-color: #333;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            transform: translate(-50%, -120%);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .transcript-highlight {
+            background-color: #FFF0F0;
+            border-left: 4px solid #F4978E;
+            padding-left: 12px;
+            font-weight: 600;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- Premium Header with Docked Submit Button -->
+    <header class="bg-white border-b border-gray-200 shadow-sm shrink-0 relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-pastel-accent to-pastel-dark rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md border border-pastel-pink shrink-0">
+                    <i class="fa-solid fa-headphones-simple"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-gray-900 text-lg sm:text-xl tracking-tight leading-tight">Chan Truong</h1>
+                    <p class="text-xs sm:text-sm text-pastel-dark font-semibold tracking-wide uppercase">Computer-Delivered IELTS</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 sm:gap-5">
+                <div id="timer-display" class="hidden bg-gray-50 border border-gray-200 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-mono font-bold text-gray-800 tracking-widest shadow-sm text-base sm:text-lg items-center gap-2">
+                    <i class="fa-regular fa-clock text-pastel-accent"></i> <span id="time-text">10:00</span>
+                </div>
+                <button id="header-submit-btn" class="hidden bg-pastel-dark hover:bg-pastel-accent text-white font-bold py-2 px-4 sm:py-2.5 sm:px-7 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 items-center gap-2 border-b-4 border-black border-opacity-10 active:border-b-0 active:translate-y-1 text-sm sm:text-base">
+                    <i class="fa-solid fa-paper-plane"></i> <span class="hidden sm:inline">Submit Test</span><span class="sm:hidden">Submit</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-hidden relative w-full h-full bg-gray-50">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center z-10 overflow-y-auto py-10 px-4 bg-gray-50">
+            <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div class="bg-pastel-blush p-8 text-center border-b border-pastel-pink">
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-pastel-dark text-2xl shadow-sm border border-pastel-pink">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Listening Test</h2>
+                    <h3 class="text-xl text-pastel-dark font-medium">Section 4: Blogs and the History of Blogging</h3>
+                </div>
+                <div class="p-8">
+                    <div class="bg-gray-50 border-l-4 border-pastel-accent p-6 rounded-r-lg mb-8 shadow-sm">
+                        <h4 class="font-bold text-gray-800 mb-3 flex items-center text-lg"><i class="fa-solid fa-circle-info mr-2 text-pastel-dark"></i> Information for Candidates</h4>
+                        <ul class="space-y-3 text-gray-600 text-sm md:text-base">
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-3"></i> There are 10 questions in this section.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-3"></i> The audio will start playing automatically when you click "Start Test".</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-3"></i> You cannot pause or stop the audio once it begins.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-lightbulb text-yellow-500 mt-1 mr-3"></i> <strong>Tip:</strong> You can highlight text by selecting it with your mouse to mark key information during the test.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex justify-center">
+                        <button id="start-btn" class="bg-pastel-dark hover:bg-pastel-accent text-white text-lg font-bold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center gap-3">
+                            <i class="fa-solid fa-play"></i> Start Test Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test View -->
+        <div id="test-view" class="hidden absolute inset-0 flex justify-center overflow-y-auto pb-20 pt-8 bg-white">
+            <div class="max-w-4xl w-full px-4 sm:px-6">
+                <div class="flex items-center justify-between border-b-2 border-pastel-pink pb-3 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Section 4</h2>
+                    <span class="bg-pastel-blush text-pastel-dark px-3 py-1 rounded-full text-sm font-bold border border-pastel-pink">Questions 1-10</span>
+                </div>
+                
+                <div id="questions-area" class="relative">
+                    <!-- Highlight Tooltip -->
+                    <div id="highlight-tooltip"><i class="fa-solid fa-highlighter mr-1"></i> Highlight</div>
+                    <!-- Questions injected here -->
+                    <div id="questions-container" class="space-y-10"></div>
+                </div>
+                
+                <audio id="test-audio" class="hidden" controls preload="auto"></audio>
+            </div>
+        </div>
+
+        <!-- Submission Modal -->
+        <div id="confirm-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform scale-95 transition-all duration-300" id="modal-content">
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 bg-pastel-blush rounded-full flex items-center justify-center mx-auto mb-5 text-pastel-dark text-4xl border-4 border-white shadow-md">
+                        <i class="fa-solid fa-flag-checkered"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Submit Test?</h3>
+                    <p class="text-gray-600 mb-8 leading-relaxed">Are you sure you want to submit your answers? The audio will stop, and you will be taken to the review screen to check your score.</p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button id="cancel-submit-btn" class="px-6 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors w-full sm:w-auto">Keep Working</button>
+                        <button id="confirm-submit-btn" class="px-6 py-3 rounded-xl bg-pastel-dark text-white font-bold hover:bg-pastel-accent shadow-md transition-colors w-full sm:w-auto flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check"></i> Yes, Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result View -->
+        <div id="result-view" class="hidden absolute inset-0 bg-gray-50 flex flex-col h-full">
+            <div class="bg-white border-b border-gray-200 shadow-sm p-4 shrink-0 z-10 relative">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Test Review</h2>
+                        <p class="text-gray-500 text-sm mt-1">Review your answers and click 'Play Explanation' to sync with the transcript.</p>
+                    </div>
+                    <div class="bg-white border-2 border-pastel-pink px-8 py-3 rounded-2xl shadow-sm text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-pastel-blush opacity-50"></div>
+                        <span class="relative block text-xs font-black text-pastel-dark uppercase tracking-widest mb-1">Overall Score</span>
+                        <span class="relative text-4xl font-black text-gray-800"><span id="score-display">0</span> <span class="text-xl text-gray-400 font-medium">/ 10</span></span>
+                    </div>
+                </div>
+                
+                <!-- Result Navigation Bar -->
+                <div class="max-w-7xl mx-auto mt-5 border-t border-gray-100 pt-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Jump to Question</p>
+                    <div id="result-nav" class="flex gap-3 overflow-x-auto pb-3 custom-scrollbar">
+                        <!-- Navigation pills injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split Screen Content -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden w-full max-w-7xl mx-auto">
+                
+                <!-- Left Panel: Transcript -->
+                <div class="w-full md:w-1/2 h-full flex flex-col border-r border-gray-200 bg-white">
+                    <div class="p-4 bg-gray-50 border-b border-gray-200 shrink-0 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-700 flex items-center text-lg"><i class="fa-solid fa-file-lines mr-2 text-pastel-dark"></i> Audio Transcript</h3>
+                    </div>
+                    <div class="p-4 bg-white border-b border-gray-100 shrink-0">
+                        <audio id="review-audio" class="w-full rounded-lg h-10" controls></audio>
+                    </div>
+                    <div class="p-6 overflow-y-auto h-full text-gray-700 leading-relaxed text-base sm:text-lg" id="transcript-area">
+                        <!-- Transcript injected here -->
+                    </div>
+                </div>
+                
+                <!-- Right Panel: Questions Review -->
+                <div class="w-full md:w-1/2 h-full flex flex-col bg-gray-50">
+                    <div class="p-4 bg-white border-b border-gray-200 shrink-0">
+                        <h3 class="font-bold text-gray-700 flex items-center text-lg"><i class="fa-solid fa-list-check mr-2 text-pastel-dark"></i> Questions & Explanations</h3>
+                    </div>
+                    <div class="p-4 sm:p-6 overflow-y-auto h-full custom-scrollbar" id="review-area">
+                        <!-- Review items injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- STREAMING_CHUNK:Initializing Application State & Test Data... ---
+        const AUDIO_URL = "https://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_5.5_6.5_workbook_unit4.mp3"; 
+        
+        const mockTestData = {
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: AUDIO_URL,
+            questions: [
+                // --- TEST VIEW VISUAL BLOCKS ---
+                {
+                    id: "q_summary_block", type: "html-only", number: 0,
+                    text: `
+                    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-200 mb-10">
+                        <div class="mb-6">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 1-5</h3>
+                            <p class="text-gray-700 font-medium bg-gray-100 inline-block px-3 py-1 rounded border border-gray-200 shadow-sm text-sm">Complete the summary below. Write <strong>ONE OR TWO WORDS</strong> for each answer.</p>
+                        </div>
+                        
+                        <h4 class="font-bold text-lg sm:text-xl text-pastel-dark mb-5 text-center uppercase tracking-wide">Blogs and the History of Blogging</h4>
+                        
+                        <p class="text-gray-800 leading-loose text-base sm:text-lg text-justify bg-gray-50 p-6 rounded-xl border border-gray-100">
+                            A blog can perhaps be best described as a website that consists of a kind of journal that is regularly updated. Blogs cover a very wide variety of topics and many of them are personal diaries. Blogs are usually not 
+                            <strong class="text-pastel-dark ml-1">1.</strong> <input type="text" class="ielts-input w-32 sm:w-40 text-center font-bold bg-white mx-1" data-qid="q1" autocomplete="off"> 
+                            because they have interactive elements, which may lead to friendships or even 
+                            <strong class="text-pastel-dark ml-1">2.</strong> <input type="text" class="ielts-input w-32 sm:w-40 text-center font-bold bg-white mx-1" data-qid="q2" autocomplete="off"> 
+                            relationships between people.<br><br>
+                            The first 'blog' was probably created in 1994 by a student and he called it his ' 
+                            <strong class="text-pastel-dark ml-1">3.</strong> <input type="text" class="ielts-input w-40 sm:w-48 text-center font-bold bg-white mx-1" data-qid="q3" autocomplete="off"> 
+                            .' Similar websites were then created and these included both links and 
+                            <strong class="text-pastel-dark ml-1">4.</strong> <input type="text" class="ielts-input w-32 sm:w-40 text-center font-bold bg-white mx-1" data-qid="q4" autocomplete="off"> 
+                            . In 1999, someone changed the term used for these websites by creating the phrase ' 
+                            <strong class="text-pastel-dark ml-1">5.</strong> <input type="text" class="ielts-input w-32 sm:w-40 text-center font-bold bg-white mx-1" data-qid="q5" autocomplete="off"> 
+                            ', and therefore invented the term 'blog'.
+                        </p>
+                    </div>
+                    `
+                },
+                {
+                    id: "q_flowchart_block", type: "html-only", number: 0,
+                    text: `
+                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-8 mb-10 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pastel-pink via-pastel-accent to-pastel-dark"></div>
+                        
+                        <div class="mb-8">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 6-10</h3>
+                            <p class="text-gray-700 font-medium bg-white inline-block px-3 py-1 rounded border border-gray-200 shadow-sm text-sm">Complete the flow chart below. Write <strong>ONE WORD ONLY</strong> for each answer.</p>
+                        </div>
+
+                        <h4 class="font-bold text-center text-lg sm:text-xl text-pastel-dark mb-8 tracking-wider uppercase flex items-center justify-center gap-2 bg-white py-3 rounded-lg border border-pastel-pink shadow-sm max-w-2xl mx-auto">
+                            <i class="fa-solid fa-sitemap"></i> Blogging Workflow - Advice
+                        </h4>
+                        
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                Decide what the <strong class="text-pastel-dark">6.</strong> <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q6" autocomplete="off"> of your posts will be
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+                            
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700">
+                                Do some reading before starting a post
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+                            
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                As you compose the post, keep a record of <strong class="text-pastel-dark">7.</strong> <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q7" autocomplete="off"> and links
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+                            
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700">
+                                After creating the post, add some tags to it to improve searchability
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                Use social networking sites to <strong class="text-pastel-dark">8.</strong> <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q8" autocomplete="off"> a post you think is outstanding
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                Look at the <strong class="text-pastel-dark">9.</strong> <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q9" autocomplete="off"> relating to the post
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                Don't simply say <strong class="text-pastel-dark">10.</strong> <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q10" autocomplete="off"> to people who have responded to your post
+                            </div>
+                            <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700">
+                                Go on to other blogs and leave comments.
+                            </div>
+                        </div>
+                    </div>
+                    `
+                },
+                // --- REVIEW LOGIC / HIDDEN QUESTIONS ---
+                {
+                    id: "q1", hideInTestView: true, type: "fill-in", number: 1,
+                    text: `Blogs are usually not <strong class="text-pastel-dark ml-1">1.</strong> <input type="text" class="ielts-input w-32 text-center font-bold bg-white mx-1" data-qid="q1"> because they have interactive elements...`,
+                    correctAnswer: ["monologues"], timestamp: 110, transcriptRef: "tr_1_50",
+                    explanation: "The speaker notes that 'most blogs are not monologues, because they allow readers to make their own comments'."
+                },
+                {
+                    id: "q2", hideInTestView: true, type: "fill-in", number: 2,
+                    text: `...which may lead to friendships or even <strong class="text-pastel-dark ml-1">2.</strong> <input type="text" class="ielts-input w-32 text-center font-bold bg-white mx-1" data-qid="q2"> relationships between people.`,
+                    correctAnswer: ["business"], timestamp: 123, transcriptRef: "tr_2_03",
+                    explanation: "Blogging allows people to contact each other, 'sharing ideas, perhaps making friends or even doing business with each other'."
+                },
+                {
+                    id: "q3", hideInTestView: true, type: "fill-in", number: 3,
+                    text: `The first 'blog' was probably created in 1994 by a student and he called it his '<strong class="text-pastel-dark ml-1">3.</strong> <input type="text" class="ielts-input w-32 text-center font-bold bg-white mx-1" data-qid="q3">.'`,
+                    correctAnswer: ["Home Page", "Home page", "home page"], timestamp: 137, transcriptRef: "tr_2_17",
+                    explanation: "The first blog is reckoned to be an online diary by Justin Hall, whose site was called 'Justin's Home Page'."
+                },
+                {
+                    id: "q4", hideInTestView: true, type: "fill-in", number: 4,
+                    text: `Similar websites were then created and these included both links and <strong class="text-pastel-dark ml-1">4.</strong> <input type="text" class="ielts-input w-32 text-center font-bold bg-white mx-1" data-qid="q4">.`,
+                    correctAnswer: ["forums"], timestamp: 169, transcriptRef: "tr_2_49",
+                    explanation: "More websites sprang up 'with links to other websites and forums for people to contribute their personal opinions'."
+                },
+                {
+                    id: "q5", hideInTestView: true, type: "fill-in", number: 5,
+                    text: `In 1999, someone changed the term used for these websites by creating the phrase '<strong class="text-pastel-dark ml-1">5.</strong> <input type="text" class="ielts-input w-32 text-center font-bold bg-white mx-1" data-qid="q5">'.`,
+                    correctAnswer: ["we blog"], timestamp: 189, transcriptRef: "tr_3_09",
+                    explanation: "In 1999, Peter Merholz 'jokingly broke this word up into \"we blog\" and therefore invented the term \"blog\"'."
+                },
+                {
+                    id: "q6", hideInTestView: true, type: "fill-in", number: 6,
+                    text: `Decide what the <strong class="text-pastel-dark ml-1">6.</strong> <input type="text" class="ielts-input w-32 text-center font-bold mx-1" data-qid="q6"> of your posts will be.`,
+                    correctAnswer: ["frequency"], timestamp: 239, transcriptRef: "tr_3_59",
+                    explanation: "When running a blog, the speaker advises: 'First of all, you need to decide on the frequency of your blog posts'."
+                },
+                {
+                    id: "q7", hideInTestView: true, type: "fill-in", number: 7,
+                    text: `As you compose the post, keep a record of <strong class="text-pastel-dark ml-1">7.</strong> <input type="text" class="ielts-input w-32 text-center font-bold mx-1" data-qid="q7"> and links.`,
+                    correctAnswer: ["sources"], timestamp: 289, transcriptRef: "tr_4_49",
+                    explanation: "If your post involves research, 'open a file for storing the sources of your information and the links'."
+                },
+                {
+                    id: "q8", hideInTestView: true, type: "fill-in", number: 8,
+                    text: `Use social networking sites to <strong class="text-pastel-dark ml-1">8.</strong> <input type="text" class="ielts-input w-32 text-center font-bold mx-1" data-qid="q8"> a post you think is outstanding.`,
+                    correctAnswer: ["announce"], timestamp: 337, transcriptRef: "tr_5_37",
+                    explanation: "If you are proud of a post, 'announce it by sending links to it on social networking sites'."
+                },
+                {
+                    id: "q9", hideInTestView: true, type: "fill-in", number: 9,
+                    text: `Look at the <strong class="text-pastel-dark ml-1">9.</strong> <input type="text" class="ielts-input w-32 text-center font-bold mx-1" data-qid="q9"> relating to the post.`,
+                    correctAnswer: ["statistics"], timestamp: 350, transcriptRef: "tr_5_50",
+                    explanation: "Next step in workflow: 'Then check your blog statistics to see how many people are reading and responding'."
+                },
+                {
+                    id: "q10", hideInTestView: true, type: "fill-in", number: 10,
+                    text: `Don't simply say <strong class="text-pastel-dark ml-1">10.</strong> <input type="text" class="ielts-input w-32 text-center font-bold mx-1" data-qid="q10"> to people who have responded to your post.`,
+                    correctAnswer: ["thanks"], timestamp: 359, transcriptRef: "tr_5_59",
+                    explanation: "When replying to comments, 'give them a proper reply rather than just saying thanks'."
+                }
+            ],
+            transcript: [
+                { id: "tr_0_42", text: "<strong>Expert:</strong> OK, I'm going to talk today about blogs and blogging. Though I'm assuming you're all familiar with what a blog is, let's just start with a definition. Perhaps the simplest definition is that a blog is a type of website in the form of a journal of one sort or another. It consists of posts - new material, or entries - that are arranged in chronological order, with the most recent post at the top of the page." },
+                { id: "tr_1_15", text: "Now, what are the typical characteristics of a blog? Well, blogs are usually written by one person, they are usually updated regularly and they are often, though by no means always, about one particular topic. That topic might be the blogger's own life, as many blogs are personal diaries. But there are blogs on just about any topic you could think of - there are political blogs, news blogs, blogs about a particular hobby, etc., etc." },
+                { id: "tr_1_50", text: "Now, most blogs are not monologues <em>(Q1)</em>, because they allow readers to make their own comments on what appears in the blog, or to add their own information to it." },
+                { id: "tr_2_03", text: "In this way, people get into contact with each other, learning from each other, sharing ideas, perhaps making friends or even doing business <em>(Q2)</em> with each other, wherever they are in the world." },
+                { id: "tr_2_17", text: "Although blogs are very much part of modern life and there are literally millions of blogs on the web, the history of blogging is a pretty short one. There is some disagreement over what the first blog was, but many people reckon it was an online diary started by a student called Justin Hall in 1994. His site was called Justin's Home Page <em>(Q3)</em>, and he later called it Links From The Underground." },
+                { id: "tr_2_49", text: "At that point, the word 'blog' didn't exist. More websites like his started to spring up, in the form of regularly updated online journals on various subjects, with links to other websites and forums <em>(Q4)</em> for people to contribute their personal opinions." },
+                { id: "tr_3_09", text: "In 1997, someone called Jorn Barger first used the term 'web log' to categorise this kind of website, when he launched his own website, Robot Wisdom. In 1999, a blogger called Peter Merholz jokingly broke this word up into 'we blog' <em>(Q5)</em> and therefore invented the term 'blog'. Pretty soon, everyone called the sites 'blogs' and the people writing them 'bloggers'." },
+                { id: "tr_3_47", text: "OK, now let's move on to how to run a blog, and what I'm going to do now is to tell you what I think is the best approach to workflow with a blog." },
+                { id: "tr_3_59", text: "First of all, you need to decide on the frequency <em>(Q6)</em> of your blog posts. Some people do several a day, which is great if you can keep it up, others one a day. Once a week might be enough. but the key question is what the readers of your blog expect. They need to know when they can expect to see a new post on the blog, so whatever schedule you decide on, it's important to stick to it. When you're going to do a post, start by reading material to find out what's being discussed in friends' blogs, or in other blogs related to the topic of yours. That way you can take these things into account to ensure that your blog is bang up to date." },
+                { id: "tr_4_49", text: "Then start composing your blog post. If you're doing one that involves research and links, open a file for storing the sources <em>(Q7)</em> of your information and the links you're going to put in the post. Also consider using pictures. These can make your blog much more attractive than one that's just text. If you use photos from the web, make sure you cite the source in your blog." },
+                { id: "tr_5_17", text: "When you've completed the post, add some tags. If you don't have the kind of software that enables you to build them into the post. add them at the bottom. Tags are really important for searchability - they can get you new readers who find your blog via the tags." },
+                { id: "tr_5_37", text: "If you think this is a particularly good post and you're really proud of it, announce <em>(Q8)</em> it by sending links to it on social networking sites together with a very brief summary of what it's about." },
+                { id: "tr_5_50", text: "Then check your blog statistics <em>(Q9)</em> to see how many people are reading and responding to your blog." },
+                { id: "tr_5_59", text: "Find out who's blogged about your post and reply to them, and give them a proper reply rather than just saying thanks <em>(Q10)</em>. After you've done all that, get off your own blog and comment elsewhere. Remember that you're not the only person blogging and putting out new material - there are lots of others doing the same and you should show them some respect by giving them comments and feedback on their posts where you feel it's appropriate. Well, that's just some advice on being a good blogger. Blogging's obviously a major thing now in the world of electronic media and it's anybody's guess how it will develop in the future." }
+            ]
+        };
+
+        // --- STREAMING_CHUNK:Initializing Logic & Render Test View... ---
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = mockTestData.totalTimeSeconds;
+        
+        const audioElement = document.getElementById('test-audio');
+        const reviewAudioElement = document.getElementById('review-audio');
+        const confirmModal = document.getElementById('confirm-modal');
+        const modalContent = document.getElementById('modal-content');
+
+        function initTest() {
+            audioElement.src = mockTestData.audioUrl;
+            reviewAudioElement.src = mockTestData.audioUrl;
+
+            const questionsArea = document.getElementById('questions-container');
+            questionsArea.innerHTML = ''; 
+            
+            // Only inject visual blocks into the Test View
+            mockTestData.questions.forEach(q => {
+                if (!q.hideInTestView) {
+                    questionsArea.insertAdjacentHTML('beforeend', `<div id="q-container-${q.id}">${q.text}</div>`);
+                }
+            });
+
+            document.querySelectorAll('.ielts-input').forEach(input => {
+                const updateAnswer = (e) => { userAnswers[e.target.dataset.qid] = e.target.value; };
+                input.addEventListener('input', updateAnswer);
+                input.addEventListener('change', updateAnswer);
+            });
+        }
+
+        // --- STREAMING_CHUNK:Handling UI Transitions & Timer... ---
+        document.getElementById('start-btn').addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('timer-display').classList.remove('hidden');
+            document.getElementById('timer-display').classList.add('flex');
+            document.getElementById('header-submit-btn').classList.remove('hidden');
+            document.getElementById('header-submit-btn').classList.add('flex');
+            
+            audioElement.play().catch(e => console.log("Auto-play blocked by browser. User must click play.", e));
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60);
+                const s = timeRemaining % 60;
+                document.getElementById('time-text').innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 60) {
+                    document.getElementById('timer-display').classList.add('text-red-500', 'border-red-300', 'bg-red-50');
+                }
+                
+                if (timeRemaining <= 0) handleFinalSubmit();
+            }, 1000);
+        });
+
+        // Modal Logic
+        const showModal = () => {
+            confirmModal.classList.remove('hidden');
+            setTimeout(() => {
+                confirmModal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        };
+        const hideModal = () => {
+            confirmModal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => confirmModal.classList.add('hidden'), 300);
+        };
+
+        document.getElementById('header-submit-btn').addEventListener('click', showModal);
+        document.getElementById('cancel-submit-btn').addEventListener('click', hideModal);
+        document.getElementById('confirm-submit-btn').addEventListener('click', () => {
+            hideModal();
+            setTimeout(handleFinalSubmit, 300); // Wait for modal animation
+        });
+
+        function handleFinalSubmit() {
+            clearInterval(timerInterval);
+            audioElement.pause();
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('timer-display').classList.add('hidden');
+            document.getElementById('header-submit-btn').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            
+            renderResultView();
+        }
+
+        // --- STREAMING_CHUNK:Rendering Result View & Evaluation... ---
+        function renderResultView() {
+            let score = 0;
+            const reviewArea = document.getElementById('review-area');
+            const navArea = document.getElementById('result-nav');
+            const transcriptArea = document.getElementById('transcript-area');
+            
+            reviewArea.innerHTML = '';
+            navArea.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            // 1. Render Transcript
+            mockTestData.transcript.forEach(tr => {
+                transcriptArea.insertAdjacentHTML('beforeend', `<div id="${tr.id}" class="mb-4 transition-colors duration-300 p-4 rounded-xl hover:bg-pastel-blush hover:shadow-sm">${tr.text}</div>`);
+            });
+
+            // 2. Evaluate & Render Review Cards
+            mockTestData.questions.forEach((q) => {
+                if(q.type === 'html-only') return;
+
+                const userAns = (userAnswers[q.id] || "").toString().toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase().trim() === userAns);
+                if (isCorrect) score++;
+
+                // Sanitize input/select for review display
+                let cleanText = q.text.replace(/<input[^>]*>/gi, `<span class="font-bold text-gray-800 tracking-widest px-4 border-b-2 border-gray-400 mx-1 bg-gray-200 shadow-inner rounded-sm">___</span>`);
+                cleanText = cleanText.replace(/<select[^>]*>[\s\S]*?<\/select>/gi, `<span class="font-bold text-gray-800 tracking-widest px-4 border-b-2 border-gray-400 mx-1 bg-gray-200 shadow-inner rounded-sm">___</span>`);
+
+                // Nav Pill
+                const pillColor = isCorrect 
+                    ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200 hover:scale-105' 
+                    : 'bg-red-100 text-red-700 border-red-300 hover:bg-red-200 hover:scale-105';
+                
+                navArea.insertAdjacentHTML('beforeend', `
+                    <button onclick="document.getElementById('review-q-${q.id}').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                            class="w-11 h-11 shrink-0 rounded-full border-2 font-bold flex items-center justify-center transition-all shadow-sm ${pillColor}">
+                        ${q.number}
+                    </button>
+                `);
+
+                // Review Card
+                reviewArea.insertAdjacentHTML('beforeend', `
+                    <div id="review-q-${q.id}" class="bg-white p-5 sm:p-7 rounded-2xl shadow-sm border border-gray-200 scroll-mt-6 mb-6 transition-all hover:shadow-md">
+                        <div class="flex items-center justify-between mb-5 border-b border-gray-100 pb-4">
+                            <span class="font-bold text-gray-500 bg-gray-100 px-4 py-1.5 rounded-lg text-sm uppercase tracking-wide">Question ${q.number}</span>
+                            ${isCorrect 
+                                ? `<span class="text-green-600 bg-green-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm border border-green-100"><i class="fa-solid fa-check mr-2"></i>Correct</span>` 
+                                : `<span class="text-red-600 bg-red-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm border border-red-100"><i class="fa-solid fa-xmark mr-2"></i>Incorrect</span>`
+                            }
+                        </div>
+                        
+                        <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-100 text-gray-800 text-lg shadow-inner overflow-hidden leading-relaxed">
+                            ${cleanText}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="${isCorrect ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'} p-4 rounded-xl border">
+                                <p class="text-xs ${isCorrect ? 'text-green-600' : 'text-red-500'} font-bold uppercase tracking-wider mb-1">Your Answer</p>
+                                <p class="font-medium text-lg ${!userAns ? 'text-gray-400 italic' : 'text-gray-800'} break-words">${userAns || 'No answer provided'}</p>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                <p class="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Correct Answer</p>
+                                <p class="font-bold text-gray-800 text-lg break-words">${q.correctAnswer.join(' / ')}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-pastel-blush border border-pastel-pink rounded-xl p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                                <p class="font-bold text-pastel-dark flex items-center text-lg"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Explanation</p>
+                                <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}')" class="bg-white hover:bg-pastel-dark hover:text-white text-pastel-dark border border-pastel-pink font-bold py-2 px-5 rounded-full text-sm transition-all flex items-center shadow-sm whitespace-nowrap group">
+                                    <i class="fa-solid fa-circle-play mr-2 text-lg group-hover:scale-110 transition-transform"></i> Play Audio Sync
+                                </button>
+                            </div>
+                            <p class="text-gray-700 text-base leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('score-display').innerText = score;
+        }
+
+        // --- STREAMING_CHUNK:Audio Sync & Highlighting Tool... ---
+        window.playExplanation = function(time, trId) {
+            reviewAudioElement.currentTime = time;
+            reviewAudioElement.play();
+
+            // Clear previous highlight
+            document.querySelectorAll('.transcript-highlight').forEach(el => {
+                el.classList.remove('transcript-highlight');
+            });
+
+            // Add highlight to active transcript block
+            const trElement = document.getElementById(trId);
+            if (trElement) {
+                trElement.classList.add('transcript-highlight');
+                // Scroll into view
+                const container = document.getElementById('transcript-area');
+                container.scrollTo({
+                    top: trElement.offsetTop - container.offsetTop - 20,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Highlight Tool Logic
+        const tooltip = document.getElementById('highlight-tooltip');
+        let currentSelection = null;
+
+        document.getElementById('questions-container').addEventListener('mouseup', (e) => {
+            const selection = window.getSelection();
+            if (selection.toString().trim().length > 0 && !e.target.closest('input') && !e.target.closest('select')) {
+                currentSelection = selection.getRangeAt(0);
+                const rect = currentSelection.getBoundingClientRect();
+                const containerRect = document.getElementById('questions-area').getBoundingClientRect();
+                
+                tooltip.style.left = `${rect.left - containerRect.left + (rect.width / 2)}px`;
+                tooltip.style.top = `${rect.top - containerRect.top}px`;
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target !== tooltip) tooltip.style.display = 'none';
+        });
+
+        tooltip.addEventListener('click', () => {
+            if (currentSelection) {
+                try {
+                    const span = document.createElement('span');
+                    span.className = 'highlighted-text';
+                    span.title = "Click to remove highlight";
+                    span.onclick = function(e) {
+                        e.stopPropagation();
+                        const parent = this.parentNode;
+                        while (this.firstChild) { parent.insertBefore(this.firstChild, this); }
+                        parent.removeChild(this);
+                    };
+                    currentSelection.surroundContents(span);
+                } catch (e) {
+                    console.log("Cannot highlight across multiple elements.", e);
+                }
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Initialize on load
+        initTest();
+    </script>
+</body>
+</html>

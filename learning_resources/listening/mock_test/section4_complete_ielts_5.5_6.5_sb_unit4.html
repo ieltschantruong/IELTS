@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Amateur Journalism</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#FAD4D4',
+                            blush: '#FFF0F0',
+                            accent: '#F4978E',
+                            dark: '#F08080',
+                            text: '#4A4A4A'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #FAFAFA; color: #333; }
+        
+        .ielts-input {
+            border: none;
+            border-bottom: 2px solid #cbd5e1;
+            background-color: transparent;
+            padding: 2px 8px;
+            transition: all 0.3s;
+            outline: none;
+            color: #F08080;
+        }
+        .ielts-input:focus { border-bottom-color: #F4978E; background-color: #FFF0F0; }
+        
+        /* Highlight Feature Styles */
+        .highlighted-text {
+            background-color: #fef08a; /* Yellow-200 */
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .highlighted-text:hover { background-color: #fde047; }
+        
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background-color: #333;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            transform: translate(-50%, -120%);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .transcript-highlight {
+            background-color: #FFF0F0;
+            border-left: 4px solid #F4978E;
+            padding-left: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-white border-b border-gray-200 shadow-md shrink-0 relative z-20">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-pastel-accent to-pastel-dark rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg border border-pastel-pink">
+                    IELTS
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-gray-900 text-xl tracking-tight leading-tight">Chan Truong</h1>
+                    <p class="text-sm text-pastel-dark font-semibold tracking-wide uppercase">Computer-Delivered Platform</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-5">
+                <div id="timer-display" class="hidden bg-gray-900 px-5 py-2.5 rounded-xl font-mono font-bold text-white tracking-widest shadow-inner text-lg items-center gap-2">
+                    <i class="fa-regular fa-clock text-pastel-accent"></i> <span>10:00</span>
+                </div>
+                <button id="header-submit-btn" class="hidden bg-pastel-dark hover:bg-pastel-accent text-white font-bold py-2.5 px-7 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 items-center gap-2 border-b-4 border-black border-opacity-10 active:border-b-0 active:translate-y-1">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Test
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-hidden relative w-full h-full">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="absolute inset-0 bg-gray-50 flex flex-col items-center justify-center z-10 overflow-y-auto py-10 px-4">
+            <div class="max-w-2xl w-full bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                <div class="bg-pastel-blush p-8 text-center border-b border-pastel-pink">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Listening Test</h2>
+                    <h3 id="intro-section-title" class="text-xl text-pastel-dark font-medium">Section 4: Amateur Journalism</h3>
+                </div>
+                <div class="p-8">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-lg mb-8">
+                        <h4 class="font-bold text-yellow-800 mb-2 flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Important Instructions</h4>
+                        <ul class="list-disc list-inside text-yellow-700 space-y-1 text-sm">
+                            <li>The audio will start playing automatically when you click "Start Test".</li>
+                            <li>You cannot pause or stop the audio once it begins.</li>
+                            <li>Read the instructions for each part of the paper carefully.</li>
+                            <li>Answer all the questions while listening.</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-8 text-center">Highlight text by selecting it with your mouse during the test to mark keywords.</p>
+                    
+                    <div class="flex justify-center">
+                        <button id="start-btn" class="bg-pastel-dark hover:bg-pastel-accent text-white text-lg font-bold py-4 px-12 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center gap-3">
+                            <i class="fa-solid fa-headphones"></i> Start Test Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test View -->
+        <div id="test-view" class="hidden absolute inset-0 bg-white flex justify-center overflow-y-auto pb-20">
+            <div class="max-w-4xl w-full px-6 py-8">
+                <h2 id="test-main-title" class="text-2xl font-bold text-gray-800 border-b-2 border-pastel-pink pb-3 mb-6 inline-block">Section 4</h2>
+                
+                <div id="questions-area" class="relative">
+                    <!-- Highlight Tooltip -->
+                    <div id="highlight-tooltip"><i class="fa-solid fa-highlighter mr-1"></i> Highlight</div>
+                    <!-- Questions will be injected here -->
+                    <div id="questions-container" class="space-y-10"></div>
+                </div>
+                
+                <audio id="test-audio" class="hidden" controls preload="auto"></audio>
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div id="confirm-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all">
+                <div class="p-6 text-center">
+                    <div class="w-16 h-16 bg-pastel-blush rounded-full flex items-center justify-center mx-auto mb-4 text-pastel-dark text-3xl">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Submit Test?</h3>
+                    <p class="text-gray-600 mb-6">Are you sure you want to submit your answers? The test will end and you will be taken to the review screen.</p>
+                    <div class="flex gap-3 justify-center">
+                        <button id="cancel-submit-btn" class="px-6 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button id="confirm-submit-btn" class="px-6 py-2.5 rounded-xl bg-pastel-dark text-white font-bold hover:bg-pastel-accent shadow-md transition-colors">Yes, Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result View -->
+        <div id="result-view" class="hidden absolute inset-0 bg-gray-50 flex flex-col h-full">
+            <div class="bg-white border-b border-gray-200 shadow-sm p-4 shrink-0 z-10">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Test Review</h2>
+                        <p class="text-gray-500 text-sm mt-1">Review your answers and check the transcript explanations.</p>
+                    </div>
+                    <div class="bg-pastel-blush border border-pastel-pink px-6 py-3 rounded-xl shadow-sm text-center">
+                        <span class="block text-xs font-bold text-pastel-dark uppercase tracking-wider mb-1">Overall Score</span>
+                        <span class="text-3xl font-black text-gray-800"><span id="score-display">0</span> <span class="text-lg text-gray-400 font-medium">/ 10</span></span>
+                    </div>
+                </div>
+                
+                <!-- Result Navigation Bar -->
+                <div class="max-w-7xl mx-auto mt-4 border-t border-gray-100 pt-3">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Quick Navigation</p>
+                    <div id="result-nav" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                        <!-- Navigation pills injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Split Screen Content -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full">
+                <!-- Left Panel: Transcript -->
+                <div class="w-full md:w-1/2 h-full flex flex-col border-r border-gray-200 bg-white">
+                    <div class="p-4 bg-gray-50 border-b border-gray-200 shrink-0 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-file-lines mr-2 text-pastel-dark"></i> Audio Transcript</h3>
+                    </div>
+                    <div class="p-4 bg-white border-b border-gray-100 shrink-0">
+                        <audio id="review-audio" class="w-full rounded-lg" controls></audio>
+                    </div>
+                    <div class="p-6 overflow-y-auto h-full text-gray-700 leading-relaxed text-lg" id="transcript-area">
+                        <!-- Transcript injected here -->
+                    </div>
+                </div>
+                
+                <!-- Right Panel: Questions Review -->
+                <div class="w-full md:w-1/2 h-full flex flex-col bg-gray-50">
+                    <div class="p-4 bg-white border-b border-gray-200 shrink-0">
+                        <h3 class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-list-check mr-2 text-pastel-dark"></i> Question Review</h3>
+                    </div>
+                    <div class="p-6 overflow-y-auto h-full" id="review-area">
+                        <!-- Review items injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const MOCK_AUDIO_URL = "https://ieltschantruong.github.io/IELTS/src/listening_audios/complete_ielts_5.5_6.5_studentbook_unit4.mp3"; 
+        
+        const mockTestData = {
+            sectionTitle: "Section 4: Amateur Journalism",
+            totalTimeSeconds: 600, // 10 minutes
+            audioUrl: MOCK_AUDIO_URL,
+            questions: [
+                {
+                    id: "q_intro_1", type: "html-only", number: 0,
+                    text: `
+                        <div class="mb-4">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 1-5</h3>
+                            <p class="text-gray-700 font-medium bg-gray-100 inline-block px-3 py-1 rounded border border-gray-200 shadow-sm">Complete the sentences below. Write <strong>ONE OR TWO WORDS</strong> for each answer.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: "q1", type: "fill-in", number: 1,
+                    text: `<div class="mb-5 leading-loose text-lg"><strong class="text-pastel-dark mr-2">1.</strong> Ordinary people can provide a news story, <input type="text" class="ielts-input w-40 text-center font-bold" data-qid="q1" autocomplete="off"> a video when no professional journalist is present.</div>`,
+                    correctAnswer: ["photo", "photograph"],
+                    timestamp: 31, transcriptRef: "tr_0_31",
+                    explanation: "The lecturer mentions ordinary people can 'take a photo with a digital camera or use their mobile phone'."
+                },
+                {
+                    id: "q2", type: "fill-in", number: 2,
+                    text: `<div class="mb-5 leading-loose text-lg"><strong class="text-pastel-dark mr-2">2.</strong> Amateur journalists often report on subjects which would be of little interest to a large <input type="text" class="ielts-input w-48 text-center font-bold" data-qid="q2" autocomplete="off">.</div>`,
+                    correctAnswer: ["organisation", "organization"],
+                    timestamp: 58, transcriptRef: "tr_0_58",
+                    explanation: "The lecturer states people write reports about things 'which a big organisation might not be interested in'."
+                },
+                {
+                    id: "q3", type: "fill-in", number: 3,
+                    text: `<div class="mb-5 leading-loose text-lg"><strong class="text-pastel-dark mr-2">3.</strong> In the past, someone who wanted to express an opinion used to write a <input type="text" class="ielts-input w-40 text-center font-bold" data-qid="q3" autocomplete="off">, while now they write a blog.</div>`,
+                    correctAnswer: ["letter"],
+                    timestamp: 86, transcriptRef: "tr_1_26",
+                    explanation: "Before blogs, 'one of the few ways of doing this was to send a letter to a newspaper'."
+                },
+                {
+                    id: "q4", type: "fill-in", number: 4,
+                    text: `<div class="mb-5 leading-loose text-lg"><strong class="text-pastel-dark mr-2">4.</strong> An amateur journalist's subject is more likely to be a <input type="text" class="ielts-input w-40 text-center font-bold" data-qid="q4" autocomplete="off"> rather than national or international news.</div>`,
+                    correctAnswer: ["local issue"],
+                    timestamp: 104, transcriptRef: "tr_1_44",
+                    explanation: "The lecturer notes that 'amateur journalists often write about something which is a local issue'."
+                },
+                {
+                    id: "q5", type: "fill-in", number: 5,
+                    text: `<div class="mb-8 pb-6 border-b-2 border-gray-100 leading-loose text-lg"><strong class="text-pastel-dark mr-2">5.</strong> Amateur news websites, such as Ohmynews in South Korea, earn money from <input type="text" class="ielts-input w-40 text-center font-bold" data-qid="q5" autocomplete="off">.</div>`,
+                    correctAnswer: ["advertising"],
+                    timestamp: 137, transcriptRef: "tr_2_17",
+                    explanation: "Ohmynews has a large readership and can 'attract advertising and get income from this'."
+                },
+                {
+                    id: "q_intro_2", type: "html-only", number: 0,
+                    text: `
+                        <div class="mb-6 mt-8">
+                            <h3 class="font-bold text-xl text-gray-800 mb-2">Questions 6-10</h3>
+                            <p class="text-gray-700 font-medium bg-gray-100 inline-block px-3 py-1 rounded border border-gray-200 shadow-sm">Complete the flow chart below. Write <strong>ONE WORD ONLY</strong> for each answer.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: "q_flowchart", type: "html-only", number: 0,
+                    text: `
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-8 mb-10 shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pastel-pink via-pastel-accent to-pastel-dark"></div>
+                            <h4 class="font-bold text-center text-xl text-pastel-dark mb-8 tracking-wider uppercase flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-pen-nib"></i> How to write an article
+                            </h4>
+                            
+                            <div class="flex flex-col items-center text-center space-y-3">
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700">
+                                    Put the main facts at the beginning to attract attention.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                    <strong class="text-pastel-dark">6.</strong> Use a model in the shape of a <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q6" autocomplete="off"> to build up details.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                    <strong class="text-pastel-dark">7.</strong> Include <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q7" autocomplete="off"> from people involved.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+                                
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                    <strong class="text-pastel-dark">8.</strong> Check the accuracy of your <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q8" autocomplete="off">.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700">
+                                    Rewrite, making sure paragraphs are short.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                    <strong class="text-pastel-dark">9.</strong> Don't write a <input type="text" class="ielts-input text-center w-32 font-bold bg-gray-50" data-qid="q9" autocomplete="off">.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 w-full max-w-lg font-medium text-gray-700">
+                                    Add a picture to accompany the article.
+                                </div>
+                                <div class="text-xl text-pastel-accent"><i class="fa-solid fa-arrow-down"></i></div>
+
+                                <div class="bg-pastel-blush p-4 rounded-xl shadow-sm border border-pastel-pink w-full max-w-lg font-medium text-gray-700 flex items-center justify-center gap-2 flex-wrap">
+                                    <strong class="text-pastel-dark">10.</strong> Finally, write an attractive <input type="text" class="ielts-input text-center w-32 font-bold bg-white" data-qid="q10" autocomplete="off">.
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: "q6", type: "fill-in", number: 6, hideInTestView: true,
+                    text: `Use a model in the shape of a <input type="text" class="ielts-input text-center w-32 font-bold" data-qid="q6" autocomplete="off"> to build up details.`,
+                    correctAnswer: ["pyramid"],
+                    timestamp: 209, transcriptRef: "tr_3_29",
+                    explanation: "To build details, the lecturer says 'the best model is really shaped like a pyramid'."
+                },
+                {
+                    id: "q7", type: "fill-in", number: 7, hideInTestView: true,
+                    text: `Include <input type="text" class="ielts-input text-center w-32 font-bold" data-qid="q7" autocomplete="off"> from people involved.`,
+                    correctAnswer: ["quotes", "quotations"],
+                    timestamp: 232, transcriptRef: "tr_3_52",
+                    explanation: "To hold reader interest, a good technique is 'to put in quotations from people who are part of the story'."
+                },
+                {
+                    id: "q8", type: "fill-in", number: 8, hideInTestView: true,
+                    text: `Check the accuracy of your <input type="text" class="ielts-input text-center w-32 font-bold" data-qid="q8" autocomplete="off">.`,
+                    correctAnswer: ["figures"],
+                    timestamp: 264, transcriptRef: "tr_4_24",
+                    explanation: "Once written, go over the article 'to make sure that any figures you quote are correct'."
+                },
+                {
+                    id: "q9", type: "fill-in", number: 9, hideInTestView: true,
+                    text: `Don't write a <input type="text" class="ielts-input text-center w-32 font-bold" data-qid="q9" autocomplete="off">.`,
+                    correctAnswer: ["conclusion"],
+                    timestamp: 299, transcriptRef: "tr_4_59",
+                    explanation: "To keep the article brief for online readers, 'Don't put in a conclusion just let your article end without it'."
+                },
+                {
+                    id: "q10", type: "fill-in", number: 10, hideInTestView: true,
+                    text: `Finally, write an attractive <input type="text" class="ielts-input text-center w-32 font-bold" data-qid="q10" autocomplete="off">.`,
+                    correctAnswer: ["headline"],
+                    timestamp: 340, transcriptRef: "tr_5_40",
+                    explanation: "Finally, the lecturer advises: 'you need to write a headline - something eye-catching'."
+                }
+            ],
+            transcript: [
+                { id: "tr_0_00", text: "<strong>Lecturer:</strong> Today, I'm going to be talking about amateur journalism; in other words, journalism practised by ordinary people, not professional journalists. For people like you, who want to get some real writing experience, this can be a good way to get started, and later I'll be offering you some practical tips to help you." },
+                { id: "tr_0_31", text: "Amateur journalists are providing more and more news. I think the main cause of this change has been the Internet. Nowadays, anyone close to an important event can write a report and email it to a newspaper, or they can take a photo <em>(Q1)</em> with a digital camera or use their mobile phone to make a video film of what's happening." },
+                { id: "tr_0_58", text: "Also, amateur journalism isn't just for people who are in the right place at the right time. People can now write reports and articles about things which a big organisation <em>(Q2)</em> might not be interested in and post their ideas on their website or blog. This means that all sorts of people can express their views." },
+                { id: "tr_1_26", text: "Also, in the past, if you wanted to make your opinions known, one of the few ways of doing this was to send a letter <em>(Q3)</em> to a newspaper, but normally newspapers only print a few of the thousands of letters they receive each day." },
+                { id: "tr_1_44", text: "Now, people can write about the things which are really important to them and the people around them and they put it in a blog. As a result, amateur journalists often write about something which is a local issue <em>(Q4)</em>, and by 'local issue', I mean something happening in the school in their area or the traffic in their town, but not something necessarily of national or international interest." },
+                { id: "tr_2_17", text: "Amateur journalism is a growing phenomenon. There are now major online newspapers. Ohmynews in South Korea, for example, has a large number of readers, and for this reason, they can attract advertising <em>(Q5)</em> and get income from this. And, as a result, it's become a profitable business." },
+                { id: "tr_3_01", text: "<strong>Lecturer:</strong> But how can you get involved? How can you begin to write articles which will be published on sites like these? Well, first you must have something interesting to say, something you want to communicate with readers. Assuming you have this, it's important in an article to attract people's attention and gain their interest, so put the main facts first, answering these questions: Who? Why? When? How? and Where?" },
+                { id: "tr_3_29", text: "Get those basic facts down to start with and get people interested. Then fill in the details in the rest of the article: the best model is really shaped like a pyramid <em>(Q6)</em>. You put the most important facts at the top of the article and lots of smaller details down below." },
+                { id: "tr_3_52", text: "Remember, you want people to keep reading, so you need to hold your readers' interest. A really good technique for doing that is to put in quotations <em>(Q7)</em> from people who are part of the story - what they really said. You know the sort of thing, um, 'Tanya, mother of two, said: \"It all happened so quickly that we didn't have time to react.\" Quotations bring the article alive." },
+                { id: "tr_4_24", text: "Once you've written your article, go over it again to make sure that any figures <em>(Q8)</em> you quote are correct. Make sure that Tanya really has two children and not one or three. Then, after that, once you've got your ideas down, rewrite your article, making sure that your paragraphs don't contain more than three sentences - people like them to be brief and to the point, and this will help to hold their attention." },
+                { id: "tr_4_59", text: "And another thing to bear in mind: if they're reading online, people will soon stop reading your piece and start reading something else, so keep the whole article brief. Don't put in a conclusion <em>(Q9)</em> just let your article end without it." },
+                { id: "tr_5_19", text: "Another good piece of advice is to remember that old cliché which we've all heard - that a picture is worth a thousand words. It's true, so if you can, include a picture. It'll attract more attention and illustrate what you've been saying." },
+                { id: "tr_5_40", text: "Finally, you need to write a headline <em>(Q10)</em> - something eye-catching which will get people to just skim the article to start with, and then, if it's well written, they'll read it more carefully afterwards." }
+            ]
+        };
+
+        // --- STREAMING_CHUNK:Initializing Application State & Event Listeners... ---
+        let userAnswers = {};
+        let timerInterval;
+        let timeRemaining = mockTestData.totalTimeSeconds;
+        
+        const audioElement = document.getElementById('test-audio');
+        const reviewAudioElement = document.getElementById('review-audio');
+        const startBtn = document.getElementById('start-btn');
+        const headerSubmitBtn = document.getElementById('header-submit-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+        const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+
+        function initTest() {
+            audioElement.src = mockTestData.audioUrl;
+            reviewAudioElement.src = mockTestData.audioUrl;
+
+            const questionsArea = document.getElementById('questions-container');
+            questionsArea.innerHTML = ''; 
+            
+            mockTestData.questions.forEach(q => {
+                if (!q.hideInTestView) {
+                    questionsArea.insertAdjacentHTML('beforeend', `<div id="q-container-${q.id}">${q.text}</div>`);
+                }
+            });
+
+            // Attach listeners to save answers
+            document.querySelectorAll('.ielts-input').forEach(input => {
+                const updateAnswer = (e) => { userAnswers[e.target.dataset.qid] = e.target.value; };
+                input.addEventListener('input', updateAnswer);
+                input.addEventListener('change', updateAnswer);
+            });
+        }
+
+        // --- STREAMING_CHUNK:Handling Test Flow & Submission... ---
+        startBtn.addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('timer-display').classList.remove('hidden');
+            document.getElementById('timer-display').classList.add('flex');
+            document.getElementById('header-submit-btn').classList.remove('hidden');
+            document.getElementById('header-submit-btn').classList.add('flex');
+            
+            audioElement.play().catch(e => console.log("Auto-play blocked", e));
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                const m = Math.floor(timeRemaining / 60);
+                const s = timeRemaining % 60;
+                document.getElementById('timer-display').innerHTML = `<i class="fa-regular fa-clock text-pastel-accent"></i> <span>${m}:${s.toString().padStart(2, '0')}</span>`;
+                if (timeRemaining <= 0) {
+                    handleFinalSubmit(); 
+                }
+            }, 1000);
+        });
+
+        headerSubmitBtn.addEventListener('click', () => confirmModal.classList.remove('hidden'));
+        cancelSubmitBtn.addEventListener('click', () => confirmModal.classList.add('hidden'));
+        confirmSubmitBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            handleFinalSubmit();
+        });
+
+        function handleFinalSubmit() {
+            clearInterval(timerInterval);
+            audioElement.pause();
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('timer-display').classList.add('hidden');
+            document.getElementById('header-submit-btn').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            
+            renderResultView();
+        }
+
+        // --- STREAMING_CHUNK:Rendering Result View & Checking Answers... ---
+        function renderResultView() {
+            let score = 0;
+            const reviewArea = document.getElementById('review-area');
+            const navArea = document.getElementById('result-nav');
+            const transcriptArea = document.getElementById('transcript-area');
+            
+            reviewArea.innerHTML = '';
+            navArea.innerHTML = '';
+            transcriptArea.innerHTML = '';
+
+            // Render Transcript
+            mockTestData.transcript.forEach(tr => {
+                transcriptArea.insertAdjacentHTML('beforeend', `<div id="${tr.id}" class="mb-4 transition-colors duration-300 p-3 rounded-xl hover:bg-gray-100">${tr.text}</div>`);
+            });
+
+            // Render Review Items & Navigation
+            mockTestData.questions.forEach((q) => {
+                if(q.type === 'html-only') return;
+
+                const userAns = (userAnswers[q.id] || "").toString().toLowerCase().trim();
+                const isCorrect = q.correctAnswer.some(ans => ans.toLowerCase().trim() === userAns);
+                if (isCorrect) score++;
+
+                // Clean the input box from text for review rendering
+                let cleanText = q.text.replace(/<input[^>]*>/gi, `<span class="font-bold text-gray-800 tracking-widest px-4 border-b-2 border-gray-400 mx-1 bg-gray-200">___</span>`);
+                cleanText = cleanText.replace(/<select[^>]*>[\s\S]*?<\/select>/gi, `<span class="font-bold text-gray-800 tracking-widest px-4 border-b-2 border-gray-400 mx-1 bg-gray-200">___</span>`);
+
+                const pillColor = isCorrect ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200' : 'bg-red-100 text-red-700 border-red-300 hover:bg-red-200';
+                
+                navArea.insertAdjacentHTML('beforeend', `
+                    <button onclick="document.getElementById('review-q-${q.id}').scrollIntoView({behavior: 'smooth', block: 'start'})" 
+                            class="w-10 h-10 shrink-0 rounded-full border-2 font-bold flex items-center justify-center transition-all shadow-sm ${pillColor}">
+                        ${q.number}
+                    </button>
+                `);
+
+                reviewArea.insertAdjacentHTML('beforeend', `
+                    <div id="review-q-${q.id}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 scroll-mt-6 mb-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <span class="font-bold text-gray-500 bg-gray-100 px-4 py-1.5 rounded-lg text-sm uppercase tracking-wide">Question ${q.number}</span>
+                            ${isCorrect 
+                                ? `<span class="text-green-600 bg-green-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm"><i class="fa-solid fa-check mr-2"></i>Correct</span>` 
+                                : `<span class="text-red-600 bg-red-50 px-4 py-1.5 rounded-lg font-bold flex items-center shadow-sm"><i class="fa-solid fa-xmark mr-2"></i>Incorrect</span>`
+                            }
+                        </div>
+                        
+                        <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-100 text-gray-800 text-lg shadow-inner overflow-hidden">
+                            ${cleanText}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                                <p class="text-xs text-red-500 font-bold uppercase tracking-wider mb-1">Your Answer</p>
+                                <p class="font-medium text-lg ${!userAns ? 'text-gray-400 italic' : 'text-gray-800'} break-words">${userAns || 'No answer provided'}</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                                <p class="text-xs text-green-600 font-bold uppercase tracking-wider mb-1">Correct Answer</p>
+                                <p class="font-bold text-gray-800 text-lg break-words">${q.correctAnswer.join(' / ')}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-pastel-blush border border-pastel-pink rounded-xl p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                                <p class="font-bold text-pastel-dark flex items-center text-lg"><i class="fa-regular fa-lightbulb mr-2"></i> Explanation</p>
+                                <button onclick="playExplanation(${q.timestamp}, '${q.transcriptRef}')" class="bg-white hover:bg-pastel-dark hover:text-white text-pastel-dark border border-pastel-pink font-bold py-2 px-5 rounded-full text-sm transition-all flex items-center shadow-sm whitespace-nowrap group">
+                                    <i class="fa-solid fa-circle-play mr-2 text-lg group-hover:scale-110 transition-transform"></i> Play Audio
+                                </button>
+                            </div>
+                            <p class="text-gray-700 text-base leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                `);
+            });
+
+            document.getElementById('score-display').innerText = score;
+        }
+
+        // --- STREAMING_CHUNK:Handling Transcript Sync & Highlighting Tool... ---
+        window.playExplanation = function(time, trId) {
+            reviewAudioElement.currentTime = time;
+            reviewAudioElement.play();
+
+            document.querySelectorAll('.transcript-highlight').forEach(el => {
+                el.classList.remove('transcript-highlight');
+            });
+
+            const trElement = document.getElementById(trId);
+            if (trElement) {
+                trElement.classList.add('transcript-highlight');
+                // Scroll the transcript panel to the specific element
+                const container = document.getElementById('transcript-area');
+                container.scrollTo({
+                    top: trElement.offsetTop - container.offsetTop - 20,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Custom Highlight Tool Logic
+        const tooltip = document.getElementById('highlight-tooltip');
+        let currentSelection = null;
+
+        document.getElementById('questions-container').addEventListener('mouseup', (e) => {
+            const selection = window.getSelection();
+            if (selection.toString().trim().length > 0 && !e.target.closest('input') && !e.target.closest('select')) {
+                currentSelection = selection.getRangeAt(0);
+                const rect = currentSelection.getBoundingClientRect();
+                
+                const containerRect = document.getElementById('questions-area').getBoundingClientRect();
+                tooltip.style.left = `${rect.left - containerRect.left + (rect.width / 2)}px`;
+                tooltip.style.top = `${rect.top - containerRect.top}px`;
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target !== tooltip) tooltip.style.display = 'none';
+        });
+
+        tooltip.addEventListener('click', () => {
+            if (currentSelection) {
+                try {
+                    const span = document.createElement('span');
+                    span.className = 'highlighted-text';
+                    span.title = "Click to remove highlight";
+                    span.onclick = function(e) {
+                        e.stopPropagation();
+                        const parent = this.parentNode;
+                        while (this.firstChild) { parent.insertBefore(this.firstChild, this); }
+                        parent.removeChild(this);
+                    };
+                    currentSelection.surroundContents(span);
+                } catch (e) {
+                    console.log("Cannot highlight across multiple elements.", e);
+                }
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // Initialize on load
+        initTest();
+    </script>
+</body>
+</html>

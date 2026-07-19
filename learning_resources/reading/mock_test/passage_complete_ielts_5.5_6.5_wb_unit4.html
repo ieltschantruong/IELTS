@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            width: 180px;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 1</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">IS CONSTANT USE OF ELECTRONIC MEDIA CHANGING OUR MINDS?</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><span id="exp-q1" class="explanation-target">The power of modern electronic media - the net, mobile phones and video games - to capture the attention of the human mind, particularly the young mind, and then distract it, has lately become a subject of concern.</span> We are, say the worriers, losing the ability to apply ourselves properly to a single task, like reading a book in its entirety or mastering a piece of music on an instrument, with the result that our thinking is becoming shallower.</p>
+
+                    <p>Nicholas Carr, the American science writer, has explored this theme for his new book, The Shallows, in which he argues that new media are not just changing our habits but our brain too. It turns out that the mature human brain is not an immutable seat of personality and intellect but a changeable thing, subject to 'neuroplasticity'. When our activities alter, so does the architecture of our brain. 'I'm not thinking the way I used to think,' writes Carr. 'I feel it most strongly when I'm reading.' <span id="exp-q3" class="explanation-target">Years of internet use have, he suspects, dented his ability to read deeply, to absorb himself in books:</span> 'My brain wasn't just drifting. It was hungry. It was demanding to be fed the way the net fed it.' He describes getting fidgety when faced with a long text: 'When we go online, we enter an environment that promotes cursory reading, hurried and distracted thinking, and superficial learning.'</p>
+
+                    <p><span id="exp-q4" class="explanation-target">Carr cites research by Gary Small, a professor of psychiatry at UCLA, who concluded that constant exposure to modern media strengthens new neural pathways while weakening older ones.</span> Just five hours of internet use is enough to awaken previously dormant parts of the brain's pre-fontal cortex, concluded Small. <span id="exp-q4-b" class="explanation-target">For Carr, this is proof that the net can rewire the mind.</span> He sees dangers. Deep thought, the ability to immerse oneself in an area of study, to follow a narrative, to understand an argument and develop a critique, is giving way to skimming. Young users of the Internet are good at drawing together information for a school project, for example, but that does not mean they have digested it.</p>
+
+                    <p>But is a changing mind a more stupid one? Jake Vigdor and Helen Ladd are researchers at Duke University, North Carolina. <span id="exp-q7" class="explanation-target">In a study spanning five years and involving more than 100,000 children</span>, <span id="exp-q8" class="explanation-target">they discovered a correlation between declining test scores in both mathematics and reading and the spread of home computers</span> and broadband. 'The decline in scores was in the order of one or two percent but it was statistically significant,' says Vigdor. <span id="exp-q9" class="explanation-target">'The drop may not be that great but one can say that the increase in computer use was certainly not positive.'</span> The cut-off year for the study was 2005, when socialising was more primitive. Since then, social networking sites have become enormously powerful consumers of young people's time. <span id="exp-q10" class="explanation-target">Vigdor and Ladd concluded that the educational value of home computing was best realised when youngsters were actively supervised by parents.</span></p>
+
+                    <p>This tendency to skim is compounded by the temptation of new media users to 'multi-task'. Watch a youngster on a computer and he could be Facebook-ing while burning a CD or Tweeting on his mobile phone. <span id="exp-q5" class="explanation-target">Modern management tends to promote multi-tasking as an expression of increased efficiency. Science, on the other hand, does not.</span> The human brain is, it seems, not at all good at multi-tasking- unless it involves a highly developed skill like driving. David Meyer, a neuroscientist at the University of Michigan, says: 'The bottom line is that you can't simultaneously be thinking about your tax return and reading an essay, just as you can't talk to yourself about two things at once. People may think otherwise but it's a myth. With complicated tasks, you will never, ever be able to overcome the inherent limitations in the brain.'</p>
+
+                    <p>Paying attention is the prerequisite of memory: the sharper the attention, the sharper the memory. Cursory study born of the knowledge that information is easily available online results, say the worriers, in a failure to digest it. In addition, the brain needs rest and recovery time to consolidate thoughts. Teenagers who fill every moment with a text or Tweet are not allowing their minds necessary downtime. All rather worrying, but is it that bad?</p>
+
+                    <p>We have been here before, of course. The Ancient Greeks lamented the replacement of the oral tradition with written text, and the explosion in book ownership resulting from the printing press was, for some, a disaster. <span id="exp-q11" class="explanation-target">In the 18th century, a French statesman railed against a new device</span> that turned people into 'dispersed' individuals, isolated in 'sullen silence'. <span id="exp-q11-b" class="explanation-target">He was talking about the newspaper.</span></p>
+
+                    <p>The net is supposed to consume the lives of young people, yet <span id="exp-q12" class="explanation-target">the only reliable studies about the time spent online, collated by the World Health Organization, suggest children spend between two and four hours in front of screens</span>, including television screens, and not six or seven, as often suggested. Moreover, there is evidence that youngsters who use social networking sites have more rewarding offline social lives than those who do not.</p>
+
+                    <p>A study on children and new technology in the UK included a 'study of studies' by Professor David Buckingham of the University of London's Institute of Education. <span id="exp-q1-b" class="explanation-target">He concluded: 'Broadly speaking, the evidence about the effects of new media is weak and inconclusive - and this applies to both positive and negative effects.'</span></p>
+
+                    <p>Certainly the 'old' media don't seem to be doing that badly. <span id="exp-q13" class="explanation-target">An annual survey shows that sales of children's books this year were 4.9 per cent greater than last year</span>, with more than 60 million sold. The damage, if any, done by excessive computer time may not be so much to do with what is being done online as what is being missed - time spent with family or playing in trees with friends.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: TRUE/FALSE/NOT GIVEN -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-6</h3>
+                        <p class="text-sm text-gray-800">Do the following statements agree with the information given in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 mt-2 space-y-1">
+                            <li><strong class="text-brand-700">TRUE</strong> if the statement agrees with the information</li>
+                            <li><strong class="text-brand-700">FALSE</strong> if the statement contradicts the information</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if there is no information on this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const tfngQuestions = [
+                                { q: 1, text: "Some people believe that modern electronic media only have a negative effect on young people.", exp: ['exp-q1', 'exp-q1-b'] },
+                                { q: 2, text: "Nicholas Carr's book on the subject is a bestseller.", exp: 'not-given' },
+                                { q: 3, text: "Nicholas Carr believes that electronic media have affected his enjoyment of reading books.", exp: ['exp-q3'] },
+                                { q: 4, text: "Gary Small's research supports Nicholas Carr's beliefs.", exp: ['exp-q4', 'exp-q4-b'] },
+                                { q: 5, text: "Management beliefs on multi-tasking are proved correct by scientific research.", exp: ['exp-q5'] },
+                                { q: 6, text: "David Meyer's views on the limitations of the brain have caused controversy.", exp: 'not-given' }
+                            ];
+                            
+                            tfngQuestions.forEach(item => {
+                                const explanationCall = item.exp === 'not-given' ? `showNotGivenToast()` : `showExplanation(${JSON.stringify(item.exp)})`;
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-3 pl-9">
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="TRUE" onchange="updateRadioMap(${item.q})"> TRUE
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="FALSE" onchange="updateRadioMap(${item.q})"> FALSE
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="updateRadioMap(${item.q})"> NOT GIVEN
+                                            </label>
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${explanationCall}'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Notes Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 7-10</h3>
+                        <p class="text-sm text-gray-800">Complete the notes below. Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS AND/OR A NUMBER</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-gray-800 mb-4 text-center text-lg border-b border-gray-300 pb-2">Vigdor and Ladd's research</h4>
+                        
+                        <div class="space-y-4">
+                            <!-- Q7 -->
+                            <div class="q-block" data-q="7">
+                                <div class="flex gap-3 items-center">
+                                    <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">7</span>
+                                    <div class="text-sm text-gray-800 flex flex-wrap items-center gap-2">
+                                        looked at over <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="feedback-container hidden flex-col pl-9 mt-2">
+                                    <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q7"])'>View Explanation</button>
+                                </div>
+                            </div>
+
+                            <!-- Q8 -->
+                            <div class="q-block" data-q="8">
+                                <div class="flex gap-3 items-center">
+                                    <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">8</span>
+                                    <div class="text-sm text-gray-800 flex flex-wrap items-center gap-2">
+                                        found that lower <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off"> and home computer use were linked
+                                    </div>
+                                </div>
+                                <div class="feedback-container hidden flex-col pl-9 mt-2">
+                                    <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q8"])'>View Explanation</button>
+                                </div>
+                            </div>
+
+                            <!-- Q9 -->
+                            <div class="q-block" data-q="9">
+                                <div class="flex gap-3 items-start">
+                                    <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">9</span>
+                                    <div class="text-sm text-gray-800 flex flex-wrap items-center gap-2 leading-loose">
+                                        indicated that the effects of greater home computer use could not be described as <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div class="feedback-container hidden flex-col pl-9 mt-2">
+                                    <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q9"])'>View Explanation</button>
+                                </div>
+                            </div>
+
+                            <!-- Q10 -->
+                            <div class="q-block" data-q="10">
+                                <div class="flex gap-3 items-center">
+                                    <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">10</span>
+                                    <div class="text-sm text-gray-800 flex flex-wrap items-center gap-2">
+                                        concluded that <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off"> should be involved in home computer use
+                                    </div>
+                                </div>
+                                <div class="feedback-container hidden flex-col pl-9 mt-2">
+                                    <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q10"])'>View Explanation</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Short Answer -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 11-13</h3>
+                        <p class="text-sm text-gray-800">Answer the questions below. Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS AND/OR A NUMBER</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Q11 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="11">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">11</span>
+                                <div class="w-full">
+                                    <p class="text-sm text-gray-800 font-medium mb-2">Which invention was criticised by an 18th century French politician?</p>
+                                    <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off" class="!w-full max-w-[250px]">
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2 mt-2" onclick='showExplanation(["exp-q11", "exp-q11-b"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q12 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="12">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">12</span>
+                                <div class="w-full">
+                                    <p class="text-sm text-gray-800 font-medium mb-2">According to studies that can be trusted, what is the maximum amount of time per day that children spend looking at screens?</p>
+                                    <input type="text" id="input-q12" onkeyup="updateTextInput(12, this.value)" autocomplete="off" class="!w-full max-w-[250px]">
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2 mt-2" onclick='showExplanation(["exp-q12"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q13 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="13">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">13</span>
+                                <div class="w-full">
+                                    <p class="text-sm text-gray-800 font-medium mb-2">Which products have become more popular recently?</p>
+                                    <input type="text" id="input-q13" onkeyup="updateTextInput(13, this.value)" autocomplete="off" class="!w-full max-w-[250px]">
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9">
+                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2 mt-2" onclick='showExplanation(["exp-q13"])'>View Explanation</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: ["FALSE", "F"],
+            2: ["NOT GIVEN", "NG"],
+            3: ["TRUE", "T"],
+            4: ["TRUE", "T"],
+            5: ["FALSE", "F"],
+            6: ["NOT GIVEN", "NG"],
+            
+            7: ["100,000 children", "100000 children", "100,000"],
+            8: ["test scores"],
+            9: ["positive"],
+            10: ["parents"],
+            11: ["the newspaper", "newspaper"],
+            12: ["4 hours", "four hours", "4", "four"],
+            13: ["children's books", "childrens books"]
+        };
+
+        const TOTAL_QS = 13;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            // Grade Q1-Q6 (T/F/NG)
+            for (let i = 1; i <= 6; i++) {
+                const uAns = userAnswers[i].toUpperCase();
+                const acceptableKeys = ANSWER_KEYS[i];
+                const isCorrect = acceptableKeys.includes(uAns);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.appendChild(createCorrectMarker(acceptableKeys[0]));
+                }
+                feedbackContainer.classList.remove('hidden');
+                
+                // Highlight incorrect radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900', 'font-bold');
+                }
+            }
+
+            // Grade Q7-Q13 (Text Inputs)
+            for (let i = 7; i <= 13; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qBlock = document.querySelector(`.q-block[data-q="${i}"]`);
+                const feedbackContainer = qBlock.querySelector('.feedback-container');
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                }
+                
+                if (!isCorrect || uAns === '') {
+                    feedbackContainer.appendChild(createCorrectMarker(ANSWER_KEYS[i][0]));
+                }
+                feedbackContainer.classList.remove('hidden');
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function showNotGivenToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
