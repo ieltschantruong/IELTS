@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Checkbox Styling */
+        input[type="checkbox"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .checkbox-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+        }
+        
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            width: 140px;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 2</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Learning color words</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">Young children struggle with color concepts, and the reason for this may have something to do with how we use the words that describe them.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><strong>A.</strong> In the course of the first few years of their lives, children who are brought up in English-speaking homes successfully master the use of hundreds of words. Words for objects, actions, emotions, and many other aspects of the physical world quickly become part of their infant repertoire. <span id="exp-q1" class="explanation-target">For some reason, however, when it comes to learning color words, the same children perform very badly.</span> At the age of four months, babies can distinguish between basic color categories. Yet it turns out they do this in much the same way as blind children. "Blue" and "yellow" appear in older children's expressive language in answer to questions such as "What color is this?", but their mapping of objects to individual colors is haphazard and interchangeable. If shown a blue cup and asked about its color, typical two-year-olds seem as likely to come up with "red" as "blue." <span id="exp-q5" class="explanation-target">Even after hundreds of training trials, children as old as four may still end up being unable to accurately sort objects by color.</span></p>
+
+                    <p><strong>B.</strong> In an effort to work out why this is, <span id="exp-q2" class="explanation-target">cognitive scientists at Stanford University in California hypothesized that children's incompetence at color-word learning may be directly linked to the way these words are used in English.</span> <span id="exp-q6" class="explanation-target">While word order for color adjectives varies, they are used overwhelmingly in pre-nominal position (e.g. "blue cup"); in other words, the adjective comes before the noun it is describing.</span> This is in contrast to post-nominal position (e.g. "The cup is blue") where the adjective comes after the noun. It seems that the difficulty children have may not be caused by any unique property of color, or indeed, of the world. Rather, it may simply come down to the challenge of having to make predictions from color words to the objects they refer to, instead of being able to make predictions from the world of objects to the color words. </p>
+                    
+                    <p>To illustrate, the word "chair" has a meaning that applies to the somewhat varied set of entities in the world that people use for sitting on. Chairs have features, such as arms and legs and backs, that are combined to some degree in a systematic way; they turn up in a range of chairs of different shapes, sizes, and ages. <span id="exp-q7" class="explanation-target">It could be said that children learn to narrow down the set of cues that make up a chair</span> and <span id="exp-q8" class="explanation-target">in this way they learn the concept associated with that word. On the other hand, color words tend to be unique and not bound to other specific co-occurring features; there is nothing systematic about color words to help cue their meaning.</span> In the speech that adults direct at children, color adjectives occur pre-nominally ("blue cup") around 70 percent of the time. <span id="exp-q9" class="explanation-target">This suggests that most of what children hear from adults will, in fact, be unhelpful in learning what color words refer to.</span></p>
+
+                    <p><strong>C.</strong> <span id="exp-q3" class="explanation-target">To explore this idea further, the research team recruited 41 English children aged between 23 and 29 months and carried out a three-phase experiment.</span> It consisted of a pre-test, followed by training in the use of color words, and finally a post-test that was identical to the pre-test. <span id="exp-q1011a" class="explanation-target">The pre- and post-test materials comprised six objects that were novel to the children.</span> There were three examples of each object in each of three colors-red, yellow, and blue. The objects were presented on trays, and in both tests, the children were asked to pick out objects in response to requests in which the color word was either a prenominal ("Which is the red one?") or a post-nominal ("Which one is red?").</p>
+
+                    <p>In the training, the children were introduced to a "magic bucket" containing five sets of items familiar to 26-month-olds (balls, cups, crayons, glasses, and toy bears) in each of the three colors. <span id="exp-q1011c" class="explanation-target">The training was set up so that half the children were presented with the items one by one and heard them labelled with color words used pre-nominally ("This is a red crayon"), while the other half were introduced to the same items described with a post-nominal color word ("This crayon is red").</span> After the training, the children repeated the selection task on the unknown items in the post-test. To assess the quality of children's understanding of the color words, and the effect of each type of training, correct choices on items that were consistent across the pre- and post-tests were used to measure children's color knowledge.</p>
+
+                    <p><strong>D.</strong> Individual analysis of pre- and post-test data, which confirmed parental vocabulary reports, showed the children had at least some knowledge of the three colour words: they averaged two out of three correct choices in response to both pre- and post-nominal question types, which, it has been pointed out, is better than chance. When children's responses to the question types were assessed independently, performance was at its most consistent when children were both trained and tested on post-nominal adjectives, and worst when trained on pre-nominal adjectives and tested on post-nominal adjectives. <span id="exp-q1213c" class="explanation-target">Only children who had been trained with post-nominal color-word presentation and then tested with post-nominal question types were significantly more accurate than chance.</span> <span id="exp-q1213d" class="explanation-target">Comparing the pre- and post-test scores across each condition revealed a significant decline in performance when children were both pre- and post-tested with questions that placed the color words pre-nominally.</span></p>
+
+                    <p><span id="exp-q4" class="explanation-target">As predicted, when children are exposed to color adjectives in post-nominal position, they learn them rapidly (after just five training trials per color); when they are presented with them pre-nominally, as English overwhelmingly tends to do, children show no signs of learning.</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: Matching Headings -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-4</h3>
+                        <p class="text-sm text-gray-800 mb-2">The Reading Passage has four sections, A-D. Choose the correct heading for each section from the list of headings below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a heading, OR click a heading then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Headings Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <h4 class="font-bold text-sm text-gray-700 mb-3 text-center uppercase tracking-wider">List of Headings</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm font-medium" id="headings-bank">
+                            <div draggable="true" data-type="heading" data-val="i" data-display="i. A possible explanation" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">i</span> <span class="leading-tight">A possible explanation</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="ii" data-display="ii. Why names of objects are unhelpful" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">ii</span> <span class="leading-tight">Why names of objects are unhelpful</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="iii" data-display="iii. Checking out the theory" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">iii</span> <span class="leading-tight">Checking out the theory</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="iv" data-display="iv. A curious state of affairs" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">iv</span> <span class="leading-tight">A curious state of affairs</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="v" data-display="v. The need to look at how words are formed" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">v</span> <span class="leading-tight">The need to look at how words are formed</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="vi" data-display="vi. How age impacts on learning colours" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">vi</span> <span class="leading-tight">How age impacts on learning colours</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="vii" data-display="vii. Some unsurprising data" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">vii</span> <span class="leading-tight">Some unsurprising data</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const headingsQuestions = [
+                                { q: 1, text: "Section A", exp: ['exp-q1', 'exp-q5'] },
+                                { q: 2, text: "Section B", exp: ['exp-q2'] },
+                                { q: 3, text: "Section C", exp: ['exp-q3'] },
+                                { q: 4, text: "Section D", exp: ['exp-q4'] }
+                            ];
+                            headingsQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-center gap-3 w-32 shrink-0">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <span class="text-sm font-bold text-gray-700">${item.text}</span>
+                                        </div>
+                                        <div class="flex-1 flex flex-col">
+                                            <div class="drop-zone w-full min-h-[40px] px-3 py-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="heading" data-q="${item.q}"></div>
+                                            <button class="exp-btn hidden self-start mt-2 text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Summary Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 5-9</h3>
+                        <p class="text-sm text-gray-800">Complete the summary below. Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="text-gray-800 leading-loose text-justify text-[15px] space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-center text-lg mb-2">The Hypothesis</h4>
+                        <p>
+                            Children learn many words quite quickly, but their ability to learn colour words takes longer than expected. In fact, despite 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="5">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">5</strong>
+                                    <input type="text" id="input-q5" onkeyup="updateTextInput(5, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q5"])'>Explanation</button>
+                                </span>
+                            </span>, 
+                            many four-year-olds still struggle to arrange objects into colour categories. Scientists have hypothesised that this is due to the 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="6">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">6</strong>
+                                    <input type="text" id="input-q6" onkeyup="updateTextInput(6, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q6"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            of the adjectives in a phrase or sentence and the challenges this presents.
+                        </p>
+                        <p>
+                            While objects consist of a number of 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="7">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">7</strong>
+                                    <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q7"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            that can be used to recognise other similar objects, the 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="8">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">8</strong>
+                                    <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q8"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            of a colour cannot be developed using the same approach. As a consequence, the way colour words tend to be used in English may be 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-row-text align-middle" data-q="9">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">9</strong>
+                                    <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q9"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            to children.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 3: Choose TWO Letters -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-13</h3>
+                        <p class="text-sm text-gray-800">Choose <strong class="text-brand-700">TWO</strong> letters, A-E.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Select exactly two checkboxes per group.</p>
+                    </div>
+
+                    <!-- Q10-11 -->
+                    <div class="mb-8">
+                        <div class="q-row-group p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-qgroup="10-11">
+                            <div class="flex gap-3 mb-3 border-b border-gray-200 pb-3">
+                                <div class="flex flex-col gap-1 shrink-0">
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-10">10</span>
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-11">11</span>
+                                </div>
+                                <p class="text-gray-800 font-bold text-sm leading-relaxed mt-1">Which TWO of the following statements about the experiment are true?</p>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-700 font-medium pl-2">
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1011" value="A" onchange="handleChooseTwo(this, '10-11', [10, 11])" class="mt-0.5 shrink-0"> A. The children were unfamiliar with the objects used in the pre- and post-test.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1011" value="B" onchange="handleChooseTwo(this, '10-11', [10, 11])" class="mt-0.5 shrink-0"> B. The children had to place the pre- and post-test objects onto coloured trays.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1011" value="C" onchange="handleChooseTwo(this, '10-11', [10, 11])" class="mt-0.5 shrink-0"> C. The training was conducted by dividing the children into two groups.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1011" value="D" onchange="handleChooseTwo(this, '10-11', [10, 11])" class="mt-0.5 shrink-0"> D. Pre-nominal questions were used less frequently than post-nominal questions in the training.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1011" value="E" onchange="handleChooseTwo(this, '10-11', [10, 11])" class="mt-0.5 shrink-0"> E. The researchers were looking for inconsistencies in children's knowledge of word order.
+                                </label>
+                            </div>
+                            <div class="feedback-container hidden flex-col mt-4 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q1011a", "exp-q1011c"])'>View Explanation</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q12-13 -->
+                    <div>
+                        <div class="q-row-group p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-qgroup="12-13">
+                            <div class="flex gap-3 mb-3 border-b border-gray-200 pb-3">
+                                <div class="flex flex-col gap-1 shrink-0">
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-12">12</span>
+                                    <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-13">13</span>
+                                </div>
+                                <p class="text-gray-800 font-bold text-sm leading-relaxed mt-1">Which TWO of the following outcomes are reported in the passage?</p>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-700 font-medium pl-2">
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1213" value="A" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> A. Average results contradicted parental assessment of children's knowledge.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1213" value="B" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> B. Children who were post-tested using post-nominal adjectives performed well, regardless of the type of training.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1213" value="C" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> C. Greatest levels of improvement were achieved by children who were trained and post-tested using post-nominal adjectives.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1213" value="D" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> D. Some children performed less well in the post-test than in the pre-test.
+                                </label>
+                                <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                    <input type="checkbox" name="q1213" value="E" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> E. Some children were unable to accurately name any of the colours in the pre- and post-tests.
+                                </label>
+                            </div>
+                            <div class="feedback-container hidden flex-col mt-4 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q1213c", "exp-q1213d"])'>View Explanation</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            // Drag and Drop (Headings)
+            1: "iv", 2: "i", 3: "iii", 4: "vii",
+            // Text Input (Multiple acceptable variations)
+            5: ["training trials"],
+            6: ["position", "pre-nominal position", "prenominal position"],
+            7: ["features", "cues", "features/cues", "cues/features"],
+            8: ["meaning", "concept", "meaning/concept", "concept/meaning"],
+            9: ["unhelpful"],
+            // Choose TWO (Order does not matter)
+            group1011: ["A", "C"],
+            group1213: ["C", "D"],
+        };
+
+        const HEADING_DISPLAYS = {
+            "i": "i. A possible explanation",
+            "ii": "ii. Why names of objects are unhelpful",
+            "iii": "iii. Checking out the theory",
+            "iv": "iv. A curious state of affairs",
+            "v": "v. The need to look at how words are formed",
+            "vi": "vi. How age impacts on learning colours",
+            "vii": "vii. Some unsurprising data"
+        };
+
+        let userAnswers = {};
+        for(let i=1; i<=13; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=13; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.getElementById(`map-marker-${i}`);
+                    if(!el) el = document.querySelector(`.q-row-text[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Interactive Mechanics: Drag & Drop + Click-to-Apply
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300'); });
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300'); });
+                zone.addEventListener('dragleave', () => { zone.classList.remove('ring-4', 'ring-brand-300'); });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                    if (isSubmitted) return;
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        if (zone.textContent) {
+                            zone.textContent = '';
+                            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            const qNum = zone.dataset.q;
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        // Mechanics: Choose TWO
+        function handleChooseTwo(checkbox, groupName, qIndices) {
+            if (isSubmitted) return;
+            const container = document.querySelector(`.q-row-group[data-qgroup="${groupName}"]`);
+            const checkedBoxes = container.querySelectorAll(`input[type="checkbox"]:checked`);
+            
+            // Limit to max 2
+            if (checkedBoxes.length > 2) {
+                checkbox.checked = false;
+                return;
+            }
+
+            // Extract values
+            let selectedVals = Array.from(checkedBoxes).map(cb => cb.value);
+            
+            // Assign sequentially based on indices
+            userAnswers[qIndices[0]] = selectedVals[0] || "";
+            userAnswers[qIndices[1]] = selectedVals[1] || "";
+
+            updateMapStatus(qIndices[0], !!selectedVals[0]);
+            updateMapStatus(qIndices[1], !!selectedVals[1]);
+        }
+
+        // Mechanics: Text Input
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        // Custom Highlighting Feature
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold mt-1 bg-green-100 px-2 py-0.5 rounded border border-green-300 w-fit text-center flex items-center justify-center gap-1`;
+            el.innerHTML = `<svg class="w-3 h-3 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Ans: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // 1. Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'checkbox') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // 2. Grade Q1-Q4 (Matching Headings)
+            for (let i = 1; i <= 4; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const expBtn = qRow.querySelector('.exp-btn');
+                expBtn.classList.remove('hidden');
+                
+                if (!isCorrect) {
+                    const corrMarker = document.createElement('div');
+                    corrMarker.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+                    corrMarker.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${HEADING_DISPLAYS[key]}`;
+                    qRow.querySelector('.flex-1').appendChild(corrMarker);
+                }
+            }
+
+            // 3. Grade Q5-Q9 (Text Inputs inline)
+            for (let i = 5; i <= 9; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qRowText = document.querySelector(`.q-row-text[data-q="${i}"]`);
+                const feedbackContainer = qRowText.querySelector('.feedback-container');
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                    feedbackContainer.appendChild(createCorrectMarker(ANSWER_KEYS[i][0]));
+                }
+                
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+            }
+
+            // 4. Grade Q10-13 (Choose TWO)
+            const gradeChooseTwo = (groupName, indices, keys) => {
+                const uAns1 = userAnswers[indices[0]];
+                const uAns2 = userAnswers[indices[1]];
+                
+                const userVals = [uAns1, uAns2].filter(v => v !== "");
+                let groupScore = 0;
+                
+                let remainingKeys = [...keys];
+                let results = [];
+                
+                userVals.forEach(val => {
+                    const keyIndex = remainingKeys.indexOf(val);
+                    if(keyIndex > -1) {
+                        groupScore++;
+                        remainingKeys.splice(keyIndex, 1);
+                        results.push('correct');
+                    } else {
+                        results.push('incorrect');
+                    }
+                });
+
+                while(results.length < 2) results.push('blank');
+
+                score += groupScore;
+
+                styleMapBox(indices[0], results[0]);
+                styleMapBox(indices[1], results[1]);
+
+                const qGroup = document.querySelector(`.q-row-group[data-qgroup="${groupName}"]`);
+                if(groupScore === 2) {
+                    qGroup.classList.replace('border-gray-200', 'border-green-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-green-50');
+                } else if (groupScore === 1) {
+                    qGroup.classList.replace('border-gray-200', 'border-yellow-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (userVals.length > 0) {
+                    qGroup.classList.replace('border-gray-200', 'border-red-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-red-50');
+                } else {
+                    qGroup.classList.replace('border-gray-200', 'border-yellow-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-yellow-50');
+                }
+
+                const checkboxes = qGroup.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => {
+                    const val = cb.value;
+                    const wrapper = cb.parentElement;
+                    if (keys.includes(val)) {
+                        wrapper.classList.add('bg-green-100', 'border-green-400', 'font-bold', 'text-green-900');
+                    } else if (cb.checked) {
+                        wrapper.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                    }
+                });
+                
+                const feedbackContainer = qGroup.querySelector('.feedback-container');
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                if (groupScore < 2) {
+                    const corrMarker = document.createElement('div');
+                    corrMarker.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 mb-2 w-fit`;
+                    corrMarker.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${keys.join(', ')}`;
+                    feedbackContainer.insertBefore(corrMarker, feedbackContainer.firstChild);
+                }
+            };
+
+            gradeChooseTwo('10-11', [10, 11], ANSWER_KEYS.group1011);
+            gradeChooseTwo('12-13', [12, 13], ANSWER_KEYS.group1213);
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
