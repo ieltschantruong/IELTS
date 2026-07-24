@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking Vocab | Art & History - IELTS Chan Truong</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #334155;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 6rem;
+        }
+
+        .exam-paper {
+            background-color: #fff;
+            width: 100%;
+            max-width: 900px;
+            padding: 4rem 5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+                              linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 0; background: #fff; padding-bottom: 6rem; }
+            .exam-paper { padding: 2rem 1.5rem; box-shadow: none; }
+        }
+
+        .blank-input {
+            border: none;
+            border-bottom: 1.5px dotted #000;
+            background: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #1e3a8a;
+            text-align: center;
+            outline: none;
+            padding: 0 5px;
+            margin: 0 5px;
+            border-radius: 0;
+            transition: all 0.2s;
+        }
+        
+        .blank-input:focus {
+            background-color: rgba(253, 253, 150, 0.3);
+            border-bottom: 1.5px solid #2563eb;
+        }
+
+        .blank-input.graded-correct {
+            color: #16a34a;
+            border-bottom: 1.5px solid #16a34a;
+        }
+
+        .blank-input.graded-incorrect {
+            color: #dc2626;
+            border-bottom: 1.5px solid #dc2626;
+            text-decoration: line-through;
+        }
+
+        .mcq-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        @media (max-width: 640px) {
+            .mcq-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+        }
+
+        .mcq-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+        .mcq-option input[type="radio"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #000;
+            border-radius: 50%;
+            outline: none;
+            position: relative;
+        }
+
+        .mcq-option input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: #1e3a8a;
+            border-radius: 50%;
+        }
+
+        .correction-text {
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 1rem;
+            font-style: italic;
+            margin-left: 0.5rem;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+        
+        .mark-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin-left: 5px;
+            transform: translateY(-2px);
+        }
+
+        p, li, .q-item { line-height: 1.8; font-size: 1.05rem; }
+        .section-title { font-weight: bold; margin-top: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-size: 1.1rem;}
+        
+        .word-bank { 
+            text-align: center; 
+            font-style: italic; 
+            margin: 1.5rem 0; 
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            row-gap: 1rem;
+            column-gap: 2rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0;
+            background: #fafafa;
+        }
+        
+        .word-bank span { white-space: nowrap; }
+
+        .submit-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid #cbd5e1;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            flex-wrap: wrap;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .hide-print { display: flex; gap: 0.5rem; }
+        @media print {
+            .hide-print, .submit-bar { display: none !important; }
+            body { background: white; padding: 0; }
+            .exam-paper { padding: 0; box-shadow: none; max-width: 100%; }
+            .word-bank { gap: 1.5rem; padding: 1rem; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="exam-paper" id="test-container">
+        
+        <div class="flex justify-between items-start text-sm mb-8 border-b-2 border-black pb-4">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-end gap-2">
+                    <span class="font-bold">Name:</span>
+                    <input type="text" class="blank-input w-48" placeholder="Student Name">
+                </div>
+                <div class="flex items-end gap-2">
+                    <span class="font-bold">Date:</span>
+                    <input type="text" class="blank-input w-32">
+                </div>
+            </div>
+            <div class="text-right italic font-bold">
+                IELTS Chan Truong 2026<br>
+                Target Band: 6.5 - 7.5+
+            </div>
+        </div>
+
+        <div class="text-center mb-10">
+            <h1 class="text-2xl font-bold uppercase tracking-widest mb-1">Speaking Vocab Test</h1>
+            <h2 class="text-lg font-bold italic text-slate-600">Art & History (40 Questions)</h2>
+        </div>
+
+        <!-- Grade Display -->
+        <div id="grade-display" class="hidden absolute top-12 right-12 w-28 h-28 border-[5px] border-red-600 rounded-full flex flex-col items-center justify-center text-red-600 transform rotate-12 bg-white/90 backdrop-blur-sm z-10 shadow-xl">
+            <span class="text-4xl font-black font-sans leading-none" id="final-score">0</span>
+            <span class="text-sm font-bold border-t-[3px] border-red-600 w-16 text-center mt-1 pt-1 font-sans">/40</span>
+        </div>
+
+        <form id="vocab-form" onsubmit="event.preventDefault(); gradeTest();">
+
+            <div class="section">
+                <div class="section-title flex gap-4">
+                    <span>I.</span>
+                    <span>Core Vocabulary (Context Gap-Fill)</span>
+                </div>
+                <div class="italic text-sm mb-4">Fill in each blank with one suitable word from the list below.</div>
+                
+                <div class="word-bank font-bold text-base" id="shufflable-bank-1">
+                    <span>masterpiece</span>
+                    <span>artifacts</span>
+                    <span>abstract</span>
+                    <span>curator</span>
+                    <span>exhibition</span>
+                    <span>antiquity</span>
+                    <span>renaissance</span>
+                    <span>portrait</span>
+                    <span>calligraphy</span>
+                    <span>monument</span>
+                </div>
+
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="1">1. The Mona Lisa is considered Leonardo da Vinci's greatest <input type="text" class="blank-input w-32" id="q1" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="2">2. The museum holds several fascinating <input type="text" class="blank-input w-32" id="q2" autocomplete="off"> dating back to the Roman Empire.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="3">3. <input type="text" class="blank-input w-32" id="q3" autocomplete="off"> paintings often leave the interpretation entirely up to the viewer's imagination.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="4">4. The <input type="text" class="blank-input w-32" id="q4" autocomplete="off"> carefully selected the paintings for the upcoming modern art show.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="5">5. There's a wonderful new <input type="text" class="blank-input w-32" id="q5" autocomplete="off"> on ancient Egyptian culture downtown.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="6">6. Statues from <input type="text" class="blank-input w-32" id="q6" autocomplete="off"> provide us with great insight into early human civilizations.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="7">7. The city underwent a cultural <input type="text" class="blank-input w-32" id="q7" autocomplete="off"> following the end of the long war.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="8">8. She sat for a famous artist for three hours to have her <input type="text" class="blank-input w-32" id="q8" autocomplete="off"> painted.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="9">9. He took a masterclass to learn the traditional art of Chinese <input type="text" class="blank-input w-32" id="q9" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="10">10. The ancient <input type="text" class="blank-input w-32" id="q10" autocomplete="off"> in the town square attracts thousands of tourists every year.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>II.</span>
+                    <span>Word Formation</span>
+                </div>
+                <div class="italic text-sm mb-4">Fill in each blank with the <span class="font-bold underline">suitable form</span> of the word in brackets.</div>
+                
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="11">11. The building has a highly <input type="text" class="blank-input w-32" id="q11" autocomplete="off"> appeal due to its minimalist design. <span class="font-bold italic">(AESTHETICS)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="12">12. The famous <input type="text" class="blank-input w-32" id="q12" autocomplete="off"> spent months carving the marble statue. <span class="font-bold italic">(SCULPTURE)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="13">13. The government needs to <input type="text" class="blank-input w-32" id="q13" autocomplete="off"> these vital historical sites. <span class="font-bold italic">(PRESERVATION)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="14">14. The wooden ceiling panels were <input type="text" class="blank-input w-36" id="q14" autocomplete="off"> carved with floral designs. <span class="font-bold italic">(INTRICATE)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="15">15. Mozart relied heavily on the financial <input type="text" class="blank-input w-32" id="q15" autocomplete="off"> of wealthy nobles. <span class="font-bold italic">(PATRON)</span><span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>III.</span>
+                    <span>Pronunciation: Word Stress</span>
+                </div>
+                <div class="italic text-sm mb-4">Choose the word which has a <span class="font-bold underline">different stress pattern</span> from the others.</div>
+
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="16">
+                        <div class="flex items-center gap-2"><span>16.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q16" value="a"> a) epoch</label>
+                            <label class="mcq-option"><input type="radio" name="q16" value="b"> b) canvas</label>
+                            <label class="mcq-option"><input type="radio" name="q16" value="c"> c) relic</label>
+                            <label class="mcq-option"><input type="radio" name="q16" value="d"> d) avant-garde</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="17">
+                        <div class="flex items-center gap-2"><span>17.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q17" value="a"> a) tapestry</label>
+                            <label class="mcq-option"><input type="radio" name="q17" value="b"> b) monument</label>
+                            <label class="mcq-option"><input type="radio" name="q17" value="c"> c) curator</label>
+                            <label class="mcq-option"><input type="radio" name="q17" value="d"> d) portrait</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="18">
+                        <div class="flex items-center gap-2"><span>18.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q18" value="a"> a) calligraphy</label>
+                            <label class="mcq-option"><input type="radio" name="q18" value="b"> b) exhibition</label>
+                            <label class="mcq-option"><input type="radio" name="q18" value="c"> c) antiquity</label>
+                            <label class="mcq-option"><input type="radio" name="q18" value="d"> d) aesthetics</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="19">
+                        <div class="flex items-center gap-2"><span>19.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q19" value="a"> a) renaissance</label>
+                            <label class="mcq-option"><input type="radio" name="q19" value="b"> b) abstract</label>
+                            <label class="mcq-option"><input type="radio" name="q19" value="c"> c) patron</label>
+                            <label class="mcq-option"><input type="radio" name="q19" value="d"> d) intricate</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="20">
+                        <div class="flex items-center gap-2"><span>20.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            <label class="mcq-option"><input type="radio" name="q20" value="a"> a) artifact</label>
+                            <label class="mcq-option"><input type="radio" name="q20" value="b"> b) preservation</label>
+                            <label class="mcq-option"><input type="radio" name="q20" value="c"> c) masterpiece</label>
+                            <label class="mcq-option"><input type="radio" name="q20" value="d"> d) sculpture</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>IV.</span>
+                    <span>Idioms & Expressions (Context)</span>
+                </div>
+                <div class="italic text-sm mb-4">Choose the correct idiom to complete the sentence.</div>
+
+                <div class="space-y-6 ml-6">
+                    <div class="q-item" data-q="21">
+                        <div class="flex items-start gap-2"><span>21.</span> <div>Her garden is so beautifully landscaped, it's truly ________.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q21" value="a"> a) a work of art</label>
+                            <label class="mcq-option"><input type="radio" name="q21" value="b"> b) ahead of its time</label>
+                            <label class="mcq-option"><input type="radio" name="q21" value="c"> c) a blank canvas</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="22">
+                        <div class="flex items-start gap-2"><span>22.</span> <div>The discovery of electricity ________ as a major turning point for mankind.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q22" value="a"> a) painted a picture of</label>
+                            <label class="mcq-option"><input type="radio" name="q22" value="b"> b) went down in history</label>
+                            <label class="mcq-option"><input type="radio" name="q22" value="c"> c) turned back the clock</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="23">
+                        <div class="flex items-start gap-2"><span>23.</span> <div>Moving to a new city feels like starting with ________; you can be whoever you want.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q23" value="a"> a) a blank canvas</label>
+                            <label class="mcq-option"><input type="radio" name="q23" value="b"> b) the golden age</label>
+                            <label class="mcq-option"><input type="radio" name="q23" value="c"> c) behind the scenes</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="24">
+                        <div class="flex items-start gap-2"><span>24.</span> <div>The author ________ what life was truly like during the war.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q24" value="a"> a) made history</label>
+                            <label class="mcq-option"><input type="radio" name="q24" value="b"> b) paints a vivid picture of</label>
+                            <label class="mcq-option"><input type="radio" name="q24" value="c"> c) gets the picture</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="25">
+                        <div class="flex items-start gap-2"><span>25.</span> <div>The 1920s are often considered ________ of jazz music due to the incredible amount of talent.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q25" value="a"> a) the golden age</label>
+                            <label class="mcq-option"><input type="radio" name="q25" value="b"> b) a blast from the past</label>
+                            <label class="mcq-option"><input type="radio" name="q25" value="c"> c) poetry in motion</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="26">
+                        <div class="flex items-start gap-2"><span>26.</span> <div>Walking through the ancient ruins made me feel like I had ________.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q26" value="a"> a) set the stage</label>
+                            <label class="mcq-option"><input type="radio" name="q26" value="b"> b) turned back the clock</label>
+                            <label class="mcq-option"><input type="radio" name="q26" value="c"> c) drawn a blank</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="27">
+                        <div class="flex items-start gap-2"><span>27.</span> <div>The museum offers a VIP tour where you can see how artifacts are restored ________.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q27" value="a"> a) behind the scenes</label>
+                            <label class="mcq-option"><input type="radio" name="q27" value="b"> b) in the limelight</label>
+                            <label class="mcq-option"><input type="radio" name="q27" value="c"> c) in broad strokes</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="28">
+                        <div class="flex items-start gap-2"><span>28.</span> <div>The astronauts ________ when they finally landed on the moon.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q28" value="a"> a) made history</label>
+                            <label class="mcq-option"><input type="radio" name="q28" value="b"> b) scratched the surface</label>
+                            <label class="mcq-option"><input type="radio" name="q28" value="c"> c) put us in the picture</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="29">
+                        <div class="flex items-start gap-2"><span>29.</span> <div>Hearing that old song on the radio was a real ________ to my high school days.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q29" value="a"> a) thing of the past</label>
+                            <label class="mcq-option"><input type="radio" name="q29" value="b"> b) blast from the past</label>
+                            <label class="mcq-option"><input type="radio" name="q29" value="c"> c) work of art</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="30">
+                        <div class="flex items-start gap-2"><span>30.</span> <div>Watching the ballet dancers perform on stage was simply ________.<span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q30" value="a"> a) poetry in motion</label>
+                            <label class="mcq-option"><input type="radio" name="q30" value="b"> b) a blank canvas</label>
+                            <label class="mcq-option"><input type="radio" name="q30" value="c"> c) behind the scenes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>V.</span>
+                    <span>Idioms & Expressions (Meaning)</span>
+                </div>
+                <div class="italic text-sm mb-4">Choose the correct expression that matches the definition.</div>
+
+                <div class="space-y-6 ml-6">
+                    <div class="q-item" data-q="31">
+                        <div class="flex items-start gap-2"><span>31.</span> <div>To understand a situation without needing all the details. <span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q31" value="a"> a) to get the picture</label>
+                            <label class="mcq-option"><input type="radio" name="q31" value="b"> b) to scratch the surface</label>
+                            <label class="mcq-option"><input type="radio" name="q31" value="c"> c) to draw a blank</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="32">
+                        <div class="flex items-start gap-2"><span>32.</span> <div>To tell someone the facts about a situation so they are updated. <span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q32" value="a"> a) to make history</label>
+                            <label class="mcq-option"><input type="radio" name="q32" value="b"> b) to put someone in the picture</label>
+                            <label class="mcq-option"><input type="radio" name="q32" value="c"> c) to set the stage</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="33">
+                        <div class="flex items-start gap-2"><span>33.</span> <div>Recorded forever in historical documents. <span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q33" value="a"> a) down in the annals of history</label>
+                            <label class="mcq-option"><input type="radio" name="q33" value="b"> b) a blast from the past</label>
+                            <label class="mcq-option"><input type="radio" name="q33" value="c"> c) behind the scenes</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="34">
+                        <div class="flex items-start gap-2"><span>34.</span> <div>A general description without detailing specific facts. <span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q34" value="a"> a) a blank canvas</label>
+                            <label class="mcq-option"><input type="radio" name="q34" value="b"> b) broad strokes</label>
+                            <label class="mcq-option"><input type="radio" name="q34" value="c"> c) the golden age</label>
+                        </div>
+                    </div>
+
+                    <div class="q-item" data-q="35">
+                        <div class="flex items-start gap-2"><span>35.</span> <div>To prepare for something or make something possible. <span class="correction-area"></span></div></div>
+                        <div class="mcq-grid" style="grid-template-columns: 1fr;">
+                            <label class="mcq-option"><input type="radio" name="q35" value="a"> a) to set the stage</label>
+                            <label class="mcq-option"><input type="radio" name="q35" value="b"> b) to turn back the clock</label>
+                            <label class="mcq-option"><input type="radio" name="q35" value="c"> c) to paint a picture of</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-10">
+                <div class="section-title flex gap-4">
+                    <span>VI.</span>
+                    <span>Idioms (Direct Recall)</span>
+                </div>
+                <div class="italic text-sm mb-4">Complete the idioms by filling in <span class="font-bold underline">exactly ONE word</span>. (No word bank provided).</div>
+
+                <div class="space-y-4 ml-6">
+                    <div class="q-item" data-q="36">36. With the rise of digital streaming, physical DVDs are quickly becoming a thing of the <input type="text" class="blank-input w-24" id="q36" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="37">37. I tried to remember the name of the famous painter, but I just drew a <input type="text" class="blank-input w-24" id="q37" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="38">38. Many historical figures only found themselves in the <input type="text" class="blank-input w-32" id="q38" autocomplete="off"> after their deaths.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="39">39. Leonardo da Vinci's flying machines proved he was centuries ahead of his <input type="text" class="blank-input w-24" id="q39" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="40">40. We have been studying this ancient civilization for years, but we've only begun to scratch the <input type="text" class="blank-input w-32" id="q40" autocomplete="off">.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="submit-bar">
+        <div class="text-sm text-slate-500 italic hidden md:block">Export or Submit</div>
+        
+        <div class="flex gap-2 hide-print">
+            <button type="button" onclick="window.print()" class="px-4 py-2 border-2 border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2" title="Print as PDF">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                PDF
+            </button>
+            <button type="button" onclick="exportWord()" class="px-4 py-2 border-2 border-blue-200 rounded-lg text-blue-700 font-bold hover:bg-blue-50 transition-colors flex items-center gap-2" title="Export as MS Word">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Word
+            </button>
+            <button type="button" onclick="exportMarkdown()" class="px-4 py-2 border-2 border-slate-800 rounded-lg text-slate-800 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2" title="Export as Markdown">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                .MD
+            </button>
+        </div>
+
+        <button type="button" onclick="gradeTest()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg shadow-blue-500/30 transition-colors text-lg flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Submit for Grading
+        </button>
+    </div>
+
+    <script>
+        // Dynamically shuffle word banks on page load
+        function shuffleWordBanks() {
+            document.querySelectorAll('.word-bank').forEach(bank => {
+                const words = Array.from(bank.children);
+                for (let i = words.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [words[i], words[j]] = [words[j], words[i]];
+                }
+                words.forEach(word => bank.appendChild(word));
+            });
+        }
+        
+        shuffleWordBanks();
+
+        const answerKey = {
+            // Part 1: Core Gap Fill
+            q1: ["masterpiece"], q2: ["artifacts", "artifact"], q3: ["abstract"], q4: ["curator"], q5: ["exhibition"],
+            q6: ["antiquity"], q7: ["renaissance"], q8: ["portrait"], q9: ["calligraphy"], q10: ["monument"],
+            
+            // Part 2: Word Forms
+            q11: ["aesthetic"], q12: ["sculptor"], q13: ["preserve"], q14: ["intricately"], q15: ["patronage"],
+            
+            // Part 3: Stress Pattern MCQ
+            q16: "d", q17: "c", q18: "b", q19: "a", q20: "b",
+            
+            // Part 4: Idioms MCQ Context
+            q21: "a", q22: "b", q23: "a", q24: "b", q25: "a", q26: "b", q27: "a", q28: "a", q29: "b", q30: "a",
+            
+            // Part 5: Idiom Meaning
+            q31: "a", q32: "b", q33: "a", q34: "b", q35: "a",
+            
+            // Part 6: Idiom Completion
+            q36: ["past"], q37: ["blank"], q38: ["limelight"], q39: ["time"], q40: ["surface"]
+        };
+
+        const explanations = {
+            q16: "'avant-garde' is stressed on the 3rd syllable (a-vant-GARDE), others are on the 1st.",
+            q17: "'curator' is stressed on the 2nd syllable (cu-RA-tor), others are on the 1st.",
+            q18: "'exhibition' is stressed on the 3rd syllable (ex-hi-BI-tion), others are on the 2nd.",
+            q19: "'renaissance' is stressed on the 2nd/3rd syllable (re-NAIS-sance), others are on the 1st.",
+            q20: "'preservation' is stressed on the 3rd syllable (pres-er-VA-tion), others are on the 1st."
+        };
+
+        const tickSVG = `<svg class="mark-icon text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+        const crossSVG = `<svg class="mark-icon text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+        function exportWord() {
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                 "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                 "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                 "<head><meta charset='utf-8'><title>Export HTML to Word</title></head><body>";
+            const footer = "</body></html>";
+            
+            const clone = document.getElementById('test-container').cloneNode(true);
+            
+            const gradeDisplay = clone.querySelector('#grade-display');
+            if(gradeDisplay) gradeDisplay.remove();
+            clone.querySelectorAll('.correction-area').forEach(el => el.remove());
+            
+            clone.querySelectorAll('input[type="text"]').forEach(input => {
+                const blank = document.createTextNode(' __________________ ');
+                input.parentNode.replaceChild(blank, input);
+            });
+            
+            clone.querySelectorAll('input[type="radio"]').forEach(input => {
+                const box = document.createTextNode('○ ');
+                input.parentNode.replaceChild(box, input);
+            });
+
+            clone.querySelectorAll('.word-bank').forEach(wb => {
+                wb.style.border = "1px solid black";
+                wb.style.padding = "10px";
+                wb.style.textAlign = "center";
+                wb.style.lineHeight = "2";
+            });
+
+            const html = header + clone.innerHTML + footer;
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Speaking_Vocab_Art_History.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportMarkdown() {
+            let md = "# Speaking Vocab | Art & History\n\n";
+            md += "**Name:** __________________\n";
+            md += "**Date:** __________________\n\n";
+            md += "---\n\n";
+
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const titleEl = section.querySelector('.section-title');
+                if(titleEl) md += "### " + titleEl.innerText.replace(/\s+/g, ' ').trim() + "\n\n";
+
+                const wordBank = section.querySelector('.word-bank');
+                if(wordBank) {
+                    const words = Array.from(wordBank.querySelectorAll('span')).map(s => s.innerText);
+                    md += "**Word Bank:** " + words.join(', ') + "\n\n";
+                }
+
+                const questions = section.querySelectorAll('.q-item');
+                questions.forEach(q => {
+                    const qClone = q.cloneNode(true);
+                    const corr = qClone.querySelector('.correction-area');
+                    if(corr) corr.remove();
+
+                    qClone.querySelectorAll('input[type="text"]').forEach(input => {
+                        const blank = document.createTextNode(' ________ ');
+                        input.parentNode.replaceChild(blank, input);
+                    });
+
+                    const mcqGrid = qClone.querySelector('.mcq-grid');
+                    if (mcqGrid) {
+                        const qTextEl = qClone.querySelector('.flex.items-start > div:last-child, .flex.items-center');
+                        let qText = qClone.innerText.split('\n')[0].trim();
+                        if(qTextEl) qText = qTextEl.innerText.trim();
+                        
+                        md += qText + "\n";
+                        
+                        const options = mcqGrid.querySelectorAll('.mcq-option');
+                        options.forEach(opt => md += "- [ ] " + opt.innerText.trim() + "\n");
+                        md += "\n";
+                    } else {
+                        md += qClone.innerText.replace(/\s+/g, ' ').trim() + "\n\n";
+                    }
+                });
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Speaking_Vocab_Art_History.md';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function gradeTest() {
+            let score = 0;
+            let totalQuestions = Object.keys(answerKey).length;
+
+            for (let id in answerKey) {
+                let isCorrect = false;
+                let userAnswer = "";
+                let expectedAnswer = "";
+                const container = document.querySelector(`.q-item[data-q="${id.replace('q', '')}"]`);
+                if(!container) continue; 
+                
+                const correctionArea = container.querySelector('.correction-area');
+                correctionArea.innerHTML = '';
+                
+                // Handle Text Inputs
+                if (Array.isArray(answerKey[id])) {
+                    const inputEl = document.getElementById(id);
+                    inputEl.classList.remove('graded-correct', 'graded-incorrect');
+                    
+                    userAnswer = inputEl.value.trim().toLowerCase().replace(/[.,]/g, '');
+                    expectedAnswer = answerKey[id][0]; 
+                    
+                    if (answerKey[id].includes(userAnswer)) {
+                        isCorrect = true;
+                        inputEl.classList.add('graded-correct');
+                        correctionArea.innerHTML = tickSVG;
+                    } else {
+                        inputEl.classList.add('graded-incorrect');
+                        correctionArea.innerHTML = crossSVG + ` <span class="correction-text">${expectedAnswer}</span>`;
+                    }
+                    inputEl.readOnly = true;
+                } 
+                // Handle Radio Buttons
+                else {
+                    const radios = document.getElementsByName(id);
+                    expectedAnswer = answerKey[id];
+                    
+                    for (let radio of radios) {
+                        radio.disabled = true;
+                        if (radio.checked) userAnswer = radio.value;
+                    }
+
+                    let explanationHTML = "";
+                    if (explanations[id]) {
+                        explanationHTML = ` <span class="text-[0.95rem] text-slate-500 font-normal italic ml-2">(${explanations[id]})</span>`;
+                    }
+
+                    if (userAnswer === expectedAnswer) {
+                        isCorrect = true;
+                        correctionArea.innerHTML = tickSVG + explanationHTML;
+                    } else {
+                        correctionArea.innerHTML = crossSVG + ` <span class="correction-text">Correct answer: ${expectedAnswer.toUpperCase()}</span>` + explanationHTML;
+                    }
+                }
+
+                if (isCorrect) score++;
+            }
+
+            // Display Final Score
+            const gradeDisplay = document.getElementById('grade-display');
+            document.getElementById('final-score').textContent = score;
+            
+            // Calculate percentage for styling
+            const percentage = (score / totalQuestions) * 100;
+            if(percentage >= 80) {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-green-600 rounded-full flex flex-col items-center justify-center text-green-600 transform rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-green-600 w-16 text-center mt-1 pt-1 font-sans";
+            } else if (percentage >= 60) {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-blue-600 rounded-full flex flex-col items-center justify-center text-blue-600 transform -rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-blue-600 w-16 text-center mt-1 pt-1 font-sans";
+            } else {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-red-600 rounded-full flex flex-col items-center justify-center text-red-600 transform rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-red-600 w-16 text-center mt-1 pt-1 font-sans";
+            }
+            
+            gradeDisplay.querySelector('.border-t-[3px]').innerHTML = `/${totalQuestions}`;
+            gradeDisplay.classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const submitBar = document.querySelector('.submit-bar');
+            submitBar.innerHTML = `
+                <button type="button" onclick="location.reload()" class="px-8 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold shadow-lg transition-colors text-lg flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Clear Answers & Retake
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>
