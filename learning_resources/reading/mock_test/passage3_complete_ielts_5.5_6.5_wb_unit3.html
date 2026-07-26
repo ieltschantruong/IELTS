@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio & Checkbox Styling */
+        input[type="radio"], input[type="checkbox"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Inline Drop Zone for Summary */
+        .summary-drop-zone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            height: 28px;
+            padding: 0 8px;
+            margin: 0 4px;
+            border: 2px dashed #9ca3af;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #a03046;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+        .summary-drop-zone.filled {
+            border: 2px solid #d75872;
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .summary-drop-zone.correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        .summary-drop-zone.incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <!-- Left Pane: Passage -->
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">STRICTLY ENGLISH</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">British newspaper columnist Simon Heffer talks about his new book, 'Strictly English: the Correct Way to Write... and Why It Matters', aimed at native speakers</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p>For the last couple of years I have sent a round-robin email to my colleagues at this newspaper every few weeks pointing out to them mistakes that we make in our use of the English language. <span id="exp-q1" class="explanation-target">Happily, these are reasonably rare.</span> The emails have been circulated on the Internet- and are now available on the paper's website- and one of them ended up in the inbox of a publisher at Random House about this time last year. He asked me whether I would write a book not just on what constituted correct English, but also why it matters. The former is relatively easy to do, once one has armed oneself with the Oxford English Dictionary (OED) and some reputable grammar books by way of research materials. <span id="exp-q2" class="explanation-target">The latter, being a matter for debate, is less straightforward.</span></p>
+
+                    <p>I suppose my own interest in language started at school. Having studied French, Latin and Greek, I saw clearly how those languages had exported words into our own. When I studied German later on, I could see even more clearly why it was the sister tongue and what an enormous impact it had had on English. I saw that words had specific meanings and that, for the avoidance of doubt, it was best to use them in the correct way. <span id="exp-q3" class="explanation-target">Most of all, I became fascinated by grammar, and especially by the logic that drove it and that was common to all the other languages I knew.</span> I did not intend in those days to earn a living by writing; but I was keen to ensure that my use of English was, as far as possible, correct.</p>
+
+                    <p>Studying English at university forced me to focus even more intently on what words actually meant: why would a writer choose that noun rather than another and why that adjective- or, in George Orwell's case, often no adjective at all. <span id="exp-q4" class="explanation-target">Was the ambiguity in a certain order of words deliberate or accidental? The whole question of communication is rooted in such things.</span> For the second part of my degree I specialised in the history of the English language, studying how words had changed their meaning and how grammar had evolved. Language had become not just a tool for me, but something of a hobby.</p>
+
+                    <p><span id="exp-q5" class="explanation-target">Can English, though, ever be fixed? Of course not</span>: if you read a passage from Chaucer you will see that the meaning of words and the framework of grammar has shifted over the centuries, and both will continue to evolve. But we have had a standard dictionary now ever since the OED was completed in 1928, and <span id="exp-q6" class="explanation-target">learned men</span>, many of whom contributed to the OED, wrote grammars a century ago that established a pattern of language that was logical and free from the danger of ambiguity.</p>
+
+                    <p>It is to these standards that I hope Strictly English is looking. Our language is to a great extent settled and codified, and to <span id="exp-q7" class="explanation-target">a standard that people recognise and are comfortable with</span>. All my book does is describe and commend that standard, and <span id="exp-q8" class="explanation-target">help people towards a capable grasp of the English tongue</span>. We shall always need new words to describe new things; but we don't need the wrong word to describe the right thing, when the right word exists. Also, <span id="exp-q9" class="explanation-target">English grammar shouldn't be a matter for debate.</span> It has a coherent and logical structure and we should stick to it.</p>
+
+                    <p>Some groups of people - state officials, academics, lawyers, certain breeds of scientist-talk to each other in a private language. Some official documents make little sense to lay people because they have to be written in a language that combines avoidance of the politically incorrect with constant use of the contemporary jargon of the profession. Some articles written by academics in particular are almost incomprehensible to those outside their circle. This is not because the outsiders are stupid. <span id="exp-q10" class="explanation-target">It is because the academics feel they have to write in a certain stilted, dense way in order to be taken seriously by their peers.</span></p>
+
+                    <p>Many officials seem to have lost the knack of communicating with people outside their closed world. Some academics, however, are bilingual. <span id="exp-q11" class="explanation-target">If asked to write for a publication outside the circle - such as a newspaper- they can rediscover the knack of writing reasonably plain English.</span> They do not indulge themselves in such a fashion when they write for learned journals. It is almost as though the purpose of such writing is not to be clear: that the writer is recording research in order to prove to peers or superiors that he has discovered something. It does not seem to bother such people that their style is considered ugly and barbaric by anyone of discernment. It is repetitious, long-winded, abstract and abstruse. <span id="exp-q12" class="explanation-target">Those who write in such a way probably will not easily be discouraged, unless what is considered acceptable within their disciplines changes.</span></p>
+
+                    <p><span id="exp-q14" class="explanation-target">The ideal style is one comprehensible to any intelligent person.</span> If you make a conscious decision to communicate with a select group, so be it: but in trying to appeal to a large audience, or even a small one that you wish to be sure will understand your meaning, writing of the sort mentioned above will not do. This sort of writing used to be kept from the general public thanks to the need to find someone to publish it. <span id="exp-q13" class="explanation-target">The advent of the Internet means that it is now much more widespread than it used to be; and the fact that it is now so common and so accessible means that this sort of writing is having a harmful effect on the language and causing it to be corrupted.</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Questions -->
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: YES/NO/NOT GIVEN -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-4</h3>
+                        <p class="text-sm text-gray-800">Do the following statements agree with the views of the writer in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 mt-2 space-y-1">
+                            <li><strong class="text-brand-700">YES</strong> if the statement agrees with the views of the writer</li>
+                            <li><strong class="text-brand-700">NO</strong> if the statement contradicts the views of the writer</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const ynnQuestions = [
+                                { q: 1, text: "The mistakes made by his colleagues are minor ones.", exp: 'not-given' },
+                                { q: 2, text: "It is difficult to explain why using correct English is important.", exp: ['exp-q2'] },
+                                { q: 3, text: "English grammar has a different function from the grammar of other languages.", exp: ['exp-q3'] },
+                                { q: 4, text: "Word order may be as important as the choice of words used.", exp: ['exp-q4'] }
+                            ];
+                            
+                            ynnQuestions.forEach(item => {
+                                const explanationCall = item.exp === 'not-given' ? `showNotGivenToast()` : `showExplanation(${JSON.stringify(item.exp)})`;
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-3 pl-9">
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="YES" onchange="updateRadioMap(${item.q})"> YES
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NO" onchange="updateRadioMap(${item.q})"> NO
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="updateRadioMap(${item.q})"> NOT GIVEN
+                                            </label>
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${explanationCall}'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Summary Completion (Word Bank) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 5-9</h3>
+                        <p class="text-sm text-gray-800 mb-2">Complete the summary using the list of words, A-H, below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a word, OR click a word then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm font-medium" id="words-bank">
+                            <div draggable="true" data-type="summary" data-val="A" data-display="A. simple" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">A. simple</div>
+                            <div draggable="true" data-type="summary" data-val="B" data-display="B. general" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">B. general</div>
+                            <div draggable="true" data-type="summary" data-val="C" data-display="C. controversial" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm text-center leading-tight">C. controversial</div>
+                            <div draggable="true" data-type="summary" data-val="D" data-display="D. permanent" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">D. permanent</div>
+                            <div draggable="true" data-type="summary" data-val="E" data-display="E. knowledgeable" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm text-center leading-tight">E. knowledgeable</div>
+                            <div draggable="true" data-type="summary" data-val="F" data-display="F. compulsory" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">F. compulsory</div>
+                            <div draggable="true" data-type="summary" data-val="G" data-display="G. historic" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">G. historic</div>
+                            <div draggable="true" data-type="summary" data-val="H" data-display="H. useful" class="draggable-item flex items-center justify-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">H. useful</div>
+                        </div>
+                    </div>
+
+                    <div class="text-gray-800 leading-loose text-[15px] bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-center text-lg mb-4 text-gray-900 border-b border-gray-300 pb-2">The rules of English</h4>
+                        <p class="mb-4">
+                            According to the writer, the English language should not be considered something 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="5">5</span>, 
+                            and this will always be the case. However, there have been accepted reference books for over a century that were produced by 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="6">6</span> 
+                            people, and these have established a system for the language that enables people to express themselves in a completely clear way.
+                        </p>
+                        <p>
+                            In his own book, the writer aims to describe and support the established rules of the language that are in 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="7">7</span> 
+                            use and that people are accustomed to. He also wants his book to be 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="8">8</span> 
+                            as a way of improving people's ability at the language. He believes that there is no reason why someone's use of vocabulary should not be correct and that grammar should not be a 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="9">9</span> 
+                            subject. In his view, a system of grammar rules exists and people should always obey those rules.
+                        </p>
+                        
+                        <!-- Dedicated Feedback Area for Q5-Q9 -->
+                        <div id="summary-feedback-area" class="hidden mt-6 pt-4 border-t border-gray-300 flex-col gap-3">
+                            <h5 class="font-bold text-sm text-gray-700 uppercase tracking-wider mb-1">Summary Answers Review</h5>
+                            <!-- Javascript will inject correct markers and explanation buttons here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Multiple Choice -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-14</h3>
+                        <p class="text-sm text-gray-800">Choose the correct letter, <strong class="text-brand-700">A, B, C</strong> or <strong class="text-brand-700">D</strong>.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <script>
+                            const mcqQuestions = [
+                                {
+                                    q: 10,
+                                    text: "The writer says that some groups of people use a 'private language' because",
+                                    options: [
+                                        { val: 'A', text: "they do not want outsiders to be able to understand them." },
+                                        { val: 'B', text: "they want to show their superiority over other groups." },
+                                        { val: 'C', text: "they want to impress other members of their group." },
+                                        { val: 'D', text: "they do not want to use the same language as other groups." }
+                                    ],
+                                    exp: ['exp-q10']
+                                },
+                                {
+                                    q: 11,
+                                    text: "According to the writer, some academics are capable of",
+                                    options: [
+                                        { val: 'A', text: "making sense to people outside their group." },
+                                        { val: 'B', text: "writing very clearly for learned journals." },
+                                        { val: 'C', text: "changing the way they communicate within their own group." },
+                                        { val: 'D', text: "explaining other people's work to the general public." }
+                                    ],
+                                    exp: ['exp-q11']
+                                },
+                                {
+                                    q: 12,
+                                    text: "The writer believes that the use of 'private language' by academics will",
+                                    options: [
+                                        { val: 'A', text: "eventually be adopted by the general public." },
+                                        { val: 'B', text: "be banned by publication editors." },
+                                        { val: 'C', text: "lead to a decline in their academic reputation." },
+                                        { val: 'D', text: "continue unless there is a shift in their professional standards." }
+                                    ],
+                                    exp: ['exp-q12']
+                                },
+                                {
+                                    q: 13,
+                                    text: "What point does the writer make about the Internet in the final paragraph?",
+                                    options: [
+                                        { val: 'A', text: "It has encouraged the general public to write more clearly." },
+                                        { val: 'B', text: "It has made it harder to find publishers for academic articles." },
+                                        { val: 'C', text: "It has allowed poor writing styles to spread more widely." },
+                                        { val: 'D', text: "It has restricted the audience for specialized academic writing." }
+                                    ],
+                                    exp: ['exp-q13']
+                                },
+                                {
+                                    q: 14,
+                                    text: "What is the writer's overall main point in the passage?",
+                                    options: [
+                                        { val: 'A', text: "English grammar should be simplified for the Internet age." },
+                                        { val: 'B', text: "Clear and accessible English should be the standard for all writers." },
+                                        { val: 'C', text: "Academics make the most significant contributions to the English language." },
+                                        { val: 'D', text: "The history of English shows that rules are unnecessary." }
+                                    ],
+                                    exp: ['exp-q14']
+                                }
+                            ];
+
+                            mcqQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed mt-0.5">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-col gap-2 pl-9">
+                                            ${item.options.map(opt => `
+                                                <label class="radio-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                    <input type="radio" name="q${item.q}" value="${opt.val}" onchange="updateRadioMap(${item.q})" class="mt-0.5 shrink-0">
+                                                    <span class="font-bold text-brand-700">${opt.val}.</span> <span class="leading-snug">${opt.text}</span>
+                                                </label>
+                                            `).join('')}
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-4 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: "NOT GIVEN", 2: "YES", 3: "NO", 4: "YES", // Q1-4
+            5: "D", 6: "E", 7: "B", 8: "H", 9: "C",      // Q5-9 (Summary word bank)
+            10: "C", 11: "A", 12: "D", 13: "C", 14: "B"  // Q10-14 (MCQ)
+        };
+
+        const SUMMARY_DISPLAYS = {
+            "A": "A. simple",
+            "B": "B. general",
+            "C": "C. controversial",
+            "D": "D. permanent",
+            "E": "E. knowledgeable",
+            "F": "F. compulsory",
+            "G": "G. historic",
+            "H": "H. useful"
+        };
+
+        const TOTAL_QS = 14;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.summary-drop-zone[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        // Mechanics: Drag & Drop + Click-to-Apply for Summary
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.summary-drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.summary-drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-2', 'ring-brand-300'); });
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-2', 'ring-brand-300'); });
+                zone.addEventListener('dragleave', () => { zone.classList.remove('ring-2', 'ring-brand-300'); });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-2', 'ring-brand-300');
+                    if (isSubmitted) return;
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+                    const qNum = zone.dataset.q;
+
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        // Clear zone
+                        if (zone.classList.contains('filled')) {
+                            zone.textContent = qNum; // Reset back to just the number
+                            zone.classList.remove('filled');
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.add('filled');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.summary-drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // Grade Q1-Q4 (Y/N/NG)
+            for (let i = 1; i <= 4; i++) {
+                const uAns = userAnswers[i].toUpperCase();
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(key), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                }
+                if (uAns !== '') {
+                     const correctLabel = qRow.querySelector(`input[value="${key}"]`);
+                     if(correctLabel) correctLabel.parentElement.classList.add('font-bold', 'text-green-800');
+                }
+            }
+
+            // Grade Q5-Q9 (Summary Word Bank)
+            const summaryFeedbackArea = document.getElementById('summary-feedback-area');
+            const summaryExps = {
+                5: 'exp-q5', 6: 'exp-q6', 7: 'exp-q7', 8: 'exp-q8', 9: 'exp-q9'
+            };
+            
+            for (let i = 5; i <= 9; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const dropZone = document.querySelector(`.summary-drop-zone[data-q="${i}"]`);
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    dropZone.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    dropZone.classList.add('incorrect');
+                }
+
+                // Add to dedicated feedback area below the summary
+                const itemFeedback = document.createElement('div');
+                itemFeedback.className = 'flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200 shadow-sm';
+                
+                let markerHtml = '';
+                if(isCorrect) {
+                    markerHtml = `<span class="w-6 h-6 shrink-0 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${i}</span>
+                                  <span class="text-sm font-bold text-green-700">${SUMMARY_DISPLAYS[key]}</span>`;
+                } else {
+                    markerHtml = `<span class="w-6 h-6 shrink-0 ${uAns==='' ? 'bg-yellow-400' : 'bg-red-500'} text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${i}</span>
+                                  <span class="text-sm text-gray-500 line-through mr-2">${uAns ? SUMMARY_DISPLAYS[uAns] : 'Blank'}</span>
+                                  <span class="text-sm font-bold text-green-700">Correct: ${SUMMARY_DISPLAYS[key]}</span>`;
+                }
+
+                itemFeedback.innerHTML = `
+                    ${markerHtml}
+                    <button class="ml-auto text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick="showExplanation(['${summaryExps[i]}'])">Explanation</button>
+                `;
+                summaryFeedbackArea.appendChild(itemFeedback);
+            }
+            summaryFeedbackArea.classList.remove('hidden');
+            summaryFeedbackArea.classList.add('flex');
+
+
+            // Grade Q10-Q14 (MCQ)
+            for (let i = 10; i <= 14; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(key), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect and correct radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                }
+                const correctLabel = qRow.querySelector(`input[value="${key}"]`);
+                if(correctLabel) {
+                    correctLabel.parentElement.classList.add('bg-green-50', 'border-green-300', 'font-bold', 'text-green-900');
+                }
+            }
+
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function showNotGivenToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
