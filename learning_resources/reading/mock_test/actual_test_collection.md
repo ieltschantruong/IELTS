@@ -1225,7 +1225,7 @@ iii The pressure of restraining an outgoing nature
 iv Why researchers decided to focus on the workplace
 v How does personality influence your choice of career?
 vi Examples of various contexts in which we might need to act out of character
-vii How workplace facilities aid the success of one personality type
+vii How workplace facilities aid the success of different personality types
 viii Learning by trial and error
 ix The concept of 'free traits' and personal projects
 x The biological basis of personality types
@@ -1272,7 +1272,7 @@ D. One that encourages employees to always act naturally without restraint
 15. iv
 16. vi
 17. xi
-18. ii
+18. vii
 19. i
 20. ii
 21. free traits
