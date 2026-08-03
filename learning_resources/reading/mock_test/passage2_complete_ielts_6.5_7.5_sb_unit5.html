@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+        
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 140px;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">20:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 2</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Last man standing</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">Some 50,000 years ago, Homo sapiens beat other hominids to become the only surviving species. Kate Ravilious reveals how we did it.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><strong>A.</strong> Today, there are over seven billion people living on Earth. No other species has exerted as much influence over the planet as us. But turn the clock back 80,000 years and we were one of a number of species roaming the Earth. Our own species, Homo sapiens (Latin for 'wise man'], was most successful in Africa. In western Eurasia, the Neanderthals dominated, while Homo erectus may have lived in Indonesia. Meanwhile, <span id="exp-q3" class="explanation-target">an unusual finger bone and tooth, discovered in Denisova cave in Siberia in 2008, have led scientists to believe that yet another human population - the Denisovans - may also have been widespread across Asia.</span> Somewhere along the line, these other human species died out, leaving Homo sapiens as the sole survivor. So what made us the winners in the battle for survival?</p>
+
+                    <p><strong>B.</strong> Some 74,000 years ago, the Toba 'supervolcano' on the Indonesian island of Sumatra erupted. The scale of the event was so great that ash from the eruption was flung as far as eastern India, more than 2,000 kilometres away. Oxford archaeologist Mike Petraglia and his team have uncovered thousands of stone tools buried underneath the Toba ash. The mix of hand axes and spear tips have led Petraglia to speculate that Homo sapiens and Homo erectus were both living in eastern India prior to the Toba eruption. <span id="exp-q6" class="explanation-target">Based on careful examination of the tools and dating of the sediment layers where they were found</span>, Petraglia and his team suggest that Homo sapiens arrived in eastern India around 78,000 years ago, migrating out of Africa and across Arabia during a favourable climate period. After their arrival, the simple tools belonging to Homo erectus seemed to lessen in number and eventually disappear completely. “We think that Homo sapiens had a more efficient hunting technology, which could have given them the edge,” says Petraglia. “<span id="exp-q12" class="explanation-target">Whether the eruption of Toba also played a role in the extinction of the Homo erectus-like species is unclear to us.</span>”</p>
+
+                    <p><strong>C.</strong> Some 45,000 years later, another fight for survival took place. This time, the location was Europe and the protagonists were another species, the Neanderthals. They were a highly successful species that dominated the European landscape for 300,000 years. Yet within just a few thousand years of the arrival of Homo sapiens, their numbers plummeted. They eventually disappeared from the landscape around 30,000 years ago, with <span id="exp-q5" class="explanation-target">their last known refuge being southern Iberia, including Gibraltar.</span> Initially, Homo sapiens and Neanderthals lived alongside each other and had no reason to compete. But then Europe's climate swung into a cold, inhospitable, dry phase. '<span id="exp-q13" class="explanation-target">Neanderthal and Homo sapiens populations had to retreat to refugia [pockets of habitable land]. This heightened competition between the two groups,' explains Chris Stringer</span>, anthropologist at the Natural History Museum in London.</p>
+
+                    <p><strong>D.</strong> <span id="exp-q1" class="explanation-target">Both species were strong and stockier than the average human today, but Neanderthals were particularly robust. 'Their skeletons show that they had broad shoulders and thick necks,' says Stringer. 'Homo sapiens, on the other hand, had longer forearms, which undoubtedly enabled them to throw a spear from some distance, with less danger and using relatively little energy,' explains Stringer.</span> This long-range ability may have given Homo sapiens an advantage in hunting. When it came to keeping warm, Homo sapiens had another skill: weaving and sewing. <span id="exp-q7" class="explanation-target">Archaeologists have uncovered simple needles fashioned from ivory and bone alongside Homo sapiens</span>, dating as far back as 35,000 years ago. "Using this technology. we could use animal skins to make ourselves tents, warm clothes and fur boots,' says Stringer. In contrast, Neanderthals never seemed to master sewing skills, instead relying on pinning skins together with thorns.</p>
+
+                    <p><strong>E.</strong> A thirst for exploration provided Homo sapiens with another significant advantage over Neanderthals. <span id="exp-q2" class="explanation-target">Objects such as shell beads and flint tools, discovered many miles from their source, show that our ancestors travelled over large distances, in order to barter and exchange useful materials</span>, and share ideas and knowledge. By contrast, Neanderthals tended to keep themselves to themselves, living in small groups. They misdirected their energies by only gathering resources from their immediate surroundings and perhaps <span id="exp-q8" class="explanation-target">failing to discover new technologies</span> outside their territory.</p>
+
+                    <p><strong>F.</strong> Some of these differences in behaviour may have emerged because the two species thought in different ways. <span id="exp-q9" class="explanation-target">By comparing skull shapes, archaeologists have shown that Homo sapiens had a more developed temporal lobe</span> - the regions at the side of the brain, associated with listening, language and long-term memory. '<span id="exp-q11" class="explanation-target">We think that Homo sapiens had a significantly more complex language than Neanderthals and were able to comprehend and discuss concepts such as the distant past and future," says Stringer.</span> Penny Spikins, an archaeologist at the University of York, has recently suggested that Homo sapiens may also have had a greater diversity of brain types than Neanderthals. 'Our research indicates that high-precision tools, new hunting technologies and the development of symbolic communication may all have come about because they were willing to include people with "different" minds and specialised roles in their society,' she explains. "<span id="exp-q10" class="explanation-target">We see similar kinds of injuries on male and female Neanderthal skeletons, implying there was no such division of labour,' says Spikins.</span></p>
+
+                    <p><strong>G.</strong> Thus by around 30,000 years ago, many talents and traits were well established in Homo sapiens societies but still absent from Neanderthal communities. Stringer thinks that the Neanderthals were just living in the wrong place at the wrong time. "<span id="exp-q4" class="explanation-target">They had to compete with Homo sapiens during a phase of very unstable climate across Europe. During each rapid climate fluctuation, they may have suffered greater losses of people than Homo sapiens, and thus were slowly worn down,' he says. "If the climate had remained stable throughout, they might still be here.'</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: Matching Information -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800 mb-2">The Reading passage has seven paragraphs, <strong>A-G</strong>.</p>
+                        <p class="text-sm text-gray-800 mb-2">Which paragraph contains the following information?</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a letter, OR click a letter then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Letters Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <div class="flex flex-wrap gap-2 justify-center" id="letters-bank-1">
+                            <div draggable="true" data-type="paragraph" data-val="A" data-display="A" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">A</div>
+                            <div draggable="true" data-type="paragraph" data-val="B" data-display="B" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">B</div>
+                            <div draggable="true" data-type="paragraph" data-val="C" data-display="C" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">C</div>
+                            <div draggable="true" data-type="paragraph" data-val="D" data-display="D" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">D</div>
+                            <div draggable="true" data-type="paragraph" data-val="E" data-display="E" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">E</div>
+                            <div draggable="true" data-type="paragraph" data-val="F" data-display="F" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">F</div>
+                            <div draggable="true" data-type="paragraph" data-val="G" data-display="G" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">G</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const q1To5 = [
+                                { q: 1, text: "a comparison of a range of physical features of Neanderthals and Homo sapiens", exp: ['exp-q1'] },
+                                { q: 2, text: "reference to items that were once used for trade", exp: ['exp-q2'] },
+                                { q: 3, text: "mention of evidence for the existence of a previously unknown human species", exp: ['exp-q3'] },
+                                { q: 4, text: "mention of the part played by ill fortune in the downfall of Neanderthal society", exp: ['exp-q4'] },
+                                { q: 5, text: "reference to the final geographical location of Neanderthals", exp: ['exp-q5'] }
+                            ];
+                            q1To5.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-start gap-3 flex-1">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-1">${item.q}</span>
+                                            <span class="text-sm text-gray-700 leading-relaxed mt-1">${item.text}</span>
+                                        </div>
+                                        <div class="flex flex-col items-end shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                                            <div class="drop-zone w-16 h-10 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="paragraph" data-q="${item.q}"></div>
+                                            <div class="feedback-container hidden flex-col items-end w-full mt-2">
+                                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Sentence Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-9</h3>
+                        <p class="text-sm text-gray-800">Complete the sentences below. Choose <strong class="text-brand-700">NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Q6 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="6">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">6</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    Analysis of stone tools and <input type="text" id="input-q6" onkeyup="updateTextInput(6, this.value)" autocomplete="off" class="mx-2"> has enabled Petraglia's team to put forward an arrival date for Homo sapiens in eastern India.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q6"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="7">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">7</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    Homo sapiens used both <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off" class="mx-2"> to make sewing implements.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q7"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q8 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="8">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">8</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    The territorial nature of Neanderthals may have limited their ability to acquire resources and <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off" class="mx-2">.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q8"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q9 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="9">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">9</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    Archaeologists examined <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off" class="mx-2"> in order to get an insight into Neanderthal and Homo sapiens' capacity for language and thought.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q9"])'>View Explanation</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Matching Features -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-13</h3>
+                        <p class="text-sm text-gray-800 mb-2">Look at the following statements and the list of researchers, <strong>A-C</strong>, below.</p>
+                        <p class="text-sm text-gray-800 mb-2">Match each statement with the correct researcher.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a researcher, OR click a researcher then click a dashed box to apply.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-1 block">NB You may use any letter more than once.</p>
+                    </div>
+
+                    <!-- Researchers Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <h4 class="font-bold text-sm text-gray-700 mb-3 text-center uppercase tracking-wider">List of Researchers</h4>
+                        <div class="flex flex-wrap gap-3 justify-center text-sm font-medium" id="researchers-bank">
+                            <div draggable="true" data-type="researcher" data-val="A" data-display="A. Mike Petraglia" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">A</span> <span class="leading-tight">Mike Petraglia</span>
+                            </div>
+                            <div draggable="true" data-type="researcher" data-val="B" data-display="B. Chris Stringer" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">B</span> <span class="leading-tight">Chris Stringer</span>
+                            </div>
+                            <div draggable="true" data-type="researcher" data-val="C" data-display="C. Penny Spikins" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">C</span> <span class="leading-tight">Penny Spikins</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const q10To13 = [
+                                { q: 10, text: "No evidence can be found to suggest that Neanderthal communities allocated tasks to different members.", exp: ['exp-q10'] },
+                                { q: 11, text: "Homo sapiens may have been able to plan ahead.", exp: ['exp-q11'] },
+                                { q: 12, text: "Scientists cannot be sure whether a sudden natural disaster contributed to the loss of a human species.", exp: ['exp-q12'] },
+                                { q: 13, text: "Environmental conditions restricted the areas where Homo sapiens and Neanderthals could live.", exp: ['exp-q13'] }
+                            ];
+                            q10To13.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-start gap-3 w-full sm:w-2/3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <span class="text-sm text-gray-700 leading-relaxed">${item.text}</span>
+                                        </div>
+                                        <div class="flex flex-col items-start sm:items-end shrink-0 w-full sm:w-auto">
+                                            <div class="drop-zone w-full sm:w-48 min-h-[40px] px-3 py-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="researcher" data-q="${item.q}"></div>
+                                            <div class="feedback-container hidden flex-col items-start sm:items-end w-full mt-2">
+                                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            // Drag and Drop (Paragraphs)
+            1: "D", 2: "E", 3: "A", 4: "G", 5: "C",
+            // Text Input (Multiple acceptable variations)
+            6: ["sediment layers", "dating sediment layers"],
+            7: ["ivory and bone"],
+            8: ["technologies", "new technologies"],
+            9: ["skull shapes"],
+            // Drag and Drop (Researchers)
+            10: "C", 11: "B", 12: "A", 13: "B"
+        };
+
+        const PARA_DISPLAYS = {
+            "A": "A", "B": "B", "C": "C", "D": "D", "E": "E", "F": "F", "G": "G"
+        };
+
+        const RESEARCHER_DISPLAYS = {
+            "A": "A. Mike Petraglia",
+            "B": "B. Chris Stringer",
+            "C": "C. Penny Spikins"
+        };
+
+        let userAnswers = {};
+        for(let i=1; i<=13; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 20 * 60; // 20 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=13; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Dual Drag & Drop + Click-to-Apply
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { 
+                    e.preventDefault(); 
+                    if (!isSubmitted && (!activeSelection || activeSelection.type === zone.dataset.type)) {
+                        zone.classList.add('ring-4', 'ring-brand-300'); 
+                    }
+                });
+                zone.addEventListener('dragover', (e) => { 
+                    e.preventDefault(); 
+                });
+                zone.addEventListener('dragleave', () => { 
+                    zone.classList.remove('ring-4', 'ring-brand-300'); 
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                    if (isSubmitted) return;
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+
+                    if (activeSelection) {
+                        // Check if the type matches (e.g. don't drop a researcher into a paragraph question)
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection(); // Mismatched type, just clear
+                        }
+                    } else {
+                        // Clear the zone if nothing is selected
+                        if (zone.textContent) {
+                            zone.textContent = '';
+                            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            const qNum = zone.dataset.q;
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // Grade Q1-Q5 (Matching Paragraphs)
+            for (let i = 1; i <= 5; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                feedbackContainer.classList.remove('hidden');
+                
+                if (!isCorrect) {
+                    feedbackContainer.insertBefore(createCorrectMarker(PARA_DISPLAYS[key]), feedbackContainer.firstChild);
+                }
+            }
+
+            // Grade Q6-Q9 (Text Inputs)
+            for (let i = 6; i <= 9; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qBlock = document.querySelector(`.q-block[data-q="${i}"]`);
+                const feedbackContainer = qBlock.querySelector('.feedback-container');
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                }
+                
+                if (!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(ANSWER_KEYS[i][0]), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+            }
+
+            // Grade Q10-Q13 (Matching Researchers)
+            for (let i = 10; i <= 13; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                feedbackContainer.classList.remove('hidden');
+                
+                if (!isCorrect) {
+                    feedbackContainer.insertBefore(createCorrectMarker(RESEARCHER_DISPLAYS[key]), feedbackContainer.firstChild);
+                }
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
