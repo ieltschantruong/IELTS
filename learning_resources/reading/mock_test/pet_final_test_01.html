@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Final Test 01 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 800px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature (Locate) */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* User Highlighting Feature */
+        .user-hl { transition: background-color 0.2s ease; border-radius: 3px; padding: 0 2px; cursor: pointer; }
+        .user-hl:hover { filter: brightness(0.95); }
+        .user-hl-yellow { background-color: #fef08a; } /* bg-yellow-200 */
+        .user-hl-green { background-color: #bbf7d0; } /* bg-green-200 */
+        .user-hl-pink { background-color: #fbcfe8; } /* bg-pink-200 */
+        
+        ::selection { background-color: #e2e8f0; color: inherit; }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Cached DOM State Utilities */
+        .result-element { display: none; }
+        .is-result-mode .result-element { display: block; }
+        .is-result-mode .test-element { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col relative">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PET Final Test 01</h2>
+            <p class="text-gray-500 text-lg mb-8 uppercase tracking-widest font-medium">Academic Reading Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-left shadow-sm">
+                <h3 class="font-bold text-pink-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    Instructions
+                </h3>
+                <ul class="space-y-3 text-sm text-pink-800/80">
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can highlight text in both the passage and questions. The highlights will persist!</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report and explanations.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+                Start Mock Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Main View -->
+    <div id="view-main" class="hidden flex-auto flex flex-col overflow-hidden bg-white relative">
+        <!-- Result Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Mock Test Result</h2>
+                <p class="text-gray-400 text-sm">Review your performance and detailed explanations below.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Raw Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">--/40</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Time Used</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative"></nav>
+
+        <!-- Split View -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            <!-- Left Pane: Passage -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100 italic"></h2>
+                    <!-- Cached Passages Container -->
+                    <div id="passage-content-container" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions -->
+            <div id="pane-questions" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative">
+                    <!-- Cached Questions Container -->
+                    <div id="questions-content-container" class="space-y-10 pb-20"></div>
+                    
+                    <div id="floating-submit-container" class="mt-12 text-center border-t border-gray-200 pt-8 hidden">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-all w-full sm:w-auto">
+                            Submit Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigator -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-lg relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-widest mr-2">Questions:</span>
+                <div id="navigator-grid" class="flex gap-2"></div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 hidden md:flex items-center gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest"></div>
+        </div>
+    </div>
+
+    <!-- Highlight Toolbar -->
+    <div id="highlight-toolbar" class="hidden fixed z-50 bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2)] border border-gray-200 rounded-lg p-1.5 flex gap-1.5 transition-opacity transform -translate-x-1/2 -translate-y-full mt-[-10px]">
+        <button class="hl-btn bg-[#fef08a] hover:bg-[#fde047] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="yellow" title="Highlight Yellow"></button>
+        <button class="hl-btn bg-[#bbf7d0] hover:bg-[#86efac] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="green" title="Highlight Green"></button>
+        <button class="hl-btn bg-[#fbcfe8] hover:bg-[#f9a8d4] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="pink" title="Highlight Pink"></button>
+        <div class="w-[1px] bg-gray-200 mx-0.5 my-1"></div>
+        <button class="hl-btn bg-white hover:bg-gray-100 text-gray-500 hover:text-red-500 w-7 h-7 rounded-md border border-gray-200 shadow-sm flex items-center justify-center transition-all" data-color="clear" title="Remove Highlight">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </button>
+    </div>
+
+    <!-- Vocab Tooltip -->
+    <div id="vocab-tooltip" class="bg-white rounded-2xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-600 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-none">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-xs font-mono mt-1 italic">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+        <div class="p-5 bg-white space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tiếng Việt</span>
+                <p id="tt-vi" class="text-gray-900 font-bold text-sm"></p>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-1">Context</span>
+                <p id="tt-context" class="text-gray-600 text-sm leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 text-pink-500">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Finish Test?</h3>
+            <p id="modal-message" class="text-center text-gray-500 mb-8 px-4 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Resume</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-2xl bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors shadow-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA TEMPLATE ---
+        // You will append the passage content and questions here for PET Final Test 01.
+        // Below is the template structure required by the engine.
+        const TEST_DATA = {
+            totalDurationSeconds: 3600, // 60 minutes
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Footprints in the Mud",
+                    passage: `
+                        <p class="mb-4 font-bold italic text-gray-700">The dinosaurs may have risen to power in as little as 10,000 years.</p>
+                        <p class="mb-4">
+                            <span id="loc_p1_q1" class="highlight-target">Everybody knows that the dinosaurs became extinct as a result of a large asteroid; something big hit the Earth 65 million years ago and, when the dust had fallen, so had the great reptiles.</span> There is thus a nice, if ironic, <span class="vocab-word" data-en="Symmetry" data-vi="Sự đối xứng / tương đồng" data-pron="/ˈsɪmətri/" data-context="Sự cân đối hoặc tương đồng giữa hai sự việc">symmetry</span> in the idea that a similar impact brought about the dinosaurs’ rise. That is the thesis proposed by Paul Olsen of Columbia University.
+                        </p>
+                        <p class="mb-4">
+                            Dinosaurs first appear in the fossil record 230 million years ago, during the Triassic period. But they were mostly small, and they shared the Earth with lots of other sorts of reptile. It was in the subsequent Jurassic period, which began 202 million years ago, that they overran the planet and <span id="loc_p1_q2" class="highlight-target">turned into the monsters realistically depicted in modern books and movies.</span> Dr Olsen and his colleagues are not the first to suggest that the dinosaurs inherited the Earth as the result of an asteroid strike. But they are the first to show that the takeover did, indeed, happen in a geological eye-blink.
+                        </p>
+                        <p class="mb-4">
+                            <span id="loc_p1_q4" class="highlight-target">Dinosaur skeletons are rare. Dinosaur footprints are, however, surprisingly abundant.</span> And the size of the prints is as good an indication of the size of the beasts as are the skeletons themselves. Dr Olsen and his colleagues therefore concentrated on prints, not bones. The prints in question were made in Eastern North America, a part of the world then full of rift valleys similar to those in East Africa today. Like the modern African rift valleys, the Triassic/Jurassic American ones contained lakes, and these lakes grew and shrank at regular intervals because of climatic changes. Rocks from this place and period can be dated to within a few thousand years. As a bonus, squishy lake-edge <span class="vocab-word" data-en="Sediments" data-vi="Trầm tích" data-pron="/ˈsɛdɪmənts/" data-context="Các chất lắng đọng ở đáy nước">sediments</span> are just the things for recording the tracks of passing animals.
+                        </p>
+                        <p class="mb-4">
+                            By dividing the labour between them, the research team were able to study such tracks at 80 sites and look at 18 so-called ‘ichnotaxa’. <span id="loc_p1_q5" class="highlight-target">These are recognisable types of footprint that cannot be matched precisely within the species of animal that left them.</span> But they can be matched with a general sort of animal, and thus act as an indicator of the fate of that group, even when there are no bones to tell the story.
+                        </p>
+                        <p class="mb-4">
+                            <span id="loc_p1_q6" class="highlight-target">Their findings show that five of the ichnotaxa disappear before the end of the Triassic, and four march confidently across the boundary into the Jurassic.</span> Six, however, vanish at the boundary, or only just splutter across it; and three appear from nowhere, almost as soon as the Jurassic begins. That boundary itself is suggestive. The first geological indication of the impact that killed the dinosaurs was an unusually high level of iridium in rocks at the end of the Cretaceous period, when the beasts disappear from the fossil record. Iridium is normally rare at the Earth’s surface, but it is more abundant in meteorites. When people began to believe the impact theory, they started looking for other Cretaceous-end <span class="vocab-word" data-en="Anomalies" data-vi="Sự dị thường" data-pron="/əˈnɒməliz/" data-context="Những hiện tượng khác với bình thường">anomalies</span>. One that turned up was a surprising abundance of fern spores in rocks just above the boundary layer – a phenomenon known as the ‘fern spike’.
+                        </p>
+                        <p class="mb-4">
+                            That matched the theory nicely. Many modern ferns are opportunists. They cannot compete against plants with leaves, but if a piece of land is cleared by, say, a volcanic eruption, they are often the first things to set up shop there. An asteroid strike would have scoured much of the Earth of its vegetable cover, and provided a paradise for ferns. A fern spike in the rocks is thus a good indication that something terrible has happened.
+                        </p>
+                        <p class="mb-4">
+                            The surprises are how rapidly the new ichnotaxa appeared and how quickly they increased in size. <span id="loc_p1_q7" class="highlight-target">Dr Olsen and his colleagues suggest that the explanation for this may be a phenomenon called ecological release.</span> <span id="loc_p1_q9" class="highlight-target">This is seen today when reptiles (which in modern times tend to be small creatures) reach islands where they face no competitors.</span> <span id="loc_p1_q8" class="highlight-target">The most spectacular example is on the Indonesian island of Komodo, where local lizards have grown so large that they are often referred to as dragons.</span> The dinosaurs, in other words, could flourish only when the competition had been knocked out.
+                        </p>
+                        <p class="mb-4">
+                            That leaves the question of where the impact happened. No large hole in the Earth’s crust seems to be 202 million years old. <span id="loc_p1_q10" class="highlight-target">It may, of course, have been overlooked.</span> Old craters are eroded and buried, and not always easy to find. <span id="loc_p1_q11" class="highlight-target">Alternatively, it may have vanished.</span> Although continental crust is more or less permanent, <span id="loc_p1_q12" class="highlight-target">the ocean floor is constantly recycled by the tectonic processes that bring about continental drift.</span> There is no ocean floor left that is more than 200 million years old, so a crater that formed in the ocean would have been swallowed up by now.
+                        </p>
+                        <p class="mb-4">
+                            There is a third possibility, however. <span id="loc_p1_q13" class="highlight-target">This is that the crater is known, but has been misdated.</span> The Manicouagan ‘structure’, a crater in Quebec, is thought to be 214 million years old. It is huge – some 100 kilometres across – and seems to be the largest of between three and five craters that formed within a few hours of each other as the lumps of disintegrated comet hit the Earth one by one. Such an impact would surely have had a perceptible effect on the world, but the rocks from 214 million years ago do not record one. It is possible, therefore, that Manicouagan has been misdated. That will be the next thing to check.
+                        </p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_6_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–6</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the Reading Passage?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1',
+                            displayType: 'radio',
+                            text: 'There is still doubt about the theory that an asteroid strike killed the dinosaurs.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 1 states: "Everybody knows that the dinosaurs became extinct as a result of a large asteroid..." This implies it is a widely accepted fact, not something still doubted.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q2',
+                            displayType: 'radio',
+                            text: 'Books and the cinema have exaggerated the size of dinosaurs.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 2 states: "...turned into the monsters realistically depicted in modern books and movies." The word "realistically" contradicts the idea that they exaggerated the size.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q3',
+                            displayType: 'radio',
+                            text: 'Other scientists have rejected Olsen’s idea of a sudden dinosaur occupation of the Earth.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'The passage mentions that "they are the first to show that the takeover did, indeed, happen in a geological eye-blink", but it does not mention if other scientists accepted or rejected this specific idea.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q4',
+                            displayType: 'radio',
+                            text: 'Dinosaur footprints are found more frequently than dinosaur skeletons.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 3 states: "Dinosaur skeletons are rare. Dinosaur footprints are, however, surprisingly abundant." Abundant means they are found more frequently.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q5',
+                            displayType: 'radio',
+                            text: 'Ichnotaxa offer an exact identification of a dinosaur species.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 4 states: "These are recognisable types of footprint that cannot be matched precisely within the species of animal that left them." Therefore, they do not offer exact identification.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'radio',
+                            text: 'There is evidence that some groups of dinosaurs survived from the Triassic period into the Jurassic period.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 5 mentions that findings show "...four march confidently across the boundary into the Jurassic", meaning some groups survived from the Triassic into the Jurassic.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7_13_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 7–13</h3>
+                                    <p class="text-gray-700">Complete the summary below. Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q7_13_group',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base">
+                                    Dr Olsen’s group believe that the sudden increase in the size of dinosaurs may have been due to something known as <strong>7</strong> <input type="text" data-qid="p1_q7" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40">. A current example of this can be found on Komodo Island in Indonesia, where some of the lizards are commonly called <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30"> because of their size. Apparently, they have grown this big because they do not have any <strong>9</strong> <input type="text" data-qid="p1_q9" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30">. The asteroid strike that may have cleared the way for dinosaurs to become the dominant group probably occurred 202 million years ago.
+                                    <br><br>
+                                    According to the writer, there are three possible reasons why we have not found a large hole in the Earth’s crust dating back 202 million years. First, it may have been <strong>10</strong> <input type="text" data-qid="p1_q10" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30"> by scientists, because craters are easily covered up. Or, it could have <strong>11</strong> <input type="text" data-qid="p1_q11" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30">; for example, if the hole had been in the ocean, it would no longer exist because of the <strong>12</strong> <input type="text" data-qid="p1_q12" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"> that produce continental drift. Thirdly, the hole could still exist but have been <strong>13</strong> <input type="text" data-qid="p1_q13" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30">.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q7', correct: 'ecological release', explanation: 'Paragraph 7: "Dr Olsen and his colleagues suggest that the explanation for this may be a phenomenon called ecological release."' },
+                                { id: 'p1_q8', correct: 'dragons', explanation: 'Paragraph 7: "The most spectacular example is on the Indonesian island of Komodo, where local lizards have grown so large that they are often referred to as dragons."' },
+                                { id: 'p1_q9', correct: 'competitors', explanation: 'Paragraph 7: "This is seen today when reptiles (...) reach islands where they face no competitors."' },
+                                { id: 'p1_q10', correct: 'overlooked', explanation: 'Paragraph 8: "It may, of course, have been overlooked. Old craters are eroded and buried, and not always easy to find."' },
+                                { id: 'p1_q11', correct: 'vanished', explanation: 'Paragraph 8: "Alternatively, it may have vanished."' },
+                                { id: 'p1_q12', correct: 'tectonic processes', explanation: 'Paragraph 8: "...the ocean floor is constantly recycled by the tectonic processes that bring about continental drift."' },
+                                { id: 'p1_q13', correct: 'misdated', explanation: 'Paragraph 9: "This is that the crater is known, but has been misdated."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: A new look for Talbot Park",
+                    passage: `
+                        <p class="mb-4 italic text-gray-600">Talbot Park, a housing project in Auckland, New Zealand, was once described as a ghetto, troubled by high rates of crime and vandalism. However, it has just been rebuilt at a cost of $48 m and the project reflects some new thinking about urban design.</p>
+                        
+                        <p class="mb-4"><strong>A.</strong> <span id="loc_p2_q14" class="highlight-target">The new Talbot Park is immediately eye-catching because the buildings look quite different to other state-housing projects in Auckland.</span> 'There is no reason why state housing should look cheap in my view,' says architect Neil Cotton, one of the design team. 'In fact, I was anticipating a backlash by those who objected to the quality of what is provided with government money.' <span id="loc_p2_q14_alt" class="highlight-target">The tidy brick and wood apartments and townhouses would not look out of place in some of the city's most <span class="vocab-word" data-en="Affluent" data-vi="Giàu có, sung túc" data-pron="/ˈæfluənt/" data-context="Nơi có nhiều tiền bạc và mức sống cao">affluent</span> suburbs</span>, and this is a central theme of the Talbot Park philosophy.</p>
+
+                        <p class="mb-4"><strong>B.</strong> Talbot Park is a triangle of government-owned land, which in the early 1960s was developed for state housing built around a linear garden that ran through the middle. <span id="loc_p2_q15" class="highlight-target">Initially, there was a strong sense of neighbourliness.</span> Former residents recall how the garden played a big part in their childhoods — a place where kids came together to play softball, cricket and bullrush. 'We had respect for our neighbours and addressed them by title — Mr and Mrs so-and-so,' recalls Georgie Thompson, who grew up there in the 1960s.</p>
+
+                        <p class="mb-4"><strong>C.</strong> Exactly what went wrong with Talbot Park is unclear. The community began to change in the late 1970s as more immigrants moved in. The new arrivals didn't always integrate with the community and a 'them and us' mentality developed. <span id="loc_p2_q16" class="highlight-target">In the process, standards dropped and the neighbourhood began to look shabbier. The buildings themselves were also deteriorating and becoming run-down, petty crime was on the rise and the garden was considered unsafe.</span> In 2002, Housing New Zealand decided the properties needed upgrading. The question was, how to avoid repeating the mistakes of the past?</p>
+
+                        <p class="mb-4"><strong>D.</strong> <span id="loc_p2_q17" class="highlight-target">One controversial aspect of the upgrade is that the new development has actually made the <span id="loc_p2_q24" class="highlight-target">density</span> of housing in Talbot Park greater, putting 52 more homes on the same site. Doing this required a fresh approach that can be summed up as 'mix and match'. The first priority was to mix up the housing by employing a variety of plans by different <span id="loc_p2_q25" class="highlight-target">architects</span>: some of the accommodation is free-standing houses, some semi-detached, some low-level, multi-apartment blocks.</span> By doing this, the development avoids the uniform appearance of so many state-housing projects, which residents complain denies them any sense of individual identity. The next goal was to prevent overspending by using efficient designs to maximise the sense of space from minimum room sizes. <span id="loc_p2_q26" class="highlight-target">There was also a no-frills, industrial approach to kitchens, bathrooms and flooring, to optimise durability and ensure the project did not go over budget.</span> Architecturally, the buildings are relatively conservative: fairly plain houses standing in a small garden. There's a slight reflection of the traditional Pacific beach house (a fale) but it's not over-played. 'It seems to us that low-cost housing is about getting as much amenity as you can for the money,' says architect Michael Thompson. Another key aspect of the 'mix and match' approach is openness: one that not only lets residents see what is going on but also lets them know they are seen. The plan ensures there are no cul-de-sacs or properties hidden from view, that the gardens are not enclosed by trees and that most boundary fences are see-through — a community contained but without walls.</p>
+
+                        <p class="mb-4"><strong>E.</strong> <span id="loc_p2_q18" class="highlight-target">The population today is <span class="vocab-word" data-en="Cosmopolitan" data-vi="Đa quốc gia, đa văn hóa" data-pron="/ˌkɒzməˈpɒlɪtən/" data-context="Gồm những người từ nhiều quốc gia và nền văn hóa khác nhau">cosmopolitan</span>: 50% Pacific Islanders, 20% Māori, 15% Asian, 10% New Zealand European and the rest composed of immigrants from Russia, Ukraine and Iran.</span> <span id="loc_p2_q21" class="highlight-target">'It was important that the buildings were sufficiently flexible to cater for the needs of people from a wide variety of cultural backgrounds,' explains designer James Lundy.</span></p>
+
+                        <p class="mb-4"><strong>F.</strong> Despite the quality of the buildings, however, there should be no doubt that Talbot Park and its surrounding suburb of Tāmaki are low socio-economic areas. Of the 5,000 houses there, 55% are state houses, 28% privately owned (compared to about 65% nationally) and 17% private rental. <span id="loc_p2_q19" class="highlight-target">The area has a high density of households with incomes in the $5,000 to $15,000 range and very few with an income over $70,000. That's in sharp contrast to the more affluent suburbs in Auckland.</span></p>
+
+                        <p class="mb-4"><strong>G.</strong> <span id="loc_p2_q20" class="highlight-target">Another important part of the new development is what Housing New Zealand calls 'intensive tenancy management'.</span> Opponents of the project call it social control. <span id="loc_p2_q22" class="highlight-target">'The focus is on frequent inspections and setting clear guidelines and boundaries regarding the sort of behaviour we expect from tenants,' says Graham Bodman, Housing New Zealand's regional manager.</span> The result is a code of sometimes strict rules: no loud parties after 10 pm; no washing hung over balcony rails; and a requirement to mow lawns and keep the property tidy. The Tenancy Manager walks the site every day, knows everyone by name and deals with problems quickly. <span id="loc_p2_q23" class="highlight-target">'It's all based on the intensification,' says project manager Stuart Bracey. 'We acknowledge that if you are going to ask people to live in these quite tightly-packed communities, you have to actually help them to get to know each other by organising morning teas and street barbecues.'</span> So far it seems to be working and many involved in the project believe Talbot Park represents the way forward for state housing.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_20_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–20</h3>
+                                    <p class="text-gray-700">Reading Passage 2 has seven paragraphs, <strong>A-G</strong>.</p>
+                                    <p class="text-gray-700 mt-2">Choose the correct heading for each paragraph from the list of headings below.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q14_20',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Headings',
+                            isReusable: false,
+                            pool: [
+                                { id: 'i', text: 'i. Some of the problems that developed at Talbot Park' },
+                                { id: 'ii', text: 'ii. Where the residents lived while the work was being completed' },
+                                { id: 'iii', text: 'iii. The ethnic makeup of the new Talbot Park' },
+                                { id: 'iv', text: 'iv. The unexpectedly high standard of the housing' },
+                                { id: 'v', text: 'v. Financial hardship in Talbot Park and a neighbouring community' },
+                                { id: 'vi', text: 'vi. The experiences of one family living at Talbot Park today' },
+                                { id: 'vii', text: 'vii. How to co-ordinate and assist the people who live at Talbot Park' },
+                                { id: 'viii', text: 'viii. Raising the money to pay for the makeover' },
+                                { id: 'ix', text: 'ix. A close community in the original Talbot Park development' },
+                                { id: 'x', text: 'x. Details of the style of buildings used in the makeover' }
+                            ],
+                            questions: [
+                                { id: 'p2_q14', text: '14. Paragraph A', correct: 'iv', explanation: 'Paragraph A highlights how the new buildings look quite different, with "tidy brick and wood apartments" that "would not look out of place in some of the city\'s most affluent suburbs" despite being state housing.' },
+                                { id: 'p2_q15', text: '15. Paragraph B', correct: 'ix', explanation: 'Paragraph B describes the early 1960s state housing development where "there was a strong sense of neighbourliness" and a close community feel.' },
+                                { id: 'p2_q16', text: '16. Paragraph C', correct: 'i', explanation: 'Paragraph C details how "standards dropped", buildings deteriorated, petty crime rose, and the garden became unsafe—all problems that developed in the park.' },
+                                { id: 'p2_q17', text: '17. Paragraph D', correct: 'x', explanation: 'Paragraph D details the "mix and match" approach, providing specifics about the style: free-standing houses, semi-detached, multi-apartment blocks, industrial approaches to kitchens, and openness without walls.' },
+                                { id: 'p2_q18', text: '18. Paragraph E', correct: 'iii', explanation: 'Paragraph E explicitly gives the breakdown of the population (50% Pacific Islanders, 20% Māori, 15% Asian, etc.), indicating the ethnic makeup.' },
+                                { id: 'p2_q19', text: '19. Paragraph F', correct: 'v', explanation: 'Paragraph F explains that Talbot Park and surrounding Tāmaki are "low socio-economic areas" with high densities of households earning very low incomes ($5,000 to $15,000).' },
+                                { id: 'p2_q20', text: '20. Paragraph G', correct: 'vii', explanation: 'Paragraph G discusses "intensive tenancy management", describing how Housing New Zealand co-ordinates and assists the people with rules, inspections, and social events (morning teas, street barbecues).' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q21_23_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 21–23</h3>
+                                    <p class="text-gray-700">Look at the following people and the list of ideas below.</p>
+                                    <p class="text-gray-700 mt-2">Match each person with the correct idea, <strong>A-F</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q21_23',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Ideas',
+                            isReusable: false,
+                            pool: [
+                                { id: 'A', text: 'A. Good tenant management involves supervision and regulation.' },
+                                { id: 'B', text: 'B. State housing must be built at minimum expense to the public.' },
+                                { id: 'C', text: 'C. Organising social events helps tenants to live close together.' },
+                                { id: 'D', text: 'D. Mixed-race communities require adaptable and responsive designs.' },
+                                { id: 'E', text: 'E. Complaints were expected about the high standard of the development.' },
+                                { id: 'F', text: 'F. Too many rules and regulations will cause resentment from tenants.' }
+                            ],
+                            questions: [
+                                { id: 'p2_q21', text: '21. James Lundy', correct: 'D', explanation: 'In Paragraph E, designer James Lundy explains: "It was important that the buildings were sufficiently flexible to cater for the needs of people from a wide variety of cultural backgrounds."' },
+                                { id: 'p2_q22', text: '22. Graham Bodman', correct: 'A', explanation: 'In Paragraph G, Graham Bodman notes: "The focus is on frequent inspections and setting clear guidelines and boundaries regarding the sort of behaviour we expect from tenants."' },
+                                { id: 'p2_q23', text: '23. Stuart Bracey', correct: 'C', explanation: 'In Paragraph G, Stuart Bracey says: "...you have to actually help them to get to know each other by organising morning teas and street barbecues."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q24_26_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 24–26</h3>
+                                    <p class="text-gray-700 mb-4">Complete the summary below. Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q24_26',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">The 'mix and match' strategy</strong>
+                                    One aspect of the Talbot Park project that some critics are concerned about is that the higher <strong>24</strong> <input type="text" data-qid="p2_q24" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> of accommodation would lead to the old social problems returning. To prevent this, a team of various <strong>25</strong> <input type="text" data-qid="p2_q25" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> worked on the project to ensure the buildings were not uniform. Further, they created pleasant, functional interiors that could still be built within their <strong>26</strong> <input type="text" data-qid="p2_q26" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30">. Finally, the absence of walls means Talbot Park is characterised by openness, making it easier to regulate behaviour within the community.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q24', correct: 'density', explanation: 'Paragraph D states: "One controversial aspect of the upgrade is that the new development has actually made the density of housing in Talbot Park greater..."' },
+                                { id: 'p2_q25', correct: 'architects', explanation: 'Paragraph D states: "The first priority was to mix up the housing by employing a variety of plans by different architects..."' },
+                                { id: 'p2_q26', correct: 'budget', explanation: 'Paragraph D states: "There was also a no-frills, industrial approach to kitchens, bathrooms and flooring, to optimise durability and ensure the project did not go over budget."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: The Fruit Book",
+                    passage: `
+                        <p class="mb-4 italic text-gray-700 font-medium">It's not every scientist who writes books for people who can't read. And how many scientists want their books to look as dog-eared as possible? But Patricia Shanley, an <span class="vocab-word" data-en="Ethnobotanist" data-vi="Nhà dân tộc thực vật học" data-pron="/ˌeθnoʊˈbɑːtənɪst/" data-context="Người nghiên cứu cách các nền văn hóa và con người sử dụng thực vật bản địa">ethnobotanist</span>, wanted to give something back. After the poorest people of the Amazon allowed her to study their land and its ecology, she turned her research findings into a picture book that tells the local people how to get a good return from their trees without succumbing to the lure of a quick buck from a logging company. It has proved a big success.</p>
+                        
+                        <p class="mb-4"><strong>A.</strong> The book is called Fruit Trees and Useful Plants in the Lives of Amazonians, but is better known simply as the "fruit book". The second edition was produced at the request of politicians in western Amazonia. <span id="loc_p3_q28" class="highlight-target">Its blend of hard science and local knowledge on the use and trade of 35 native forest species has been so well received (and well used) that no less a dignitary than Brazil's environment minister, Marina Silva, has written the foreword.</span> "There is nothing else like the Shanley book," says Adalberto Veríssimo, director of the Institute of People and the Environment of the Amazon. "It gives science back to the poor, to the people who really need it."</p>
+
+                        <p class="mb-4"><strong>B.</strong> <span id="loc_p3_q30" class="highlight-target">Shanley's work on the book began a decade ago, with a plea for help from the Rural Workers' Union of Paragominas, a Brazilian town whose prosperity is based on exploitation of timber.</span> The union realised that logging companies would soon be knocking on the doors of the caboclos, peasant farmers living on the Rio Capim, an Amazon tributary in the Brazilian state of Pará. Isolated and illiterate, the caboclos would have little concept of the true value of their trees; communities downstream had already sold off large blocks of forest for a <span class="vocab-word" data-en="Pittance" data-vi="Số tiền rẻ mạt" data-pron="/ˈpɪtns/" data-context="Một số tiền rất nhỏ, thường không tương xứng với giá trị thực">pittance</span>. "What they wanted to know was how valuable the forests were," recalls Shanley, then a researcher in the area for the Massachusetts-based Woods Hole Research Centre.</p>
+
+                        <p class="mb-4"><strong>C.</strong> <span id="loc_p3_q29" class="highlight-target">The Rural Workers' Union wanted to know whether harvesting wild fruits would make economic sense in the Rio Capim.</span> "There was a lot of interest in trading non-timber forest products (NTFPs)," Shanley says. At the time, environmental groups and green-minded businesses were promoting the idea. This was the view presented in a <span class="vocab-word" data-en="Seminal" data-vi="Cốt lõi, có ảnh hưởng lớn" data-pron="/ˈsemɪnl/" data-context="Rất quan trọng và có ảnh hưởng mạnh mẽ đến sự phát triển sau này">seminal</span> paper, Valuation of an Amazonian Rainforest, published in Nature in 1989. The researchers had calculated that revenues from the sale of fruits could far exceed those from a one-off sale of trees to loggers. "The union was keen to discover whether it made more sense conserving the forest for <span class="vocab-word" data-en="Subsistence" data-vi="Sự tự cung tự cấp" data-pron="/səbˈsɪstəns/" data-context="Tình trạng chỉ có đủ nguồn lực để duy trì sự sống cơ bản">subsistence</span> use and the possible sale of fruit, game and medicinal plants, than selling trees for timber," says Shanley. Whether it would work for the caboclos was far from clear.</p>
+
+                        <p class="mb-4"><strong>D.</strong> Although Shanley had been invited to work in the Rio Capim, some caboclos were suspicious. "When Patricia asked if she could study my forest," says Joao Fernando Moreira Brito, "my neighbours said she was a foreigner who'd come to rob me of my trees." In the end, Moreira Brito, or Mangueira as he is known, welcomed Shanley and worked on her study. His land, an hour's walk from the Rio Capim, is almost entirely covered with primary forest. A study of this and other tracts of forest selected by the communities enabled Shanley to identify three trees, found throughout the Amazon, whose fruit was much favoured by the caboclos: bacuri (Platonia insignis), uxi (Endopleura uchi) and piquia (Caryocar villosum). The caboclos used their fruits, extracted oils, and knew what sort of wildlife they attracted. But, in the face of aggressive tactics from the logging companies, they had no measure of the trees' financial worth. The only way to find out, Shanley decided, was to start from scratch with a scientific study. "From a scientific point of view, hardly anything was known about these trees," she says. <span id="loc_p3_q27" class="highlight-target">But six years of field research yielded a mass of data on their flowering and fruiting behaviour. During 1993 and 1994, 30 families weighed everything they used from the forest – game, fruit, fibre, medicinal plants – and documented its source.</span></p>
+
+                        <p class="mb-4"><strong>E.</strong> After three logging sales and a major fire in 1997, the researchers were also able to study the ecosystem's reaction to logging and disturbance. They carried out a similar, though less exhaustive, study in 1999, this time with 15 families. The changes were striking. <span id="loc_p3_q33_34" class="highlight-target">Average annual household consumption of forest fruit had fallen from 89 to 28 kilograms between 1993 and 1999.</span> "What we found," says Shanley, "was that fruit collection could coexist with a certain amount of logging, but after the forest fire, it dropped dramatically." <span id="loc_p3_q33_34_alt" class="highlight-target">Over the same period, fibre use also dropped from around 20 to 4 kilograms.</span> <span id="loc_p3_q31" class="highlight-target">The fire and logging also changed the nature of the caboclo diet.</span> In 1993 most households ate game two or three times a month. By 1999 some were fortunate if they ate game more than two or three times a year.</p>
+
+                        <p class="mb-4"><strong>F.</strong> The loss of certain species of tree was especially significant. Shanley's team persuaded local hunters to weigh their catch, noting the trees under which the animals were caught. Over the year, they trapped five species of game averaging 232 kilogrammes under piquia trees. Under copaiba, they caught just two species averaging 63 kilogrammes; <span id="loc_p3_q35" class="highlight-target">and under uxi, four species weighing 38 kilogrammes.</span> At last, the team was getting a handle on which trees were worth keeping, and which could reasonably be sold. <span id="loc_p3_q37" class="highlight-target">"This showed that selling piquia trees to loggers for a few dollars made little sense," explains Shanley.</span> "Their local value lies in providing a prized fruit, as well as flowers which attract more game than any other species."</p>
+
+                        <p class="mb-4"><strong>G.</strong> As a result of these studies, Shanley had to tell the Rural Workers' Union of Paragominas that the Nature thesis could not be applied wholesale to their community – harvesting NTFPs would not always yield more than timber sales. <span id="loc_p3_q36" class="highlight-target">Fruiting patterns of trees such as uxi were unpredictable, for example.</span> In 1994, one household collected 3,654 uxi fruits; the following year, none at all.</p>
+
+                        <p class="mb-4"><strong>H.</strong> This is not to say that wild fruit trees were unimportant. <span id="loc_p3_q38_39" class="highlight-target">On the contrary, argues Shanley, they are critical for subsistence, something that is often ignored in much of the current research on NTFPs, which tends to focus on their commercial potential.</span> Geography was another factor preventing the Rio Capim caboclos from establishing a serious trade in wild fruit: villagers in remote areas could not compete with communities collecting NTFPs close to urban markets, although they could sell them to passing river boats.</p>
+
+                        <p class="mb-4"><strong>I.</strong> But Shanley and her colleagues decided to do more than just report their results to the union. Together with two of her research colleagues, Shanley wrote the fruit book. This, the Bible and a publication on medicinal plants co-authored by Shanley and designed for people with minimal literacy skills are about the only books you will see along this stretch of the Rio Capim. The first print run was only 3,000 copies, but the fruit book has been remarkably influential, and is used by colleges, peasant unions, industries and the caboclos themselves. <span id="loc_p3_q32" class="highlight-target">Its success is largely due to the fact that people with poor literacy skills can understand much of the information it contains</span> <span id="loc_p3_q40" class="highlight-target">about the non-timber forest products</span>, thanks to its illustrations, anecdotes, stories and songs. "The book doesn't tell people what to do," says Shanley, "but it does provide them with choices." The caboclos who have used the book now have a much better understanding of which trees to sell to the loggers, and which to protect.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_32_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–32</h3>
+                                    <p class="text-gray-700">Reading Passage 3 has nine paragraphs, <strong>A–I</strong>.</p>
+                                    <p class="text-gray-700 mt-2">Which paragraph contains the following information? Drag and drop the correct letter into the corresponding box.</p>
+                                    <p class="text-gray-500 text-sm mt-2 italic"><strong>NB</strong> You may use any letter more than once.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q27_32',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Paragraphs',
+                            isReusable: true,
+                            pool: [
+                                { id: 'A', text: 'A. Paragraph A' },
+                                { id: 'B', text: 'B. Paragraph B' },
+                                { id: 'C', text: 'C. Paragraph C' },
+                                { id: 'D', text: 'D. Paragraph D' },
+                                { id: 'E', text: 'E. Paragraph E' },
+                                { id: 'F', text: 'F. Paragraph F' },
+                                { id: 'G', text: 'G. Paragraph G' },
+                                { id: 'H', text: 'H. Paragraph H' },
+                                { id: 'I', text: 'I. Paragraph I' }
+                            ],
+                            questions: [
+                                { id: 'p3_q27', text: '27. A description of Shanley\'s initial data collection', correct: 'D', explanation: 'Paragraph D describes her initial data collection: "During 1993 and 1994, 30 families weighed everything they used from the forest – game, fruit, fibre, medicinal plants – and documented its source."' },
+                                { id: 'p3_q28', text: '28. Why a government official also contributes to the book', correct: 'A', explanation: 'Paragraph A mentions that "Its blend of hard science and local knowledge... has been so well received (and well used) that no less a dignitary than Brazil\'s environment minister, Marina Silva, has written the foreword."' },
+                                { id: 'p3_q29', text: '29. Reasons why the community asked Shanley to conduct the research', correct: 'C', explanation: 'Paragraph C states: "The Rural Workers\' Union wanted to know whether harvesting wild fruits would make economic sense in the Rio Capim." This explains the reason they needed the research.' },
+                                { id: 'p3_q30', text: '30. Reference to the starting point of her research', correct: 'B', explanation: 'Paragraph B explicitly references the starting point in time: "Shanley\'s work on the book began a decade ago, with a plea for help from the Rural Workers\' Union..."' },
+                                { id: 'p3_q31', text: '31. Two factors that alter food consumption patterns', correct: 'E', explanation: 'Paragraph E states: "The fire and logging also changed the nature of the caboclo diet." (The two factors are fire and logging).' },
+                                { id: 'p3_q32', text: '32. Why the book is successful', correct: 'I', explanation: 'Paragraph I states: "Its success is largely due to the fact that people with poor literacy skills can understand much of the information it contains..."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q33_40_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 33–40</h3>
+                                    <p class="text-gray-700 mb-4">Complete the summary below. Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q33_40',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">Summary</strong>
+                                    Forest fire has caused local villagers to consume less: 
+                                    <ul class="list-disc list-inside ml-4 mb-2 space-y-1">
+                                        <li><strong>33</strong> <input type="text" data-qid="p3_q33" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"></li>
+                                        <li><strong>34</strong> <input type="text" data-qid="p3_q34" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"></li>
+                                        <li>game</li>
+                                    </ul>
+                                    <br>
+                                    There is the least amount of game hunted under <strong>35</strong> <input type="text" data-qid="p3_q35" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30">; yield is also <strong>36</strong> <input type="text" data-qid="p3_q36" class="inline-blank w-40 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40">.
+                                    <br><br>
+                                    Thus, it is more reasonable to keep <strong>37</strong> <input type="text" data-qid="p3_q37" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40">.
+                                    <br><br>
+                                    All the trees can also be used for <strong>38</strong> <input type="text" data-qid="p3_q38" class="inline-blank w-40 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"> besides selling them to loggers. But this is often ignored, because most research usually focuses on the <strong>39</strong> <input type="text" data-qid="p3_q39" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"> of the trees.
+                                    <br><br>
+                                    <strong>The purpose of the book:</strong><br>
+                                    To give information about <strong>40</strong> <input type="text" data-qid="p3_q40" class="inline-blank w-64 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="50">.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p3_q33', correct: 'forest fruit', explanation: 'Paragraph E: "Average annual household consumption of forest fruit had fallen from 89 to 28 kilograms..."' },
+                                { id: 'p3_q34', correct: 'fibre', explanation: 'Paragraph E: "Over the same period, fibre use also dropped from around 20 to 4 kilograms."' },
+                                { id: 'p3_q35', correct: 'uxi', explanation: 'Paragraph F: "...and under uxi, four species weighing 38 kilogrammes." (This was the lowest weight recorded).' },
+                                { id: 'p3_q36', correct: 'unpredictable', explanation: 'Paragraph G: "Fruiting patterns of trees such as uxi were unpredictable, for example."' },
+                                { id: 'p3_q37', correct: 'piquia trees', explanation: 'Paragraph F: "This showed that selling piquia trees to loggers for a few dollars made little sense... Their local value lies in providing a prized fruit..."' },
+                                { id: 'p3_q38', correct: 'subsistence', explanation: 'Paragraph H: "...they are critical for subsistence, something that is often ignored..."' },
+                                { id: 'p3_q39', correct: 'commercial potential', explanation: 'Paragraph H: "...something that is often ignored in much of the current research on NTFPs, which tends to focus on their commercial potential."' },
+                                { id: 'p3_q40', correct: 'non-timber forest products', explanation: 'Paragraph I: "...understand much of the information it contains about the non-timber forest products..."' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. ENGINE ARCHITECTURE & STATE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            questionsList: [], 
+            activeDragItem: null,
+            cachedPanes: {},
+            activeHighlightMark: null
+        };
+
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), time: document.getElementById('time-taken-display') },
+            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), pContainer: document.getElementById('passage-content-container'), qContainer: document.getElementById('questions-content-container'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') },
+            highlightTb: document.getElementById('highlight-toolbar')
+        };
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                    }
+                });
+            });
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
+            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+
+            document.addEventListener('mousedown', (e) => {
+                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
+                
+                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                    state.activeDragItem = null;
+                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                }
+            });
+
+            initHighlightEngine();
+        }
+
+        function initHighlightEngine() {
+            document.querySelectorAll('.hl-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const color = btn.dataset.color;
+                    
+                    if (state.activeHighlightMark) {
+                        if (color === 'clear') {
+                            const parent = state.activeHighlightMark.parentNode;
+                            while (state.activeHighlightMark.firstChild) {
+                                parent.insertBefore(state.activeHighlightMark.firstChild, state.activeHighlightMark);
+                            }
+                            parent.removeChild(state.activeHighlightMark);
+                        } else {
+                            state.activeHighlightMark.className = `user-hl user-hl-${color}`;
+                        }
+                        hideToolbar();
+                    } else {
+                        applyHighlightToSelection(color);
+                    }
+                });
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (e.target.closest('#highlight-toolbar')) return; 
+                
+                if (e.target.classList.contains('user-hl')) {
+                    state.activeHighlightMark = e.target;
+                    positionToolbar(e.target.getBoundingClientRect());
+                    return;
+                }
+
+                const sel = window.getSelection();
+                if (!sel.isCollapsed && sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    let valid = false;
+                    let node = range.commonAncestorContainer;
+                    if (node.nodeType === 3) node = node.parentNode;
+                    
+                    if (node && node.closest('.highlightable-area')) valid = true;
+                    
+                    if (valid) {
+                        state.activeHighlightMark = null; 
+                        positionToolbar(range.getBoundingClientRect());
+                    } else {
+                        hideToolbar();
+                    }
+                } else {
+                    hideToolbar();
+                }
+            });
+
+            document.getElementById('pane-passage').addEventListener('scroll', hideToolbar);
+            document.getElementById('pane-questions').addEventListener('scroll', hideToolbar);
+        }
+
+        function positionToolbar(rect) {
+            const tb = DOM.highlightTb;
+            tb.style.top = `${rect.top - 10}px`;
+            tb.style.left = `${rect.left + (rect.width / 2)}px`;
+            tb.classList.remove('hidden');
+        }
+
+        function hideToolbar() {
+            DOM.highlightTb.classList.add('hidden');
+            state.activeHighlightMark = null;
+        }
+
+        function applyHighlightToSelection(color) {
+            if (color === 'clear') {
+                window.getSelection().removeAllRanges();
+                hideToolbar();
+                return;
+            }
+            const sel = window.getSelection();
+            if (sel.isCollapsed) return;
+            const range = sel.getRangeAt(0);
+            
+            const walker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
+                acceptNode: function(node) {
+                    return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            }, false);
+
+            const nodesToWrap = [];
+            let currentNode = walker.currentNode;
+            while (currentNode) {
+                if (currentNode.nodeType === Node.TEXT_NODE && currentNode.nodeValue.trim().length > 0) nodesToWrap.push(currentNode);
+                currentNode = walker.nextNode();
+            }
+
+            if(nodesToWrap.length > 0) {
+                 try {
+                     const mark = document.createElement('mark');
+                     mark.className = `user-hl user-hl-${color}`;
+                     range.surroundContents(mark);
+                 } catch (e) {
+                     try {
+                        const mark = document.createElement('mark');
+                        mark.className = `user-hl user-hl-${color}`;
+                        mark.appendChild(range.extractContents());
+                        range.insertNode(mark);
+                     } catch(err) {
+                         console.warn("Could not highlight complex selection");
+                     }
+                 }
+            }
+            sel.removeAllRanges();
+            hideToolbar();
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            
+            renderTabs(); 
+            loadPart(0); 
+            updateNavigator();
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) { finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderTabs() {
+            DOM.navigator.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${idx + 1}`;
+                btn.onclick = () => loadPart(idx);
+                DOM.navigator.tabs.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            if(state.mode !== 'RESULT') return;
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; 
+            DOM.tooltip.pron.textContent = d.pron; 
+            DOM.tooltip.vi.textContent = d.vi; 
+            DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
+            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function loadPart(idx) {
+            state.currentPart = idx;
+            renderTabs();
+            
+            const data = TEST_DATA.parts[idx];
+            DOM.panes.title.textContent = data.title;
+
+            if (!state.cachedPanes[idx]) {
+                state.cachedPanes[idx] = buildPartDOM(idx);
+                DOM.panes.pContainer.appendChild(state.cachedPanes[idx].passage);
+                DOM.panes.qContainer.appendChild(state.cachedPanes[idx].questions);
+            }
+
+            Array.from(DOM.panes.pContainer.children).forEach(el => el.style.display = 'none');
+            Array.from(DOM.panes.qContainer.children).forEach(el => el.style.display = 'none');
+            
+            state.cachedPanes[idx].passage.style.display = 'block';
+            state.cachedPanes[idx].questions.style.display = 'block';
+
+            document.getElementById('pane-passage').scrollTop = 0;
+            document.getElementById('pane-questions').scrollTop = 0;
+            
+            updateNavigator();
+        }
+
+        function buildPartDOM(idx) {
+            const data = TEST_DATA.parts[idx];
+            
+            const passageWrapper = document.createElement('div');
+            passageWrapper.className = 'highlightable-area';
+            passageWrapper.innerHTML = data.passage;
+            passageWrapper.querySelectorAll('.vocab-word').forEach(word => {
+                word.addEventListener('click', handleVocabClick);
+            });
+
+            const questionsWrapper = document.createElement('div');
+            questionsWrapper.className = 'highlightable-area';
+
+            data.questions.forEach((q, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.id = `container_${q.id}`;
+                qDiv.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                if (q.instructionBox) {
+                    const instr = document.createElement('div');
+                    instr.innerHTML = q.instructionBox;
+                    qDiv.appendChild(instr);
+                }
+
+                // -> Drag and Drop Builder
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+
+                    // Local Pool Refresher
+                    const refreshPool = () => {
+                        const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                        poolGrid.innerHTML = '';
+                        q.pool.forEach(item => {
+                            const isUsed = !q.isReusable && used.includes(item.id);
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
+                            itemDiv.textContent = item.text;
+                            
+                            if (state.mode === 'TEST' && !isUsed) {
+                                itemDiv.setAttribute('draggable', 'true');
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    state.activeDragItem = item.id;
+                                };
+                                itemDiv.onclick = () => {
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    state.activeDragItem = item.id;
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                };
+                            }
+                            poolGrid.appendChild(itemDiv);
+                        });
+                    };
+                    refreshPool();
+                    
+                    const qList = document.createElement('div');
+                    qList.className = 'space-y-4';
+                    q.questions.forEach(subQ => {
+                        const row = document.createElement('div');
+                        row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                        const label = document.createElement('span');
+                        label.className = 'text-sm font-semibold text-gray-700';
+                        label.textContent = subQ.text;
+                        
+                        const drop = document.createElement('div');
+                        drop.id = `drop_${subQ.id}`; 
+                        
+                        // Local Drop Refresher
+                        const refreshDrop = () => {
+                            const currentAnsId = state.answers[subQ.id];
+                            const currentAns = q.pool.find(p => p.id === currentAnsId);
+                            
+                            drop.className = `drop-zone w-full min-h-[44px] border-2 rounded-xl flex items-center justify-center text-xs transition-all p-3 text-center ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
+                            
+                            if (currentAns) {
+                                drop.classList.remove('border-dashed');
+                                drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
+                                drop.textContent = currentAns.text;
+                                if (state.mode === 'TEST') {
+                                    drop.onclick = (e) => { 
+                                        e.stopPropagation(); 
+                                        delete state.answers[subQ.id]; 
+                                        refreshDrop(); 
+                                        refreshPool(); 
+                                        updateNavigator(); 
+                                    };
+                                }
+                            } else {
+                                drop.classList.add('border-dashed', 'border-gray-300');
+                                drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                                if (state.mode === 'TEST') {
+                                    drop.onclick = () => { 
+                                        if (state.activeDragItem) { 
+                                            state.answers[subQ.id] = state.activeDragItem; 
+                                            state.activeDragItem = null; 
+                                            refreshDrop(); 
+                                            refreshPool(); 
+                                            updateNavigator(); 
+                                        } 
+                                    };
+                                }
+                            }
+
+                            if (state.mode === 'TEST') {
+                                drop.ondragover = (e) => {
+                                    e.preventDefault();
+                                    drop.classList.add('bg-pink-50', 'border-pink-400');
+                                };
+                                drop.ondragleave = (e) => {
+                                    drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                };
+                                drop.ondrop = (e) => {
+                                    e.preventDefault();
+                                    drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                    const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                    if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                        state.answers[subQ.id] = draggedId;
+                                        state.activeDragItem = null;
+                                        refreshDrop();
+                                        refreshPool();
+                                        updateNavigator();
+                                    }
+                                };
+                            }
+                        };
+                        
+                        refreshDrop();
+
+                        // Explanation container
+                        const exp = document.createElement('div');
+                        exp.id = `exp_${subQ.id}`;
+                        exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100 result-element';
+                        
+                        const correctItem = q.pool.find(p => p.id === subQ.correct);
+                        exp.innerHTML = `
+                            <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem.text.length > 2 ? '' : ''}</div>
+                            <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                            <div class="mt-2 text-right">
+                                <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">
+                                    Locate in Passage
+                                </button>
+                            </div>
+                        `;
+                        
+                        row.appendChild(label); 
+                        row.appendChild(drop);
+                        row.appendChild(exp);
+                        qList.appendChild(row);
+                    });
+                    wrapper.appendChild(qList); 
+                    qDiv.appendChild(wrapper);
+                } 
+                // -> Render Inline Blanks
+                else if (q.displayType === 'inline_blanks') {
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = q.html;
+                    
+                    wrap.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        input.value = state.answers[qid] || '';
+                        input.addEventListener('input', (e) => {
+                            if(state.mode === 'TEST') {
+                                state.answers[qid] = e.target.value;
+                                updateNavigator();
+                            }
+                        });
+                    });
+                    qDiv.appendChild(wrap);
+
+                    const expContainer = document.createElement('div');
+                    expContainer.className = 'mt-8 space-y-3 result-element';
+                    q.blanks.forEach(b => {
+                        const exp = document.createElement('div');
+                        exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                        const absNum = state.questionsList.find(x => x.qId === b.id)?.absNum || '';
+                        exp.innerHTML = `
+                            <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
+                            <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                            <div class="mt-3 text-right">
+                                <button onclick="locateInPassage('loc_${b.parentId || b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                            </div>
+                        `;
+                        expContainer.appendChild(exp);
+                    });
+                    qDiv.appendChild(expContainer);
+                } 
+                // -> Render Radios
+                else if (q.displayType === 'radio') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                    const qMeta = state.questionsList.find(x => x.qId === q.id);
+                    const qNum = qMeta ? qMeta.absNum : (qIdx + 1);
+                    // Wrapped text in a span to prevent flexbox from splitting marked highlight sentences
+                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qNum}</span> <span>${q.text}</span>`;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'radio-label flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+                            
+                            state.answers[q.id] = opt.id;
+                            updateNavigator();
+                            
+                            optsContainer.querySelectorAll('.radio-label').forEach(l => {
+                                const input = l.querySelector('input');
+                                if (l.dataset.optId === opt.id) {
+                                    l.classList.remove('border-gray-100');
+                                    l.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                } else {
+                                    l.classList.remove('border-pink-500', 'bg-pink-50');
+                                    l.classList.add('border-gray-100');
+                                    input.checked = false;
+                                }
+                            });
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+
+                questionsWrapper.appendChild(qDiv);
+            });
+
+            if (state.mode === 'RESULT') {
+                applyResultStylesToCachedNode(idx, { passage: passageWrapper, questions: questionsWrapper });
+            }
+
+            return { passage: passageWrapper, questions: questionsWrapper };
+        }
+
+        function showSubmitModal() {
+            const answered = state.questionsList.filter(q => {
+                const ans = state.answers[q.qId];
+                return ans && ans.toString().trim() !== '';
+            }).length;
+            DOM.modal.message.innerHTML = `You have answered <strong>${answered}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function finishTest() {
+            state.mode = 'RESULT';
+            clearInterval(state.timerInterval);
+            DOM.modal.container.classList.add('hidden');
+            DOM.header.actions.classList.add('hidden');
+            DOM.result.banner.classList.remove('hidden');
+            DOM.result.banner.classList.add('flex');
+            
+            document.body.classList.add('is-result-mode');
+
+            let score = 0;
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                if (q.displayType === 'inline_blank') {
+                    if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++;
+                } else {
+                    if (ans === q.isCorrect) score++;
+                }
+            });
+
+            const totalQuestions = state.questionsList.length || 40;
+            DOM.result.score.textContent = `${score}/${totalQuestions}`;
+            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            
+            Object.keys(state.cachedPanes).forEach(partIdxStr => {
+                applyResultStylesToCachedNode(parseInt(partIdxStr), state.cachedPanes[partIdxStr]);
+            });
+
+            updateNavigator();
+            loadPart(state.currentPart);
+        }
+
+        function applyResultStylesToCachedNode(idx, cachedNodes) {
+            const data = TEST_DATA.parts[idx];
+            
+            cachedNodes.passage.querySelectorAll('.vocab-word').forEach(w => w.classList.add('mode-result'));
+
+            data.questions.forEach(q => {
+                const qContainer = cachedNodes.questions.querySelector(`#container_${q.id}`);
+                if (!qContainer) return;
+
+                if (q.displayType === 'inline_blanks') {
+                    qContainer.querySelectorAll('input').forEach(input => {
+                        input.disabled = true;
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        
+                        if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
+                            input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                        } else {
+                            input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                            if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('correction-badge')) {
+                                const corr = document.createElement('span');
+                                corr.className = 'correction-badge text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                corr.textContent = info.correct;
+                                input.after(corr);
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'radio') {
+                    qContainer.querySelectorAll('.radio-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] === optId;
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'drag_drop') {
+                    qContainer.querySelectorAll('.pool-item').forEach(item => {
+                        item.removeAttribute('draggable');
+                        item.onclick = null;
+                        item.classList.remove('cursor-pointer', 'hover:border-pink-300', 'hover:bg-pink-50');
+                    });
+                    
+                    q.questions.forEach(subQ => {
+                        const drop = qContainer.querySelector(`#drop_${subQ.id}`);
+                        if(drop) {
+                            drop.onclick = null;
+                            drop.ondragover = null;
+                            drop.ondragleave = null;
+                            drop.ondrop = null;
+                            
+                            drop.classList.remove('text-pink-600', 'border-pink-200', 'cursor-pointer', 'hover:bg-white');
+                            const currentAnsId = state.answers[subQ.id];
+                            const isCorrect = currentAnsId === subQ.correct;
+                            
+                            if (isCorrect) {
+                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                            } else {
+                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            
+            if(state.questionsList.length === 0) {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+                return;
+            }
+
+            state.questionsList.forEach(q => {
+                const ans = state.answers[q.qId];
+                let bg = '';
+                
+                if (state.mode === 'TEST') {
+                    const isAnswered = ans && ans.toString().trim() !== '';
+                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
+                } else {
+                    const corr = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
+                    bg = corr ? 'bg-green-500 text-white border-green-500' : ans ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors flex-shrink-0 ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { 
+                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
+                    setTimeout(() => {
+                        const targetId = 'container_' + (q.parentId || q.qId);
+                        const targetEl = DOM.panes.qContainer.querySelector(`#${targetId}`);
+                        if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100); 
+                };
+                DOM.navigator.grid.appendChild(btn);
+            });
+
+            if(state.mode === 'TEST') DOM.panes.floatingSubmit.classList.remove('hidden');
+            else DOM.panes.floatingSubmit.classList.add('hidden');
+        }
+
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+
+        window.locateInPassage = function(targetId) {
+            document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+            
+            const mappings = {
+                'loc_p1_q1': ['loc_p1_q1'], 'loc_p1_q2': ['loc_p1_q2', 'loc_p1_q2_alt'], 'loc_p1_q3': ['loc_p1_q3'],
+                'loc_p1_q4': ['loc_p1_q4'], 'loc_p1_q5': ['loc_p1_q5'], 'loc_p1_q6': ['loc_p1_q6'],
+                'loc_p1_q7': ['loc_p1_q7'], 'loc_p1_q8': ['loc_p1_q8'], 'loc_p1_q9': ['loc_p1_q9'],
+                'loc_p1_q10': ['loc_p1_q10'], 'loc_p1_q11': ['loc_p1_q11'], 'loc_p1_q12': ['loc_p1_q12'],
+                'loc_p1_q13': ['loc_p1_q13'], 'loc_p2_q14': ['loc_p2_q14'], 'loc_p2_q15': ['loc_p2_q15'],
+                'loc_p2_q16': ['loc_p2_q16'], 'loc_p2_q17': ['loc_p2_q17'], 'loc_p2_q18': ['loc_p2_q18'],
+                'loc_p2_q19': ['loc_p2_q19'], 'loc_p2_q20': ['loc_p2_q20'], 'loc_p2_q21': ['loc_p2_q21'],
+                'loc_p2_q22': ['loc_p2_q22'], 'loc_p2_q23': ['loc_p2_q23'], 'loc_p2_q24': ['loc_p2_q24'],
+                'loc_p2_q25': ['loc_p2_q25'], 'loc_p2_q26': ['loc_p2_q26'], 'loc_p3_q27': ['loc_p3_q27'],
+                'loc_p3_q28': ['loc_p3_q28'], 'loc_p3_q29': ['loc_p3_q29'], 'loc_p3_q30': ['loc_p3_q30'],
+                'loc_p3_q31': ['loc_p3_q31'], 'loc_p3_q32': ['loc_p3_q32'], 'loc_p3_q33': ['loc_p3_q33_34', 'loc_p3_q33_34_alt'],
+                'loc_p3_q34': ['loc_p3_q33_34', 'loc_p3_q33_34_alt'], 'loc_p3_q35': ['loc_p3_q35'],
+                'loc_p3_q36': ['loc_p3_q36'], 'loc_p3_q37': ['loc_p3_q37'], 'loc_p3_q38': ['loc_p3_q38_39'],
+                'loc_p3_q39': ['loc_p3_q38_39'], 'loc_p3_q40': ['loc_p3_q40']
+            };
+
+            const targetIds = mappings[targetId] || [targetId];
+            let found = false;
+
+            targetIds.forEach(id => {
+                const targetEl = DOM.panes.pContainer.querySelector(`#${id}`);
+                if (targetEl) {
+                    if (!found) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found = true;
+                    }
+                    targetEl.classList.add('highlight-active');
+                    setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+                }
+            });
+
+            if (!found) {
+                console.warn('Passage location target not found for:', targetId);
+                const pane = document.getElementById('pane-passage');
+                if (pane) pane.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
