@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+        
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">20:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 1</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">THIRD CULTURE KIDS</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><span id="exp-q1" class="explanation-target">In a world where international careers are becoming commonplace, the phenomenon of third culture kids (TCKS)- children who spend a significant portion of their developmental years in a culture outside their parents' passport culture(s)-is increasing exponentially.</span> Not only is their number increasing, but the cultural complexity and relevance of their experience and the adult TCKS (ATCKS) they become, is also growing.</p>
+
+                    <p><span id="exp-q3" class="explanation-target">When Ruth Hill Useem, a sociologist, first coined this term in the 1950s, she spent a year researching expatriates in India.</span> <span id="exp-q4" class="explanation-target">She discovered that folks who came from their home (or first) culture and moved to a host (or second) culture, had, in reality, formed a culture, or lifestyle, different from either the first or second cultures. She called this the third culture</span> and the children who grew up in this lifestyle 'third culture kids'. At that time, most expatriate families had parents from the same culture and they often remained in one host culture while overseas.</p>
+
+                    <p>This is no longer the case. Take, for example, Brice Royer, the founder of TCKid.com. His father is a half-French/half-Vietnamese UN peacekeeper, while his mom is Ethiopian. Brice lived in seven countries before he was eighteen including France, Mayotte, La Réunion, Ethiopia, Egypt, Canada and England. He writes, "When people ask me 'Where are you from?' I just joke around and say, 'My mom says I'm from heaven.'" What other answer can he give?</p>
+
+                    <p>ATCK Elizabeth Dunbar's father, Roy, moved from Jamaica to Britain as a young boy. Her mother, Hortense, was born in Britain as the child of Jamaican immigrants who always planned to repatriate 'one day'. While Elizabeth began life in Britain, her dad's international career took the family to the United States, then to Venezuela and back to living in three different cities in the U.S. <span id="exp-q6" class="explanation-target">She soon realised that while racial diversity may be recognised, the hidden cultural diversity of her life remained invisible.</span></p>
+
+                    <p>Despite such complexities, however, most ATCKs say their experience of growing up among different cultural worlds has given them many priceless gifts. They have seen the world and often learnt several languages. More importantly, through friendships that cross the usual racial, national or social barriers, <span id="exp-q7" class="explanation-target">they have also learned the very different ways people see life.</span> This offers a great opportunity to become social and cultural bridges between worlds that traditionally would never connect. ATCK Mikel Jentzsch, author of a best-selling book in Germany, Bloodbrothers - Our Friendship in Liberia, has a German passport but grew up in Niger and then Liberia. Before the Liberian civil war forced his family to leave, Mikel played daily with those who were later forced to become soldiers for that war. Through his eyes, the stories of those we would otherwise overlook come to life for the rest of us.</p>
+
+                    <p>Understanding the TCK experience is also important for other reasons. Many ATCKs are now in positions of influence and power. Their capacity to often think 'outside the box' can offer new and creative thinking for doing business and living in our globalising world. <span id="exp-q8" class="explanation-target">But that same thinking can create fear for those who see the world from a more traditional world view.</span> <span id="exp-q9" class="explanation-target">Neither the non-ATCKS nor the ATCKS may recognise that there may be a cultural clash going on</span> because, by traditional measures of diversity such as race or gender, they are alike.</p>
+
+                    <p>In addition, many people hear the benefits and challenges of the TCK profile described and wonder why they relate to it when they never lived overseas because of a parent's career. Usually, however, they have grown up cross-culturally in another way, perhaps as children of immigrants, refugees, bi-racial or bi-cultural unions, international adoptees, even children of minorities. If we see the TCK experience as a Petri dish of sorts-<span id="exp-q10" class="explanation-target">a place where the effects of growing up among many cultural worlds accompanied by a high degree of mobility have been studied</span> - then we can look for what <span id="exp-q11" class="explanation-target">lessons may also be relevant to helping us understand issues other cross-cultural kids (CCKs) may also face.</span> <span id="exp-q12" class="explanation-target">It is possible we may discover that we need to rethink our traditional ways of defining diversity and identity.</span> <span id="exp-q13" class="explanation-target">For some, as for TCKS, 'culture' may be something defined by shared experience</span> rather than shared nationality or ethnicity. In telling their stories and developing new models for our changing world, many will be able to recognise and use well the great gifts of a cross-cultural childhood and deal successfully with the challenges for their personal, communal and corporate good.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: TRUE/FALSE/NOT GIVEN -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-6</h3>
+                        <p class="text-sm text-gray-800">Do the following statements agree with the information given in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 mt-2 space-y-1">
+                            <li><strong class="text-brand-700">TRUE</strong> if the statement agrees with the information</li>
+                            <li><strong class="text-brand-700">FALSE</strong> if the statement contradicts the information</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if there is no information on this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const tfngQuestions = [
+                                { q: 1, text: "There is a close connection between careers and the number of TCKs.", exp: ['exp-q1'] },
+                                { q: 2, text: "An increasing number of people describe themselves as TCKs.", exp: 'not-given' },
+                                { q: 3, text: "Ruth Hill Useem studied children in several countries.", exp: ['exp-q3'] },
+                                { q: 4, text: "Ruth Hill Useem defined the third culture as a mixture of two parents' original cultures.", exp: ['exp-q4'] },
+                                { q: 5, text: "Brice Royer feels that he has benefited greatly from living in many different countries.", exp: 'not-given' },
+                                { q: 6, text: "Elizabeth Dunbar felt that she had a culture that was different from most people's.", exp: ['exp-q6'] }
+                            ];
+                            
+                            tfngQuestions.forEach(item => {
+                                const explanationCall = item.exp === 'not-given' ? `showNotGivenToast()` : `showExplanation(${JSON.stringify(item.exp)})`;
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-3 pl-9">
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="TRUE" onchange="updateRadioMap(${item.q})"> TRUE
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="FALSE" onchange="updateRadioMap(${item.q})"> FALSE
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="updateRadioMap(${item.q})"> NOT GIVEN
+                                            </label>
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${explanationCall}'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 7-13</h3>
+                        <p class="text-sm text-gray-800">Complete the table below. Choose <strong class="text-brand-700">NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-gray-300 text-sm text-left">
+                            <thead class="bg-gray-100 text-gray-700">
+                                <tr>
+                                    <th colspan="3" class="border border-gray-300 p-3 font-bold text-center text-lg text-brand-800 uppercase tracking-widest bg-brand-50">
+                                        THIRD CULTURE KIDS – ADVANTAGES AND RESULTS
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="border border-gray-300 p-3 font-bold">Area</th>
+                                    <th class="border border-gray-300 p-3 font-bold">Advantage for ATCKs</th>
+                                    <th class="border border-gray-300 p-3 font-bold">Possible result</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-800 leading-relaxed bg-white">
+                                <!-- Row 1 -->
+                                <tr>
+                                    <td class="border border-gray-300 p-3 align-top font-medium text-gray-700 bg-gray-50/50">Friendships</td>
+                                    <td class="border border-gray-300 p-3 align-top">
+                                        <div class="mb-2">know how different people</div>
+                                        <div class="q-block flex flex-col" data-q="7">
+                                            <div class="flex items-center gap-2">
+                                                <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">7</strong>
+                                                <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off" class="!w-[140px]">
+                                            </div>
+                                            <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q7"])'>Explanation</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="border border-gray-300 p-3 align-top">
+                                        can act as bridges between worlds that are usually separate
+                                    </td>
+                                </tr>
+
+                                <!-- Row 2 -->
+                                <tr>
+                                    <td class="border border-gray-300 p-3 align-top font-medium text-gray-700 bg-gray-50/50">Business</td>
+                                    <td class="border border-gray-300 p-3 align-top">
+                                        creative thinking
+                                    </td>
+                                    <td class="border border-gray-300 p-3 align-top space-y-4">
+                                        <div>
+                                            <div class="mb-2">may cause</div>
+                                            <div class="q-block flex flex-col" data-q="8">
+                                                <div class="flex items-center gap-2">
+                                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">8</strong>
+                                                    <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off" class="!w-[140px]">
+                                                </div>
+                                                <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q8"])'>Explanation</button>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">among certain people</div>
+                                        </div>
+                                        <hr class="border-gray-200">
+                                        <div>
+                                            <div class="mb-2">can lead to</div>
+                                            <div class="q-block flex flex-col" data-q="9">
+                                                <div class="flex items-center gap-2">
+                                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">9</strong>
+                                                    <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off" class="!w-[160px]">
+                                                </div>
+                                                <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q9"])'>Explanation</button>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">despite similarities</div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 3 -->
+                                <tr>
+                                    <td class="border border-gray-300 p-3 align-top font-medium text-gray-700 bg-gray-50/50">Whole experience</td>
+                                    <td class="border border-gray-300 p-3 align-top">
+                                        <div class="mb-2">knowledge of many cultural worlds and a great deal of</div>
+                                        <div class="q-block flex flex-col" data-q="10">
+                                            <div class="flex items-center gap-2">
+                                                <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">10</strong>
+                                                <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off" class="!w-[140px]">
+                                            </div>
+                                            <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q10"])'>Explanation</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="border border-gray-300 p-3 align-top space-y-4">
+                                        <div>
+                                            <div class="mb-2">can teach us about problems faced by</div>
+                                            <div class="q-block flex flex-col" data-q="11">
+                                                <div class="flex items-center gap-2">
+                                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">11</strong>
+                                                    <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off" class="!w-[180px]">
+                                                </div>
+                                                <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q11"])'>Explanation</button>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">of all kinds</div>
+                                        </div>
+                                        <hr class="border-gray-200">
+                                        <div>
+                                            <div class="mb-2">current ideas of what both</div>
+                                            <div class="q-block flex flex-col" data-q="12">
+                                                <div class="flex items-center gap-2">
+                                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">12</strong>
+                                                    <input type="text" id="input-q12" onkeyup="updateTextInput(12, this.value)" autocomplete="off" class="!w-[180px]">
+                                                </div>
+                                                <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q12"])'>Explanation</button>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">mean may be considered wrong</div>
+                                        </div>
+                                        <hr class="border-gray-200">
+                                        <div>
+                                            <div class="mb-2">belief that culture depends on</div>
+                                            <div class="q-block flex flex-col" data-q="13">
+                                                <div class="flex items-center gap-2">
+                                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full shrink-0">13</strong>
+                                                    <input type="text" id="input-q13" onkeyup="updateTextInput(13, this.value)" autocomplete="off" class="!w-[160px]">
+                                                </div>
+                                                <div class="feedback-container hidden flex-col mt-2 pt-2 border-t border-gray-100">
+                                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 w-max" onclick='showExplanation(["exp-q13"])'>Explanation</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: ["TRUE", "T"],
+            2: ["NOT GIVEN", "NG"],
+            3: ["FALSE", "F"],
+            4: ["FALSE", "F"],
+            5: ["NOT GIVEN", "NG"],
+            6: ["TRUE", "T"],
+            // Text Input (Multiple acceptable variations)
+            7: ["see life"],
+            8: ["fear"],
+            9: ["a cultural clash", "cultural clash"],
+            10: ["mobility"],
+            11: ["cross-cultural kids", "ccks", "cross cultural kids"],
+            12: ["diversity and identity"],
+            13: ["shared experience"]
+        };
+
+        const TOTAL_QS = 13;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 20 * 60; // 20 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300 w-fit flex items-center gap-1 shadow-sm mt-1`;
+            el.innerHTML = `<svg class="w-3 h-3 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Ans: ${text}`;
+            return el;
+        }
+        
+        function createRadioCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            // Grade Q1-Q6 (T/F/NG)
+            for (let i = 1; i <= 6; i++) {
+                const uAns = userAnswers[i].toUpperCase();
+                const acceptableKeys = ANSWER_KEYS[i];
+                const isCorrect = acceptableKeys.includes(uAns);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createRadioCorrectMarker(acceptableKeys[0]), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900', 'font-bold');
+                }
+            }
+
+            // Grade Q7-Q13 (Table Inputs)
+            for (let i = 7; i <= 13; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qBlock = document.querySelector(`.q-block[data-q="${i}"]`);
+                const feedbackContainer = qBlock.querySelector('.feedback-container');
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                }
+                
+                if (!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(ANSWER_KEYS[i][0]), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function showNotGivenToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
