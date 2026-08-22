@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive Vol 2 Test 1 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Deep Forest/Olive reflecting Nature, History, and Earth Sciences */
+            --primary: #3f6212; 
+            --primary-light: #fefce8;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #14532d;
+            --border: #fde047;
+            --badge-bg: #fde047;
+            --badge-text: #422006;
+            --success: #0284c7; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Search Bar */
+        .search-container { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; max-width: 500px; padding: 0.75rem 1.5rem; font-size: 1rem; border: 2px solid var(--border); border-radius: 25px; outline: none; transition: border-color 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-input:focus { border-color: var(--primary); }
+
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(63, 98, 18, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none !important; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+        .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
+        .extra-example span { color: #475569; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary); text-transform: capitalize;}
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>PET Intensive Vol 2 Test 1 - Vocabulary</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a word..." oninput="handleSearch()">
+    </div>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Carnivorous Plant')">Passage 1: Carnivorous Plant</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'History Lessons')">Passage 2: History Lessons</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Neanderthal Technology')">Passage 3: Neanderthals</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <h2 class="word" id="fc-word">Word</h2>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / X</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Intensive Vol 2 Test 1)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- PASSAGE 1: Carnivorous Plant ---
+        { topic: "Carnivorous Plant", level: "B2", word: "Carnivorous", form: "Adjective", phonetic: "/kɑːˈnɪvərəs/", forms: "N: Carnivore", def: "(Of an animal or plant) feeding on other animals.", translation: "Ăn thịt", example: "He spent months running experiments on carnivorous plants.", extraExample: "Lions are carnivorous animals." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Flesh", form: "Noun", phonetic: "/fleʃ/", forms: "Adj: Fleshy", def: "The soft substance consisting of muscle and fat that is found between the skin and bones of a human or an animal.", translation: "Thịt", example: "They attract insects and then eat their flesh.", extraExample: "The trap was baited with raw flesh." },
+        { topic: "Carnivorous Plant", level: "B2", word: "Naturalist", form: "Noun", phonetic: "/ˈnætʃrəlɪst/", forms: "Adj: Natural", def: "An expert in or student of natural history.", translation: "Nhà tự nhiên học", example: "The naturalist and author of Origin of Species, Charles Darwin.", extraExample: "The documentary was filmed by a famous wildlife naturalist." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Sundew", form: "Noun", phonetic: "/ˈsʌndjuː/", forms: "N/A", def: "A small carnivorous plant of boggy places, with leaves covered with sticky hairs.", translation: "Cây gọng vó", example: "Soon after he came across his first carnivorous plant — the sundew...", extraExample: "The sundew catches small insects with its sticky droplets." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Tentacle", form: "Noun", phonetic: "/ˈtentəkl/", forms: "N/A", def: "A slender, flexible limb or appendage in an animal, used for grasping or moving about.", translation: "Xúc tu", example: "He watched them slowly fold their sticky tentacles over their prey.", extraExample: "The octopus uses its tentacles to catch prey." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Adaptation", form: "Noun", phonetic: "/ˌædæpˈteɪʃn/", forms: "V: Adapt", def: "The process of change by which an organism or species becomes better suited to its environment.", translation: "Sự thích nghi", example: "This was no accident. This was adaptation.", extraExample: "Evolution is driven by the process of adaptation." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Venus flytrap", form: "Noun Phrase", phonetic: "/ˌviːnəs ˈflaɪtræp/", forms: "N/A", def: "A carnivorous plant that catches insects by trapping them between its specialized leaves.", translation: "Cây bẫy ruồi Venus", example: "He was amazed at the quickness and power of the Venus flytrap.", extraExample: "The Venus flytrap snapped shut around the unsuspecting fly." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Secrete", form: "Verb", phonetic: "/sɪˈkriːt/", forms: "N: Secretion", def: "(Of a cell, gland, or organ) produce and discharge (a substance).", translation: "Tiết ra", example: "It formed itself into a temporary ‘stomach’, secreting enzymes that could dissolve the prey.", extraExample: "The glands secrete a digestive fluid." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Dissolve", form: "Verb", phonetic: "/dɪˈzɒlv/", forms: "N: Dissolution", def: "(With reference to a solid) become or cause to become incorporated into a liquid.", translation: "Hòa tan, phân hủy", example: "Secreting enzymes that could dissolve the prey.", extraExample: "Sugar easily dissolves in hot water." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Physiologist", form: "Noun", phonetic: "/ˌfɪziˈɒlədʒɪst/", forms: "N: Physiology", def: "A biologist who deals with the functions and activities of life or of living matter.", translation: "Nhà sinh lý học", example: "Alexander Volkov, a plant physiologist at Oakwood University...", extraExample: "The physiologist studied the effects of extreme temperatures on the body." },
+        { topic: "Carnivorous Plant", level: "B2", word: "Stimulate", form: "Verb", phonetic: "/ˈstɪmjuleɪt/", forms: "N: Stimulation", def: "Raise levels of physiological or nervous activity in (the body or any biological system).", translation: "Kích thích", example: "The charge is not enough to stimulate the snap.", extraExample: "The drug is meant to stimulate the immune system." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Convex", form: "Adjective", phonetic: "/ˈkɒnveks/", forms: "N/A", def: "Having an outline or surface curved like the exterior of a circle or sphere.", translation: "Lồi", example: "Causing the leaf to rapidly flip in shape from convex to concave.", extraExample: "The outer surface of the lens is convex." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Concave", form: "Adjective", phonetic: "/ˈkɒnkeɪv/", forms: "N/A", def: "Having an outline or surface that curves inward like the interior of a circle or sphere.", translation: "Lõm", example: "Causing the leaf to rapidly flip in shape from convex to concave.", extraExample: "The bowl has a smooth concave surface." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Bladderwort", form: "Noun", phonetic: "/ˈblædəwɜːt/", forms: "N/A", def: "An aquatic or bog carnivorous plant that catches small insects in submerged bladders.", translation: "Cây rong bắt ruồi", example: "The bladderwort plant has an equally sophisticated way of setting its underwater trap.", extraExample: "The bladderwort thrives in shallow ponds." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Pitcher plant", form: "Noun Phrase", phonetic: "/ˈpɪtʃə plɑːnt/", forms: "N/A", def: "A plant with a deep pitcher-shaped pouch that contains fluid and traps insects.", translation: "Cây nắp ấm", example: "Pitcher plants use yet another strategy, growing long tube-shaped leaves.", extraExample: "The pitcher plant digested the ant." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Phosphorus", form: "Noun", phonetic: "/ˈfɒsfərəs/", forms: "Adj: Phosphorous", def: "A poisonous, combustible non-metallic element.", translation: "Phốt pho", example: "Carnivorous plants take nitrogen and phosphorus from the flesh.", extraExample: "Phosphorus is essential for strong bones and teeth." },
+        { topic: "Carnivorous Plant", level: "B2", word: "Photosynthesis", form: "Noun", phonetic: "/ˌfəʊtəʊˈsɪnθəsɪs/", forms: "V: Photosynthesize", def: "The process by which green plants and some other organisms use sunlight to synthesize nutrients.", translation: "Sự quang hợp", example: "A pitcher or a flytrap is not very good at photosynthesis.", extraExample: "Photosynthesis is the process that produces oxygen." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Bog", form: "Noun", phonetic: "/bɒɡ/", forms: "Adj: Boggy", def: "Wet muddy ground too soft to support a heavy body.", translation: "Đầm lầy", example: "The poor soil of bogs and swamps offers little nitrogen.", extraExample: "He got stuck in the muddy bog." },
+        { topic: "Carnivorous Plant", level: "C1", word: "Swamp", form: "Noun", phonetic: "/swɒmp/", forms: "Adj: Swampy", def: "An area of low-lying, uncultivated ground where water collects; a bog or marsh.", translation: "Đầm lầy, vũng lầy", example: "The poor soil of bogs and swamps offers little nitrogen.", extraExample: "Alligators often live in the swamps of Florida." },
+        { topic: "Carnivorous Plant", level: "C2", word: "Suppress", form: "Verb", phonetic: "/səˈpres/", forms: "N: Suppression", def: "Prevent the development, action, or expression of (a feeling, impulse, idea, etc.).", translation: "Kìm hãm, đàn áp", example: "The suppression of wildfires allows other plants to outcompete the Venus flytraps.", extraExample: "The government tried to suppress the rebellion." },
+
+        // --- PASSAGE 2: Drawing Lessons from History ---
+        { topic: "History Lessons", level: "B2", word: "Collapse", form: "Noun", phonetic: "/kəˈlæps/", forms: "V: Collapse", def: "A sudden failure of an institution or enterprise.", translation: "Sự sụp đổ", example: "The term 'collapse' refers to a significant reduction in population and complexity.", extraExample: "The sudden collapse of the company shocked everyone." },
+        { topic: "History Lessons", level: "C1", word: "Reminiscent", form: "Adjective", phonetic: "/ˌremɪˈnɪsnt/", forms: "V: Reminisce", def: "Tending to remind one of something.", translation: "Gợi nhớ", example: "Leaving behind grand ruins reminiscent of what poet Shelley described.", extraExample: "The smell was reminiscent of my childhood home." },
+        { topic: "History Lessons", level: "C1", word: "Intricate", form: "Adjective", phonetic: "/ˈɪntrɪkət/", forms: "N: Intricacy", def: "Very complicated or detailed.", translation: "Phức tạp, tinh xảo", example: "Vast stone structures, intricate carvings, or towering temples.", extraExample: "The watch has a very intricate mechanism." },
+        { topic: "History Lessons", level: "C2", word: "Reverence", form: "Noun", phonetic: "/ˈrevərəns/", forms: "V: Revere", def: "Deep respect for someone or something.", translation: "Sự tôn kính", example: "Standing in silent reverence before the remnants of a world that once thrived.", extraExample: "He spoke of his old teacher with great reverence." },
+        { topic: "History Lessons", level: "C1", word: "Thrive", form: "Verb", phonetic: "/θraɪv/", forms: "Adj: Thriving", def: "Prosper; flourish.", translation: "Phát triển mạnh, thịnh vượng", example: "Standing in silent reverence before the remnants of a world that once thrived.", extraExample: "The business began to thrive under her leadership." },
+        { topic: "History Lessons", level: "C1", word: "Grandeur", form: "Noun", phonetic: "/ˈɡrændʒə/", forms: "Adj: Grand", def: "Splendor and impressiveness, especially of appearance or style.", translation: "Sự vĩ đại, tráng lệ", example: "The grandeur of these ruins attests to the previous wealth and power of their builders.", extraExample: "We were struck by the breathtaking grandeur of the mountains." },
+        { topic: "History Lessons", level: "C2", word: "Ecocide", form: "Noun", phonetic: "/ˈiːkəʊsaɪd/", forms: "N/A", def: "Destruction of the natural environment, especially when willfully done.", translation: "Sự hủy diệt môi trường", example: "This suspicion of unintended ecological suicide, or ecocide, has been substantiated.", extraExample: "The illegal logging operations were accused of committing ecocide." },
+        { topic: "History Lessons", level: "C1", word: "Substantiate", form: "Verb", phonetic: "/səbˈstænʃieɪt/", forms: "N: Substantiation", def: "Provide evidence to support or prove the truth of.", translation: "Chứng minh, xác minh", example: "This suspicion has been substantiated by discoveries made in recent decades.", extraExample: "The scientist was unable to substantiate his claims." },
+        { topic: "History Lessons", level: "C1", word: "Degradation", form: "Noun", phonetic: "/ˌdeɡrəˈdeɪʃn/", forms: "V: Degrade", def: "The condition or process of degrading or being degraded.", translation: "Sự suy thoái", example: "The processes include deforestation, soil degradation, and water management challenges.", extraExample: "Environmental degradation is a major concern globally." },
+        { topic: "History Lessons", level: "C1", word: "Strife", form: "Noun", phonetic: "/straɪf/", forms: "N/A", def: "Angry or bitter disagreement over fundamental issues; conflict.", translation: "Xung đột, sự bất hòa", example: "These patterns often include resource depletion, environmental degradation, internal strife...", extraExample: "The country was torn apart by internal political strife." },
+        { topic: "History Lessons", level: "C1", word: "Trajectory", form: "Noun", phonetic: "/trəˈdʒektəri/", forms: "N/A", def: "The path followed by a projectile flying or an object moving under the action of given forces.", translation: "Quỹ đạo, tiến trình", example: "Writers are often tempted to draw analogies between the trajectory of human society and that of an individual's life.", extraExample: "The missile's trajectory was carefully calculated." },
+        { topic: "History Lessons", level: "C2", word: "Demise", form: "Noun", phonetic: "/dɪˈmaɪz/", forms: "N/A", def: "A person's death, or the end or failure of an enterprise or institution.", translation: "Sự suy tàn, cái chết", example: "Speaking of a society's birth, growth, peak, old age, and eventual demise.", extraExample: "The financial crisis led to the rapid demise of the company." },
+        { topic: "History Lessons", level: "C2", word: "Contingent", form: "Adjective", phonetic: "/kənˈtɪndʒənt/", forms: "N: Contingency", def: "Occurring or existing only if (certain circumstances) are the case; dependent on.", translation: "Phụ thuộc vào", example: "Their expression is deeply contingent on local conditions.", extraExample: "The success of the plan is contingent upon receiving adequate funding." },
+        { topic: "History Lessons", level: "C1", word: "Eclipse", form: "Verb", phonetic: "/ɪˈklɪps/", forms: "N: Eclipse", def: "Deprive (someone or something) of significance, power, or prominence.", translation: "Làm lu mờ", example: "Many individuals believe that environmental problems eclipse other global threats.", extraExample: "Her performance eclipsed that of all the other actors." },
+        { topic: "History Lessons", level: "C2", word: "Encompass", form: "Verb", phonetic: "/ɪnˈkʌmpəs/", forms: "N/A", def: "Surround and have or hold within.", translation: "Bao gồm, bao quanh", example: "These environmental problems encompass the same eight factors.", extraExample: "The festival encompasses a wide range of musical styles." },
+        { topic: "History Lessons", level: "B2", word: "Deplete", form: "Verb", phonetic: "/dɪˈpliːt/", forms: "N: Depletion", def: "Use up the supply or resources of.", translation: "Làm cạn kiệt", example: "When one resource is depleted, can we trust that new alternatives will emerge?", extraExample: "The lake's fish population was severely depleted by overfishing." },
+
+        // --- PASSAGE 3: Neanderthal Technology ---
+        { topic: "Neanderthal Technology", level: "C1", word: "Prehistoric", form: "Adjective", phonetic: "/ˌpriːhɪˈstɒrɪk/", forms: "N: Prehistory", def: "Relating to or denoting the period before written records.", translation: "Tiền sử", example: "We think of our prehistoric ancestors as people of the ice and snow.", extraExample: "The museum houses a large collection of prehistoric artifacts." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Steppe", form: "Noun", phonetic: "/step/", forms: "N/A", def: "A large area of flat unforested grassland in southeastern Europe or Siberia.", translation: "Thảo nguyên", example: "Further to the east on the Russian steppe, open-air sites were the only option.", extraExample: "The nomadic tribes traveled across the vast Asian steppes." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Postglacial", form: "Adjective", phonetic: "/ˌpəʊstˈɡleɪʃl/", forms: "N/A", def: "Relating to or denoting the period of time following a glacial period.", translation: "Hậu kỷ băng hà", example: "Many of them have disappeared under deep mud deposits or under the rising postglacial seas.", extraExample: "The postglacial warming dramatically changed the landscape." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Flint", form: "Noun", phonetic: "/flɪnt/", forms: "N/A", def: "A hard grey rock consisting of nearly pure chert, occurring chiefly as nodules in chalk.", translation: "Đá lửa", example: "There were good supplies of flint to hand for axes and the like.", extraExample: "Early humans used pieces of sharpened flint as knives." },
+        { topic: "Neanderthal Technology", level: "C1", word: "Vantage point", form: "Noun Phrase", phonetic: "/ˈvɑːntɪdʒ pɔɪnt/", forms: "N/A", def: "A place or position affording a good view of something.", translation: "Vị trí có tầm nhìn tốt", example: "Caves at some height above the valley floor offered good game-watching vantage points.", extraExample: "The balcony provided a perfect vantage point to watch the parade." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Benign", form: "Adjective", phonetic: "/bɪˈnaɪn/", forms: "N/A", def: "Gentle and kindly; (of a climate or environment) mild and favourable.", translation: "Ôn hòa, thuận lợi", example: "The Périgord region during the last ice age was an exceptionally benign habitat for humans.", extraExample: "They enjoyed the benign climate of the Mediterranean island." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Tundra", form: "Noun", phonetic: "/ˈtʌndrə/", forms: "N/A", def: "A vast, flat, treeless Arctic region of Europe, Asia, and North America in which the subsoil is permanently frozen.", translation: "Lãnh nguyên", example: "A maritime climate with cooler summers that permitted the extension of tundra and steppe.", extraExample: "Reindeer graze on the frozen tundra during the summer months." },
+        { topic: "Neanderthal Technology", level: "C1", word: "Abundant", form: "Adjective", phonetic: "/əˈbʌndənt/", forms: "N: Abundance", def: "Existing or available in large quantities; plentiful.", translation: "Phong phú, dồi dào", example: "Men never needed to travel far from home to find abundant supplies of meat.", extraExample: "The region is known for its abundant wildlife and natural resources." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Sedimentation", form: "Noun", phonetic: "/ˌsedɪmenˈteɪʃn/", forms: "N: Sediment", def: "The process of settling or being deposited as a sediment.", translation: "Sự bồi tích, sự lắng đọng", example: "The sedimentation potential of lakes and stream courses has aided archaeological preservation.", extraExample: "Heavy rains caused massive soil sedimentation in the river." },
+        { topic: "Neanderthal Technology", level: "C1", word: "Strut", form: "Noun", phonetic: "/strʌt/", forms: "N/A", def: "A rod or bar forming part of a framework and designed to resist compression.", translation: "Thanh chống", example: "Arrangements of large stones out from the cave wall that might have supported timber struts.", extraExample: "The wooden struts kept the old roof from collapsing." },
+        { topic: "Neanderthal Technology", level: "C1", word: "Pelt", form: "Noun", phonetic: "/pelt/", forms: "N/A", def: "The skin of an animal with the fur, wool, or hair still on it.", translation: "Da thú (còn lông)", example: "Foot bones inside these ‘tents’ have been thought to indicate the use of animal pelts as bed coverings.", extraExample: "The trapper sold the thick fox pelts at the market." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Cobble", form: "Noun", phonetic: "/ˈkɒbl/", forms: "Adj: Cobbled", def: "A small round stone used to cover road surfaces.", translation: "Đá cuội", example: "The cave boasts ten square metres of cobbles brought up from the local river.", extraExample: "The old town's streets were paved with uneven cobbles." },
+        { topic: "Neanderthal Technology", level: "C1", word: "Predatory", form: "Adjective", phonetic: "/ˈpredətri/", forms: "N: Predator", def: "Relating to or denoting an animal or animals preying naturally on others.", translation: "Ăn thịt, săn mồi", example: "Fire gave warmth, light, heat for cooking and defence against predatory animals.", extraExample: "The eagle is a predatory bird." },
+        { topic: "Neanderthal Technology", level: "C2", word: "Charred", form: "Adjective", phonetic: "/tʃɑːd/", forms: "V: Char", def: "Burnt and made black by fire.", translation: "Cháy thành than", example: "A charred piece of birch from Krapina is thought to be the remains of a fire-making twirl stick.", extraExample: "Only the charred remains of the wooden house were left." },
+        { topic: "Neanderthal Technology", level: "C1", word: "Hearth", form: "Noun", phonetic: "/hɑːθ/", forms: "N/A", def: "The floor of a fireplace.", translation: "Lò sưởi, bếp lò", example: "But Neanderthal hearths are fewer and harder to identify with certainty.", extraExample: "The family gathered around the warm hearth on a cold evening." }
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+    let searchQuery = '';
+
+    function handleSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase();
+        applyFilters();
+    }
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const cardWord = card.querySelector('.word').textContent.toLowerCase();
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            const matchSearch = (searchQuery === '' || cardWord.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const word = item.word.toLowerCase();
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            const matchSearch = (searchQuery === '' || word.includes(searchQuery));
+            if (matchTopic && matchLevel && matchSearch) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #fde047; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #14532d;">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: #14532d;">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: #fefce8; padding: 1rem; border-left: 4px solid #14532d; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #14532d; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
