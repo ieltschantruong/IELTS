@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Inline Drop Zone for Summary */
+        .summary-drop-zone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            height: 28px;
+            padding: 0 8px;
+            margin: 0 4px;
+            border: 2px dashed #9ca3af;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #a03046;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+        .summary-drop-zone.filled {
+            border: 2px solid #d75872;
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .summary-drop-zone.correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        .summary-drop-zone.incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <!-- Left Pane: Passage -->
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Life on Mars?</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">Terraforming may sound like something out of science fiction, but some believe it is possible to turn that fiction into fact.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p>As plans are slowly being drawn up for the first manned mission to Mars, many space travel sceptics are asking one vital question: why go there? Mars is a barren, desolate planet, and with its thin atmosphere and bitterly cold climate, it would appear to be completely unsuitable for human life. Above all, it is a very distant place, and getting there would be an enormous challenge. However, the planet might just hold the key to long-term human survival. With the Earth's population currently at more than seven billion and climbing, we may eventually be forced to look elsewhere in the solar system for somewhere to live. <span id="exp-q1" class="explanation-target">It is just possible that, contrary to photographic evidence, Mars may be more promising than it appears.</span></p>
+
+                    <p>Today, Mars is a viciously cold, dry place. However, it does have some things in common with our own planet. For example, it has a daily rotation rate of 24 hours 37 minutes, compared with 23 hours 56 minutes on Earth. It also has an axial tilt of 24 degrees, which is just half a degree more than Earth's, and a gravitational pull one third of Earth's. Furthermore, it holds many of the elements that are required to support life, including carbon and oxygen (in the form of carbon dioxide), nitrogen, and frozen water at its polar ice caps. In fact, if you were to travel back in time several billions years, you would notice some remarkable parallels between the atmosphere on Earth then and Mars today. Back then, Earth was also a lifeless planet; until photosynthetic bacteria developed and began to produce enough oxygen to allow for the development of animal and plant life, our atmosphere also consisted entirely of carbon dioxide and nitrogen.</p>
+
+                    <p>It comes as no surprise to learn, therefore, that some scientists believe the same process which turned Earth's atmosphere from mostly carbon dioxide into breathable air could be repeated on Mars, but by using technology rather than by letting nature and evolution take its natural course. Terraforming, as this process is known, would initially create a greenhouse effect that would heat the planet, which in turn would create other conditions necessary to provide a suitable living environment for plants and animals. However, it would be a highly challenging undertaking, and the process of terraforming the entire planet into an Earth-like habitat could still take many thousands of years.</p>
+
+                    <p>Three terraforming methods have been suggested, <span id="exp-q3" class="explanation-target">with the first already under development, albeit for a different purpose.</span> At present, the American space agency NASA is working on a system that will use large mirrors to capture the sun's radiation. This radiation will be used to propel spacecraft through space, removing the need for heavy and expensive rocket fuel. With a few changes, it might be possible to use similar mirrors to reflect the sun's radiation and heat the surface of Mars. Aimed at the planet from a distance of two hundred thousand miles, these enormous mirrors would raise the surface temperature by a few degrees. If they were concentrated on the polar ice caps, they would provide enough heat to melt the polar ice caps and release the carbon dioxide that is believed to be trapped there. Gradually, as the temperature rose, greenhouse gases would be released, and this would create a form of Martian global warming, the first stage in making the planet sustainable for life.</p>
+
+                    <p>The second method would be to set up greenhouse gas 'factories' in order to raise the temperature of the planet. It is generally accepted that greenhouse gases produced by heavy industry are raising the Earth's temperature. Therefore, by building hundreds of greenhouse-gas emitting factories on Mars, a similar effect could be achieved. Carbon dioxide, methane and other greenhouse gases would be pumped into the Martian atmosphere. <span id="exp-q4" class="explanation-target">The same factories would then produce oxygen by mimicking the natural process of plant photosynthesis: they would inhale the carbon dioxide they produce, and then emit oxygen. The process could be accelerated by 'sowing' the planet's surface with photosynthetic bacteria, which would increase the rate at which oxygen is produced. Eventually, there would be enough oxygen on the planet for humans to breathe using only special apparatus similar to that used by mountain climbers.</span></p>
+
+                    <p>The third, and by far the most extreme, method has been proposed by space scientists Robert Zubrin and Christopher McKay. They believe that it would be possible to produce greenhouse gases and water by firing large, ammonia-bearing asteroids at the planet. <span id="exp-q10" class="explanation-target">Each asteroid would weigh about ten billion tons, and would be powered by huge rocket engines which would move it towards Mars at over 10,000 miles per hour.</span> <span id="exp-q11" class="explanation-target">At this speed, it would take each asteroid about ten years to reach its destination.</span> <span id="exp-q12" class="explanation-target">The energy produced by one asteroid slamming into Mars' surface, say Zubrin and McKay, would raise the temperature of the planet by three degrees Celsius</span> and <span id="exp-q13" class="explanation-target">melt about one thousand billion tons of ice at the polar caps.</span> <span id="exp-q14" class="explanation-target">They believe it would take many of these asteroids, and at least fifty years, in order to create a temperate climate</span> and enough water to cover a quarter of the planet's surface.</p>
+
+                    <p>Terraforming Mars, if it is ever attempted, will be neither cheap nor easy. And it certainly won't be quick; although optimists like Zubrin and McKay say it could be achieved in five or six decades, the reality is that terraforming is more likely to take hundreds or even thousands of years. <span id="exp-q5" class="explanation-target">Furthermore, it will stretch human ingenuity to its limits, and will require levels of will and commitment that have rarely been seen before.</span> The challenge of developing a habitable environment and bringing life to the cold, dry world of Mars is fraught with challenges, but it might just be one that saves the human race.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Questions -->
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: YES/NO/NOT GIVEN -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800">Do the following statements agree with the views of the writer in the Reading passage?</p>
+                        <ul class="text-sm text-gray-700 mt-2 space-y-1">
+                            <li><strong class="text-brand-700">YES</strong> if the statement agrees with the views of the writer</li>
+                            <li><strong class="text-brand-700">NO</strong> if the statement contradicts the views of the writer</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const ynnQuestions = [
+                                { q: 1, text: "Pictures of Mars suggest it might make a good place for people to settle.", exp: ['exp-q1'] },
+                                { q: 2, text: "Modern Mars and ancient Earth looked remarkably similar.", exp: 'not-given' },
+                                { q: 3, text: "One method of terraforming could involve adapting technology that is already under development.", exp: ['exp-q3'] },
+                                { q: 4, text: "Greenhouse gas factories would provide enough oxygen for people to breathe without special equipment.", exp: ['exp-q4'] },
+                                { q: 5, text: "Terraforming Mars would be an extreme test of human skill and intelligence.", exp: ['exp-q5'] }
+                            ];
+                            
+                            ynnQuestions.forEach(item => {
+                                const explanationCall = item.exp === 'not-given' ? `showNotGivenToast()` : `showExplanation(${JSON.stringify(item.exp)})`;
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-3 pl-9">
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="YES" onchange="updateRadioMap(${item.q})"> YES
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NO" onchange="updateRadioMap(${item.q})"> NO
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="updateRadioMap(${item.q})"> NOT GIVEN
+                                            </label>
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${explanationCall}'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Multiple Choice -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-9</h3>
+                        <p class="text-sm text-gray-800">Choose the correct letter, <strong class="text-brand-700">A, B, C</strong> or <strong class="text-brand-700">D</strong>.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <script>
+                            const mcqQuestions = [
+                                {
+                                    q: 6,
+                                    text: "Which one of these factors suggests that Mars might be a good place for people to settle?",
+                                    options: [
+                                        { val: 'A', text: "It is not too far from Earth." },
+                                        { val: 'B', text: "It has no other life forms living there." },
+                                        { val: 'C', text: "It has a cool, dry climate." },
+                                        { val: 'D', text: "It has some similarities with Earth." }
+                                    ],
+                                    // General paragraph 3 context
+                                    exp: ['exp-q5'] 
+                                },
+                                {
+                                    q: 7,
+                                    text: "The first step in terraforming Mars would be to",
+                                    options: [
+                                        { val: 'A', text: "make the planet warmer." },
+                                        { val: 'B', text: "create a breathable atmosphere." },
+                                        { val: 'C', text: "find a suitable source of water." },
+                                        { val: 'D', text: "create a habitat for living organisms." }
+                                    ],
+                                    // General paragraph 4 context
+                                    exp: ['exp-q3']
+                                },
+                                {
+                                    q: 8,
+                                    text: "Special factories on Mars could be used to",
+                                    options: [
+                                        { val: 'A', text: "control the level of greenhouse gases." },
+                                        { val: 'B', text: "absorb excess levels of carbon dioxide." },
+                                        { val: 'C', text: "produce oxygen in a manner similar to plants." },
+                                        { val: 'D', text: "help grow essential bacteria." }
+                                    ],
+                                    // General paragraph 5 context
+                                    exp: ['exp-q4']
+                                },
+                                {
+                                    q: 9,
+                                    text: "What is the writer's main purpose in the passage?",
+                                    options: [
+                                        { val: 'A', text: "To explain why we need to terraform Mars." },
+                                        { val: 'B', text: "To illustrate the three processes required to terraform a planet like Mars." },
+                                        { val: 'C', text: "To consider how and why Mars might be terraformed." },
+                                        { val: 'D', text: "To demonstrate how straightforward it would be to terraform a planet." }
+                                    ],
+                                    // General passage theme
+                                    exp: ['exp-q1']
+                                }
+                            ];
+
+                            mcqQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-col gap-2 pl-9">
+                                            ${item.options.map(opt => `
+                                                <label class="radio-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                    <input type="radio" name="q${item.q}" value="${opt.val}" onchange="updateRadioMap(${item.q})" class="mt-0.5 shrink-0">
+                                                    <span class="font-bold text-brand-700">${opt.val}.</span> <span class="leading-snug">${opt.text}</span>
+                                                </label>
+                                            `).join('')}
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-4 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 3: Summary Completion (Word Bank) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-14</h3>
+                        <p class="text-sm text-gray-800 mb-2">Complete the summary using a word, A-I, from the box.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a word, OR click a word then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 text-sm font-medium" id="words-bank">
+                            <div draggable="true" data-type="summary" data-val="A" data-display="A. cover" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">A</span> cover</div>
+                            <div draggable="true" data-type="summary" data-val="B" data-display="B. create" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">B</span> create</div>
+                            <div draggable="true" data-type="summary" data-val="C" data-display="C. hit" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">C</span> hit</div>
+                            <div draggable="true" data-type="summary" data-val="D" data-display="D. increase" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">D</span> increase</div>
+                            <div draggable="true" data-type="summary" data-val="E" data-display="E. land" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">E</span> land</div>
+                            <div draggable="true" data-type="summary" data-val="F" data-display="F. drive" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">F</span> drive</div>
+                            <div draggable="true" data-type="summary" data-val="G" data-display="G. power" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">G</span> power</div>
+                            <div draggable="true" data-type="summary" data-val="H" data-display="H. rise" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">H</span> rise</div>
+                            <div draggable="true" data-type="summary" data-val="I" data-display="I. shoot" class="draggable-item flex items-center justify-start px-2 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-5">I</span> shoot</div>
+                        </div>
+                    </div>
+
+                    <div class="text-gray-800 leading-loose text-[15px] bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <p class="mb-4">
+                            One method of terraforming Mars would be to 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="10">10</span> 
+                            asteroids at the planet. Rockets attached to an enormous asteroid would propel it towards Mars, taking ten years to 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="11">11</span> 
+                            the enormous distances required. The asteroid would 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="12">12</span> 
+                            the planet with incredible force and 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="13">13</span> 
+                            enough energy to 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="14">14</span> 
+                            the planet's temperature. The result would be a temperate climate and lots of water from melting ice caps.
+                        </p>
+                        
+                        <!-- Dedicated Feedback Area for Q10-Q14 -->
+                        <div id="summary-feedback-area" class="hidden mt-6 pt-4 border-t border-gray-300 flex-col gap-3">
+                            <h5 class="font-bold text-sm text-gray-700 uppercase tracking-wider mb-1">Summary Answers Review</h5>
+                            <!-- Javascript will inject correct markers and explanation buttons here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: "NO", 2: "NOT GIVEN", 3: "YES", 4: "NO", 5: "YES", // Q1-5
+            6: "D", 7: "A", 8: "C", 9: "C",                       // Q6-9
+            10: "I", 11: "A", 12: "C", 13: "B", 14: "D"           // Q10-14 (Summary word bank)
+        };
+
+        const SUMMARY_DISPLAYS = {
+            "A": "A. cover",
+            "B": "B. create",
+            "C": "C. hit",
+            "D": "D. increase",
+            "E": "E. land",
+            "F": "F. drive",
+            "G": "G. power",
+            "H": "H. rise",
+            "I": "I. shoot"
+        };
+
+        const TOTAL_QS = 14;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.summary-drop-zone[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        // Mechanics: Drag & Drop + Click-to-Apply for Summary
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.summary-drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.summary-drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-2', 'ring-brand-300'); });
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-2', 'ring-brand-300'); });
+                zone.addEventListener('dragleave', () => { zone.classList.remove('ring-2', 'ring-brand-300'); });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-2', 'ring-brand-300');
+                    if (isSubmitted) return;
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+                    const qNum = zone.dataset.q;
+
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        // Clear zone
+                        if (zone.classList.contains('filled')) {
+                            zone.textContent = qNum; // Reset back to just the number
+                            zone.classList.remove('filled');
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.add('filled');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.summary-drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // Grade Q1-Q5 (Y/N/NG)
+            for (let i = 1; i <= 5; i++) {
+                const uAns = userAnswers[i].toUpperCase();
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(key), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                }
+                if (uAns !== '') {
+                     const correctLabel = qRow.querySelector(`input[value="${key}"]`);
+                     if(correctLabel) correctLabel.parentElement.classList.add('font-bold', 'text-green-800');
+                }
+            }
+
+            // Grade Q6-Q9 (MCQ)
+            for (let i = 6; i <= 9; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(key), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect and correct radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                }
+                const correctLabel = qRow.querySelector(`input[value="${key}"]`);
+                if(correctLabel) {
+                    correctLabel.parentElement.classList.add('bg-green-50', 'border-green-300', 'font-bold', 'text-green-900');
+                }
+            }
+
+            // Grade Q10-Q14 (Summary Word Bank)
+            const summaryFeedbackArea = document.getElementById('summary-feedback-area');
+            const summaryExps = {
+                10: 'exp-q10', 11: 'exp-q11', 12: 'exp-q12', 13: 'exp-q13', 14: 'exp-q14'
+            };
+            
+            for (let i = 10; i <= 14; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const dropZone = document.querySelector(`.summary-drop-zone[data-q="${i}"]`);
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    dropZone.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    dropZone.classList.add('incorrect');
+                }
+
+                // Add to dedicated feedback area below the summary
+                const itemFeedback = document.createElement('div');
+                itemFeedback.className = 'flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200 shadow-sm';
+                
+                let markerHtml = '';
+                if(isCorrect) {
+                    markerHtml = `<span class="w-6 h-6 shrink-0 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${i}</span>
+                                  <span class="text-sm font-bold text-green-700">${SUMMARY_DISPLAYS[key]}</span>`;
+                } else {
+                    markerHtml = `<span class="w-6 h-6 shrink-0 ${uAns==='' ? 'bg-yellow-400' : 'bg-red-500'} text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${i}</span>
+                                  <span class="text-sm text-gray-500 line-through mr-2">${uAns ? SUMMARY_DISPLAYS[uAns] : 'Blank'}</span>
+                                  <span class="text-sm font-bold text-green-700">Correct: ${SUMMARY_DISPLAYS[key]}</span>`;
+                }
+
+                itemFeedback.innerHTML = `
+                    ${markerHtml}
+                    <button class="ml-auto text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick="showExplanation(['${summaryExps[i]}'])">Explanation</button>
+                `;
+                summaryFeedbackArea.appendChild(itemFeedback);
+            }
+            summaryFeedbackArea.classList.remove('hidden');
+            summaryFeedbackArea.classList.add('flex');
+
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function showNotGivenToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

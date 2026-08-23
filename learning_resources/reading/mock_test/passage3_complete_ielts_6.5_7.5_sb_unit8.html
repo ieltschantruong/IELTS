@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Inline Drop Zone for Summary */
+        .summary-drop-zone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            height: 28px;
+            padding: 0 8px;
+            margin: 0 4px;
+            border: 2px dashed #9ca3af;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #a03046;
+            cursor: pointer;
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+        .summary-drop-zone.filled {
+            border: 2px solid #d75872;
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .summary-drop-zone.correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        .summary-drop-zone.incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 3</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">The Earth and Space Foundation</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><span id="exp-q1" class="explanation-target">The community that focuses its efforts on the exploration of space has largely been different from the community focused on the study and protection of the Earth's environment, despite the fact that both fields of interest involve what might be referred to as 'scientific exploration'.</span> <span id="exp-q2" class="explanation-target">The reason for this dichotomous existence is chiefly historical.</span> The exploration of the Earth has been occurring over many centuries, and the institutions created to do it are often very different from those founded in the second part of the 20th century to explore space. This separation is also caused by the fact that space exploration has attracted experts from mainly non-biological disciplines- primarily engineers and physicists - but the study of Earth and its environment is a domain heavily populated by biologists.</p>
+
+                    <p>The separation between the two communities is often reflected in attitudes. In the environmental community. it is not uncommon for space exploration to be regarded as a waste of money, distracting governments from solving major environmental problems here at home. In the space exploration community, it is not uncommon for environmentalists to be regarded as introspective people who divert attention from the more expansive visions of the exploration of space-the 'new frontier'. <span id="exp-q4" class="explanation-target">These perceptions can also be negative in consequence because the full potential of both communities can be realised better when they work together to solve problems. For example, those involved in space exploration can provide the satellites to monitor the Earth's fragile environments, and environmentalists can provide information on the survival of life in extreme environments.</span></p>
+
+                    <p>In the sense that Earth and space exploration both stem from the same human drive to understand our environment and our place within it, there is no reason for the split to exist. A more accurate view of Earth and space exploration is to see them as a continuum of exploration with many interconnected and mutually beneficial links. <span id="exp-q9" class="explanation-target">The Earth and Space Foundation, a registered charity, was established for the purposes of fostering such links through field research and by direct practical action.</span></p>
+
+                    <p>Projects that have been supported by the Foundation include environmental projects using technologies resulting from space exploration: satellite communications, GPS, remote sensing, advanced materials and power sources. For example, in places where people are faced with destruction of the forests on which their livelihood depends, rather than rejecting economic progress and trying to save the forests on their intrinsic merit, another approach is to enhance the value of the forests-although these schemes must be carefully assessed to be successful. <span id="exp-q6" class="explanation-target">In the past, the Foundation provided a grant to a group of expeditions that used remote sensing to plan eco-tourism routes in the forests of Guatemala, thus providing capital to the local communities through the tourist trade. This novel approach is now making the protection of the forests a sensible economic decision.</span></p>
+
+                    <p>The Foundation funds expeditions making astronomical observations from remote, difficult-to-access Earth locations, archaeological field projects studying the development of early civilisations that made significant contributions to astronomy and space sciences, and field expeditions studying the way in which views of the astronomical environment shaped the nature of past civilisations. A part of Syria- 'the Fertile Crescent' - was the birthplace of astronomy, accountancy, animal domestication and many other fundamental developments of human civilisation. <span id="exp-q7" class="explanation-target">The Foundation helped fund a large archaeology project by the Society for Syrian Archaeology at the University of California, Los Angeles, in collaboration with the Syrian government that used GPS and satellite imagery to locate mounds, or 'tels', containing artefacts and remnants of early civilisations.</span> These collections are being used to build a better picture of the nature of the civilisations that gave birth to astronomy.</p>
+
+                    <p>Field research also applies the Earth's environmental and biological resources to the human exploration and settlement of space. This may include the use of remote environments on Earth, as well as physiological and psychological studies in harsh environments. <span id="exp-q10" class="explanation-target">In one research project, the Foundation provided a grant to an international caving expedition to study the psychology of explorers subjected to long-term isolation in caves in Mexico.</span> <span id="exp-q11" class="explanation-target">The psychometric tests on the cavers were used to enhance US astronaut selection criteria by the NASA Johnson Space Center.</span></p>
+
+                    <p><span id="exp-q12" class="explanation-target">Space-like environments on Earth help us understand how to operate in the space environment</span> or help us characterise extraterrestrial environments for future scientific research. <span id="exp-q13" class="explanation-target">In the Arctic, a 24-kilometre- wide impact crater formed by an asteroid or comet 23 million years ago has become home to a Mars- analogue programme.</span> The Foundation helped fund the NASA Haughton-Mars Project to use this crater to test communications and exploration technologies in preparation for the human exploration of Mars. The crater, which sits in high Arctic permafrost, provides an excellent replica of the physical processes occurring on Mars, a permafrosted, impact-altered planet. Geologists and biologists can work at the site to help understand how impact craters shape the geological characteristics and possibly biological potential of Mars. <span id="exp-q14" class="explanation-target">Geologists and biologists can work at the site to help understand how impact craters shape the geological characteristics and possibly biological potential of Mars.</span></p>
+
+                    <p>In addition to its fieldwork and scientific activities, the Foundation has award programmes. These include a series of awards for the future human exploration of Mars, a location with a diverse set of exploration challenges. The awards will honour a number of 'firsts' on Mars that include landing on the surface, undertaking an overland expedition to the Martian South Pole, undertaking an overland expedition to the Martian North Pole, climbing Olympus Mons, the highest mountain in the solar system, and descending to the bottom of Valles Marineris, the deepest canyon on Mars. The Foundation will offer awards for expeditions further out in the solar system once these Mars awards have been claimed. <span id="exp-q8" class="explanation-target">Together, they demonstrate that the programme really has no boundary in what it could eventually support, and they provide longevity for the objectives of the Foundation.</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800">Do the following statements agree with the views of the writer in the reading passage?</p>
+                        <ul class="text-sm text-gray-700 mt-2 space-y-1">
+                            <li><strong class="text-brand-700">YES</strong> if the statement agrees with the views of the writer</li>
+                            <li><strong class="text-brand-700">NO</strong> if the statement contradicts the views of the writer</li>
+                            <li><strong class="text-brand-700">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const ynnQuestions = [
+                                { q: 1, text: "Activities related to environmental protection and space exploration have a common theme.", exp: ['exp-q1'] },
+                                { q: 2, text: "It is unclear why space exploration evolved in a different way from environmental studies on Earth.", exp: ['exp-q2'] },
+                                { q: 3, text: "Governments tend to allocate more money to environmental projects than space exploration.", exp: 'not-given' },
+                                { q: 4, text: "Unfortunately, the environmental and space exploration communities have little to offer each other in terms of resources.", exp: ['exp-q4'] },
+                                { q: 5, text: "The Earth and Space Foundation was set up later than it was originally intended.", exp: 'not-given' }
+                            ];
+                            
+                            ynnQuestions.forEach(item => {
+                                const explanationCall = item.exp === 'not-given' ? `showNotGivenToast()` : `showExplanation(${JSON.stringify(item.exp)})`;
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-3 pl-9">
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="YES" onchange="updateRadioMap(${item.q})"> YES
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NO" onchange="updateRadioMap(${item.q})"> NO
+                                            </label>
+                                            <label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                <input type="radio" name="q${item.q}" value="NOT GIVEN" onchange="updateRadioMap(${item.q})"> NOT GIVEN
+                                            </label>
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${explanationCall}'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-9</h3>
+                        <p class="text-sm text-gray-800">Choose the correct letter, <strong class="text-brand-700">A, B, C</strong> or <strong class="text-brand-700">D</strong>.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <script>
+                            const mcqQuestions = [
+                                {
+                                    q: 6,
+                                    text: "What was the significance of the 'novel approach' adopted in the Guatemala project?",
+                                    options: [
+                                        { val: 'A', text: "It minimised the need to protect the forests." },
+                                        { val: 'B', text: "It reduced the impact of tourists on the forests." },
+                                        { val: 'C', text: "It showed that preserving the forests can be profitable." },
+                                        { val: 'D', text: "It gave the Foundation greater control over the forests." }
+                                    ],
+                                    exp: ['exp-q6']
+                                },
+                                {
+                                    q: 7,
+                                    text: "GPS and satellite imagery were used in the Syrian project to",
+                                    options: [
+                                        { val: 'A', text: "help archaeologists find ancient items." },
+                                        { val: 'B', text: "explore land that is hard to reach." },
+                                        { val: 'C', text: "reduce the impact of archaeological activity." },
+                                        { val: 'D', text: "evaluate some early astronomical theories." }
+                                    ],
+                                    exp: ['exp-q7']
+                                },
+                                {
+                                    q: 8,
+                                    text: "One of the purposes of the Foundation's awards is to",
+                                    options: [
+                                        { val: 'A', text: "attract non-scientists to its work." },
+                                        { val: 'B', text: "establish priorities for Mars exploration." },
+                                        { val: 'C', text: "offer financial incentives for space exploration." },
+                                        { val: 'D', text: "establish the long-term continuity of its activities." }
+                                    ],
+                                    exp: ['exp-q8']
+                                },
+                                {
+                                    q: 9,
+                                    text: "What is the writer's purpose in the passage?",
+                                    options: [
+                                        { val: 'A', text: "to persuade people to support the Foundation" },
+                                        { val: 'B', text: "to explain the nature of the Foundation's work" },
+                                        { val: 'C', text: "to show how views on the Foundation have changed" },
+                                        { val: 'D', text: "to reject earlier criticisms of the Foundation's work" }
+                                    ],
+                                    exp: ['exp-q9']
+                                }
+                            ];
+
+                            mcqQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex gap-3 mb-3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p>
+                                        </div>
+                                        <div class="flex flex-col gap-2 pl-9">
+                                            ${item.options.map(opt => `
+                                                <label class="radio-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer">
+                                                    <input type="radio" name="q${item.q}" value="${opt.val}" onchange="updateRadioMap(${item.q})" class="mt-0.5 shrink-0">
+                                                    <span class="font-bold text-brand-700">${opt.val}.</span> <span class="leading-snug">${opt.text}</span>
+                                                </label>
+                                            `).join('')}
+                                        </div>
+                                        <div class="feedback-container hidden flex-col pl-9 mt-4 border-t border-gray-200 pt-3">
+                                            <button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-14</h3>
+                        <p class="text-sm text-gray-800 mb-2">Complete the summary using the words, A-I, below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a word, OR click a word then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm font-medium" id="words-bank">
+                            <div draggable="true" data-type="summary" data-val="A" data-display="A. comparable" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">A</span> comparable</div>
+                            <div draggable="true" data-type="summary" data-val="B" data-display="B. extreme" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">B</span> extreme</div>
+                            <div draggable="true" data-type="summary" data-val="C" data-display="C. connected" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">C</span> connected</div>
+                            <div draggable="true" data-type="summary" data-val="D" data-display="D. ideal" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">D</span> ideal</div>
+                            <div draggable="true" data-type="summary" data-val="E" data-display="E. unexpected" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">E</span> unexpected</div>
+                            <div draggable="true" data-type="summary" data-val="F" data-display="F. beneficial" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">F</span> beneficial</div>
+                            <div draggable="true" data-type="summary" data-val="G" data-display="G. scientific" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">G</span> scientific</div>
+                            <div draggable="true" data-type="summary" data-val="H" data-display="H. extended" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">H</span> extended</div>
+                            <div draggable="true" data-type="summary" data-val="I" data-display="I. individual" class="draggable-item flex items-center justify-start px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm"><span class="font-bold w-6">I</span> individual</div>
+                        </div>
+                    </div>
+
+                    <div class="text-gray-800 leading-loose text-[15px] bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-center text-lg mb-4 text-gray-900 border-b border-gray-300 pb-2">Field research: Applying the Earth's environment to the settlement of space</h4>
+                        <p class="mb-4">
+                            Some studies have looked at how humans function in 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="10">10</span> 
+                            situations. In one project, it was decided to review cave explorers in Mexico who tolerate 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="11">11</span> 
+                            periods on their own.
+                        </p>
+                        <p>
+                            It is also possible to prepare for space exploration by studying environments on Earth that are 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="12">12</span> 
+                            to those on Mars. A huge crater in the Arctic is the 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="13">13</span> 
+                            place to test the technologies needed to explore Mars and gather other relevant 
+                            <span class="summary-drop-zone inline-block" data-type="summary" data-q="14">14</span> 
+                            information.
+                        </p>
+                        
+                        <!-- Dedicated Feedback Area for Q10-Q14 -->
+                        <div id="summary-feedback-area" class="hidden mt-6 pt-4 border-t border-gray-300 flex-col gap-3">
+                            <h5 class="font-bold text-sm text-gray-700 uppercase tracking-wider mb-1">Summary Answers Review</h5>
+                            <!-- Javascript will inject correct markers and explanation buttons here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            1: "YES", 2: "NO", 3: "NOT GIVEN", 4: "NO", 5: "NOT GIVEN", // Q1-5
+            6: "C", 7: "A", 8: "D", 9: "B",                             // Q6-9 (MCQ)
+            10: "B", 11: "H", 12: "A", 13: "D", 14: "G"                 // Q10-14 (Summary word bank)
+        };
+
+        const SUMMARY_DISPLAYS = {
+            "A": "A. comparable",
+            "B": "B. extreme",
+            "C": "C. connected",
+            "D": "D. ideal",
+            "E": "E. unexpected",
+            "F": "F. beneficial",
+            "G": "G. scientific",
+            "H": "H. extended",
+            "I": "I. individual"
+        };
+
+        const TOTAL_QS = 14;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.summary-drop-zone[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        // Mechanics: Drag & Drop + Click-to-Apply for Summary
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.summary-drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.summary-drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-2', 'ring-brand-300'); });
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-2', 'ring-brand-300'); });
+                zone.addEventListener('dragleave', () => { zone.classList.remove('ring-2', 'ring-brand-300'); });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-2', 'ring-brand-300');
+                    if (isSubmitted) return;
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+                    const qNum = zone.dataset.q;
+
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        // Clear zone
+                        if (zone.classList.contains('filled')) {
+                            zone.textContent = qNum; // Reset back to just the number
+                            zone.classList.remove('filled');
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.add('filled');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.summary-drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // Grade Q1-Q5 (Y/N/NG)
+            for (let i = 1; i <= 5; i++) {
+                const uAns = userAnswers[i].toUpperCase();
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(key), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                }
+                if (uAns !== '') {
+                     const correctLabel = qRow.querySelector(`input[value="${key}"]`);
+                     if(correctLabel) correctLabel.parentElement.classList.add('font-bold', 'text-green-800');
+                }
+            }
+
+            // Grade Q6-Q9 (MCQ)
+            for (let i = 6; i <= 9; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                if(!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(key), feedbackContainer.firstChild);
+                }
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                // Highlight incorrect and correct radio wrappers
+                if(!isCorrect && uAns !== '') {
+                    const selectedLabel = qRow.querySelector(`input[value="${uAns}"]`).parentElement;
+                    selectedLabel.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                }
+                const correctLabel = qRow.querySelector(`input[value="${key}"]`);
+                if(correctLabel) {
+                    correctLabel.parentElement.classList.add('bg-green-50', 'border-green-300', 'font-bold', 'text-green-900');
+                }
+            }
+
+
+            // Grade Q10-Q14 (Summary Word Bank)
+            const summaryFeedbackArea = document.getElementById('summary-feedback-area');
+            const summaryExps = {
+                10: 'exp-q10', 11: 'exp-q11', 12: 'exp-q12', 13: 'exp-q13', 14: 'exp-q14'
+            };
+            
+            for (let i = 10; i <= 14; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const isCorrect = (uAns === key);
+                const dropZone = document.querySelector(`.summary-drop-zone[data-q="${i}"]`);
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    dropZone.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    dropZone.classList.add('incorrect');
+                }
+
+                // Add to dedicated feedback area below the summary
+                const itemFeedback = document.createElement('div');
+                itemFeedback.className = 'flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200 shadow-sm';
+                
+                let markerHtml = '';
+                if(isCorrect) {
+                    markerHtml = `<span class="w-6 h-6 shrink-0 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${i}</span>
+                                  <span class="text-sm font-bold text-green-700">${SUMMARY_DISPLAYS[key]}</span>`;
+                } else {
+                    markerHtml = `<span class="w-6 h-6 shrink-0 ${uAns==='' ? 'bg-yellow-400' : 'bg-red-500'} text-white rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${i}</span>
+                                  <span class="text-sm text-gray-500 line-through mr-2">${uAns ? SUMMARY_DISPLAYS[uAns] : 'Blank'}</span>
+                                  <span class="text-sm font-bold text-green-700">Correct: ${SUMMARY_DISPLAYS[key]}</span>`;
+                }
+
+                itemFeedback.innerHTML = `
+                    ${markerHtml}
+                    <button class="ml-auto text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick="showExplanation(['${summaryExps[i]}'])">Explanation</button>
+                `;
+                summaryFeedbackArea.appendChild(itemFeedback);
+            }
+            summaryFeedbackArea.classList.remove('hidden');
+            summaryFeedbackArea.classList.add('flex');
+
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function showNotGivenToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Checkbox Styling */
+        input[type="checkbox"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .checkbox-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+        }
+        
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">25:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 2</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Keystone species</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">Some species are crucial when it comes to maintaining a well-balanced ecosystem.</p>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><strong>A.</strong> In the world of wildlife conservation, it is usually animals like whales and tigers which get the most public attention. Consequently, projects to protect these so-called 'flagship species' receive the greatest amount of funding, and this help to ensure, or at least improve the chances of, their long-term survival. However, it could be argued that perhaps we should be focusing more attention elsewhere. This is because <span id="exp-q1" class="explanation-target">many of the minute plants, insects and microorganisms that we tend to ignore actually play a far more important role in biodiversity protection.</span> Consider, for example, the Western honeybee Apis mellifera. Regarded as one of the world's most efficient pollinators, the honeybee plays a direct or indirect part in the production of many food products in our markets and stores. However, in recent years, a problem known as 'colony collapse disorder' has manifested itself, and now honeybee colonies are rapidly disappearing. Nobody knows the cause of this phenomenon, but the implications are worryingly clear: <span id="exp-q8" class="explanation-target">unless a solution to colony collapse disorder is found soon, food production will be seriously, perhaps disastrously, affected.</span></p>
+
+                    <p><strong>B.</strong> The honeybee example illustrates how everything in the natural world is connected, and how the disappearance of one species can have a profound effect on the ecosystem around it. <span id="exp-q2" class="explanation-target">To understand how this happens, imagine an arched doorway or window in an ancient stone building.</span> Many buildings containing arches are still standing today, hundreds, or even thousands, of years after they were built, in spite of the ravages of time and natural disasters such as earthquakes and floods. If you examine one of the arches carefully, you will see the reason why. On each side of the arch, there is a vertical series of bricks which gradually curve inwards, and these are supported at the centre by a keystone. <span id="exp-q9" class="explanation-target">It is this keystone that gives the arch, and the structure around it, its strength and stability.</span> Once the keystone is put in position, the arch can stand indefinitely. Remove it, however, and the whole thing collapses.</p>
+
+                    <p><strong>C.</strong> In the same way that an archway relies on its keystone to stay standing, so the ecosystem in a particular area relies on certain species in order to continue functioning. Named 'keystone species' by zoologist Robert Paine, who undertook the first major study of the effect of species loss on local environments, they have a major influence on the ecosystem around them. <span id="exp-q3" class="explanation-target">And there are a surprisingly large variety of them Some are carnivores and some are herbivores. Some are marine and some are terrestrial. Some, like the huge, majestic African elephant, dominate their landscape, while others, like tiny microorganisms, are invisible to the human eye.</span></p>
+
+                    <p><strong>D.</strong> At first glance, it is hard to imagine how the disappearance of one of these species could have such an effect on its environment. <span id="exp-q4" class="explanation-target">However, as Paine discovered when he carried out a series of experiments in the 1960s, the impact can be extreme.</span> The subject of his first study was the starfish Pisaster ochraceous. When Paine removed a large number of these fish from part of Mukkaw Bay in the USA, he observed sudden changes in species diversity. The mussel and sea urchin population increased, since these creatures form an important part of Pisaster's diet. However, <span id="exp-q10" class="explanation-target">other species saw a dramatic decline.</span> Paine counted fifteen species at the beginning of his experiment, but only eight remained at the end. Furthermore, reefs in the area were also destroyed, as increasing numbers of sea urchins fed on their coral. In another area of the bay, where the starfish community was left undisturbed, no changes were observed. Paine also observed that once Pisaster was returned to the area he had removed it from, the ecosystem began a gradual return to its pre-experiment state. His experiment prompted ecologists and conservation biologists around the world to identify other keystone species using similar removal experiments to find them. Over the next thirty years, the list of keystone species increased rapidly.</p>
+
+                    <p><strong>E.</strong> <span id="exp-q5" class="explanation-target">Unfortunately, significant changes in other interconnected populations are taking place without removal experiments being carried out</span>, with some keystone species being driven close to extinction. For the last ten years, Professor David Gomm of the Marine Conservation Association has led a study of sea otters in the North Pacific. This keystone predator feeds on sea urchins, which in turn feed on the vast kelp forests in the region. 'At the beginning of our study, sea otters were very common in the area, and so the kelp forests were thick and healthy,' says Professor Gomm. '<span id="exp-q11" class="explanation-target">However, for a number of reasons, killer whales have begun to include otters in their diet, and this has caused sea otter populations to fall rapidly.</span> Consequently, sea urchin populations have exploded, and this has led to an almost total destruction of the kelp forests.' He believes that if sea otters become extinct, other species will follow. 'The ecosystem would be changed forever,' he warns.</p>
+
+                    <p><strong>F.</strong> Professor Gomm's prediction may sound overly dramatic to environmental sceptics, but there is an indication that it might already have happened. The species in question is, or rather was, the dodo, a large, flightless bird that once lived on the island of Mauritius. <span id="exp-q1213" class="explanation-target">In the late sixteenth century, the bird's population began to fall sharply as European settlers arriving on the island cut down the forest where they lived and introduced dogs, cats and rats, which raided their nests for their eggs.</span> By the end of the seventeenth century, the dodo was extinct. <span id="exp-q6" class="explanation-target">Today, it is often regarded as little more than a rather slow-witted bird that was unable to adapt. However, there are some who believe it may have been a keystone species.</span> For evidence of this, they point to a tree called the tambalacoque. Once common across Mauritius, there are now only a few dozen left at most. It is thought that the dodo ate the fruit of the tambalacoque and activated the seed through unique digestive processes. With the demise of the dodo, tambalacoque numbers declined to just a few trees, reducing a valuable food source for other animals on the island.</p>
+
+                    <p><strong>G.</strong> Some scientists are doubtful about the connection between the dodo and the tambalacoque. After all, they argue, if the tree was dependent on the dodo, why are there still some growing on the island? However, they all agree that even if there is no direct connection, the study does help to make an important point: <span id="exp-q7" class="explanation-target">even though a species may seem unimportant in isolation, it may actually form an important part of a much larger system of organisms, and its disappearance could have far-reaching consequences. It is therefore essential that, for the sake of the environment, ecologists continue to identify and preserve keystone species.</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: Matching Headings -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-7</h3>
+                        <p class="text-sm text-gray-800 mb-2">The Reading passage has seven sections, <strong>A-G</strong>. Choose the correct heading for each section from the list of headings below.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a heading, OR click a heading then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Headings Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <h4 class="font-bold text-sm text-gray-700 mb-3 text-center uppercase tracking-wider">List of Headings</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm font-medium" id="headings-bank">
+                            <div draggable="true" data-type="heading" data-val="i" data-display="i. When human intervention is not a factor" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">i</span> <span class="leading-tight">When human intervention is not a factor</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="ii" data-display="ii. Testing the theory" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">ii</span> <span class="leading-tight">Testing the theory</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="iii" data-display="iii. The dominance of carnivorous keystone species" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">iii</span> <span class="leading-tight">The dominance of carnivorous keystone species</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="iv" data-display="iv. It's the small things that matter" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">iv</span> <span class="leading-tight">It's the small things that matter</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="v" data-display="v. Putting knowledge to practical use" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">v</span> <span class="leading-tight">Putting knowledge to practical use</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="vi" data-display="vi. An argument that has divided the scientific community" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">vi</span> <span class="leading-tight">An argument that has divided the scientific community</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="vii" data-display="vii. A wide variety of shapes and sizes" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">vii</span> <span class="leading-tight">A wide variety of shapes and sizes</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="viii" data-display="viii. Why bees are disappearing" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">viii</span> <span class="leading-tight">Why bees are disappearing</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="ix" data-display="ix. A man-made structure reflects nature" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">ix</span> <span class="leading-tight">A man-made structure reflects nature</span>
+                            </div>
+                            <div draggable="true" data-type="heading" data-val="x" data-display="x. Re-examining an old case" class="draggable-item flex items-center p-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-8 shrink-0 text-center">x</span> <span class="leading-tight">Re-examining an old case</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const headingsQuestions = [
+                                { q: 1, text: "Section A", exp: ['exp-q1'] },
+                                { q: 2, text: "Section B", exp: ['exp-q2'] },
+                                { q: 3, text: "Section C", exp: ['exp-q3'] },
+                                { q: 4, text: "Section D", exp: ['exp-q4'] },
+                                { q: 5, text: "Section E", exp: ['exp-q5'] },
+                                { q: 6, text: "Section F", exp: ['exp-q6'] },
+                                { q: 7, text: "Section G", exp: ['exp-q7'] }
+                            ];
+                            headingsQuestions.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-center gap-3 w-32 shrink-0">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span>
+                                            <span class="text-sm font-bold text-gray-700">${item.text}</span>
+                                        </div>
+                                        <div class="flex-1 flex flex-col">
+                                            <div class="drop-zone w-full min-h-[40px] px-3 py-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="heading" data-q="${item.q}"></div>
+                                            <button class="exp-btn hidden self-start mt-2 text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Sentence Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 8-11</h3>
+                        <p class="text-sm text-gray-800">Complete the sentences below. Choose <strong class="text-brand-700">NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Q8 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="8">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">8</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    Scientists fear that, in the near future, the unexplained disappearance of honeybees will affect the ecosystem and have a major impact on <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off" class="mx-2 !w-[220px]">.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q8"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q9 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="9">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">9</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    The arches on old buildings rely on keystones for their <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off" class="mx-2 !w-[220px]">.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q9"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q10 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="10">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">10</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    A <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off" class="mx-2 !w-[180px]"> in the numbers of some species in Mukkaw Bay occurred following Robert Paine's removal experiment.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q10"])'>View Explanation</button>
+                            </div>
+                        </div>
+
+                        <!-- Q11 -->
+                        <div class="q-block p-4 rounded-xl border border-gray-200 bg-gray-50" data-q="11">
+                            <div class="flex gap-3 mb-2">
+                                <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">11</span>
+                                <div class="text-sm text-gray-800 leading-relaxed flex flex-wrap items-center gap-y-2">
+                                    Kelp forests in the North Pacific have almost disappeared as an indirect result of <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off" class="mx-2 !w-[220px]"> falling.
+                                </div>
+                            </div>
+                            <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3">
+                                <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q11"])'>View Explanation</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Choose TWO Letters -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 12-13</h3>
+                        <p class="text-sm text-gray-800">Choose <strong class="text-brand-700">TWO</strong> letters, A-E.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Select exactly two checkboxes.</p>
+                    </div>
+
+                    <div class="q-row-group p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-qgroup="12-13">
+                        <div class="flex gap-3 mb-3 border-b border-gray-200 pb-3">
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-12">12</span>
+                                <span class="w-6 h-6 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm" id="map-marker-13">13</span>
+                            </div>
+                            <p class="text-gray-800 font-bold text-sm leading-relaxed mt-1">Which TWO reasons does the passage give for dodos becoming extinct?</p>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-700 font-medium pl-2">
+                            <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                <input type="checkbox" name="q1213" value="A" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> A. Humans altered their natural habitat.
+                            </label>
+                            <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                <input type="checkbox" name="q1213" value="B" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> B. Their eggs were eaten by European settlers.
+                            </label>
+                            <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                <input type="checkbox" name="q1213" value="C" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> C. Other animals preyed on unborn birds.
+                            </label>
+                            <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                <input type="checkbox" name="q1213" value="D" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> D. They were too slow to avoid hunters.
+                            </label>
+                            <label class="checkbox-wrapper flex items-start gap-3 p-2.5 border border-transparent rounded-lg hover:bg-gray-100 transition-colors">
+                                <input type="checkbox" name="q1213" value="E" onchange="handleChooseTwo(this, '12-13', [12, 13])" class="mt-0.5 shrink-0"> E. One of their main food supplies died out.
+                            </label>
+                        </div>
+                        <div class="feedback-container hidden flex-col mt-4 border-t border-gray-200 pt-3">
+                            <button class="exp-btn text-xs text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider mb-2" onclick='showExplanation(["exp-q1213"])'>View Explanation</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            // Drag and Drop (Headings)
+            1: "iv", 2: "ix", 3: "vii", 4: "ii", 5: "i", 6: "x", 7: "v",
+            // Text Input (Multiple acceptable variations)
+            8: ["food production", "many food products"],
+            9: ["strength and stability"],
+            10: ["dramatic decline"],
+            11: ["sea otter populations"],
+            // Choose TWO (Order does not matter)
+            group1213: ["A", "C"]
+        };
+
+        const HEADING_DISPLAYS = {
+            "i": "i. When human intervention is not a factor",
+            "ii": "ii. Testing the theory",
+            "iii": "iii. The dominance of carnivorous keystone species",
+            "iv": "iv. It's the small things that matter",
+            "v": "v. Putting knowledge to practical use",
+            "vi": "vi. An argument that has divided the scientific community",
+            "vii": "vii. A wide variety of shapes and sizes",
+            "viii": "viii. Why bees are disappearing",
+            "ix": "ix. A man-made structure reflects nature",
+            "x": "x. Re-examining an old case"
+        };
+
+        const TOTAL_QS = 13;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 25 * 60; // 25 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.getElementById(`map-marker-${i}`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Interactive Mechanics: Drag & Drop + Click-to-Apply
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300'); });
+                zone.addEventListener('dragover', (e) => { e.preventDefault(); if (!isSubmitted) zone.classList.add('ring-4', 'ring-brand-300'); });
+                zone.addEventListener('dragleave', () => { zone.classList.remove('ring-4', 'ring-brand-300'); });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                    if (isSubmitted) return;
+
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+
+                    if (activeSelection) {
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection();
+                        }
+                    } else {
+                        if (zone.textContent) {
+                            zone.textContent = '';
+                            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            
+                            const qNum = zone.dataset.q;
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        // Mechanics: Text Input
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        // Mechanics: Choose TWO
+        function handleChooseTwo(checkbox, groupName, qIndices) {
+            if (isSubmitted) return;
+            const container = document.querySelector(`.q-row-group[data-qgroup="${groupName}"]`);
+            const checkedBoxes = container.querySelectorAll(`input[type="checkbox"]:checked`);
+            
+            // Limit to max 2
+            if (checkedBoxes.length > 2) {
+                checkbox.checked = false;
+                return;
+            }
+
+            // Extract values
+            let selectedVals = Array.from(checkedBoxes).map(cb => cb.value);
+            
+            // Assign to global answers array sequentially based on indices
+            userAnswers[qIndices[0]] = selectedVals[0] || "";
+            userAnswers[qIndices[1]] = selectedVals[1] || "";
+
+            updateMapStatus(qIndices[0], !!selectedVals[0]);
+            updateMapStatus(qIndices[1], !!selectedVals[1]);
+        }
+
+        // Custom Highlighting Feature
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // 1. Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'checkbox') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // 2. Grade Q1-Q7 (Matching)
+            for (let i = 1; i <= 7; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const expBtn = qRow.querySelector('.exp-btn');
+                expBtn.classList.remove('hidden');
+                
+                if (!isCorrect) {
+                    qRow.querySelector('.flex-1').appendChild(createCorrectMarker(HEADING_DISPLAYS[key]));
+                }
+            }
+
+            // 3. Grade Q8-Q11 (Text Inputs)
+            for (let i = 8; i <= 11; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qBlock = document.querySelector(`.q-block[data-q="${i}"]`);
+                const feedbackContainer = qBlock.querySelector('.feedback-container');
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                }
+                
+                if (!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(ANSWER_KEYS[i][0]), feedbackContainer.firstChild);
+                }
+                
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+            }
+
+            // 4. Grade Q12-13 (Choose TWO)
+            const gradeChooseTwo = (groupName, indices, keys) => {
+                const uAns1 = userAnswers[indices[0]];
+                const uAns2 = userAnswers[indices[1]];
+                
+                const userVals = [uAns1, uAns2].filter(v => v !== "");
+                let groupScore = 0;
+                
+                let remainingKeys = [...keys];
+                let results = [];
+                
+                userVals.forEach(val => {
+                    const keyIndex = remainingKeys.indexOf(val);
+                    if(keyIndex > -1) {
+                        groupScore++;
+                        remainingKeys.splice(keyIndex, 1);
+                        results.push('correct');
+                    } else {
+                        results.push('incorrect');
+                    }
+                });
+
+                while(results.length < 2) results.push('blank');
+
+                score += groupScore;
+
+                styleMapBox(indices[0], results[0]);
+                styleMapBox(indices[1], results[1]);
+
+                const qGroup = document.querySelector(`.q-row-group[data-qgroup="${groupName}"]`);
+                if(groupScore === 2) {
+                    qGroup.classList.replace('border-gray-200', 'border-green-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-green-50');
+                } else if (groupScore === 1) {
+                    qGroup.classList.replace('border-gray-200', 'border-yellow-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (userVals.length > 0) {
+                    qGroup.classList.replace('border-gray-200', 'border-red-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-red-50');
+                } else {
+                    qGroup.classList.replace('border-gray-200', 'border-yellow-400');
+                    qGroup.classList.replace('bg-gray-50', 'bg-yellow-50');
+                }
+
+                const checkboxes = qGroup.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => {
+                    const val = cb.value;
+                    const wrapper = cb.parentElement;
+                    
+                    wrapper.classList.remove('hover:bg-gray-100', 'border-transparent');
+                    
+                    if (keys.includes(val)) {
+                        wrapper.classList.add('bg-green-100', 'border-green-400', 'font-bold', 'text-green-900');
+                    } else if (cb.checked) {
+                        wrapper.classList.add('bg-red-100', 'border-red-300', 'text-red-900');
+                    }
+                });
+                
+                const feedbackContainer = qGroup.querySelector('.feedback-container');
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+                
+                if (groupScore < 2) {
+                    feedbackContainer.insertBefore(createCorrectMarker(keys.join(', ')), feedbackContainer.firstChild);
+                }
+            };
+
+            gradeChooseTwo('12-13', [12, 13], ANSWER_KEYS.group1213);
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
