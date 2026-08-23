@@ -573,6 +573,166 @@ Have a talent/gift/flair for sth
  - database
 
 # Unit 7: Our Relationship With Nature
+## Reading
+ - fly
+ - beetle
+ - gecko
+ - lemur
+ - opossum
+ - hummingbird
+ - wasp
+ - butterfly
+ - moth
+ - parasite
+ - straggler
+ - flax
+ - hedgerow
+ - hive
+ - menace
+ - culprit
+ - colony
+ - enigma
+ - monocrops
+ - infestation
+ - immunity
+ - blow
+ - surrogate
+ - flora
+ - ease (the pain)
+ - astonishing
+ - tricky
+ - picky
+ - slather
+ - bolster
+ - micoorganism
+ - curve
+ - mussel
+ - sea urchin
+ - reef
+ - starfish
+ - sea otter
+ - rat
+ - dodo
+ - marine (animals)
+ - terrestrial / extraterrestrial
+ - carnivore
+ - herbivore
+ - demise
+ - intervene
+ - ravaged
+ - majectic
 
+## Speaking
+ - programs (to protect environment)
+ - environmentalist
+ - waste
+ - habitat
+ - generation
+ - polluted
+ - environment-conscious
+ - consumerism
+ - disposable (products)
+ - enhance awareness
+ - pursue a green lifestyle
+ - public transit
+ - unleaded petrol
+ - organisms
+ - deforestation
+ - agricultual yields
+ - dead zones
+ - food security
+ - biodiversity
+ - have a green thumb
+ - ecosystem
+ - profitable
+ - metropolises
+ - set foot in
+ - under the impression
+ - once in a life time
+ - megacity
+ - bereft of
+ - concrete jungle
+ - exacerbate
+ - for the sake of
+ - oppressive
+ - let alone
+ - come to a realization
+ - laze around
+ - meticulous
+
+# Unit 8: Across the Universe
+## Reading
+ - chief
+ - harsh
+ - intrinsic
+ - replica
+ - domain
+ - remnant
+ - descend
+ - divert
+ - reject
+ - scheme
+ - introspective
+ - fertile
+ - artefact
+ - continuum
+ - analogue (n)
+ - extraterrestrial environment
+ - give birth to st
+ - in the sense that
+ - in collaboration with
+ - canyon
+ - asteroid
+ - crater
+ - cave
+ - archaeology
+ - astronomy
+ - barren & desolate (desert)
+ - vicious
+ - parallel
+ - straightforward (answers)
+ - sow (v)
+ - trap
+ - propel
+ - accelerate
+ - terraform
+ - inhale
+ - radiation
+ - commitment
+ - (strong) will
+ - rotation
+
+## Speaking
+ - unknown
+ - thrilling
+ - risky (business)
+ - long-term (effect)
+ - eyesight
+ - adversity
+ - sense of accountability
+ - resilience
+ - (level of) vitality & fitness
+ - advocate (n)
+ - cynical
+ - take on
+ - opponent
+ - public purse
+ - humanitarian
+ - habitability
+ - of great benefit
+ - remark (n)
+ - mundane
+ - idle
+ - meteor
+ - magnificence
+ - glum
+ - blow off some steam
+ - relish
+ - coincidentally
+ - on the spur of the moment
+ - make a long story short
+ - if my memory serves me will
+ - regarding st
+ 
 
 
