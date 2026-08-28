@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Intensive Vocab | Test 01 - IELTS Chan Truong</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #334155;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 6rem;
+        }
+
+        .exam-paper {
+            background-color: #fff;
+            width: 100%;
+            max-width: 900px;
+            padding: 4rem 5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
+                              linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 0; background: #fff; padding-bottom: 6rem; }
+            .exam-paper { padding: 2rem 1.5rem; box-shadow: none; }
+        }
+
+        .blank-input {
+            border: none;
+            border-bottom: 1.5px dotted #000;
+            background: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #1e3a8a;
+            text-align: center;
+            outline: none;
+            padding: 0 5px;
+            margin: 0 5px;
+            border-radius: 0;
+            transition: all 0.2s;
+        }
+        
+        .blank-input:focus {
+            background-color: rgba(253, 253, 150, 0.3);
+            border-bottom: 1.5px solid #2563eb;
+        }
+
+        .blank-input.graded-correct {
+            color: #16a34a;
+            border-bottom: 1.5px solid #16a34a;
+        }
+
+        .blank-input.graded-incorrect {
+            color: #dc2626;
+            border-bottom: 1.5px solid #dc2626;
+            text-decoration: line-through;
+        }
+
+        .mcq-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        @media (max-width: 640px) {
+            .mcq-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+        }
+
+        .mcq-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+        .mcq-option input[type="radio"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #000;
+            border-radius: 50%;
+            outline: none;
+            position: relative;
+        }
+
+        .mcq-option input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: #1e3a8a;
+            border-radius: 50%;
+        }
+
+        .correction-text {
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 1rem;
+            font-style: italic;
+            margin-left: 0.5rem;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+        
+        .mark-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        p, li, .q-item { line-height: 1.8; font-size: 1.05rem; }
+        .section-title { font-weight: bold; margin-top: 2.5rem; margin-bottom: 1rem; }
+        
+        .word-bank { 
+            text-align: center; 
+            font-style: italic; 
+            margin: 1.5rem 0; 
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            row-gap: 1rem;
+            column-gap: 2rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0;
+            background: #fafafa;
+        }
+        
+        .word-bank span { white-space: nowrap; }
+
+        .hidden-by-filter { display: none !important; }
+
+        .submit-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid #cbd5e1;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            flex-wrap: wrap;
+        }
+        
+        .hide-print { display: flex; gap: 0.5rem; }
+        @media print {
+            .hide-print, .submit-bar { display: none !important; }
+            body { background: white; padding: 0; }
+            .exam-paper { padding: 0; box-shadow: none; max-width: 100%; }
+            .word-bank { gap: 1.5rem; padding: 1rem; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="exam-paper" id="test-container">
+        
+        <!-- Filter Bar -->
+        <div class="hide-print bg-slate-100 p-4 rounded-xl mb-8 flex flex-col sm:flex-row justify-center items-center gap-4 border border-slate-300 shadow-sm font-sans">
+            <span class="font-bold text-slate-700">Filter by CEFR Level:</span>
+            <div class="flex flex-wrap gap-3 justify-center">
+                <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg border border-slate-300 shadow-sm hover:border-blue-400 transition-all select-none">
+                    <input type="checkbox" value="B2" class="cefr-checkbox w-4 h-4 accent-blue-600 cursor-pointer" checked onchange="filterLevels()">
+                    <span class="font-bold text-slate-700">B2 Upper-Intermediate</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg border border-slate-300 shadow-sm hover:border-blue-400 transition-all select-none">
+                    <input type="checkbox" value="C1" class="cefr-checkbox w-4 h-4 accent-blue-600 cursor-pointer" checked onchange="filterLevels()">
+                    <span class="font-bold text-slate-700">C1 Advanced</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg border border-slate-300 shadow-sm hover:border-blue-400 transition-all select-none">
+                    <input type="checkbox" value="C2" class="cefr-checkbox w-4 h-4 accent-blue-600 cursor-pointer" checked onchange="filterLevels()">
+                    <span class="font-bold text-slate-700">C2 Proficiency</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-start text-sm mb-8 border-b-2 border-black pb-4">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-end gap-2">
+                    <span class="font-bold">Name:</span>
+                    <input type="text" class="blank-input w-48" placeholder="Student Name">
+                </div>
+                <div class="flex items-end gap-2">
+                    <span class="font-bold">Date:</span>
+                    <input type="text" class="blank-input w-32">
+                </div>
+            </div>
+            <div class="text-right italic font-bold">
+                IELTS Chan Truong 2026<br>
+                Target Band: 6.5 - 7.5+
+            </div>
+        </div>
+
+        <div class="text-center mb-10">
+            <h1 class="text-2xl font-bold uppercase tracking-widest mb-1">Reading Intensive Vocab | Test 01</h1>
+            <h2 class="text-lg font-bold italic text-slate-600">Filtered Assessment (<span id="test-title-count">66</span> Questions)</h2>
+        </div>
+
+        <div id="grade-display" class="hidden absolute top-12 right-12 w-28 h-28 border-[5px] border-red-600 rounded-full flex flex-col items-center justify-center text-red-600 transform rotate-12 bg-white/90 backdrop-blur-sm z-10 shadow-xl">
+            <span class="text-4xl font-black font-sans leading-none" id="final-score">0</span>
+            <span class="text-sm font-bold border-t-[3px] border-red-600 w-16 text-center mt-1 pt-1 font-sans" id="final-total">/66</span>
+        </div>
+
+        <form id="vocab-form" onsubmit="event.preventDefault(); gradeTest();">
+
+            <div class="section">
+                <div class="section-title flex gap-4">
+                    <span>I.A.</span>
+                    <span>Fill in each blank with one suitable word from the list below. <span class="underline uppercase">CHANGES</span> to the <span class="underline uppercase font-bold">WORD FORM</span> can be needed.</span>
+                </div>
+                
+                <div class="word-bank font-bold text-base" id="shufflable-bank-1">
+                    <span data-level="B2">carnivorous</span>
+                    <span data-level="C1">adaptation</span>
+                    <span data-level="C2">physiologist</span>
+                    <span data-level="B2">stimulate</span>
+                    <span data-level="B2">photosynthesis</span>
+                    <span data-level="C2">reverence</span>
+                    <span data-level="C1">grandeur</span>
+                    <span data-level="C2">ecocide</span>
+                    <span data-level="C1">substantiate</span>
+                    <span data-level="C1">trajectory</span>
+                </div>
+
+                <div class="space-y-4 ml-8">
+                    <div class="q-item" data-q="1" data-level="B2"><span class="q-num">1.</span> In biological gardens in Da Lat, you can find fascinating <input type="text" class="blank-input w-28" id="q1" autocomplete="off"> plants that eat insects.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="2" data-level="C1"><span class="q-num">2.</span> The lotus flower's ability to grow in muddy water is a remarkable evolutionary <input type="text" class="blank-input w-28" id="q2" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="3" data-level="C2"><span class="q-num">3.</span> A plant <input type="text" class="blank-input w-28" id="q3" autocomplete="off"> at Can Tho University is studying how local crops react to saltwater.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="4" data-level="B2"><span class="q-num">4.</span> Drinking iced Vietnamese coffee in the morning will definitely <input type="text" class="blank-input w-28" id="q4" autocomplete="off"> your brain.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="5" data-level="B2"><span class="q-num">5.</span> Without enough sunlight, indoor plants in city apartments cannot perform <input type="text" class="blank-input w-32" id="q5" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="6" data-level="C2"><span class="q-num">6.</span> Vietnamese people show deep <input type="text" class="blank-input w-28" id="q6" autocomplete="off"> for their ancestors during the Tet holiday.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="7" data-level="C1"><span class="q-num">7.</span> Tourists are always amazed by the majestic <input type="text" class="blank-input w-28" id="q7" autocomplete="off"> of Ha Long Bay.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="8" data-level="C2"><span class="q-num">8.</span> Dumping untreated factory waste into rivers is considered a form of <input type="text" class="blank-input w-28" id="q8" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="9" data-level="C1"><span class="q-num">9.</span> The student needed more historical evidence to <input type="text" class="blank-input w-32" id="q9" autocomplete="off"> his claims about the Tran Dynasty.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="10" data-level="C1"><span class="q-num">10.</span> The economic <input type="text" class="blank-input w-28" id="q10" autocomplete="off"> of Vietnam has been consistently upward since the Doi Moi reforms.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-8">
+                <div class="section-title flex gap-4">
+                    <span>I.B.</span>
+                    <span>Fill in each blank with one suitable word from the list below. <span class="underline uppercase">CHANGES</span> to the <span class="underline uppercase font-bold">WORD FORM</span> can be needed.</span>
+                </div>
+                
+                <div class="word-bank font-bold text-base" id="shufflable-bank-2">
+                    <span data-level="C1">reminiscent</span>
+                    <span data-level="C2">demise</span>
+                    <span data-level="C2">contingent</span>
+                    <span data-level="C1">eclipse</span>
+                    <span data-level="C2">encompass</span>
+                    <span data-level="C1">contemplate</span>
+                    <span data-level="C1">prehistoric</span>
+                    <span data-level="C1">vantage point</span>
+                    <span data-level="C1">refuge</span>
+                    <span data-level="B2">migrate</span>
+                </div>
+
+                <div class="space-y-4 ml-8">
+                    <div class="q-item" data-q="11" data-level="C1"><span class="q-num">11.</span> The ancient architecture of Hue is highly <input type="text" class="blank-input w-28" id="q11" autocomplete="off"> of the Nguyen Dynasty.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="12" data-level="C2"><span class="q-num">12.</span> The sudden bankruptcy of the real estate company led to its eventual <input type="text" class="blank-input w-28" id="q12" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="13" data-level="C2"><span class="q-num">13.</span> Getting a scholarship is highly <input type="text" class="blank-input w-28" id="q13" autocomplete="off"> upon achieving an IELTS score of 7.5 or higher.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="14" data-level="C1"><span class="q-num">14.</span> The success of the new pop star seemed to completely <input type="text" class="blank-input w-32" id="q14" autocomplete="off"> all the older singers.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="15" data-level="C2"><span class="q-num">15.</span> The term 'Vietnamese cuisine' can <input type="text" class="blank-input w-28" id="q15" autocomplete="off"> a huge variety of regional dishes.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="16" data-level="C1"><span class="q-num">16.</span> Sitting by Hoan Kiem Lake with a cup of tea is a great way to relax and <input type="text" class="blank-input w-28" id="q16" autocomplete="off"> life.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="17" data-level="C1"><span class="q-num">17.</span> Dong Son bronze drums are famous artifacts from Vietnam's <input type="text" class="blank-input w-28" id="q17" autocomplete="off"> era.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="18" data-level="C1"><span class="q-num">18.</span> The top of Landmark 81 offers an incredible <input type="text" class="blank-input w-32" id="q18" autocomplete="off"> to see the whole city.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="19" data-level="C1"><span class="q-num">19.</span> During sudden thunderstorms, motorbikers often seek <input type="text" class="blank-input w-28" id="q19" autocomplete="off"> under large bridges.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="20" data-level="B2"><span class="q-num">20.</span> Many young people <input type="text" class="blank-input w-28" id="q20" autocomplete="off"> from rural provinces to Ho Chi Minh City for better jobs.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-8">
+                <div class="section-title flex gap-4">
+                    <span>II.</span>
+                    <span>Fill in each blank with the <span class="font-bold underline">suitable form</span> of the word in brackets.</span>
+                </div>
+
+                <div class="space-y-4 ml-8">
+                    <div class="q-item" data-q="21" data-level="B2"><span class="q-num">21.</span> Our stomach must produce enzymes to aid in the <input type="text" class="blank-input w-32" id="q21" autocomplete="off"> of a heavy bowl of Phở. <span class="font-bold italic">(digest)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="22" data-level="C1"><span class="q-num">22.</span> The body will <input type="text" class="blank-input w-32" id="q22" autocomplete="off"> a special sweat fluid to protect the skin from the intense Saigon sun. <span class="font-bold italic">(secretion)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="23" data-level="C1"><span class="q-num">23.</span> Traditional Ao Dai is often embroidered <input type="text" class="blank-input w-28" id="q23" autocomplete="off"> with beautiful lotus patterns. <span class="font-bold italic">(intricate)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="24" data-level="C1"><span class="q-num">24.</span> Rapid urbanization has led to severe environmental <input type="text" class="blank-input w-32" id="q24" autocomplete="off"> around major cities. <span class="font-bold italic">(degrade)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="25" data-level="C1"><span class="q-num">25.</span> Decades of historical <input type="text" class="blank-input w-32" id="q25" autocomplete="off"> have shaped the resilient character of the nation. <span class="font-bold italic">(strive)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="26" data-level="C1"><span class="q-num">26.</span> Vietnamese people are known for being incredibly <input type="text" class="blank-input w-32" id="q26" autocomplete="off"> in overcoming natural disasters. <span class="font-bold italic">(resilience)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="27" data-level="C2"><span class="q-num">27.</span> The artisan in Bat Trang village <input type="text" class="blank-input w-28" id="q27" autocomplete="off"> painted every detail on the ceramic vase. <span class="font-bold italic">(painstaking)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="28" data-level="C1"><span class="q-num">28.</span> Living in coastal areas increases your <input type="text" class="blank-input w-32" id="q28" autocomplete="off"> to heavy typhoons. <span class="font-bold italic">(vulnerable)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="29" data-level="C1"><span class="q-num">29.</span> Planting trees along the riverbanks is essential to prevent soil <input type="text" class="blank-input w-28" id="q29" autocomplete="off">. <span class="font-bold italic">(erode)</span><span class="correction-area"></span></div>
+                    <div class="q-item" data-q="30" data-level="C1"><span class="q-num">30.</span> Passing the national university entrance exam is a massive <input type="text" class="blank-input w-32" id="q30" autocomplete="off">. <span class="font-bold italic">(accomplish)</span><span class="correction-area"></span></div>
+                </div>
+            </div>
+
+            <div class="section mt-8">
+                <div class="section-title flex gap-4">
+                    <span>III.</span>
+                    <span>Choose a word which is <span class="font-bold underline">stressed differently</span> from the others.</span>
+                </div>
+
+                <div class="space-y-4 ml-8">
+                    <div class="q-item" data-q="31" data-level="C1">
+                        <div class="flex items-center gap-2"><span class="q-num">31.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q31" value="a"> a. naturalist</label>
+                            <label class="mcq-option"><input type="radio" name="q31" value="b"> b. tentacle</label>
+                            <label class="mcq-option"><input type="radio" name="q31" value="c"> c. phosphorus</label>
+                            <label class="mcq-option"><input type="radio" name="q31" value="d"> d. enigma</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="32" data-level="B2">
+                        <div class="flex items-center gap-2"><span class="q-num">32.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q32" value="a"> a. stimulate</label>
+                            <label class="mcq-option"><input type="radio" name="q32" value="b"> b. compensate</label>
+                            <label class="mcq-option"><input type="radio" name="q32" value="c"> c. penetrate</label>
+                            <label class="mcq-option"><input type="radio" name="q32" value="d"> d. abundant</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="33" data-level="C2">
+                        <div class="flex items-center gap-2"><span class="q-num">33.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q33" value="a"> a. adaptation</label>
+                            <label class="mcq-option"><input type="radio" name="q33" value="b"> b. penetration</label>
+                            <label class="mcq-option"><input type="radio" name="q33" value="c"> c. sedimentation</label>
+                            <label class="mcq-option"><input type="radio" name="q33" value="d"> d. reproduction</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="34" data-level="C2">
+                        <div class="flex items-center gap-2"><span class="q-num">34.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q34" value="a"> a. prehistoric</label>
+                            <label class="mcq-option"><input type="radio" name="q34" value="b"> b. postglacial</label>
+                            <label class="mcq-option"><input type="radio" name="q34" value="c"> c. inconceivable</label>
+                            <label class="mcq-option"><input type="radio" name="q34" value="d"> d. reminiscent</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="35" data-level="C1">
+                        <div class="flex items-center gap-2"><span class="q-num">35.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q35" value="a"> a. predatory</label>
+                            <label class="mcq-option"><input type="radio" name="q35" value="b"> b. vantage</label>
+                            <label class="mcq-option"><input type="radio" name="q35" value="c"> c. cobble</label>
+                            <label class="mcq-option"><input type="radio" name="q35" value="d"> d. demise</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="36" data-level="C1">
+                        <div class="flex items-center gap-2"><span class="q-num">36.</span><span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q36" value="a"> a. reverence</label>
+                            <label class="mcq-option"><input type="radio" name="q36" value="b"> b. intricate</label>
+                            <label class="mcq-option"><input type="radio" name="q36" value="c"> c. trajectory</label>
+                            <label class="mcq-option"><input type="radio" name="q36" value="d"> d. grandeur</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-8">
+                <div class="section-title flex gap-4">
+                    <span>IV.</span>
+                    <span>Choose the words/phrases which have the <span class="font-bold underline uppercase">SAME</span> meaning as the bolded words.</span>
+                </div>
+
+                <div class="space-y-6 ml-8">
+                    <div class="q-item" data-q="37" data-level="C1">
+                        <div class="mb-2"><span class="q-num">37.</span> Mosquitoes in the Mekong Delta are notorious for biting into human <span class="font-bold italic underline">flesh</span>. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q37" value="a"> a. meat/tissue</label>
+                            <label class="mcq-option"><input type="radio" name="q37" value="b"> b. skin</label>
+                            <label class="mcq-option"><input type="radio" name="q37" value="c"> c. bone</label>
+                            <label class="mcq-option"><input type="radio" name="q37" value="d"> d. blood</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="38" data-level="C1">
+                        <div class="mb-2"><span class="q-num">38.</span> The massive caves of Son Doong are truly an <span class="font-bold italic underline">awe-inspiring</span> natural wonder. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q38" value="a"> a. ordinary</label>
+                            <label class="mcq-option"><input type="radio" name="q38" value="b"> b. breathtaking</label>
+                            <label class="mcq-option"><input type="radio" name="q38" value="c"> c. terrifying</label>
+                            <label class="mcq-option"><input type="radio" name="q38" value="d"> d. complex</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="39" data-level="C2">
+                        <div class="mb-2"><span class="q-num">39.</span> The Mongolian <span class="font-bold italic underline">steppe</span> is a vast, open area. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q39" value="a"> a. forest</label>
+                            <label class="mcq-option"><input type="radio" name="q39" value="b"> b. grassland</label>
+                            <label class="mcq-option"><input type="radio" name="q39" value="c"> c. mountain</label>
+                            <label class="mcq-option"><input type="radio" name="q39" value="d"> d. desert</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="40" data-level="C2">
+                        <div class="mb-2"><span class="q-num">40.</span> Reindeer graze on the frozen <span class="font-bold italic underline">tundra</span>. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q40" value="a"> a. riverbed</label>
+                            <label class="mcq-option"><input type="radio" name="q40" value="b"> b. jungle</label>
+                            <label class="mcq-option"><input type="radio" name="q40" value="c"> c. frozen plain</label>
+                            <label class="mcq-option"><input type="radio" name="q40" value="d"> d. sand dune</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="41" data-level="C1">
+                        <div class="mb-2"><span class="q-num">41.</span> In ancient times, people used animal <span class="font-bold italic underline">pelts</span> to keep warm. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q41" value="a"> a. meat</label>
+                            <label class="mcq-option"><input type="radio" name="q41" value="b"> b. skin/fur</label>
+                            <label class="mcq-option"><input type="radio" name="q41" value="c"> c. bones</label>
+                            <label class="mcq-option"><input type="radio" name="q41" value="d"> d. horns</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="42" data-level="C2">
+                        <div class="mb-2"><span class="q-num">42.</span> Taking medicine can help <span class="font-bold italic underline">suppress</span> a bad cough during the rainy season. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q42" value="a"> a. encourage</label>
+                            <label class="mcq-option"><input type="radio" name="q42" value="b"> b. increase</label>
+                            <label class="mcq-option"><input type="radio" name="q42" value="c"> c. highlight</label>
+                            <label class="mcq-option"><input type="radio" name="q42" value="d"> d. stifle/stop</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="43" data-level="C1">
+                        <div class="mb-2"><span class="q-num">43.</span> Sugar will quickly <span class="font-bold italic underline">dissolve</span> in hot green tea. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q43" value="a"> a. harden</label>
+                            <label class="mcq-option"><input type="radio" name="q43" value="b"> b. sink</label>
+                            <label class="mcq-option"><input type="radio" name="q43" value="c"> c. melt/break down</label>
+                            <label class="mcq-option"><input type="radio" name="q43" value="d"> d. float</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="44" data-level="C2">
+                        <div class="mb-2"><span class="q-num">44.</span> Only the <span class="font-bold italic underline">charred</span> remains of the firewood were left after the camping trip. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q44" value="a"> a. wet</label>
+                            <label class="mcq-option"><input type="radio" name="q44" value="b"> b. burnt</label>
+                            <label class="mcq-option"><input type="radio" name="q44" value="c"> c. fresh</label>
+                            <label class="mcq-option"><input type="radio" name="q44" value="d"> d. glowing</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-8">
+                <div class="section-title flex gap-4">
+                    <span>V.</span>
+                    <span>Choose the words/phrases which have the <span class="font-bold underline uppercase">OPPOSITE</span> meaning as the bolded words.</span>
+                </div>
+
+                <div class="space-y-6 ml-8">
+                    <div class="q-item" data-q="45" data-level="B2">
+                        <div class="mb-2"><span class="q-num">45.</span> The sudden <span class="font-bold italic underline">collapse</span> of the old bridge caused major traffic jams. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q45" value="a"> a. destruction</label>
+                            <label class="mcq-option"><input type="radio" name="q45" value="b"> b. rise/success</label>
+                            <label class="mcq-option"><input type="radio" name="q45" value="c"> c. failure</label>
+                            <label class="mcq-option"><input type="radio" name="q45" value="d"> d. drop</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="46" data-level="C1">
+                        <div class="mb-2"><span class="q-num">46.</span> Despite the harsh weather, the street food culture continues to <span class="font-bold italic underline">thrive</span> in Hanoi. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q46" value="a"> a. grow</label>
+                            <label class="mcq-option"><input type="radio" name="q46" value="b"> b. prosper</label>
+                            <label class="mcq-option"><input type="radio" name="q46" value="c"> c. expand</label>
+                            <label class="mcq-option"><input type="radio" name="q46" value="d"> d. fail/decline</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="47" data-level="C2">
+                        <div class="mb-2"><span class="q-num">47.</span> Da Lat is famous for its mild, <span class="font-bold italic underline">benign</span> climate all year round. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q47" value="a"> a. gentle</label>
+                            <label class="mcq-option"><input type="radio" name="q47" value="b"> b. kind</label>
+                            <label class="mcq-option"><input type="radio" name="q47" value="c"> c. harsh</label>
+                            <label class="mcq-option"><input type="radio" name="q47" value="d"> d. warm</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="48" data-level="C1">
+                        <div class="mb-2"><span class="q-num">48.</span> The traditional Vietnamese conical hat has a <span class="font-bold italic underline">convex</span> outer shape. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q48" value="a"> a. round</label>
+                            <label class="mcq-option"><input type="radio" name="q48" value="b"> b. concave</label>
+                            <label class="mcq-option"><input type="radio" name="q48" value="c"> c. flat</label>
+                            <label class="mcq-option"><input type="radio" name="q48" value="d"> d. smooth</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="49" data-level="C1">
+                        <div class="mb-2"><span class="q-num">49.</span> The bowl has a <span class="font-bold italic underline">concave</span> inside. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q49" value="a"> a. convex</label>
+                            <label class="mcq-option"><input type="radio" name="q49" value="b"> b. hollow</label>
+                            <label class="mcq-option"><input type="radio" name="q49" value="c"> c. empty</label>
+                            <label class="mcq-option"><input type="radio" name="q49" value="d"> d. deep</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="50" data-level="B2">
+                        <div class="mb-2"><span class="q-num">50.</span> Overfishing threatens to severely <span class="font-bold italic underline">deplete</span> the fish population. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q50" value="a"> a. exhaust</label>
+                            <label class="mcq-option"><input type="radio" name="q50" value="b"> b. drain</label>
+                            <label class="mcq-option"><input type="radio" name="q50" value="c"> c. empty</label>
+                            <label class="mcq-option"><input type="radio" name="q50" value="d"> d. replenish/increase</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="51" data-level="C2">
+                        <div class="mb-2"><span class="q-num">51.</span> Life without motorbikes is almost <span class="font-bold italic underline">inconceivable</span> in Saigon. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q51" value="a"> a. imaginable</label>
+                            <label class="mcq-option"><input type="radio" name="q51" value="b"> b. impossible</label>
+                            <label class="mcq-option"><input type="radio" name="q51" value="c"> c. unbelievable</label>
+                            <label class="mcq-option"><input type="radio" name="q51" value="d"> d. unthinkable</label>
+                        </div>
+                    </div>
+                    <div class="q-item" data-q="52" data-level="C1">
+                        <div class="mb-2"><span class="q-num">52.</span> The Mekong Delta is blessed with an <span class="font-bold italic underline">abundant</span> supply of fresh fruits. <span class="correction-area"></span></div>
+                        <div class="mcq-grid">
+                            <label class="mcq-option"><input type="radio" name="q52" value="a"> a. plentiful</label>
+                            <label class="mcq-option"><input type="radio" name="q52" value="b"> b. scarce</label>
+                            <label class="mcq-option"><input type="radio" name="q52" value="c"> c. massive</label>
+                            <label class="mcq-option"><input type="radio" name="q52" value="d"> d. rich</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mt-8">
+                <div class="section-title flex gap-4">
+                    <span>VI.</span>
+                    <span>Fill in each blank with <span class="font-bold underline">ONE</span> suitable word. (No word bank provided)</span>
+                </div>
+
+                <div class="space-y-4 ml-8">
+                    <div class="q-item" data-q="53" data-level="C2"><span class="q-num">53.</span> In Vietnam's national parks, you might spot a <input type="text" class="blank-input w-28" id="q53" autocomplete="off"> catching insects with its sticky, hair-like droplets.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="54" data-level="C2"><span class="q-num">54.</span> A <input type="text" class="blank-input w-36" id="q54" autocomplete="off"> snaps its leaves shut instantly when a bug lands on it.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="55" data-level="C2"><span class="q-num">55.</span> The aquatic <input type="text" class="blank-input w-28" id="q55" autocomplete="off"> plant has an equally sophisticated way of setting its underwater trap.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="56" data-level="C2"><span class="q-num">56.</span> <input type="text" class="blank-input w-32" id="q56" autocomplete="off"> use yet another strategy, growing long tube-shaped leaves to trap bugs.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="57" data-level="C1"><span class="q-num">57.</span> Carnivorous plants take essential nitrogen and <input type="text" class="blank-input w-28" id="q57" autocomplete="off"> from the flesh they trap.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="58" data-level="C2"><span class="q-num">58.</span> The U Minh Thuong National Park is famous for its vast peat <input type="text" class="blank-input w-24" id="q58" autocomplete="off">s and dense swamps.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="59" data-level="C1"><span class="q-num">59.</span> Alligators and rare birds often live in the deep <input type="text" class="blank-input w-24" id="q59" autocomplete="off">s of the national park.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="60" data-level="B2"><span class="q-num">60.</span> Street food vendors sometimes hang sticky <input type="text" class="blank-input w-28" id="q60" autocomplete="off"> to catch annoying insects, just like some plants do!<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="61" data-level="C1"><span class="q-num">61.</span> The intense Saigon heat will make you sweat from every single <input type="text" class="blank-input w-24" id="q61" autocomplete="off"> on your skin.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="62" data-level="C2"><span class="q-num">62.</span> Early humans used hard rocks like <input type="text" class="blank-input w-28" id="q62" autocomplete="off"> to create sparks and start fires.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="63" data-level="C1"><span class="q-num">63.</span> In the freezing northern mountains of Sapa, families often gather around the warm communal <input type="text" class="blank-input w-28" id="q63" autocomplete="off">.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="64" data-level="C1"><span class="q-num">64.</span> The traditional wooden stilt houses in the Central Highlands are supported by strong timber <input type="text" class="blank-input w-24" id="q64" autocomplete="off">s.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="65" data-level="C2"><span class="q-num">65.</span> The ancient, narrow streets of Hoi An are paved with uneven stone <input type="text" class="blank-input w-28" id="q65" autocomplete="off">s.<span class="correction-area"></span></div>
+                    <div class="q-item" data-q="66" data-level="C1"><span class="q-num">66.</span> Farmers in the countryside use nets to protect their chickens from <input type="text" class="blank-input w-28" id="q66" autocomplete="off"> birds like eagles.<span class="correction-area"></span></div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="submit-bar">
+        <div class="text-sm text-slate-500 italic hidden md:block">Export or Submit</div>
+        
+        <div class="flex gap-2 hide-print">
+            <button type="button" onclick="window.print()" class="px-4 py-2 border-2 border-slate-300 rounded-lg text-slate-700 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2" title="Print as PDF">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                PDF
+            </button>
+            <button type="button" onclick="exportWord()" class="px-4 py-2 border-2 border-blue-200 rounded-lg text-blue-700 font-bold hover:bg-blue-50 transition-colors flex items-center gap-2" title="Export as MS Word">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Word
+            </button>
+            <button type="button" onclick="exportMarkdown()" class="px-4 py-2 border-2 border-slate-800 rounded-lg text-slate-800 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2" title="Export as Markdown">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                .MD
+            </button>
+        </div>
+
+        <button type="button" onclick="gradeTest()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg shadow-blue-500/30 transition-colors text-lg flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Submit for Grading
+        </button>
+    </div>
+
+    <script>
+        // Dynamically shuffle word banks on page load
+        function shuffleWordBanks() {
+            document.querySelectorAll('.word-bank').forEach(bank => {
+                const words = Array.from(bank.children);
+                for (let i = words.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [words[i], words[j]] = [words[j], words[i]];
+                }
+                words.forEach(word => bank.appendChild(word));
+            });
+        }
+        
+        shuffleWordBanks();
+
+        function filterLevels() {
+            const checkedBoxes = document.querySelectorAll('.cefr-checkbox:checked');
+            const selectedLevels = Array.from(checkedBoxes).map(cb => cb.value);
+
+            const items = document.querySelectorAll('.q-item');
+            const words = document.querySelectorAll('.word-bank span');
+            let counter = 1;
+
+            items.forEach(item => {
+                if (selectedLevels.includes(item.dataset.level)) {
+                    item.classList.remove('hidden-by-filter');
+                    const numSpan = item.querySelector('.q-num');
+                    if (numSpan) numSpan.textContent = counter + ".";
+                    counter++;
+                } else {
+                    item.classList.add('hidden-by-filter');
+                }
+            });
+
+            words.forEach(word => {
+                if (selectedLevels.includes(word.dataset.level)) {
+                    word.classList.remove('hidden-by-filter');
+                } else {
+                    word.classList.add('hidden-by-filter');
+                }
+            });
+
+            document.querySelectorAll('.section').forEach(sec => {
+                const visibleItems = sec.querySelectorAll('.q-item:not(.hidden-by-filter)');
+                if (visibleItems.length === 0) {
+                    sec.classList.add('hidden-by-filter');
+                } else {
+                    sec.classList.remove('hidden-by-filter');
+                }
+            });
+
+            const total = counter > 1 ? counter - 1 : 0;
+            document.getElementById('test-title-count').textContent = total;
+            document.getElementById('final-total').textContent = '/' + total;
+        }
+
+        // Answer Key for all 66 Questions
+        const answerKey = {
+            // Part I.A
+            q1: ["carnivorous"], q2: ["adaptation"], q3: ["physiologist"], q4: ["stimulate"], q5: ["photosynthesis"],
+            q6: ["reverence"], q7: ["grandeur"], q8: ["ecocide"], q9: ["substantiate"], q10: ["trajectory"],
+            
+            // Part I.B
+            q11: ["reminiscent"], q12: ["demise"], q13: ["contingent"], q14: ["eclipse"], q15: ["encompass"],
+            q16: ["contemplate"], q17: ["prehistoric"], q18: ["vantage point"], q19: ["refuge"], q20: ["migrate"],
+            
+            // Part II (Word Forms)
+            q21: ["digestion"], q22: ["secrete"], q23: ["intricately"], q24: ["degradation"], q25: ["strife"],
+            q26: ["resilient"], q27: ["painstakingly"], q28: ["vulnerability"], q29: ["erosion"], q30: ["accomplishment"],
+            
+            // Part III (MCQ Stress)
+            q31: "d", q32: "d", q33: "c", q34: "b", q35: "d", q36: "c",
+            
+            // Part IV (MCQ Synonyms)
+            q37: "a", q38: "b", q39: "b", q40: "c", q41: "b", q42: "d", q43: "c", q44: "b",
+            
+            // Part V (MCQ Antonyms)
+            q45: "b", q46: "d", q47: "c", q48: "b", q49: "a", q50: "d", q51: "a", q52: "b",
+            
+            // Part VI (Fill Blanks Direct)
+            q53: ["sundew"], q54: ["venus flytrap", "venus fly trap"], q55: ["bladderwort"], 
+            q56: ["pitcher plants", "pitcher plant"], q57: ["phosphorus"], q58: ["bog"], 
+            q59: ["swamp"], q60: ["flypaper"], q61: ["pore"], q62: ["flint"], 
+            q63: ["hearth"], q64: ["strut"], q65: ["cobble"], q66: ["predatory"]
+        };
+
+        const explanations = {
+            q31: "'enigma' is stressed on the 2nd syllable (/ɪˈnɪɡmə/), others are on the 1st.",
+            q32: "'abundant' is stressed on the 2nd syllable (/əˈbʌndənt/), others are on the 1st.",
+            q33: "'sedimentation' is stressed on the 4th syllable (/ˌsedɪmenˈteɪʃn/), others are on the 3rd.",
+            q34: "'postglacial' is stressed on the 2nd syllable (/ˌpəʊstˈɡleɪʃl/), others are on the 3rd.",
+            q35: "'demise' is stressed on the 2nd syllable (/dɪˈmaɪz/), others are on the 1st.",
+            q36: "'trajectory' is stressed on the 2nd syllable (/trəˈdʒektəri/), others are on the 1st."
+        };
+
+        const tickSVG = `<svg class="mark-icon text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+        const crossSVG = `<svg class="mark-icon text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+        function exportWord() {
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                 "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                 "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                 "<head><meta charset='utf-8'><title>Export HTML to Word</title></head><body>";
+            const footer = "</body></html>";
+            
+            const clone = document.getElementById('test-container').cloneNode(true);
+            
+            // Remove hidden filtered elements
+            clone.querySelectorAll('.hidden-by-filter').forEach(el => el.remove());
+            clone.querySelectorAll('.section').forEach(sec => {
+                if(sec.style.display === 'none' || sec.classList.contains('hidden-by-filter')) sec.remove();
+            });
+
+            const gradeDisplay = clone.querySelector('#grade-display');
+            if(gradeDisplay) gradeDisplay.remove();
+            clone.querySelectorAll('.correction-area').forEach(el => el.remove());
+            clone.querySelectorAll('.hide-print').forEach(el => el.remove());
+            
+            clone.querySelectorAll('input[type="text"]').forEach(input => {
+                const blank = document.createTextNode(' __________________ ');
+                input.parentNode.replaceChild(blank, input);
+            });
+            
+            clone.querySelectorAll('input[type="radio"]').forEach(input => {
+                const box = document.createTextNode('○ ');
+                input.parentNode.replaceChild(box, input);
+            });
+
+            clone.querySelectorAll('.word-bank').forEach(wb => {
+                wb.style.border = "1px solid black";
+                wb.style.padding = "10px";
+                wb.style.textAlign = "center";
+                wb.style.lineHeight = "2";
+            });
+
+            const html = header + clone.innerHTML + footer;
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Reading_Intensive_Test_01.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportMarkdown() {
+            let md = "# Reading Intensive Vocab | Test 01\n\n";
+            md += "**Name:** __________________\n";
+            md += "**Date:** __________________\n\n";
+            md += "---\n\n";
+
+            const sections = document.querySelectorAll('.section:not(.hidden-by-filter)');
+            sections.forEach(section => {
+                const titleEl = section.querySelector('.section-title');
+                if(titleEl) md += "### " + titleEl.innerText.replace(/\s+/g, ' ').trim() + "\n\n";
+
+                const wordBank = section.querySelector('.word-bank');
+                if(wordBank) {
+                    const words = Array.from(wordBank.querySelectorAll('span:not(.hidden-by-filter)')).map(s => s.innerText);
+                    md += "**Word Bank:** " + words.join(', ') + "\n\n";
+                }
+
+                const questions = section.querySelectorAll('.q-item:not(.hidden-by-filter)');
+                questions.forEach(q => {
+                    const qClone = q.cloneNode(true);
+                    const corr = qClone.querySelector('.correction-area');
+                    if(corr) corr.remove();
+
+                    qClone.querySelectorAll('input[type="text"]').forEach(input => {
+                        const blank = document.createTextNode(' ________ ');
+                        input.parentNode.replaceChild(blank, input);
+                    });
+
+                    const mcqGrid = qClone.querySelector('.mcq-grid');
+                    if (mcqGrid) {
+                        const qTextEl = qClone.querySelector('.flex.items-center, .mb-2');
+                        let qText = qClone.innerText.split('\n')[0].trim();
+                        if(qTextEl) qText = qTextEl.innerText.trim();
+                        
+                        md += qText + "\n";
+                        
+                        const options = mcqGrid.querySelectorAll('.mcq-option');
+                        options.forEach(opt => md += "- [ ] " + opt.innerText.trim() + "\n");
+                        md += "\n";
+                    } else {
+                        md += qClone.innerText.replace(/\s+/g, ' ').trim() + "\n\n";
+                    }
+                });
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Reading_Intensive_Test_01.md';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function gradeTest() {
+            let score = 0;
+            const visibleItems = document.querySelectorAll('.q-item:not(.hidden-by-filter)');
+            let totalQuestions = visibleItems.length;
+
+            if (totalQuestions === 0) return;
+
+            for (let id in answerKey) {
+                let isCorrect = false;
+                let userAnswer = "";
+                let expectedAnswer = "";
+                const container = document.querySelector(`.q-item[data-q="${id.replace('q', '')}"]`);
+                
+                // Skip if question doesn't exist or is filtered out
+                if(!container || container.classList.contains('hidden-by-filter')) continue; 
+                
+                const correctionArea = container.querySelector('.correction-area');
+                correctionArea.innerHTML = '';
+                
+                // Handle Text Inputs
+                if (Array.isArray(answerKey[id])) {
+                    const inputEl = document.getElementById(id);
+                    inputEl.classList.remove('graded-correct', 'graded-incorrect');
+                    
+                    userAnswer = inputEl.value.trim().toLowerCase();
+                    expectedAnswer = answerKey[id][0]; 
+                    
+                    if (answerKey[id].includes(userAnswer)) {
+                        isCorrect = true;
+                        inputEl.classList.add('graded-correct');
+                        correctionArea.innerHTML = tickSVG;
+                    } else {
+                        inputEl.classList.add('graded-incorrect');
+                        correctionArea.innerHTML = crossSVG + ` <span class="correction-text">${expectedAnswer}</span>`;
+                    }
+                    inputEl.readOnly = true;
+                } 
+                // Handle Radio Buttons
+                else {
+                    const radios = document.getElementsByName(id);
+                    expectedAnswer = answerKey[id];
+                    
+                    for (let radio of radios) {
+                        radio.disabled = true;
+                        if (radio.checked) userAnswer = radio.value;
+                    }
+
+                    let explanationHTML = "";
+                    if (explanations[id]) {
+                        explanationHTML = ` <span class="text-[0.95rem] text-slate-500 font-normal italic ml-2">(${explanations[id]})</span>`;
+                    }
+
+                    if (userAnswer === expectedAnswer) {
+                        isCorrect = true;
+                        correctionArea.innerHTML = tickSVG + explanationHTML;
+                    } else {
+                        correctionArea.innerHTML = crossSVG + ` <span class="correction-text">Correct answer: ${expectedAnswer.toUpperCase()}</span>` + explanationHTML;
+                    }
+                }
+
+                if (isCorrect) score++;
+            }
+
+            // Display Final Score
+            const gradeDisplay = document.getElementById('grade-display');
+            document.getElementById('final-score').textContent = score;
+            
+            // Calculate percentage for styling
+            const percentage = (score / totalQuestions) * 100;
+            if(percentage >= 80) {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-green-600 rounded-full flex flex-col items-center justify-center text-green-600 transform rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-green-600 w-16 text-center mt-1 pt-1 font-sans";
+            } else if (percentage >= 60) {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-blue-600 rounded-full flex flex-col items-center justify-center text-blue-600 transform -rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-blue-600 w-16 text-center mt-1 pt-1 font-sans";
+            } else {
+                gradeDisplay.className = "absolute top-12 right-12 w-32 h-32 border-[5px] border-red-600 rounded-full flex flex-col items-center justify-center text-red-600 transform rotate-12 bg-white/95 backdrop-blur-sm z-10 shadow-xl";
+                gradeDisplay.querySelector('.border-t-[3px]').className = "text-sm font-bold border-t-[3px] border-red-600 w-16 text-center mt-1 pt-1 font-sans";
+            }
+            
+            gradeDisplay.querySelector('.border-t-[3px]').innerHTML = `/${totalQuestions}`;
+            gradeDisplay.classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const submitBar = document.querySelector('.submit-bar');
+            submitBar.innerHTML = `
+                <button type="button" onclick="location.reload()" class="px-8 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold shadow-lg transition-colors text-lg flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Clear Answers & Retake
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>
