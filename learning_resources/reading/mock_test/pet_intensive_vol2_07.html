@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive Vol 2 Test 07 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 800px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature (Locate) */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* User Highlighting Feature */
+        .user-hl { transition: background-color 0.2s ease; border-radius: 3px; padding: 0 2px; cursor: pointer; }
+        .user-hl:hover { filter: brightness(0.95); }
+        .user-hl-yellow { background-color: #fef08a; } /* bg-yellow-200 */
+        .user-hl-green { background-color: #bbf7d0; } /* bg-green-200 */
+        .user-hl-pink { background-color: #fbcfe8; } /* bg-pink-200 */
+        
+        ::selection { background-color: #e2e8f0; color: inherit; }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Cached DOM State Utilities */
+        .result-element { display: none; }
+        .is-result-mode .result-element { display: block; }
+        .is-result-mode .test-element { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col relative">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PET Intensive Vol 2 Test 07</h2>
+            <p class="text-gray-500 text-lg mb-8 uppercase tracking-widest font-medium">Academic Reading Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-left shadow-sm">
+                <h3 class="font-bold text-pink-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    Instructions
+                </h3>
+                <ul class="space-y-3 text-sm text-pink-800/80">
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can highlight text in both the passage and questions. The highlights will persist!</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report and explanations.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+                Start Mock Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Main View -->
+    <div id="view-main" class="hidden flex-auto flex flex-col overflow-hidden bg-white relative">
+        <!-- Result Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Mock Test Result</h2>
+                <p class="text-gray-400 text-sm">Review your performance and detailed explanations below.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Band Score</div>
+                    <div id="band-score-display" class="text-xl font-bold text-yellow-400">--</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Raw Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">--/40</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Time Used</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative"></nav>
+
+        <!-- Split View -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            <!-- Left Pane: Passage -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100 italic"></h2>
+                    <!-- Cached Passages Container -->
+                    <div id="passage-content-container" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions -->
+            <div id="pane-questions" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative">
+                    <!-- Cached Questions Container -->
+                    <div id="questions-content-container" class="space-y-10 pb-20"></div>
+                    
+                    <div id="floating-submit-container" class="mt-12 text-center border-t border-gray-200 pt-8 hidden">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-all w-full sm:w-auto">
+                            Submit Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigator -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-lg relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <div id="navigator-grid" class="flex items-center gap-4"></div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 hidden md:flex items-center gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest"></div>
+        </div>
+    </div>
+
+    <!-- Highlight Toolbar -->
+    <div id="highlight-toolbar" class="hidden fixed z-50 bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2)] border border-gray-200 rounded-lg p-1.5 flex gap-1.5 transition-opacity transform -translate-x-1/2 -translate-y-full mt-[-10px]">
+        <button class="hl-btn bg-[#fef08a] hover:bg-[#fde047] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="yellow" title="Highlight Yellow"></button>
+        <button class="hl-btn bg-[#bbf7d0] hover:bg-[#86efac] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="green" title="Highlight Green"></button>
+        <button class="hl-btn bg-[#fbcfe8] hover:bg-[#f9a8d4] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="pink" title="Highlight Pink"></button>
+        <div class="w-[1px] bg-gray-200 mx-0.5 my-1"></div>
+        <button class="hl-btn bg-white hover:bg-gray-100 text-gray-500 hover:text-red-500 w-7 h-7 rounded-md border border-gray-200 shadow-sm flex items-center justify-center transition-all" data-color="clear" title="Remove Highlight">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </button>
+    </div>
+
+    <!-- Vocab Tooltip -->
+    <div id="vocab-tooltip" class="bg-white rounded-2xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-600 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-none">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-xs font-mono mt-1 italic">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+        <div class="p-5 bg-white space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tiếng Việt</span>
+                <p id="tt-vi" class="text-gray-900 font-bold text-sm"></p>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-1">Context</span>
+                <p id="tt-context" class="text-gray-600 text-sm leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 text-pink-500">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Finish Test?</h3>
+            <p id="modal-message" class="text-center text-gray-500 mb-8 px-4 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Resume</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-2xl bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors shadow-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA TEMPLATE ---
+        const TEST_DATA = {
+            totalDurationSeconds: 3600, // 60 minutes
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: The Oldest Leather Shoe",
+                    passage: `
+                        <p class="mb-4">Archeologists discovered in 2010 what is said to be the world's oldest known leather shoe. The 5,500-year-old shoe, some 1,000 years older than the Egyptian pyramids, was found by scientists excavating a huge cave, designated Areni-1, in Armenia near the border of Turkey and Iran. The shoe was part of a treasure trove of artefacts that experts say provide unprecedented information about an important and sparsely documented era: the Chalcolithic period or Copper Age, when humans are believed to have invented the wheel, as well as domesticating horses and producing other important <span id="loc_p1_q1" class="highlight-target">innovations</span>.</p>
+                        <p class="mb-4">Along with the shoe, the cave yielded horns and bones of wild goats and red deer, as well as broken pottery and evidence of what may be the oldest known intentionally dried fruits: apricots, grapes and plums. The cave, first discovered in 1997, appears to have been used primarily by powerful people of high status for keeping this Chalcolithic community's ritual objects, as well as their <span id="loc_p1_q2" class="highlight-target">harvest</span> during the winter months each year. But other people, probably acting as guards, seem to have lived in the front portion of the cave.</p>
+                        <p class="mb-4">One of the lead scientists excavating Areni-1, Dr Gregory Areshian of the University of California, Los Angeles, in the USA, said that the cave was also used by later civilizations, most recently by 14th-century Mongols, so he had assumed the shoe would be 600 to 700 years old. When separate laboratories at the University of Oxford in the UK and at the University of California at Irvine in the USA carbon-dated the leather to 3653 to 3627 BC, he said, 'We couldn't believe that a shoe could be so ancient.'</p>
+                        <p class="mb-4">Perfectly preserved under a layer of sheep dung and thus sealed in a stable, cool, dry environment, the shoe, 24.5 cm long, was made of a single piece of cowhide. This was cut into two layers and vegetable <span id="loc_p1_q3" class="highlight-target">oil</span> was applied, which was probably quite a new technology at the time. The pieces of leather comprising the shoe were joined using leather <span id="loc_p1_q4" class="highlight-target">cords</span> which ran along front and back, and these were threaded through numerous holes in the body of the shoe. Although shoes made at this time were probably not specifically designed for the right or left foot as are modern ones, the Areni-1 shoe was worn on the right foot. 'You can see the imprint of the big toe,' said another team leader, Ron Pinhasi of University College Cork in Ireland. 'As the person was wearing it and lacing it, some of the eyelets had been torn and replaced.' The shoe had been deliberately placed in the pit where the archeologists found it. Its bed had been carefully lined with yellow clay. The shoe had been stuffed with <span id="loc_p1_q5" class="highlight-target">grass</span> either to hold its shape or perhaps for warmth for the wearer.</p>
+                        <p class="mb-4">Protecting the foot was probably one of the main reasons people started wearing shoes, and this certainly seems to be the case for the Armenian leather shoe. According to Dr Areshian, the terrain around Areni-1 is very rugged and would have been difficult to walk on. Furthermore, shoes like this would have enabled people to cope with the extremes of <span id="loc_p1_q6" class="highlight-target">temperature</span> in the region - up to 45°C in summer and -10°C in winter - and to travel further. 'These people were walking long distances. We have found <span id="loc_p1_q7" class="highlight-target">stones</span> in the cave, which came from at least 120 kilometers away,' explained Dr Areshian.</p>
+                        <p class="mb-4">Manolo Blahnik, an expert on shoe design, says that 'The (Armenian) shoe's function was obviously to protect the foot, but I am in no doubt that a certain appearance of a shoe meant belonging to a certain <span id="loc_p1_q8" class="highlight-target">tribe</span>.' He adds that it was probably part of the clothing which the wearer used to distinguish their identity.</p>
+                        <p class="mb-4"><span id="loc_p1_q9" class="highlight-target">Previously, the oldest known remains of a closed-toe leather shoe was one which belonged to Otzi the Iceman, a mummy found in the early 1990s in the Alps, near the Italian-Austrian border. That shoe, about 300 years younger than the Armenian shoe, had bearskin soles, deerskin sides and contained grass socks.</span></p>
+                        <p class="mb-4"><span id="loc_p1_q10" class="highlight-target">Footwear even older than the leather shoes includes examples of sandals made of plant fibers which have been found in Missouri and Oregon in the USA.</span> <span id="loc_p1_q11" class="highlight-target">The wearing of some type of footwear, though, is almost certainly far older than the oldest shoes so far discovered. For example, an analysis of toe bones found in 40,000-year-old fossils in China indicates that people had been wearing some type of shoe at that date.</span> Drs Pinhasi and Areshian think it is plausible that shoes as we know them today originated somewhere in the Near East, around Armenia. 'Many other inventions, such as wheel-thrown pottery, cuneiform writing and sheep-wool production evolved in the ancient Near East,' Pinhasi says. 'And so it is quite plausible that Armenia may give us the earliest clue to a "prototype" shoe, which later spread to other parts of the world.'</p>
+                        <p class="mb-4"><span id="loc_p1_q12" class="highlight-target">Interestingly, the Armenian leather shoe found in Areni-1 is very similar to the 'pampooties' worn on the Aran Islands in the west of Ireland up to the 1950s.</span> <span id="loc_p1_q13" class="highlight-target">'In fact, enormous similarities exist between the manufacturing technique and style of the Armenian shoe and those found across Europe at subsequent periods, suggesting that this type of shoe was worn for thousands of years across a large and environmentally diverse region,' said Dr Pinhasi.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_8_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–8</h3>
+                                    <p class="text-gray-700">Complete the notes below.</p>
+                                    <p class="text-gray-700 mt-2">Write <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1_8',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 text-base">
+                                    <strong class="block mb-6 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">The discovery of the Areni-1 shoe</strong>
+                                    
+                                    <p class="font-bold text-gray-900 mb-2">The Areni-1 cave</p>
+                                    <ul class="list-disc list-inside ml-4 mb-6 space-y-2">
+                                        <li>contains artefacts dating from the Copper Age when various <strong>1</strong> <input type="text" data-qid="p1_q1" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> such as horse domestication, were introduced</li>
+                                        <li>used for storage of the annual <strong>2</strong> <input type="text" data-qid="p1_q2" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> as well as ceremonial items</li>
+                                    </ul>
+
+                                    <p class="font-bold text-gray-900 mb-2">The Areni-1 shoe</p>
+                                    <ul class="list-disc list-inside ml-4 mb-6 space-y-2">
+                                        <li>made of leather treated with <strong>3</strong> <input type="text" data-qid="p1_q3" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> from plants</li>
+                                        <li>held together by <strong>4</strong> <input type="text" data-qid="p1_q4" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> also made of leather</li>
+                                        <li>bearing an impression of a human toe</li>
+                                        <li>filled with <strong>5</strong> <input type="text" data-qid="p1_q5" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> possibly to keep out the cold</li>
+                                    </ul>
+
+                                    <p class="font-bold text-gray-900 mb-2">Uses of the Areni-1 shoe</p>
+                                    <ul class="list-disc list-inside ml-4 space-y-2">
+                                        <li>to protect the foot because
+                                            <ul class="list-[circle] list-inside ml-6 mt-2 space-y-2">
+                                                <li>the terrain of the surrounding area is rough</li>
+                                                <li>the area was exposed to a great variation in <strong>6</strong> <input type="text" data-qid="p1_q6" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"></li>
+                                                <li>people travelled widely - as indicated by <strong>7</strong> <input type="text" data-qid="p1_q7" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"> which were discovered in the cave</li>
+                                            </ul>
+                                        </li>
+                                        <li>to signify membership of a <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="30"></li>
+                                    </ul>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q1', correct: 'innovations', explanation: 'Paragraph 1: "...as well as domesticating horses and producing other important innovations."' },
+                                { id: 'p1_q2', correct: 'harvest', explanation: 'Paragraph 2: "...as well as their harvest during the winter months each year."' },
+                                { id: 'p1_q3', correct: 'oil', explanation: 'Paragraph 4: "This was cut into two layers and vegetable oil was applied..."' },
+                                { id: 'p1_q4', correct: 'cords', explanation: 'Paragraph 4: "The pieces of leather comprising the shoe were joined using leather cords..."' },
+                                { id: 'p1_q5', correct: 'grass', explanation: 'Paragraph 4: "The shoe had been stuffed with grass either to hold its shape or perhaps for warmth..."' },
+                                { id: 'p1_q6', correct: 'temperature', explanation: 'Paragraph 5: "Furthermore, shoes like this would have enabled people to cope with the extremes of temperature in the region..."' },
+                                { id: 'p1_q7', correct: 'stones', explanation: 'Paragraph 5: "\'These people were walking long distances. We have found stones in the cave...\'"' },
+                                { id: 'p1_q8', correct: 'tribe', explanation: 'Paragraph 6: "...I am in no doubt that a certain appearance of a shoe meant belonging to a certain tribe."' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q9_13_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 9–13</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the text?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q9',
+                            displayType: 'radio',
+                            text: '9. The Otzi shoe was made of leather from more than one animal.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 7 states it had "bearskin soles, deerskin sides", meaning it used leather from both bears and deer.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q10',
+                            displayType: 'radio',
+                            text: '10. The sandals discovered in Missouri and Oregon are examples of very early leather footwear.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 8 states the sandals found there were "made of plant fibers", not leather.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q11',
+                            displayType: 'radio',
+                            text: '11. The very early use of footwear is evident in human fossil remains.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph 8 states: "For example, an analysis of toe bones found in 40,000-year-old fossils in China indicates that people had been wearing some type of shoe at that date."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q12',
+                            displayType: 'radio',
+                            text: '12. Inhabitants of the Irish Aran Islands travelled to the Near East to trade leather goods.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'The passage mentions the shoe is very similar to the ones worn on the Aran Islands, but it does not say that the inhabitants travelled to the Near East to trade.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q13',
+                            displayType: 'radio',
+                            text: '13. The design of the Areni-1 shoe made it suitable for one specific area of Europe.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph 9 states: "...suggesting that this type of shoe was worn for thousands of years across a large and environmentally diverse region," contradicting the idea it was suitable for only one specific area.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: From princes to paupers: how Goya's portraits tell the story of Spain",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> There are, according to current scholarship, 160 existing portraits by Francisco de Goya - about a third of his painted output. <span id="loc_p2_q16" class="highlight-target">The real number, though, is much greater since there are no pure landscapes in Goya's work, in that everything he ever painted deals with people.</span> In the work of no other great portraitist are a nation's people, history, traumas, folk traditions, and superstitions so comprehensively and relentlessly captured. His subject was a good one since Goya lived in interesting times: his lifetime was a period that saw Spain pass through the effects of the French Revolution, the Napoleonic wars, and the restoration of the monarchy; it was ruled by a succession of authoritarian and liberal governments; and was simultaneously marked by the Enlightenment. <span id="loc_p2_q18" class="highlight-target">Put his work together - the public and private paintings, the personal drawings and sketches, and the unsettling and sinister etching series - and what you have is a portrait in the round of Spain itself.</span></p>
+                        
+                        <p class="mb-4"><strong>B.</strong> His work as a portraitist has its origins in the 45 tapestry cartoons he painted after he moved to Madrid in 1775. <span id="loc_p2_q19_20_a" class="highlight-target">Although his designs don't show portraits, they do show types - the majos and majas who gave Madrid its street swagger, peasants and rich men, courting couples, singers, hunters, children, and young men and women playing blind man's buff or tossing a mannequin into the air.</span> The pictures have a light, rococo palette and <span id="loc_p2_q19_20_b" class="highlight-target">the faces are individualised without being those of individuals.</span> <span id="loc_p2_q19_20_c" class="highlight-target">But in them, Goya practised poses and groupings and a way of handling light on and around figures that was to be invaluable.</span></p>
+
+                        <p class="mb-4"><strong>C.</strong> <span id="loc_p2_q19_20_d" class="highlight-target">The tapestry designs also show social roles rather than the people inhabiting them</span>, but when it came to painting portraits properly, Goya would turn this on its head. His greatest strength as a portraitist is that regardless of the status of the sitter, be they a king and queen, the Duke of Wellington, or a doctor or writer, it was the person he showed first and their position second. <span id="loc_p2_q21_22_a" class="highlight-target">It was this trait, most apparent in his royal portraiture, that has led him to be seen as satirising the Bourbon monarchy rather than as a painter who depicted what he saw without showing obeisance to the usual flattering conventions.</span> In Robert Hughes's phrase, he did not 'pay reflexive homage to authority' but instead walked a fine line between respect and truth.</p>
+
+                        <p class="mb-4"><strong>D.</strong> Goya's success was rapid; in 1785 he was made deputy director of painting at the Royal Academy (his main message to his students was subversive - 'there are no rules in painting') and in 1786 became pintor de cámara, required to paint 'works required for royal service'. Не immediately spent some of his 15,000-reales salary on a two-wheeled gig (one of only three in Madrid) which he promptly crashed on his first outing. <span id="loc_p2_q17" class="highlight-target">His amour propre untouched, he wrote to his childhood friend Martín Zapater: 'I have now established an enviable way of living: I do not wait on anyone in antechambers, and if anyone wants anything from me they must come to me; I have made myself more in demand and unless it is a person of rank or at the request of a friend I would do nothing for anyone...'</span></p>
+
+                        <p class="mb-4"><strong>E.</strong> Part of the reason for his success was that, unlike Gainsborough, for example, <span id="loc_p2_q15" class="highlight-target">he did not resent portraiture as an economically necessary chore that ate away at the time he could devote to higher art.</span> Portraiture fascinated him; it was, after all, part of that 'sacred science which requires so much study' and his portraits reveal a fully engaged artist. <span id="loc_p2_q21_22_c" class="highlight-target">There is hardly any repetition in his poses</span> (<span id="loc_p2_q21_22_e" class="highlight-target">to help, he drew on prints of English portraits as well as classical statuary</span>), he worked hard to give his sitters in repose a sense of latent movement, and <span id="loc_p2_q21_22_d" class="highlight-target">he defined them by the careful depiction of the space around them.</span> When it came to clothing <span id="loc_p2_q21_22_b" class="highlight-target">he allowed himself extraordinary freedom, the frogging on uniforms or lace on a dress sketched in thick impasto rather than being laboriously defined.</span> From close up such three-dimensional scumblings look out of focus but from a distance, they coalesce into silks, braiding, and gauze. Such varieties of technique within a painting keep the eye entertained and moving.</p>
+
+                        <p class="mb-4"><strong>F.</strong> 'My work is very simple. My art reveals idealism and truth,' Goya claimed. The truth, though, is always more apparent than idealism. <span id="loc_p2_q23" class="highlight-target">In the most important commission of his career, for example, the portrait of Charles IV and the royal family of 1800</span>, he eschewed entirely the grandeur of majesty to portray the assembled Bourbons as they appeared - a motley grouping (<span id="loc_p2_q24" class="highlight-target">a French visitor had likened Charles and his queen Maria Luisa to a butcher and his wife</span>) in fancy clothes. Goya may have been a political liberal but he wouldn't have jeopardised his hard-won new position as first court painter - the first Spaniard since Velázquez to hold the role - in order to score political points at the expense of his patrons. That his sitters didn't regard the portrait as unflattering was evidenced by succeeding royal commissions, not least his 1815 portrait of Ferdinand VII. Ferdinand himself was physically unprepossessing, tyrannical, vicious, and small-minded and that is exactly how Goya shows him. The king, however, looking in Goya's particular mirror, saw no such characteristics staring back at him.</p>
+
+                        <p class="mb-4"><strong>G.</strong> The private side of Goya's portraiture was a world away from the public. The contrast between the Ferdinand portrait and the remarkable 1820 double portrait. showing Goya with Dr Arrieta, represents a moral version of the three ages of man - <span id="loc_p2_q25" class="highlight-target">the 73-year-old painter in the throes of a debilitating illness being tended by his doctor.</span> If Ferdinand represents human malignity and Goya its frailty, then <span id="loc_p2_q26" class="highlight-target">Arrieta stands for man's innate kindness.</span> <span id="loc_p2_q14" class="highlight-target">While not all his portraits are successful (some have a doll-like stiffness)</span>, this is what Goya at his best could do: in the guise of representing individuals he showed, without judging, man as a universal being.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_18_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–18</h3>
+                                    <p class="text-gray-700">Reading Passage 2 has seven paragraphs, <strong>A-G</strong>.</p>
+                                    <p class="text-gray-700 mt-2">Which paragraph contains the following information? Drag and drop the correct letter into the corresponding box.</p>
+                                    <p class="text-gray-500 text-sm mt-2 italic"><strong>NB</strong> You may use any letter more than once.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q14_18',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Paragraphs',
+                            isReusable: true,
+                            pool: [
+                                { id: 'A', text: 'A. Paragraph A' },
+                                { id: 'B', text: 'B. Paragraph B' },
+                                { id: 'C', text: 'C. Paragraph C' },
+                                { id: 'D', text: 'D. Paragraph D' },
+                                { id: 'E', text: 'E. Paragraph E' },
+                                { id: 'F', text: 'F. Paragraph F' },
+                                { id: 'G', text: 'G. Paragraph G' }
+                            ],
+                            questions: [
+                                { id: 'p2_q14', text: '14. a weakness in some of Goya\'s paintings', correct: 'G', explanation: 'Paragraph G states: "While not all his portraits are successful (some have a doll-like stiffness)..." pointing to a weakness.' },
+                                { id: 'p2_q15', text: '15. a reason that might explain why some artists did not enjoy painting portraits', correct: 'E', explanation: 'Paragraph E states that unlike Gainsborough, Goya "did not resent portraiture as an economically necessary chore that ate away at the time he could devote to higher art." This gives the reason some artists disliked it.' },
+                                { id: 'p2_q16', text: '16. a genre Goya did not paint', correct: 'A', explanation: 'Paragraph A states: "...there are no pure landscapes in Goya\'s work..."' },
+                                { id: 'p2_q17', text: '17. description of a reaction to a promotion', correct: 'D', explanation: 'Paragraph D describes his promotion to pintor de cámara, after which he spent his salary on a gig, crashed it, and wrote a letter saying "I have now established an enviable way of living..."' },
+                                { id: 'p2_q18', text: '18. a summary of the historical significance of Goya\'s works', correct: 'A', explanation: 'Paragraph A concludes: "Put his work together... and what you have is a portrait in the round of Spain itself." This summarizes the historical significance.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q19_20_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 19–20</h3>
+                                    <p class="text-gray-700">Choose <strong>TWO</strong> correct answers.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q19_20',
+                            displayType: 'checkbox_group',
+                            text: 'Which TWO statements are true about Goya\'s tapestry cartoons?',
+                            options: [
+                                { id: 'A', text: 'A. They featured lively civilians and labourers that he observed.', isCorrect: true, explanation: 'Paragraph B states: "they do show types - the majos and majas who gave Madrid its street swagger, peasants and rich men..."' },
+                                { id: 'B', text: 'B. Individuals were portrayed without faces.', isCorrect: false, explanation: 'Paragraph B states "the faces are individualised without being those of individuals", meaning they had faces, just not specific real people.' },
+                                { id: 'C', text: 'C. They were used to develop techniques for his future works.', isCorrect: true, explanation: 'Paragraph B states: "But in them, Goya practised poses and groupings and a way of handling light... that was to be invaluable."' },
+                                { id: 'D', text: 'D. People\'s social standings were a secondary focus.', isCorrect: false, explanation: 'Paragraph C states: "The tapestry designs also show social roles rather than the people inhabiting them..." meaning social roles were the primary focus, not secondary.' },
+                                { id: 'E', text: 'E. He avoided painting political controversies.', isCorrect: false, explanation: 'Not mentioned as a specific attribute of the tapestry cartoons.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q21_22_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 21–22</h3>
+                                    <p class="text-gray-700">Choose <strong>TWO</strong> correct answers.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q21_22',
+                            displayType: 'checkbox_group',
+                            text: 'Which TWO statements are true about Goya\'s portraits?',
+                            options: [
+                                { id: 'A', text: 'A. His depiction of royalty was typical of the time.', isCorrect: false, explanation: 'Paragraph C states he "depicted what he saw without showing obeisance to the usual flattering conventions", meaning it was not typical.' },
+                                { id: 'B', text: 'B. He was meticulous about the details when painting clothes.', isCorrect: false, explanation: 'Paragraph E states "he allowed himself extraordinary freedom... sketched in thick impasto rather than being laboriously defined." This is the opposite of meticulous.' },
+                                { id: 'C', text: 'C. He generally avoided using the same pose.', isCorrect: true, explanation: 'Paragraph E states: "There is hardly any repetition in his poses..."' },
+                                { id: 'D', text: 'D. He paid very close attention to the background in his paintings.', isCorrect: true, explanation: 'Paragraph E states: "...he defined them by the careful depiction of the space around them."' },
+                                { id: 'E', text: 'E. He did not believe in using the works of other artists as inspiration.', isCorrect: false, explanation: 'Paragraph E states: "...to help, he drew on prints of English portraits as well as classical statuary..."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q23_26_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 23–26</h3>
+                                    <p class="text-gray-700 mb-4">Complete the summary below. Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q23_26',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base space-y-3">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">Goya's Artistic Duality</strong>
+                                    <div>
+                                        Francisco Goya, in embracing the simplicity and truth in his art, masterfully navigated the delicate balance between idealism and reality. Among the many royal portraits of his career, his most significant 
+                                        <strong>23</strong> <input type="text" data-qid="p2_q23" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40"> 
+                                        was from Charles IV, in which he abandoned conventional majesty to faithfully reveal the monarch, whose depiction was later likened to a 
+                                        <strong>24</strong> <input type="text" data-qid="p2_q24" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40"> . 
+                                        His subsequent royal paintings, including the 1815 unflattering portrait of Ferdinand VII, show that he was able to depict truth without jeopardizing his position.
+                                        <br><br>
+                                        However, Goya's private portraiture revealed a different narrative, as exemplified by his 1820 double portrait with Dr. Arrieta, in which an ailing Goya is seen in the care of the good 
+                                        <strong>25</strong> <input type="text" data-qid="p2_q25" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40">. 
+                                        It serves as a testament to Goya's pinnacle ability to portray humanity in both its finest and darkest moments, all while refraining from passing judgment; in the latter scenario, individuals may have to be dependent on the 
+                                        <strong>26</strong> <input type="text" data-qid="p2_q26" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40"> 
+                                        of their fellow men.
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q23', correct: 'commission', explanation: 'Paragraph F: "In the most important commission of his career, for example, the portrait of Charles IV..."' },
+                                { id: 'p2_q24', correct: 'butcher', explanation: 'Paragraph F: "...a French visitor had likened Charles and his queen Maria Luisa to a butcher and his wife..."' },
+                                { id: 'p2_q25', correct: 'doctor', explanation: 'Paragraph G: "...the 73-year-old painter in the throes of a debilitating illness being tended by his doctor."' },
+                                { id: 'p2_q26', correct: 'kindness', explanation: 'Paragraph G: "If Ferdinand represents human malignity and Goya its frailty, then Arrieta stands for man\'s innate kindness."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: Memory Champions … or just good at tricks",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> <span id="loc_p3_q29" class="highlight-target">The Examinations School at Oxford University is where, last August, 34 contestants gathered at the World Memory Championships.</span> It is an impressive historical venue, known for its austere yet grandiose setting of oak-paneled rooms, large Gothic windows, and looming portraits of eminent dukes and earls. It is here that generations of Oxford students have been tested in their final exams on their memory and knowledge, and it is here that these contestants were challenged to demonstrate their exceptional mnemonic abilities. Reciting poems, memorizing digit sequences, and recalling faces from photographs are just a few of the tasks that test the limits of human memory in this competitive setting.</p>
+
+                        <p class="mb-4"><strong>B.</strong> They are using a technique known as the loci method, <span id="loc_p3_q31" class="highlight-target">reportedly originating in 477 BC with the Greek poet Simonides of Ceos. He was able to memorize the guest list at a dinner by closing his eyes and recalling each individual around the table.</span> The loci method, which was rediscovered and popularized by Simonides, has become an integral part of historical and modern memory training. This method involves associating items to be remembered with specific physical locations, creating a mental map that facilitates recall. <span id="loc_p3_q38" class="highlight-target">After Simonides's discovery, the loci method became widely embraced across ancient Greece, serving as a fundamental technique for orators and scholars.</span> It was so effective that it was incorporated into educational curricula and became a cornerstone of rhetorical training. Aristotle wrote favorably about it, recognizing its value and effectiveness. Later, a number of treatises on the art of memory were published in Rome, further cementing its importance and utility in memory training. This method not only aids in memorization but also enhances the ability to retrieve information by navigating through these mental loci, effectively walking through a structured memory palace.</p>
+
+                        <p class="mb-4"><strong>C.</strong> One memory champion, Ed Cooke, can memorize the order of ten decks of playing cards in less than one hour or one deck of cards in less than one minute. Psychologists Elizabeth Valentine and John Wilding have teamed up with Eleanor Maguire to study how memory champions like Cooke operate differently from average individuals. Their collaboration aims to explore the neural underpinnings that might explain the exceptional memory skills exhibited by competitors in high-pressure environments such as memory championships. <span id="loc_p3_q37" class="highlight-target">When the researchers analyzed the brain scans from the number memorization, they found that the memory champions were activating some brain regions that were different from those the control subjects were using. These regions are known to be involved in visual memory and spatial navigation.</span></p>
+
+                        <p class="mb-4"><strong>D.</strong> <span id="loc_p3_q27" class="highlight-target"><span id="loc_p3_q33" class="highlight-target">To enable himself to memorize quickly, Ed Cooke has memorized a specific human being, verb, and object that he associates with every card in the deck.</span> This detailed and highly personalized system allows him to rapidly encode and decode information during competitions. <span id="loc_p3_q34" class="highlight-target">When Cooke commits a deck to memory, he does it three cards in one go</span>, with every three-card group forming a composite picture of a person doing something to an object.</span> This method not only enhances the memorization process but also makes the recall process faster and more efficient. <span id="loc_p3_q35" class="highlight-target">He then places those images along a specific familiar path in his mind</span>, creating a vivid mental journey that he can easily traverse. <span id="loc_p3_q36" class="highlight-target">When it comes to recall, Cooke takes a mental walk along his route</span> and translates the images into cards, effectively and efficiently converting his vivid mental images back into the specific order of the deck. This innovative approach to memory exercises showcases the extraordinary capabilities of mental athletes and the sophisticated strategies they employ to achieve their remarkable feats.</p>
+
+                        <p class="mb-4"><strong>E.</strong> <span id="loc_p3_q30" class="highlight-target">The term 'photographic memory' is frequently used to describe people with exceptional recall. Yet, most researchers agree there is no proof that such a memory truly exists.</span> If it is indeed a myth, it highlights how learned strategies are often more effective than natural talent. The belief in 'photographic memory' remains a point of contention among the public and scientists alike. Despite the absence of solid scientific evidence, this myth endures, reflecting how society’s fascination with remarkable memory tends to ignore the practical techniques and training that genuinely drive mnemonic success.</p>
+
+                        <p class="mb-4"><strong>F.</strong> The most renowned of the naturals was the Russian journalist S.V. Shereshevski, who could remember long sequences of numbers learned decades before, as well as poems, strings of meaningless syllables, and nearly anything else he was asked to recall. <span id="loc_p3_q32" class="highlight-target">Shereshevski also experienced synesthesia, a rare sensory condition where the senses are interconnected, which significantly improved his memorization ability.</span> His skills were not limited to these accomplishments; his remarkable memory covered an almost endless range of information, making him a figure of great interest and study. This synesthetic trait not only made his memorization tasks easier but also more vivid and long-lasting. His case has been extensively examined, as it offers deep insights into the potential of human memory when enhanced by neurological variations.</p>
+
+                        <p class="mb-4"><strong>G.</strong> K. Anders Ericsson, a well-known psychologist, claims that anyone can develop memory abilities comparable to those of memory champions through consistent practice and proper techniques. <span id="loc_p3_q28" class="highlight-target">During two years of experimentation, S.V. increased his ability to recall numbers from seven to over eighty.</span> This study led Ericsson to conclude that there is no such thing as an innately superior memory. <span id="loc_p3_q40" class="highlight-target">When he revisited original case reports of natural memorizers, he discovered that their remarkable abilities were actually based on the use of specific techniques — sometimes unconsciously — combined with extensive practice.</span> <span id="loc_p3_q39" class="highlight-target">Strategists are usually outstanding at remembering only certain kinds of material, whereas naturals exhibit strong memory across many types of tasks and can retain those memories more easily.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_32_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–32</h3>
+                                    <p class="text-gray-700">Reading Passage 3 has seven paragraphs, <strong>A-G</strong>.</p>
+                                    <p class="text-gray-700 mt-2">Which paragraph contains the following information? Drag and drop the correct letter into the corresponding box.</p>
+                                    <p class="text-gray-500 text-sm mt-2 italic"><strong>NB</strong> You may use any letter more than once.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q27_32',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Paragraphs',
+                            isReusable: true,
+                            pool: [
+                                { id: 'A', text: 'A. Paragraph A' },
+                                { id: 'B', text: 'B. Paragraph B' },
+                                { id: 'C', text: 'C. Paragraph C' },
+                                { id: 'D', text: 'D. Paragraph D' },
+                                { id: 'E', text: 'E. Paragraph E' },
+                                { id: 'F', text: 'F. Paragraph F' },
+                                { id: 'G', text: 'G. Paragraph G' }
+                            ],
+                            questions: [
+                                { id: 'p3_q27', text: '27. a description of how a contestant remembers complex sequences', correct: 'D', explanation: 'Paragraph D explains Ed Cooke\'s detailed system of memorizing specific human beings, verbs, and objects in three-card groups to navigate his mental path.' },
+                                { id: 'p3_q28', text: '28. an example of how one person’s memory was improved over time', correct: 'G', explanation: 'Paragraph G states: "During two years of experimentation, S.V. increased his ability to recall numbers from seven to over eighty."' },
+                                { id: 'p3_q29', text: '29. a description of a memorizing competition', correct: 'A', explanation: 'Paragraph A describes the 34 contestants gathering at the World Memory Championships and details the tasks like "Reciting poems, memorizing digit sequences, and recalling faces from photographs".' },
+                                { id: 'p3_q30', text: '30. a commonly held belief about memory that many experts say is unproven', correct: 'E', explanation: 'Paragraph E discusses "photographic memory", noting that "most researchers agree there is no proof that such a memory truly exists."' },
+                                { id: 'p3_q31', text: '31. a reference to the first recorded use of memorizing through location', correct: 'B', explanation: 'Paragraph B traces the loci method back to "originating in 477 BC with the Greek poet Simonides of Ceos", who recalled a guest list based on where individuals sat.' },
+                                { id: 'p3_q32', text: '32. a reference to an unusual condition which results in improved memory', correct: 'F', explanation: 'Paragraph F mentions that S.V. Shereshevski "experienced synesthesia, a rare sensory condition where the senses are interconnected, which significantly improved his memorization ability."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q33_36_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 33–36</h3>
+                                    <p class="text-gray-700 mb-4">Complete the summary below. Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q33_36',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">Memorization Strategy</strong>
+                                    Using visual imagery and spatial navigation to remember numbers are investigated and explained. A <strong>33</strong> <input type="text" data-qid="p3_q33" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40">, an action, and a thing are assigned to consecutive cards in the pack. Combining these images allows Cooke to memorise <strong>34</strong> <input type="text" data-qid="p3_q34" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"> at a time. The mind pictures are then positioned on a <strong>35</strong> <input type="text" data-qid="p3_q35" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40">. The pack of cards is remembered by going for a <strong>36</strong> <input type="text" data-qid="p3_q36" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"> while the pictures are converted back into cards.
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p3_q33', correct: 'specific human being', explanation: 'Paragraph D: "...Ed Cooke has memorized a specific human being, verb, and object that he associates with every card in the deck."' },
+                                { id: 'p3_q34', correct: 'three cards', explanation: 'Paragraph D: "When Cooke commits a deck to memory, he does it three cards in one go..."' },
+                                { id: 'p3_q35', correct: 'specific familiar path', explanation: 'Paragraph D: "He then places those images along a specific familiar path in his mind..."' },
+                                { id: 'p3_q36', correct: 'mental walk', explanation: 'Paragraph D: "When it comes to recall, Cooke takes a mental walk along his route..."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q37_40_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 37–40</h3>
+                                    <p class="text-gray-700">Complete each sentence with the correct ending, <strong>A-F</strong>, below. Drag and drop the correct ending into the corresponding box.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q37_40',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Endings',
+                            isReusable: false,
+                            pool: [
+                                { id: 'A', text: 'A. used mainly for educational purposes.' },
+                                { id: 'B', text: 'B. activated brain areas associated with visual and spatial memory.' },
+                                { id: 'C', text: 'C. became widespread in ancient Greece for memorizing speeches and texts.' },
+                                { id: 'D', text: 'D. the result of techniques and extensive practice.' },
+                                { id: 'E', text: 'E. retaining a wide variety of tasks.' },
+                                { id: 'F', text: 'F. benefited from additional cognitive abilities.' }
+                            ],
+                            questions: [
+                                { id: 'p3_q37', text: '37. Valentine, Wilding and Maguire’s experiment shows that the memory contestants', correct: 'B', explanation: 'Paragraph C states: "...the memory champions were activating some brain regions... known to be involved in visual memory and spatial navigation."' },
+                                { id: 'p3_q38', text: '38. After Simonides discovered the loci method in 477 BC, it was', correct: 'C', explanation: 'Paragraph B states: "After Simonides\'s discovery, the loci method became widely embraced across ancient Greece, serving as a fundamental technique for orators and scholars."' },
+                                { id: 'p3_q39', text: '39. According to Valentine and Wilding, natural memorisers are better than strategic memorisers at', correct: 'E', explanation: 'Paragraph G concludes that naturals "exhibit strong memory across many types of tasks and can retain those memories more easily."' },
+                                { id: 'p3_q40', text: '40. According to K. Anders Ericson, Shereshevski’s skills were', correct: 'D', explanation: 'Paragraph G states that Ericsson discovered "their remarkable abilities were actually based on the use of specific techniques... combined with extensive practice."' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. ENGINE ARCHITECTURE & STATE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            questionsList: [], 
+            activeDragItem: null,
+            cachedPanes: {},
+            activeHighlightMark: null
+        };
+
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), band: document.getElementById('band-score-display'), time: document.getElementById('time-taken-display') },
+            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), pContainer: document.getElementById('passage-content-container'), qContainer: document.getElementById('questions-content-container'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') },
+            highlightTb: document.getElementById('highlight-toolbar')
+        };
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'drag_drop') {
+                        if (q.html) {
+                            q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop_inline', isCorrect: subQ.correct, parentId: q.id }));
+                        } else {
+                            q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
+                        }
+                    } else if (q.displayType === 'checkbox_group') {
+                        q.options.forEach(opt => {
+                            if (opt.isCorrect) {
+                                state.questionsList.push({ partIndex: pIdx, qId: `${q.id}_${opt.id}`, absNum: absNum++, displayType: 'checkbox', isCorrect: true, parentId: q.id });
+                            }
+                        });
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                    }
+                });
+            });
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
+            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+
+            document.addEventListener('mousedown', (e) => {
+                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
+                
+                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                    state.activeDragItem = null;
+                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                }
+            });
+
+            initHighlightEngine();
+        }
+
+        function initHighlightEngine() {
+            document.querySelectorAll('.hl-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const color = btn.dataset.color;
+                    
+                    if (state.activeHighlightMark) {
+                        if (color === 'clear') {
+                            const parent = state.activeHighlightMark.parentNode;
+                            while (state.activeHighlightMark.firstChild) {
+                                parent.insertBefore(state.activeHighlightMark.firstChild, state.activeHighlightMark);
+                            }
+                            parent.removeChild(state.activeHighlightMark);
+                        } else {
+                            state.activeHighlightMark.className = `user-hl user-hl-${color}`;
+                        }
+                        hideToolbar();
+                    } else {
+                        applyHighlightToSelection(color);
+                    }
+                });
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (e.target.closest('#highlight-toolbar')) return; 
+                
+                if (e.target.classList.contains('user-hl')) {
+                    state.activeHighlightMark = e.target;
+                    positionToolbar(e.target.getBoundingClientRect());
+                    return;
+                }
+
+                const sel = window.getSelection();
+                if (!sel.isCollapsed && sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    let valid = false;
+                    let node = range.commonAncestorContainer;
+                    if (node.nodeType === 3) node = node.parentNode;
+                    
+                    if (node && node.closest('.highlightable-area')) valid = true;
+                    
+                    if (valid) {
+                        state.activeHighlightMark = null; 
+                        positionToolbar(range.getBoundingClientRect());
+                    } else {
+                        hideToolbar();
+                    }
+                } else {
+                    hideToolbar();
+                }
+            });
+
+            document.getElementById('pane-passage').addEventListener('scroll', hideToolbar);
+            document.getElementById('pane-questions').addEventListener('scroll', hideToolbar);
+        }
+
+        function positionToolbar(rect) {
+            const tb = DOM.highlightTb;
+            tb.style.top = `${rect.top - 10}px`;
+            tb.style.left = `${rect.left + (rect.width / 2)}px`;
+            tb.classList.remove('hidden');
+        }
+
+        function hideToolbar() {
+            DOM.highlightTb.classList.add('hidden');
+            state.activeHighlightMark = null;
+        }
+
+        function applyHighlightToSelection(color) {
+            if (color === 'clear') {
+                window.getSelection().removeAllRanges();
+                hideToolbar();
+                return;
+            }
+            const sel = window.getSelection();
+            if (sel.isCollapsed) return;
+            const range = sel.getRangeAt(0);
+            
+            const walker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
+                acceptNode: function(node) {
+                    return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            }, false);
+
+            const nodesToWrap = [];
+            let currentNode = walker.currentNode;
+            while (currentNode) {
+                if (currentNode.nodeType === Node.TEXT_NODE && currentNode.nodeValue.trim().length > 0) nodesToWrap.push(currentNode);
+                currentNode = walker.nextNode();
+            }
+
+            if(nodesToWrap.length > 0) {
+                 try {
+                     const mark = document.createElement('mark');
+                     mark.className = `user-hl user-hl-${color}`;
+                     range.surroundContents(mark);
+                 } catch (e) {
+                     try {
+                        const mark = document.createElement('mark');
+                        mark.className = `user-hl user-hl-${color}`;
+                        mark.appendChild(range.extractContents());
+                        range.insertNode(mark);
+                     } catch(err) {
+                         console.warn("Could not highlight complex selection");
+                     }
+                 }
+            }
+            sel.removeAllRanges();
+            hideToolbar();
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            
+            renderTabs(); 
+            loadPart(0); 
+            updateNavigator();
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) { finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderTabs() {
+            DOM.navigator.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${idx + 1}`;
+                btn.onclick = () => loadPart(idx);
+                DOM.navigator.tabs.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            if(state.mode !== 'RESULT') return;
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; 
+            DOM.tooltip.pron.textContent = d.pron; 
+            DOM.tooltip.vi.textContent = d.vi; 
+            DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
+            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function loadPart(idx) {
+            state.currentPart = idx;
+            renderTabs();
+            
+            const data = TEST_DATA.parts[idx];
+            DOM.panes.title.textContent = data.title;
+
+            if (!state.cachedPanes[idx]) {
+                state.cachedPanes[idx] = buildPartDOM(idx);
+                DOM.panes.pContainer.appendChild(state.cachedPanes[idx].passage);
+                DOM.panes.qContainer.appendChild(state.cachedPanes[idx].questions);
+            }
+
+            Array.from(DOM.panes.pContainer.children).forEach(el => el.style.display = 'none');
+            Array.from(DOM.panes.qContainer.children).forEach(el => el.style.display = 'none');
+            
+            state.cachedPanes[idx].passage.style.display = 'block';
+            state.cachedPanes[idx].questions.style.display = 'block';
+
+            document.getElementById('pane-passage').scrollTop = 0;
+            document.getElementById('pane-questions').scrollTop = 0;
+            
+            updateNavigator();
+        }
+
+        function buildPartDOM(idx) {
+            const data = TEST_DATA.parts[idx];
+            
+            const passageWrapper = document.createElement('div');
+            passageWrapper.className = 'highlightable-area';
+            passageWrapper.innerHTML = data.passage;
+            passageWrapper.querySelectorAll('.vocab-word').forEach(word => {
+                word.addEventListener('click', handleVocabClick);
+            });
+
+            const questionsWrapper = document.createElement('div');
+            questionsWrapper.className = 'highlightable-area';
+
+            data.questions.forEach((q, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.id = `container_${q.id}`;
+                qDiv.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                if (q.instructionBox) {
+                    const instr = document.createElement('div');
+                    instr.innerHTML = q.instructionBox;
+                    qDiv.appendChild(instr);
+                }
+
+                // -> Drag and Drop Builder
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+
+                    // Local Pool Refresher
+                    const refreshPool = () => {
+                        const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                        poolGrid.innerHTML = '';
+                        q.pool.forEach(item => {
+                            const isUsed = !q.isReusable && used.includes(item.id);
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
+                            itemDiv.textContent = item.text;
+                            
+                            if (state.mode === 'TEST' && !isUsed) {
+                                itemDiv.setAttribute('draggable', 'true');
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    state.activeDragItem = item.id;
+                                };
+                                itemDiv.onclick = () => {
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    state.activeDragItem = item.id;
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                };
+                            }
+                            poolGrid.appendChild(itemDiv);
+                        });
+                    };
+                    refreshPool();
+                    
+                    if (q.html) {
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = q.html;
+                        
+                        q.questions.forEach(subQ => {
+                            const drop = wrap.querySelector('#drop_' + subQ.id);
+                            if(drop) {
+                                const refreshDrop = () => {
+                                    const currentAnsId = state.answers[subQ.id];
+                                    const currentAns = q.pool.find(p => p.id === currentAnsId);
+                                    
+                                    drop.className = 'drop-zone inline-flex items-center justify-center min-w-[120px] min-h-[34px] border-2 rounded-lg px-3 py-1 mx-1 text-sm font-bold align-middle transition-all ' + (state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-300' : '');
+                                    
+                                    if (currentAns) {
+                                        drop.classList.remove('border-dashed', 'border-gray-300', 'bg-gray-50', 'text-gray-400');
+                                        drop.classList.add('border-solid', 'bg-white', 'text-pink-600', 'border-pink-300', 'shadow-sm');
+                                        drop.textContent = currentAns.text;
+                                        if (state.mode === 'TEST') {
+                                            drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; refreshDrop(); refreshPool(); updateNavigator(); };
+                                        }
+                                    } else {
+                                        drop.classList.add('border-dashed', 'border-gray-300', 'bg-gray-50', 'text-gray-400');
+                                        drop.classList.remove('border-solid', 'bg-white', 'text-pink-600', 'border-pink-300', 'shadow-sm');
+                                        drop.innerHTML = '<span class="opacity-50">Drop here</span>';
+                                        if (state.mode === 'TEST') {
+                                            drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; refreshDrop(); refreshPool(); updateNavigator(); } };
+                                        }
+                                    }
+
+                                    if (state.mode === 'TEST') {
+                                        drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('bg-pink-50', 'border-pink-400'); };
+                                        drop.ondragleave = (e) => { drop.classList.remove('bg-pink-50', 'border-pink-400'); };
+                                        drop.ondrop = (e) => {
+                                            e.preventDefault(); drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                            const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                            if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                                state.answers[subQ.id] = draggedId; state.activeDragItem = null; refreshDrop(); refreshPool(); updateNavigator();
+                                            }
+                                        };
+                                    }
+                                };
+                                refreshDrop();
+                            }
+                        });
+                        wrapper.appendChild(wrap);
+
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-8 space-y-3 result-element';
+                        q.questions.forEach(subQ => {
+                            const exp = document.createElement('div');
+                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            const absNum = state.questionsList.find(x => x.qId === subQ.id)?.absNum || '';
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${correctItem ? correctItem.text : subQ.correct}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                </div>
+                            `;
+                            expContainer.appendChild(exp);
+                        });
+                        wrapper.appendChild(expContainer);
+                    } else {
+                        const qList = document.createElement('div');
+                        qList.className = 'space-y-4';
+                        q.questions.forEach(subQ => {
+                            const row = document.createElement('div');
+                            row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                            const label = document.createElement('span');
+                            label.className = 'text-sm font-semibold text-gray-700';
+                            label.textContent = subQ.text;
+                            
+                            const drop = document.createElement('div');
+                            drop.id = `drop_${subQ.id}`; 
+                            
+                            // Local Drop Refresher
+                            const refreshDrop = () => {
+                                const currentAnsId = state.answers[subQ.id];
+                                const currentAns = q.pool.find(p => p.id === currentAnsId);
+                                
+                                drop.className = `drop-zone w-full min-h-[44px] border-2 rounded-xl flex items-center justify-center text-xs transition-all p-3 text-center ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
+                                
+                                if (currentAns) {
+                                    drop.classList.remove('border-dashed');
+                                    drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
+                                    drop.textContent = currentAns.text; // Display full text of the dragged item
+                                    if (state.mode === 'TEST') {
+                                        drop.onclick = (e) => { 
+                                            e.stopPropagation(); 
+                                            delete state.answers[subQ.id]; 
+                                            refreshDrop(); 
+                                            refreshPool(); 
+                                            updateNavigator(); 
+                                        };
+                                    }
+                                } else {
+                                    drop.classList.add('border-dashed', 'border-gray-300');
+                                    drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                                    if (state.mode === 'TEST') {
+                                        drop.onclick = () => { 
+                                            if (state.activeDragItem) { 
+                                                state.answers[subQ.id] = state.activeDragItem; 
+                                                state.activeDragItem = null; 
+                                                refreshDrop(); 
+                                                refreshPool(); 
+                                                updateNavigator(); 
+                                            } 
+                                        };
+                                    }
+                                }
+
+                                if (state.mode === 'TEST') {
+                                    drop.ondragover = (e) => {
+                                        e.preventDefault();
+                                        drop.classList.add('bg-pink-50', 'border-pink-400');
+                                    };
+                                    drop.ondragleave = (e) => {
+                                        drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                    };
+                                    drop.ondrop = (e) => {
+                                        e.preventDefault();
+                                        drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                        const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                        if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                            state.answers[subQ.id] = draggedId;
+                                            state.activeDragItem = null;
+                                            refreshDrop();
+                                            refreshPool();
+                                            updateNavigator();
+                                        }
+                                    };
+                                }
+                            };
+                            
+                            refreshDrop();
+
+                            // Explanation container
+                            const exp = document.createElement('div');
+                            exp.id = `exp_${subQ.id}`;
+                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100 result-element';
+                            
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem ? (correctItem.text.length > 2 ? '' : '') : ''}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            row.appendChild(label); 
+                            row.appendChild(drop);
+                            row.appendChild(exp);
+                            qList.appendChild(row);
+                        });
+                        wrapper.appendChild(qList); 
+                    }
+                    qDiv.appendChild(wrapper);
+                } 
+                // -> Render Checkbox Groups
+                else if (q.displayType === 'checkbox_group') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-4 text-sm leading-snug';
+                    header.textContent = q.text;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    optsContainer.className = 'space-y-3';
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'checkbox-label flex items-start p-4 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="checkbox" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 rounded focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100 hidden">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}_${opt.id.toLowerCase()}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+
+                            if (!state.answers[q.id]) state.answers[q.id] = [];
+                            const input = label.querySelector('input');
+                            
+                            if (state.answers[q.id].includes(opt.id)) {
+                                state.answers[q.id] = state.answers[q.id].filter(id => id !== opt.id);
+                                label.classList.remove('border-pink-500', 'bg-pink-50');
+                                label.classList.add('border-gray-100');
+                                input.checked = false;
+                            } else {
+                                // Assume 2 selections max based on instructions
+                                if (state.answers[q.id].length < 2) {
+                                    state.answers[q.id].push(opt.id);
+                                    label.classList.remove('border-gray-100');
+                                    label.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                }
+                            }
+                            updateNavigator();
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+                // -> Render Inline Blanks
+                else if (q.displayType === 'inline_blanks') {
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = q.html;
+                    
+                    wrap.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        input.value = state.answers[qid] || '';
+                        input.addEventListener('input', (e) => {
+                            if(state.mode === 'TEST') {
+                                state.answers[qid] = e.target.value;
+                                updateNavigator();
+                            }
+                        });
+                    });
+                    qDiv.appendChild(wrap);
+
+                    const expContainer = document.createElement('div');
+                    expContainer.className = 'mt-8 space-y-3 result-element';
+                    q.blanks.forEach(b => {
+                        const exp = document.createElement('div');
+                        exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                        const absNum = state.questionsList.find(x => x.qId === b.id)?.absNum || '';
+                        exp.innerHTML = `
+                            <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
+                            <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                            <div class="mt-3 text-right">
+                                <button onclick="locateInPassage('loc_${b.parentId || b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                            </div>
+                        `;
+                        expContainer.appendChild(exp);
+                    });
+                    qDiv.appendChild(expContainer);
+                } 
+                // -> Render Radios
+                else if (q.displayType === 'radio') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                    const qMeta = state.questionsList.find(x => x.qId === q.id);
+                    const qNum = qMeta ? qMeta.absNum : (qIdx + 1);
+                    // Wrapped text in a span to prevent flexbox from splitting marked highlight sentences
+                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qNum}</span> <span>${q.text}</span>`;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'radio-label flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+                            
+                            state.answers[q.id] = opt.id;
+                            updateNavigator();
+                            
+                            optsContainer.querySelectorAll('.radio-label').forEach(l => {
+                                const input = l.querySelector('input');
+                                if (l.dataset.optId === opt.id) {
+                                    l.classList.remove('border-gray-100');
+                                    l.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                } else {
+                                    l.classList.remove('border-pink-500', 'bg-pink-50');
+                                    l.classList.add('border-gray-100');
+                                    input.checked = false;
+                                }
+                            });
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+
+                questionsWrapper.appendChild(qDiv);
+            });
+
+            if (state.mode === 'RESULT') {
+                applyResultStylesToCachedNode(idx, { passage: passageWrapper, questions: questionsWrapper });
+            }
+
+            return { passage: passageWrapper, questions: questionsWrapper };
+        }
+
+        function showSubmitModal() {
+            // Recalculate unique questions answered
+            let totalAnswered = 0;
+            state.questionsList.forEach(q => {
+                 if(q.displayType === 'checkbox') {
+                      if(state.answers[q.parentId] && state.answers[q.parentId].length > 0) {
+                          // For checkboxes, we check if the parent ID has selections.
+                          // Since we mapped each correct option as a separate question in questionsList,
+                          // we should count how many selections the user made, up to the max required.
+                          // But to keep it simple and match the grid logic, we just check if it's answered.
+                          // Wait, the grid shows a box for *each* correct answer expected.
+                          // Let's rely on the answers array length for this specific parentId.
+                      }
+                 }
+            });
+
+            // Better logic: iterate through questionsList. If it's a checkbox, check if its corresponding index in the answers array is filled.
+            let answeredCount = 0;
+            
+            // Map to track how many options have been counted for a given checkbox group
+            const checkboxCounts = {};
+
+            state.questionsList.forEach(q => {
+                if (q.displayType === 'checkbox') {
+                    if (!checkboxCounts[q.parentId]) checkboxCounts[q.parentId] = 0;
+                    
+                    if (state.answers[q.parentId] && state.answers[q.parentId].length > checkboxCounts[q.parentId]) {
+                        answeredCount++;
+                        checkboxCounts[q.parentId]++;
+                    }
+                } else {
+                    const ans = state.answers[q.qId];
+                    if (ans && ans.toString().trim() !== '') answeredCount++;
+                }
+            });
+
+            DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function getBandScore(rawScore) {
+            if (rawScore >= 39) return "9.0";
+            if (rawScore >= 37) return "8.5";
+            if (rawScore >= 35) return "8.0";
+            if (rawScore >= 33) return "7.5";
+            if (rawScore >= 30) return "7.0";
+            if (rawScore >= 27) return "6.5";
+            if (rawScore >= 23) return "6.0";
+            if (rawScore >= 19) return "5.5";
+            if (rawScore >= 15) return "5.0";
+            if (rawScore >= 13) return "4.5";
+            if (rawScore >= 10) return "4.0";
+            if (rawScore >= 8) return "3.5";
+            if (rawScore >= 6) return "3.0";
+            if (rawScore >= 4) return "2.5";
+            if (rawScore >= 2) return "2.0";
+            if (rawScore >= 1) return "1.0";
+            return "0.0";
+        }
+
+        function finishTest() {
+            state.mode = 'RESULT';
+            clearInterval(state.timerInterval);
+            DOM.modal.container.classList.add('hidden');
+            DOM.header.actions.classList.add('hidden');
+            DOM.result.banner.classList.remove('hidden');
+            DOM.result.banner.classList.add('flex');
+            
+            document.body.classList.add('is-result-mode');
+
+            let score = 0;
+            state.questionsList.forEach(q => {
+                if (q.displayType === 'checkbox') {
+                    if (state.answers[q.parentId] && state.answers[q.parentId].includes(q.qId.split('_').pop())) {
+                        score++;
+                    }
+                } else if (q.displayType === 'inline_blank') {
+                    const ans = state.answers[q.qId];
+                    if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++;
+                } else {
+                    const ans = state.answers[q.qId];
+                    if (ans === q.isCorrect) score++;
+                }
+            });
+
+            const totalQuestions = state.questionsList.length || 40;
+            DOM.result.score.textContent = `${score}/${totalQuestions}`;
+            DOM.result.band.textContent = getBandScore(score);
+            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            
+            Object.keys(state.cachedPanes).forEach(partIdxStr => {
+                applyResultStylesToCachedNode(parseInt(partIdxStr), state.cachedPanes[partIdxStr]);
+            });
+
+            updateNavigator();
+            loadPart(state.currentPart);
+        }
+
+        function applyResultStylesToCachedNode(idx, cachedNodes) {
+            const data = TEST_DATA.parts[idx];
+            
+            cachedNodes.passage.querySelectorAll('.vocab-word').forEach(w => w.classList.add('mode-result'));
+
+            data.questions.forEach(q => {
+                const qContainer = cachedNodes.questions.querySelector(`#container_${q.id}`);
+                if (!qContainer) return;
+
+                if (q.displayType === 'inline_blanks') {
+                    qContainer.querySelectorAll('input').forEach(input => {
+                        input.disabled = true;
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        
+                        if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
+                            input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                        } else {
+                            input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                            if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('correction-badge')) {
+                                const corr = document.createElement('span');
+                                corr.className = 'correction-badge text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                corr.textContent = info.correct;
+                                input.after(corr);
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'checkbox_group') {
+                     qContainer.querySelectorAll('.checkbox-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] && state.answers[q.id].includes(optId);
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            expBlock.classList.remove('hidden'); // Show explanations in result mode
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                            input.checked = true; // Ensure correct answers are checked for review
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'radio') {
+                    qContainer.querySelectorAll('.radio-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] === optId;
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'drag_drop') {
+                    qContainer.querySelectorAll('.pool-item').forEach(item => {
+                        item.removeAttribute('draggable');
+                        item.onclick = null;
+                        item.classList.remove('cursor-pointer', 'hover:border-pink-300', 'hover:bg-pink-50');
+                    });
+                    
+                    q.questions.forEach(subQ => {
+                        const drop = qContainer.querySelector(`#drop_${subQ.id}`);
+                        if(drop) {
+                            drop.onclick = null;
+                            drop.ondragover = null;
+                            drop.ondragleave = null;
+                            drop.ondrop = null;
+                            
+                            drop.classList.remove('text-pink-600', 'border-pink-200', 'cursor-pointer', 'hover:bg-white');
+                            const currentAnsId = state.answers[subQ.id];
+                            const isCorrect = currentAnsId === subQ.correct;
+                            
+                            if (isCorrect) {
+                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                            } else {
+                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                                
+                                if (q.html && !drop.nextElementSibling?.classList.contains('correction-badge')) {
+                                    const corr = document.createElement('span');
+                                    corr.className = 'correction-badge text-green-600 font-bold ml-2 text-xs bg-green-50 px-2 py-1 rounded-md border border-green-200 align-middle inline-block';
+                                    const correctItem = q.pool.find(p => p.id === subQ.correct);
+                                    corr.textContent = correctItem ? correctItem.text : subQ.correct;
+                                    drop.after(corr);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            
+            if(state.questionsList.length === 0) {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+                return;
+            }
+
+            let currentPart = -1;
+            let currentGroup = null;
+            
+            // Track how many selections we've assigned to navigator buttons for a given group
+            const checkboxAssignments = {};
+
+            state.questionsList.forEach(q => {
+                if (q.partIndex !== currentPart) {
+                    currentPart = q.partIndex;
+                    currentGroup = document.createElement('div');
+                    currentGroup.className = 'flex items-center gap-2 border-r border-gray-200 pr-4 last:border-0 last:pr-0';
+                    
+                    const groupLabel = document.createElement('span');
+                    groupLabel.className = 'text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap mr-1';
+                    groupLabel.textContent = `Passage ${currentPart + 1}:`;
+                    currentGroup.appendChild(groupLabel);
+                    
+                    DOM.navigator.grid.appendChild(currentGroup);
+                }
+
+                let isAnswered = false;
+                let isCorrect = false;
+
+                if (q.displayType === 'checkbox') {
+                     if (!checkboxAssignments[q.parentId]) checkboxAssignments[q.parentId] = 0;
+                     
+                     const ansArr = state.answers[q.parentId];
+                     // If the user has made enough selections to cover this button
+                     if (ansArr && ansArr.length > checkboxAssignments[q.parentId]) {
+                         isAnswered = true;
+                         
+                         // In result mode, we need to know if THIS specific button represents a correct choice.
+                         // This is tricky because checkboxes aren't strictly ordered by the user.
+                         // Let's check if the specific option assigned to this q.qId was selected.
+                         // But q.qId is like p2_q19_20_A, so we split it.
+                         const optId = q.qId.split('_').pop();
+                         isCorrect = ansArr.includes(optId);
+                         
+                         checkboxAssignments[q.parentId]++;
+                     }
+                } else {
+                     const ans = state.answers[q.qId];
+                     isAnswered = ans && ans.toString().trim() !== '';
+                     isCorrect = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
+                }
+
+                let bg = '';
+                
+                if (state.mode === 'TEST') {
+                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
+                } else {
+                    bg = isCorrect ? 'bg-green-500 text-white border-green-500' : isAnswered ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors flex-shrink-0 ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { 
+                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
+                    setTimeout(() => {
+                        const targetId = 'container_' + (q.parentId || q.qId);
+                        const targetEl = DOM.panes.qContainer.querySelector(`#${targetId}`);
+                        if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100); 
+                };
+                currentGroup.appendChild(btn);
+            });
+
+            if(state.mode === 'TEST') DOM.panes.floatingSubmit.classList.remove('hidden');
+            else DOM.panes.floatingSubmit.classList.add('hidden');
+        }
+
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+
+        window.locateInPassage = function(targetId) {
+            document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+            
+            const mappings = {
+                // Part 1
+                'loc_p1_q1': ['loc_p1_q1'],
+                'loc_p1_q2': ['loc_p1_q2'],
+                'loc_p1_q3': ['loc_p1_q3'],
+                'loc_p1_q4': ['loc_p1_q4'],
+                'loc_p1_q5': ['loc_p1_q5'],
+                'loc_p1_q6': ['loc_p1_q6'],
+                'loc_p1_q7': ['loc_p1_q7'],
+                'loc_p1_q8': ['loc_p1_q8'],
+                'loc_p1_q9': ['loc_p1_q9'],
+                'loc_p1_q10': ['loc_p1_q10'],
+                'loc_p1_q11': ['loc_p1_q11'],
+                'loc_p1_q12': ['loc_p1_q12'],
+                'loc_p1_q13': ['loc_p1_q13'],
+                // Part 2
+                'loc_p2_q14': ['loc_p2_q14'],
+                'loc_p2_q15': ['loc_p2_q15'],
+                'loc_p2_q16': ['loc_p2_q16'],
+                'loc_p2_q17': ['loc_p2_q17'],
+                'loc_p2_q18': ['loc_p2_q18'],
+                'loc_p2_q19_20_a': ['loc_p2_q19_20_a'], 
+                'loc_p2_q19_20_c': ['loc_p2_q19_20_c'], 
+                'loc_p2_q21_22_c': ['loc_p2_q21_22_c'], 
+                'loc_p2_q21_22_d': ['loc_p2_q21_22_d'], 
+                'loc_p2_q23': ['loc_p2_q23'], 
+                'loc_p2_q24': ['loc_p2_q24'], 
+                'loc_p2_q25': ['loc_p2_q25'], 
+                'loc_p2_q26': ['loc_p2_q26'],
+                // Part 3
+                'loc_p3_q27': ['loc_p3_q27'],
+                'loc_p3_q28': ['loc_p3_q28'],
+                'loc_p3_q29': ['loc_p3_q29'],
+                'loc_p3_q30': ['loc_p3_q30'],
+                'loc_p3_q31': ['loc_p3_q31'],
+                'loc_p3_q32': ['loc_p3_q32'],
+                'loc_p3_q33': ['loc_p3_q33'],
+                'loc_p3_q34': ['loc_p3_q34'],
+                'loc_p3_q35': ['loc_p3_q35'],
+                'loc_p3_q36': ['loc_p3_q36'],
+                'loc_p3_q37': ['loc_p3_q37'],
+                'loc_p3_q38': ['loc_p3_q38'],
+                'loc_p3_q39': ['loc_p3_q39'],
+                'loc_p3_q40': ['loc_p3_q40']
+            };
+
+            const targetIds = mappings[targetId] || [targetId];
+            let found = false;
+
+            targetIds.forEach(id => {
+                const targetEl = DOM.panes.pContainer.querySelector(`#${id}`);
+                if (targetEl) {
+                    if (!found) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found = true;
+                    }
+                    targetEl.classList.add('highlight-active');
+                    setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+                }
+            });
+
+            if (!found) {
+                console.warn('Passage location target not found for:', targetId);
+                const pane = document.getElementById('pane-passage');
+                if (pane) pane.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>

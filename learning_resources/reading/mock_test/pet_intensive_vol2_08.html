@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive Vol 2 Test 08 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 800px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature (Locate) */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* User Highlighting Feature */
+        .user-hl { transition: background-color 0.2s ease; border-radius: 3px; padding: 0 2px; cursor: pointer; }
+        .user-hl:hover { filter: brightness(0.95); }
+        .user-hl-yellow { background-color: #fef08a; } /* bg-yellow-200 */
+        .user-hl-green { background-color: #bbf7d0; } /* bg-green-200 */
+        .user-hl-pink { background-color: #fbcfe8; } /* bg-pink-200 */
+        
+        ::selection { background-color: #e2e8f0; color: inherit; }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Cached DOM State Utilities */
+        .result-element { display: none; }
+        .is-result-mode .result-element { display: block; }
+        .is-result-mode .test-element { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col relative">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PET Intensive Vol 2 Test 08</h2>
+            <p class="text-gray-500 text-lg mb-8 uppercase tracking-widest font-medium">Academic Reading Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-left shadow-sm">
+                <h3 class="font-bold text-pink-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    Instructions
+                </h3>
+                <ul class="space-y-3 text-sm text-pink-800/80">
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can highlight text in both the passage and questions. The highlights will persist!</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report and explanations.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+                Start Mock Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Main View -->
+    <div id="view-main" class="hidden flex-auto flex flex-col overflow-hidden bg-white relative">
+        <!-- Result Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Mock Test Result</h2>
+                <p class="text-gray-400 text-sm">Review your performance and detailed explanations below.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Band Score</div>
+                    <div id="band-score-display" class="text-xl font-bold text-yellow-400">--</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Raw Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">--/40</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Time Used</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative"></nav>
+
+        <!-- Split View -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            <!-- Left Pane: Passage -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100 italic"></h2>
+                    <!-- Cached Passages Container -->
+                    <div id="passage-content-container" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions -->
+            <div id="pane-questions" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative">
+                    <!-- Cached Questions Container -->
+                    <div id="questions-content-container" class="space-y-10 pb-20"></div>
+                    
+                    <div id="floating-submit-container" class="mt-12 text-center border-t border-gray-200 pt-8 hidden">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-all w-full sm:w-auto">
+                            Submit Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigator -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-lg relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <div id="navigator-grid" class="flex items-center gap-4"></div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 hidden md:flex items-center gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest"></div>
+        </div>
+    </div>
+
+    <!-- Highlight Toolbar -->
+    <div id="highlight-toolbar" class="hidden fixed z-50 bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2)] border border-gray-200 rounded-lg p-1.5 flex gap-1.5 transition-opacity transform -translate-x-1/2 -translate-y-full mt-[-10px]">
+        <button class="hl-btn bg-[#fef08a] hover:bg-[#fde047] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="yellow" title="Highlight Yellow"></button>
+        <button class="hl-btn bg-[#bbf7d0] hover:bg-[#86efac] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="green" title="Highlight Green"></button>
+        <button class="hl-btn bg-[#fbcfe8] hover:bg-[#f9a8d4] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="pink" title="Highlight Pink"></button>
+        <div class="w-[1px] bg-gray-200 mx-0.5 my-1"></div>
+        <button class="hl-btn bg-white hover:bg-gray-100 text-gray-500 hover:text-red-500 w-7 h-7 rounded-md border border-gray-200 shadow-sm flex items-center justify-center transition-all" data-color="clear" title="Remove Highlight">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </button>
+    </div>
+
+    <!-- Vocab Tooltip -->
+    <div id="vocab-tooltip" class="bg-white rounded-2xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-600 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-none">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-xs font-mono mt-1 italic">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+        <div class="p-5 bg-white space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tiếng Việt</span>
+                <p id="tt-vi" class="text-gray-900 font-bold text-sm"></p>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-1">Context</span>
+                <p id="tt-context" class="text-gray-600 text-sm leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 text-pink-500">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Finish Test?</h3>
+            <p id="modal-message" class="text-center text-gray-500 mb-8 px-4 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Resume</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-2xl bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors shadow-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA TEMPLATE ---
+        // You will append the passage content and questions here for PET Intensive Vol 2 Test 08.
+        // Below is the template structure required by the engine.
+        const TEST_DATA = {
+            totalDurationSeconds: 3600, // 60 minutes
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Tulip Mania",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> Centuries before anyone ever heard of high-tech stocks such as Qualcomm, CMGI, or Cisco Systems, a tulip in 17th century Holland caused quite the stir. <span id="loc_p1_q2" class="highlight-target">The Semper Augustus was a tulip of extraordinary grandeur, with midnight blue petals topped by a pure white band and highlighted with crimson flares.</span> For the Dutch, there were few things more valuable than the Semper Augustus tulips.</p>
+                        
+                        <p class="mb-4"><strong>B.</strong> Around 1624, there were only a dozen specimens of the Semper Augustus. A man from Amsterdam owned all of the specimens. The man was offered 3,000 guilders in Dutch currency for just one bulb of the specimen. At the time, that was an absurd amount. <span id="loc_p1_q6" class="highlight-target">The well-known Dutch painter Rembrandt Harmenszoon van Rijn received only about half of that amount a few years later for his The Night Watch painting.</span> Despite the apparently exorbitant offer for just one of his tulip bulbs, the Dutch man, whose name has been lost in history, declined the offer.</p>
+                        
+                        <p class="mb-4"><strong>C.</strong> At that time, people wondered who was wackier, the man who refused to sell a tulip bulb for a fortune or the man who had offered to pay a fortune for just one bulb. This question was explored extensively by British journalist Mike Dash in his book, The Story of the World's Most Coveted Flower and the Extraordinary Passions It Aroused. <span id="loc_p1_q1" class="highlight-target">In his account of tulip mania, Dash details the history behind the buzzword and, in doing so, he presents a cautionary tale for modern-day investors, who are often inclined to load up on unproven and yet-to-be-profitable stocks, similar to the tulip mania that raged in Holland in the 17th century.</span></p>
+                        
+                        <p class="mb-4"><strong>D.</strong> It should be pointed out that the Dutch were not the first people to go bonkers over tulips. <span id="loc_p1_q3" class="highlight-target">Long before the first tulips ever bloomed in Europe, the Persians had already fallen in love with the beauty of the flower, and the rulers of the Ottoman Empire held it in the highest regard, dating back to a time around 1559.</span> However, when the tulip finally arrived in Holland, the flower seemed to find an even more fertile ground, and not just from a horticultural standpoint.</p>
+                        
+                        <p class="mb-4"><strong>E.</strong> In the early 17th century, Holland was entering its Golden Age. <span id="loc_p1_q11" class="highlight-target">Time, energy, and financial resources that had previously been used in fighting for Holland's independence from Spain were now available to be used for commerce.</span> <span id="loc_p1_q7" class="highlight-target">The city of Amsterdam was the hub of lucrative trade with the East Indies and a single voyage to the East Indies could result in substantial profits for the merchants involved in those activities.</span> Those merchants often flaunted their success by building great estates, many landscaped with magnificent flower gardens.</p>
+                        
+                        <p class="mb-4"><strong>F.</strong> Then along came the tulip. <span id="loc_p1_q12" class="highlight-target">"It is impossible to comprehend the tulip mania without understanding just how different tulips were from every other flower known to horticulturists in the 17th century. The colours they exhibited were brighter than those of ordinary plants," Dash explains.</span> Although the rarer tulips sometimes commanded higher prices, the bulbs for most ordinary tulips were sold by the pound for a modest price. Then, around 1630, a different type of tulip fancier appeared on the scene. Motivated by thoughts of great profits, these "florists" or professional tulip traders set out to find flower enthusiasts and speculators alike. But even as the number of tulip buyers grew quickly, the supply of tulip bulbs remained stagnant. <span id="loc_p1_q8" class="highlight-target">It seems that the tulip became a foil in the supply squeeze: there was no quick fix to increase the quantity of available bulbs, as it takes seven years for a tulip to grow from a seed. Even though bulbs can produce two or three offshoots annually, the mother bulb lasts only a few years.</span></p>
+                        
+                        <p class="mb-4"><strong>G.</strong> <span id="loc_p1_q13" class="highlight-target">Tulip bulb prices continued to soar throughout the 1630s, as more speculators wedged into the market.</span> <span id="loc_p1_q9" class="highlight-target">Even people in other occupations wanted in on the tulip trading business. Weavers and farmers mortgaged their assets in order to get into the tulip market.</span> In 1633, a farmhouse in Hoorn was sold in exchange for three rare bulbs. By 1636, the tulip trading business was flourishing so much that even "garbage" bulbs were being sold for hundreds of guilders. Eventually, a futures market for bulbs was even established. Tulip mania reached its zenith during the winter of 1636-1637, when some bulbs were known to be bought and sold up to ten times a day. Exemplifying this mania is the story of an auction that was held to benefit seven orphans whose only asset was 70 fine tulips left by their father. <span id="loc_p1_q4" class="highlight-target">One of those bulbs, a rare Violetten Admirael van Enkhuizen bulb, sold for 5,200 guilders, an all-time record.</span> All told, the 70 flowers from that auction brought in nearly 53,000 guilders.</p>
+                        
+                        <p class="mb-4"><strong>H.</strong> There is a saying that goes, "All good things must come to an end." That was certainly the case with the tulip market, which crashed quickly and spectacularly. <span id="loc_p1_q5" class="highlight-target">It wasn't long after the above-mentioned orphan auction, when buyers refused to pay high asking prices at a routine bulb auction in Haarlem. In just a matter of days, word of this auction spread all over the country, creating widespread panic among tulip traders and speculators.</span> And, sure enough, the market for tulips crashed quickly thereafter. Tulips that had sold for 5,000 guilders only a few weeks before now fetched only 50 guilders.</p>
+                        
+                        <p class="mb-4"><strong>I.</strong> In comparing the tulip mania of the 17th century with the recent dot-com craze, there is one major difference: even at its height, the Amsterdam Stock Exchange never touched tulips. "The speculation in tulip bulbs always existed at the margins of Dutch economic life," Dash points out. <span id="loc_p1_q10" class="highlight-target">As tulip trading was at the periphery of the Dutch economy, the fallout had little effect on the Dutch economy.</span> Will we be able to say the same when Wall Street's current obsession with the dot-com craze finally runs its course?</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_5_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–5</h3>
+                                    <p class="text-gray-700">Reading Passage 1 has nine paragraphs <strong>A-I</strong>.</p>
+                                    <p class="text-gray-700 mt-2">Which paragraph contains the following information?</p>
+                                    <p class="text-gray-700 mt-2">Drag and drop the correct letter into the corresponding box.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1_5',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Paragraphs',
+                            isReusable: true,
+                            pool: [
+                                { id: 'A', text: 'A. Paragraph A' },
+                                { id: 'B', text: 'B. Paragraph B' },
+                                { id: 'C', text: 'C. Paragraph C' },
+                                { id: 'D', text: 'D. Paragraph D' },
+                                { id: 'E', text: 'E. Paragraph E' },
+                                { id: 'F', text: 'F. Paragraph F' },
+                                { id: 'G', text: 'G. Paragraph G' },
+                                { id: 'H', text: 'H. Paragraph H' },
+                                { id: 'I', text: 'I. Paragraph I' }
+                            ],
+                            questions: [
+                                { id: 'p1_q1', text: '1. a reference to an individual who warned of the dangers of investing', correct: 'C', explanation: 'Paragraph C states: "Dash details the history behind the buzzword and, in doing so, he presents a cautionary tale for modern-day investors..."' },
+                                { id: 'p1_q2', text: '2. a description of the outstanding appearance of a famous tulip', correct: 'A', explanation: 'Paragraph A states: "The Semper Augustus was a tulip of extraordinary grandeur, with midnight blue petals topped by a pure white band and highlighted with crimson flares."' },
+                                { id: 'p1_q3', text: '3. a reference to another society fascinated by tulips', correct: 'D', explanation: 'Paragraph D refers to another society: "...the Persians had already fallen in love with the beauty of the flower, and the rulers of the Ottoman Empire held it in the highest regard..."' },
+                                { id: 'p1_q4', text: '4. a reference to the highest price offered at an auction', correct: 'G', explanation: 'Paragraph G states: "One of those bulbs, a rare Violetten Admirael van Enkhuizen bulb, sold for 5,200 guilders, an all-time record."' },
+                                { id: 'p1_q5', text: '5. an incident related to the ending of \'tulip mania\'', correct: 'H', explanation: 'Paragraph H describes the end of the mania: "It wasn\'t long after the above-mentioned orphan auction, when buyers refused to pay high asking prices at a routine bulb auction in Haarlem... creating widespread panic."' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q6_10_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 6–10</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the text?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'radio',
+                            text: '6. Rembrandt was known to have spent a considerable sum of money on purchasing flowers such as tulips.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'The passage only mentions how much Rembrandt received for his painting (Paragraph B), but does not say whether he spent money on purchasing tulips.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7',
+                            displayType: 'radio',
+                            text: '7. There was little incentive for traders to travel to the East Indies after Holland became independent.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph E states: "The city of Amsterdam was the hub of lucrative trade with the East Indies and a single voyage to the East Indies could result in substantial profits..." This contradicts the statement.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q8',
+                            displayType: 'radio',
+                            text: '8. Tulips reproduced too slowly, and in too small a quantity, to keep up with the growing demand for the flower in the 1630s.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph F states: "...there was no quick fix to increase the quantity of available bulbs, as it takes seven years for a tulip to grow from a seed. Even though bulbs can produce two or three offshoots annually, the mother bulb lasts only a few years."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q9',
+                            displayType: 'radio',
+                            text: '9. The tulip market was comprised entirely of professional tulip traders and was generally inaccessible to most people.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph G states: "Even people in other occupations wanted in on the tulip trading business. Weavers and farmers mortgaged their assets in order to get into the tulip market." This contradicts the statement.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q10',
+                            displayType: 'radio',
+                            text: '10. Despite the sizable demand for tulips, there was negligible impact on the Dutch economy as a whole when that demand suddenly dropped.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph I states: "As tulip trading was at the periphery of the Dutch economy, the fallout had little effect on the Dutch economy."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q11_13_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 11–13</h3>
+                                    <p class="text-gray-700 mb-4">Complete the sentences below. Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q11_13',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base space-y-3">
+                                    <div>
+                                        <strong>11.</strong> After their war for independence, the Dutch more heavily invested in 
+                                        <input type="text" data-qid="p1_q11" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40">.
+                                    </div>
+                                    <div>
+                                        <strong>12.</strong> The 
+                                        <input type="text" data-qid="p1_q12" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40"> 
+                                        of tulips were more eye-catching than other flowers available at the time.
+                                    </div>
+                                    <div>
+                                        <strong>13.</strong> When an increasing number of 
+                                        <input type="text" data-qid="p1_q13" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40"> 
+                                        started selling tulips in the 1630s, the prices kept skyrocketing.
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q11', correct: 'commerce', explanation: 'Paragraph E: "Time, energy, and financial resources that had previously been used in fighting for Holland\'s independence from Spain were now available to be used for commerce."' },
+                                { id: 'p1_q12', correct: 'colours', explanation: 'Paragraph F: "The colours they exhibited were brighter than those of ordinary plants..."' },
+                                { id: 'p1_q13', correct: 'speculators', explanation: 'Paragraph G: "Tulip bulb prices continued to soar throughout the 1630s, as more speculators wedged into the market."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: Roller coaster: the great fairground attraction",
+                    passage: `
+                        <p class="mb-4 font-bold text-gray-800">How they move</p>
+                        <p class="mb-4"><strong>A.</strong> Like a passenger train, a roller coaster consists of a series of connected cars that move on a track. But unlike a passenger train, it has no engine or power source of its own. For most of the ride, it is moved only by the forces of inertia and gravity. The only exertion of energy occurs at the very beginning of the ride when the coaster train is pulled up the lift hill.</p>
+                        
+                        <p class="mb-4"><strong>B.</strong> The traditional lifting mechanism is a long length of <span id="loc_p2_q14" class="highlight-target">chain</span> running up the hill under the track. The chain is fastened in a loop, which is wound around a <span id="loc_p2_q15" class="highlight-target">gear</span> at the top of the hill and another one at the bottom of the hill. The gear at the bottom of the hill is turned by a <span id="loc_p2_q16" class="highlight-target">motor</span>. This turns the chain so that it continually moves up the hill like a long conveyor belt. The coaster cars grip onto the chain, which simply pulls them to the top of the hill. At the summit, the train is released and starts its descent.</p>
+
+                        <p class="mb-4"><strong>C.</strong> The purpose of this initial ascent is to build up a sort of reservoir of potential energy, which simply means that as the coaster gets higher in the air, there is a greater distance gravity can pull it down.</p>
+
+                        <p class="mb-4"><strong>D.</strong> As the train starts coasting down the hill, this potential energy is converted into kinetic energy (energy of motion), and the train speeds up. At the bottom of the hill, this has reached its maximum, and this propels the train up the second hill, again building up the potential energy level.</p>
+
+                        <p class="mb-4"><strong>E.</strong> In this way, the course of the track is constantly converting energy from kinetic to potential and back again. This fluctuation in acceleration is what makes roller coasters so much fun. At its most basic level, this is all a roller coaster is – a machine that uses gravity and inertia to send a train along a winding track.</p>
+
+                        <p class="mb-4 font-bold text-gray-800">Coasting through history</p>
+                        <p class="mb-4"><strong>F.</strong> Roller coasters have a long, fascinating history. Their direct ancestors were ice slides, popular in Russia in the 16th and 17th centuries. They consisted of a long, steep, wooden slide <span id="loc_p2_q17" class="highlight-target">covered in ice</span>. Riders walked up a ladder or set of stairs to the top of the slide, as high as 21 meters up. At the top, they climbed into sleds made out of wood or blocks of ice and shot down the slope. At the base of the slide, the sleds would crash-land in a sand pile.</p>
+
+                        <p class="mb-4"><strong>G.</strong> <span id="loc_p2_q22" class="highlight-target">It seems that the idea was then imported into France. For most of the year, the warmer climate would melt the ice, so the French started building <span id="loc_p2_q18" class="highlight-target">waxed</span> slides instead. To help the sleds move down these slides, they <span id="loc_p2_q19" class="highlight-target">added wheels</span>, and in 1817, for the first time, a train was attached to the track.</span> The French continued to expand on this idea, coming up with more complex track layouts, with multiple cars and all sorts of twists and turns.</p>
+
+                        <p class="mb-4"><strong>H.</strong> The first American roller coaster was built in the mountains of Pennsylvania in the mid-1800s originally to provide an easy way to <span id="loc_p2_q20" class="highlight-target">send coal</span> to the railway 29 km down to the mountain. When the track was first built, a crew at the bottom of the mountain would attach the cart to a team of mules after emptying the load, and the mules would drag it back up to the top. They were eventually <span id="loc_p2_q21" class="highlight-target">replaced with steam engines</span>, to make the system more efficient.</p>
+
+                        <p class="mb-4"><strong>I.</strong> Soon after these improvements were made, the railway company built a new tunnel that brought the freight trains much closer to the coal mine. Now no longer required for its original purpose, the roller coaster was configured as a 'scenic tour'. For one dollar, tourists got a leisurely ride up to the top of the mountain, followed by a wild, bumpy ride straight down. This was soon a resounding success, attracting thousands of tourists every year.</p>
+
+                        <p class="mb-4"><strong>J.</strong> Scenic rides like this continued to thrive and were joined by wooden roller coasters similar to the ones we know today. These coasters were the main attraction at popular amusement parks throughout the United States, such as the many parks of Coney Island in New York. <span id="loc_p2_q23" class="highlight-target">By the 1920s, roller coasters were in full swing, with some 2,000 rides in operation around the country. Following the Great Depression, a decline in roller coaster production began in the early 1930s</span> but <span id="loc_p2_q24" class="highlight-target">a second roller-coaster boom in the 1970s and the beginning of the 1980s revitalized the amusement park industry, and introduced a slew of innovative tubular steel coasters.</span></p>
+
+                        <p class="mb-4"><strong>K.</strong> <span id="loc_p2_q25" class="highlight-target">This was followed by a decline in interest for the rest of the decade, but since the early 1990s the amusement-park industry has experienced another coaster boom of sorts.</span> <span id="loc_p2_q26" class="highlight-target">New launching techniques and other technological developments have opened up a world of options for designers</span> so in some rides you feel as if you are flying. In the next few years we can expect to see many faster, taller and more twisted rides popping up in amusement parks around the world.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_16_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–16</h3>
+                                    <p class="text-gray-700">Label the diagram below.</p>
+                                    <p class="text-gray-700 mt-2">Write <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q14_16',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 text-base space-y-6">
+                                    <div class="mb-6 text-center">
+                                        <img src="https://ieltschantruong.github.io/IELTS/src/reading_diagrams/roller_coaster.png" alt="Roller Coaster Diagram" class="max-w-full h-auto mx-auto rounded-lg shadow-sm border border-gray-200">
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-6 mt-6">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-indigo-900">14.</span>
+                                            <input type="text" data-qid="p2_q14" class="inline-blank w-32 px-2 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm" placeholder="ONE WORD">
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-indigo-900">15.</span>
+                                            <input type="text" data-qid="p2_q15" class="inline-blank w-32 px-2 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm" placeholder="ONE WORD">
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-indigo-900">16.</span>
+                                            <input type="text" data-qid="p2_q16" class="inline-blank w-32 px-2 py-1 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm" placeholder="ONE WORD">
+                                        </div>
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q14', correct: 'chain', explanation: 'Paragraph B: "The traditional lifting mechanism is a long length of chain running up the hill under the track."' },
+                                { id: 'p2_q15', correct: 'gear', explanation: 'Paragraph B: "...wound around a gear at the top of the hill..."' },
+                                { id: 'p2_q16', correct: 'motor', explanation: 'Paragraph B: "The gear at the bottom of the hill is turned by a motor."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q17_21_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 17–21</h3>
+                                    <p class="text-gray-700 mb-4">Complete the summary below. Write <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q17_21',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base space-y-3">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">History of roller coasters</strong>
+                                    <div>
+                                        Modern roller coasters are descended from 16th-century Russian slides with a surface of 
+                                        <strong>17</strong> <input type="text" data-qid="p2_q17" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE OR TWO WORDS" maxlength="40">. 
+                                        People climbed to the top, and travelled down in sleds. In France, because of the higher temperatures, the wooden surface on the slides was 
+                                        <strong>18</strong> <input type="text" data-qid="p2_q18" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE OR TWO WORDS" maxlength="40"> 
+                                        and 
+                                        <strong>19</strong> <input type="text" data-qid="p2_q19" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE OR TWO WORDS" maxlength="40"> 
+                                        were attached to the cars to ease the descent.
+                                        <br><br>
+                                        The first US roller coaster was used for transporting 
+                                        <strong>20</strong> <input type="text" data-qid="p2_q20" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE OR TWO WORDS" maxlength="40"> 
+                                        down a mountainside in carts. Initially, these were pulled by mules but in time power was produced by 
+                                        <strong>21</strong> <input type="text" data-qid="p2_q21" class="inline-blank w-48 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE OR TWO WORDS" maxlength="40">.
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q17', correct: 'ice', explanation: 'Paragraph F: "They consisted of a long, steep, wooden slide covered in ice."' },
+                                { id: 'p2_q18', correct: 'waxed', explanation: 'Paragraph G: "...the French started building waxed slides instead."' },
+                                { id: 'p2_q19', correct: 'wheels', explanation: 'Paragraph G: "To help the sleds move down these slides, they added wheels..."' },
+                                { id: 'p2_q20', correct: 'coal', explanation: 'Paragraph H: "The first American roller coaster was built... originally to provide an easy way to send coal to the railway..."' },
+                                { id: 'p2_q21', correct: 'steam engines', explanation: 'Paragraph H: "They were eventually replaced with steam engines, to make the system more efficient."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q22_26_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 22–26</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the text?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q22',
+                            displayType: 'radio',
+                            text: '22. The earliest modifications to the basic slide were made in France.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph G states: "It seems that the idea was then imported into France... so the French started building waxed slides instead... they added wheels, and in 1817, for the first time, a train was attached to the track."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q23',
+                            displayType: 'radio',
+                            text: '23. Roller coasters continued to increase in popularity throughout the 1920s and 1930s.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph J states: "By the 1920s, roller coasters were in full swing... Following the Great Depression, a decline in roller coaster production began in the early 1930s..." Thus, they did not continue to increase throughout the 1930s.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q24',
+                            displayType: 'radio',
+                            text: '24. New roller coaster technology was introduced in the 1970s in response to public demand.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph J mentions that a roller-coaster boom in the 1970s "introduced a slew of innovative tubular steel coasters," but it does not specify whether this was "in response to public demand."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q25',
+                            displayType: 'radio',
+                            text: '25. Roller coasters were less popular for most of the 1980s than in the 1970s and 1990s.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph K states: "This was followed by a decline in interest for the rest of the decade [the 1980s], but since the early 1990s the amusement-park industry has experienced another coaster boom..."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q26',
+                            displayType: 'radio',
+                            text: '26. The design of roller-coaster rides became more varied in the 1990s.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph K states: "New launching techniques and other technological developments have opened up a world of options for designers..." Since the 1990s.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: The Pirahã people of Brazil",
+                    passage: `
+                        <p class="mb-4 italic text-gray-700 font-medium">The Pirahä language has stirred up debate among experts</p>
+
+                        <p class="mb-4"><strong>A.</strong> The Pirahã tribe live deep in Brazil's Amazon forest, and their language is hotly debated by linguists. Since 1977, the ethnologist Daniel Everett has spent a total of seven years living with the Pirahã and <span id="loc_p3_q27" class="highlight-target">has committed his career to studying their puzzling speech.</span> Indeed, he was uncertain for so long about what he was actually hearing while living among the Pirahä that he waited nearly three decades before publishing his findings.</p>
+
+                        <p class="mb-4"><strong>B.</strong> The debate over the Pirahā language goes right to the core of the riddle regarding how Homo sapiens managed to develop vocal communication. Although bees dance, birds sing and whales even sing with syntax, <span id="loc_p3_q28" class="highlight-target">human language is unique, if only for the reason that it enables humans to piece together never-before- constructed thoughts, and be infinitely imaginative</span> - think of Shakespeare's plays or Einstein's theory of relativity.</p>
+
+                        <p class="mb-4"><strong>C.</strong> Linguistics generally focuses on what features all human languages have in common, but the Pirahã language departs from what some academics have long maintained are essential and inalienable features of all human languages. <span id="loc_p3_q29" class="highlight-target">Most of all, it may be unique for not employing subordinate clauses.</span> Instead of saying, 'When I have finished eating, I will speak to you,' the Pirahã say, 'I finish eating, I speak with you.' Equally perplexing, the Pirahã appear not to use numbers. During the time he spent with them, Everett never heard words like 'all', 'every' and 'more'. There is one word, 'hoi', that comes close to the numeral 1, but it can also mean 'small'. And they were never observed to count without language,on their fingers for example, in order to determine important tasks in village life like how many pieces of meat to grill.</p>
+
+                        <p class="mb-4"><strong>D.</strong> <span id="loc_p3_q30" class="highlight-target">Everett's findings among the Pirahã have brought new life to a controversial theory by the linguist Benjamin Whorf</span>, who suggested that people are only capable of constructing thoughts for which they possess actual words. Or to put it another way, because they have no words for numbers, they cannot even begin to understand the concept of numbers or arithmetic.</p>
+
+                        <p class="mb-4"><strong>E.</strong> The Warlpiri language - spoken by a group of Australian Aborigines-like that of the Pirahã, features only the most rudimentary system of counting. However, the Warlpiri people had no difficulty counting farther than three in a foreign language, in this case English, but <span id="loc_p3_q31" class="highlight-target">when Everett attempted to teach the Pirahã how to count in Portuguese like other Brazilians, not a single person could count to ten.</span></p>
+
+                        <p class="mb-4"><strong>F.</strong> <span id="loc_p3_q32" class="highlight-target">Everett is at pains to point out that the Pirahã are not unintelligent, for their thinking is not any slower than that of the average university student.</span> And although they reside in a remote part of the forest, they do not live in complete genetic isolation, but mix with people from the surrounding populations and share similar intellectual capacities with their neighbours whose languages do contain numbers.</p>
+
+                        <p class="mb-4"><strong>G.</strong> Eventually, after some 30 years of research, Everett has come up with a surprising explanation for the peculiarities of the Pirahã language. <span id="loc_p3_q33" class="highlight-target">Language, he believes, is created by a people's way of life, their belief system and values.</span> In this way, variety in human language is almost limitless, a function of the human capacity to live in different ways, such as in the forest. What Everett's research has revealed is that the central tenet of the Pirahã culture is to live in the <span id="loc_p3_q34" class="highlight-target">here and now</span>. The only thing of importance that is worth communicating to others is what is being experienced at that very moment, though this can often be described with great care and detail. In consequence, the language has no <span id="loc_p3_q35" class="highlight-target">means to conjugate verbs</span> in order to describe 'yesterday' or 'last week' or 'when I was a child'. Their very literal view of the world curtails abstract thought, and many features taken for granted among other peoples are absent among the Pirahã, such as a creation myth, story telling and painting. One manifestation of their beliefs is that by tradition the names they give their children are not particularly imaginative. Often they are named after other members of the tribe with whom they share similar character traits. <span id="loc_p3_q36" class="highlight-target">Standing out or being different is not encouraged</span> by the Pirahã, and this is reflected in their perhaps colourless choice of names.</p>
+
+                        <p class="mb-4"><strong>H.</strong> <span id="loc_p3_q37" class="highlight-target">Everett anticipated that these findings would be controversial and the reaction came as expected.</span> Until this point, many linguists had defended the theories of Noam Chomsky, according to which all human languages have a universal grammar. What exactly makes up this universal grammar is the subject of debate, but at its heart is the concept of 'recursion', which is defined as replication of a structure within its single parts. Without it, humans would not be able to view separate thoughts as subordinate parts of a complex whole. And, most pertinent to Everett's work, there would not be subordinate clauses, which are responsible for translating the concept of recursion into grammar. <span id="loc_p3_q39" class="highlight-target">But if the Pirahã do not form subordinate clauses, then recursion cannot explain the uniqueness of human language, and this would negate Chomsky's theories.</span></p>
+
+                        <p class="mb-4"><strong>I.</strong> The logical way forward now would be to try to prove that the Pirahã can think in a recursive fashion. The only problem is, nobody can confirm or deny Everett's observations since no other researcher can speak Pirahã as well as he does. Despite this, several researchers - including two of Chomsky's colleagues - will soon travel to Brazil to check his claims. <span id="loc_p3_q40" class="highlight-target">My concern is that soon the Pirahã will simply become one more scientific oddity with every aspect of their lives being exploited and analysed.</span></p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_32_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–32</h3>
+                                    <p class="text-gray-700">Choose the correct answer, <strong>A, B, C or D</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q27',
+                            displayType: 'radio',
+                            text: '27. What are we told about Daniel Everett in the first paragraph?',
+                            options: [
+                                { id: 'A', text: 'A. He has lived among the Pirahã since 1977.', isCorrect: false, explanation: 'Incorrect. He spent a *total* of seven years since 1977, not continuously since then.' },
+                                { id: 'B', text: 'B. It took him seven years to learn the Pirahã language.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. No one would publish his research for three decades.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. Studying the Pirahã language is the focus of his work.', isCorrect: true, explanation: 'Paragraph A states he "...has committed his career to studying their puzzling speech."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q28',
+                            displayType: 'radio',
+                            text: '28. Which of the following is the best summary of the second paragraph?',
+                            options: [
+                                { id: 'A', text: 'A. Humans are the only species to be linguistically creative.', isCorrect: true, explanation: 'Paragraph B notes that while other species communicate, "human language is unique... it enables humans to piece together never-before-constructed thoughts, and be infinitely imaginative".' },
+                                { id: 'B', text: 'B. Humans, bees, birds and whales share a characteristic.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. Human language is not fully understood by scientists.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. Humans are the only species to use syntax.', isCorrect: false, explanation: 'Incorrect. Whales also sing with syntax.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q29',
+                            displayType: 'radio',
+                            text: '29. Why does the writer refer to subordinate clauses?',
+                            options: [
+                                { id: 'A', text: 'A. to criticise the general approach of linguistics', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. to compare two features of the Pirahã language', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. to explain why the Pirahã language is difficult to learn', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. to exemplify an unusual feature of the Pirahã language', isCorrect: true, explanation: 'Paragraph C introduces subordinate clauses as something academics maintained are essential, then says: "Most of all, it may be unique for not employing subordinate clauses." It\'s an unusual feature.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q30',
+                            displayType: 'radio',
+                            text: '30. What point does the writer make about the work of Whorf?',
+                            options: [
+                                { id: 'A', text: 'A. He thought that numbers were common to all human languages.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. His theory might be supported by Everett\'s research.', isCorrect: true, explanation: 'Paragraph D states: "Everett\'s findings among the Pirahã have brought new life to a controversial theory by the linguist Benjamin Whorf..." meaning Everett\'s research supports it.' },
+                                { id: 'C', text: 'C. His research enabled him to find a new life among the Pirahã.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. He predicted that people like the Pirahã would never be found.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q31',
+                            displayType: 'radio',
+                            text: '31. The writer refers to the Warlpiri people in order to',
+                            options: [
+                                { id: 'A', text: 'A. suggest that the Pirahã be taught to count in English.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. show how tribal peoples learn a foreign language.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. compare counting in English and Portuguese.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. illustrate the uniqueness of the Pirahã.', isCorrect: true, explanation: 'Paragraph E points out that Warlpiri people *could* learn to count in a foreign language (English), "but when Everett attempted to teach the Pirahã how to count... not a single person could count to ten." This highlights the Pirahã\'s uniqueness.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q32',
+                            displayType: 'radio',
+                            text: '32. What is Everett\'s point about the Pirahä\'s intellectual capacities?',
+                            options: [
+                                { id: 'A', text: 'A. Pirahã students have not graduated from universities.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. He does not want people to criticise their intelligence.', isCorrect: true, explanation: 'Paragraph F states: "Everett is at pains to point out that the Pirahã are not unintelligent..." He wants to ensure they aren\'t misjudged.' },
+                                { id: 'C', text: 'C. Their isolation makes it difficult to evaluate their intelligence.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. He believes their language is more complex than their neighbours\'.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q33_36_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 33–36</h3>
+                                    <p class="text-gray-700">Complete the summary using the list of words, <strong>A-I</strong>, below.</p>
+                                    <p class="text-gray-700 mt-2">Select an item from the list and drop it into the corresponding blank in the text.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q33_36',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Words',
+                            isReusable: false,
+                            pool: [
+                                { id: 'A', text: 'A. present' },
+                                { id: 'B', text: 'B. past' },
+                                { id: 'C', text: 'C. time' },
+                                { id: 'D', text: 'D. Future' },
+                                { id: 'E', text: 'E. culture' },
+                                { id: 'F', text: 'F. grammar' },
+                                { id: 'G', text: 'G. art' },
+                                { id: 'H', text: 'H. individuality' },
+                                { id: 'I', text: 'I. children' }
+                            ],
+                            html: `
+                                <div class="mt-6 p-6 bg-indigo-50 border border-indigo-200 rounded-2xl shadow-sm text-gray-800 leading-10 text-base">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">Everett's explanation</strong>
+                                    <div>
+                                        Everett believes that a group's language is a product of their <strong>33</strong> <span id="drop_p3_q33"></span> and thus language is infinitely varied. During the time he spent living among them, he observed that the Pirahã only place value on the <strong>34</strong> <span id="drop_p3_q34"></span> and have no <strong>35</strong> <span id="drop_p3_q35"></span> to describe completed events. Similarly, the types of names they use reflect the fact that they do not celebrate <strong>36</strong> <span id="drop_p3_q36"></span>.
+                                    </div>
+                                </div>
+                            `,
+                            questions: [
+                                { id: 'p3_q33', correct: 'E', explanation: 'Paragraph G states: "Language, he believes, is created by a people\'s way of life, their belief system and values." This describes their culture.' },
+                                { id: 'p3_q34', correct: 'A', explanation: 'Paragraph G states: "...the central tenet of the Pirahã culture is to live in the here and now." The here and now refers to the present.' },
+                                { id: 'p3_q35', correct: 'F', explanation: 'Paragraph G states: "...the language has no means to conjugate verbs in order to describe \'yesterday\' or \'last week\'...". Verb conjugation relates to grammar.' },
+                                { id: 'p3_q36', correct: 'H', explanation: 'Paragraph G states: "Standing out or being different is not encouraged by the Pirahã..." This means they do not celebrate individuality.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q37_40_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 37–40</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the claims of the writer?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">YES</strong> - if the statement agrees with the claims of the writer</p>
+                                        <p><strong class="text-gray-900">NO</strong> - if the statement contradicts the claims of the writer</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if it is impossible to say what the writer thinks about this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q37',
+                            displayType: 'radio',
+                            text: '37. Everett was surprised by the way his research was greeted.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'no', text: 'NO', isCorrect: true, explanation: 'Paragraph H states: "Everett anticipated that these findings would be controversial and the reaction came as expected." So he was not surprised.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q38',
+                            displayType: 'radio',
+                            text: '38. Chomsky has been critical of Everett\'s research methodology.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'no', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'The text says Everett\'s work might negate Chomsky\'s theories, and Chomsky\'s colleagues are going to check his claims, but it doesn\'t mention Chomsky personally criticising Everett\'s *methodology*.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q39',
+                            displayType: 'radio',
+                            text: '39. If \'recursion\' as a universal concept is disproved, Chomsky\'s ideas about language would be wrong.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: true, explanation: 'Paragraph H states: "But if the Pirahã do not form subordinate clauses, then recursion cannot explain the uniqueness of human language, and this would negate Chomsky\'s theories."' },
+                                { id: 'no', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q40',
+                            displayType: 'radio',
+                            text: '40. The Pirahã will benefit from their new-found status among academics.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'no', text: 'NO', isCorrect: true, explanation: 'Paragraph I states: "My concern is that soon the Pirahã will simply become one more scientific oddity with every aspect of their lives being exploited and analysed." The writer thinks they will be exploited, not benefit.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. ENGINE ARCHITECTURE & STATE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            questionsList: [], 
+            activeDragItem: null,
+            cachedPanes: {},
+            activeHighlightMark: null
+        };
+
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), band: document.getElementById('band-score-display'), time: document.getElementById('time-taken-display') },
+            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), pContainer: document.getElementById('passage-content-container'), qContainer: document.getElementById('questions-content-container'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') },
+            highlightTb: document.getElementById('highlight-toolbar')
+        };
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'drag_drop') {
+                        q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
+                    } else if (q.displayType === 'checkbox_group') {
+                        q.options.forEach(opt => {
+                            if (opt.isCorrect) {
+                                state.questionsList.push({ partIndex: pIdx, qId: `${q.id}_${opt.id}`, absNum: absNum++, displayType: 'checkbox', isCorrect: true, parentId: q.id });
+                            }
+                        });
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                    }
+                });
+            });
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
+            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+
+            document.addEventListener('mousedown', (e) => {
+                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
+                
+                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                    state.activeDragItem = null;
+                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                }
+            });
+
+            initHighlightEngine();
+        }
+
+        function initHighlightEngine() {
+            document.querySelectorAll('.hl-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const color = btn.dataset.color;
+                    
+                    if (state.activeHighlightMark) {
+                        if (color === 'clear') {
+                            const parent = state.activeHighlightMark.parentNode;
+                            while (state.activeHighlightMark.firstChild) {
+                                parent.insertBefore(state.activeHighlightMark.firstChild, state.activeHighlightMark);
+                            }
+                            parent.removeChild(state.activeHighlightMark);
+                        } else {
+                            state.activeHighlightMark.className = `user-hl user-hl-${color}`;
+                        }
+                        hideToolbar();
+                    } else {
+                        applyHighlightToSelection(color);
+                    }
+                });
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (e.target.closest('#highlight-toolbar')) return; 
+                
+                if (e.target.classList.contains('user-hl')) {
+                    state.activeHighlightMark = e.target;
+                    positionToolbar(e.target.getBoundingClientRect());
+                    return;
+                }
+
+                const sel = window.getSelection();
+                if (!sel.isCollapsed && sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    let valid = false;
+                    let node = range.commonAncestorContainer;
+                    if (node.nodeType === 3) node = node.parentNode;
+                    
+                    if (node && node.closest('.highlightable-area')) valid = true;
+                    
+                    if (valid) {
+                        state.activeHighlightMark = null; 
+                        positionToolbar(range.getBoundingClientRect());
+                    } else {
+                        hideToolbar();
+                    }
+                } else {
+                    hideToolbar();
+                }
+            });
+
+            document.getElementById('pane-passage').addEventListener('scroll', hideToolbar);
+            document.getElementById('pane-questions').addEventListener('scroll', hideToolbar);
+        }
+
+        function positionToolbar(rect) {
+            const tb = DOM.highlightTb;
+            tb.style.top = `${rect.top - 10}px`;
+            tb.style.left = `${rect.left + (rect.width / 2)}px`;
+            tb.classList.remove('hidden');
+        }
+
+        function hideToolbar() {
+            DOM.highlightTb.classList.add('hidden');
+            state.activeHighlightMark = null;
+        }
+
+        function applyHighlightToSelection(color) {
+            if (color === 'clear') {
+                window.getSelection().removeAllRanges();
+                hideToolbar();
+                return;
+            }
+            const sel = window.getSelection();
+            if (sel.isCollapsed) return;
+            const range = sel.getRangeAt(0);
+            
+            const walker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
+                acceptNode: function(node) {
+                    return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            }, false);
+
+            const nodesToWrap = [];
+            let currentNode = walker.currentNode;
+            while (currentNode) {
+                if (currentNode.nodeType === Node.TEXT_NODE && currentNode.nodeValue.trim().length > 0) nodesToWrap.push(currentNode);
+                currentNode = walker.nextNode();
+            }
+
+            if(nodesToWrap.length > 0) {
+                 try {
+                     const mark = document.createElement('mark');
+                     mark.className = `user-hl user-hl-${color}`;
+                     range.surroundContents(mark);
+                 } catch (e) {
+                     try {
+                        const mark = document.createElement('mark');
+                        mark.className = `user-hl user-hl-${color}`;
+                        mark.appendChild(range.extractContents());
+                        range.insertNode(mark);
+                     } catch(err) {
+                         console.warn("Could not highlight complex selection");
+                     }
+                 }
+            }
+            sel.removeAllRanges();
+            hideToolbar();
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            
+            renderTabs(); 
+            loadPart(0); 
+            updateNavigator();
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) { finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderTabs() {
+            DOM.navigator.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${idx + 1}`;
+                btn.onclick = () => loadPart(idx);
+                DOM.navigator.tabs.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            if(state.mode !== 'RESULT') return;
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; 
+            DOM.tooltip.pron.textContent = d.pron; 
+            DOM.tooltip.vi.textContent = d.vi; 
+            DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
+            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function loadPart(idx) {
+            state.currentPart = idx;
+            renderTabs();
+            
+            const data = TEST_DATA.parts[idx];
+            DOM.panes.title.textContent = data.title;
+
+            if (!state.cachedPanes[idx]) {
+                state.cachedPanes[idx] = buildPartDOM(idx);
+                DOM.panes.pContainer.appendChild(state.cachedPanes[idx].passage);
+                DOM.panes.qContainer.appendChild(state.cachedPanes[idx].questions);
+            }
+
+            Array.from(DOM.panes.pContainer.children).forEach(el => el.style.display = 'none');
+            Array.from(DOM.panes.qContainer.children).forEach(el => el.style.display = 'none');
+            
+            state.cachedPanes[idx].passage.style.display = 'block';
+            state.cachedPanes[idx].questions.style.display = 'block';
+
+            document.getElementById('pane-passage').scrollTop = 0;
+            document.getElementById('pane-questions').scrollTop = 0;
+            
+            updateNavigator();
+        }
+
+        function buildPartDOM(idx) {
+            const data = TEST_DATA.parts[idx];
+            
+            const passageWrapper = document.createElement('div');
+            passageWrapper.className = 'highlightable-area';
+            passageWrapper.innerHTML = data.passage;
+            passageWrapper.querySelectorAll('.vocab-word').forEach(word => {
+                word.addEventListener('click', handleVocabClick);
+            });
+
+            const questionsWrapper = document.createElement('div');
+            questionsWrapper.className = 'highlightable-area';
+
+            data.questions.forEach((q, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.id = `container_${q.id}`;
+                qDiv.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                if (q.instructionBox) {
+                    const instr = document.createElement('div');
+                    instr.innerHTML = q.instructionBox;
+                    qDiv.appendChild(instr);
+                }
+
+                // -> Drag and Drop Builder
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+
+                    // Local Pool Refresher
+                    const refreshPool = () => {
+                        const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                        poolGrid.innerHTML = '';
+                        q.pool.forEach(item => {
+                            const isUsed = !q.isReusable && used.includes(item.id);
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
+                            itemDiv.textContent = item.text;
+                            
+                            if (state.mode === 'TEST' && !isUsed) {
+                                itemDiv.setAttribute('draggable', 'true');
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    state.activeDragItem = item.id;
+                                };
+                                itemDiv.onclick = () => {
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    state.activeDragItem = item.id;
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                };
+                            }
+                            poolGrid.appendChild(itemDiv);
+                        });
+                    };
+                    refreshPool();
+                    
+                    if (q.html) {
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = q.html;
+                        
+                        q.questions.forEach(subQ => {
+                            const drop = wrap.querySelector('#drop_' + subQ.id);
+                            if(drop) {
+                                const refreshDrop = () => {
+                                    const currentAnsId = state.answers[subQ.id];
+                                    const currentAns = q.pool.find(p => p.id === currentAnsId);
+                                    
+                                    drop.className = 'drop-zone inline-flex items-center justify-center min-w-[120px] min-h-[34px] border-2 rounded-lg px-3 py-1 mx-1 text-sm font-bold align-middle transition-all ' + (state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-300' : '');
+                                    
+                                    if (currentAns) {
+                                        drop.classList.remove('border-dashed', 'border-gray-300', 'bg-gray-50', 'text-gray-400');
+                                        drop.classList.add('border-solid', 'bg-white', 'text-pink-600', 'border-pink-300', 'shadow-sm');
+                                        drop.textContent = currentAns.text;
+                                        if (state.mode === 'TEST') {
+                                            drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; refreshDrop(); refreshPool(); updateNavigator(); };
+                                        }
+                                    } else {
+                                        drop.classList.add('border-dashed', 'border-gray-300', 'bg-gray-50', 'text-gray-400');
+                                        drop.classList.remove('border-solid', 'bg-white', 'text-pink-600', 'border-pink-300', 'shadow-sm');
+                                        drop.innerHTML = '<span class="opacity-50">Drop here</span>';
+                                        if (state.mode === 'TEST') {
+                                            drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; refreshDrop(); refreshPool(); updateNavigator(); } };
+                                        }
+                                    }
+
+                                    if (state.mode === 'TEST') {
+                                        drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('bg-pink-50', 'border-pink-400'); };
+                                        drop.ondragleave = (e) => { drop.classList.remove('bg-pink-50', 'border-pink-400'); };
+                                        drop.ondrop = (e) => {
+                                            e.preventDefault(); drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                            const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                            if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                                state.answers[subQ.id] = draggedId; state.activeDragItem = null; refreshDrop(); refreshPool(); updateNavigator();
+                                            }
+                                        };
+                                    }
+                                };
+                                refreshDrop();
+                            }
+                        });
+                        wrapper.appendChild(wrap);
+
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-8 space-y-3 result-element';
+                        q.questions.forEach(subQ => {
+                            const exp = document.createElement('div');
+                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            const absNum = state.questionsList.find(x => x.qId === subQ.id)?.absNum || '';
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${correctItem ? correctItem.text : subQ.correct}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                </div>
+                            `;
+                            expContainer.appendChild(exp);
+                        });
+                        wrapper.appendChild(expContainer);
+                    } else {
+                        const qList = document.createElement('div');
+                        qList.className = 'space-y-4';
+                        q.questions.forEach(subQ => {
+                            const row = document.createElement('div');
+                            row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                            const label = document.createElement('span');
+                            label.className = 'text-sm font-semibold text-gray-700';
+                            label.textContent = subQ.text;
+                            
+                            const drop = document.createElement('div');
+                            drop.id = `drop_${subQ.id}`; 
+                            
+                            // Local Drop Refresher
+                            const refreshDrop = () => {
+                                const currentAnsId = state.answers[subQ.id];
+                                const currentAns = q.pool.find(p => p.id === currentAnsId);
+                                
+                                drop.className = `drop-zone w-full min-h-[44px] border-2 rounded-xl flex items-center justify-center text-xs transition-all p-3 text-center ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
+                                
+                                if (currentAns) {
+                                    drop.classList.remove('border-dashed');
+                                    drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
+                                    drop.textContent = currentAns.text; // Display full text of the dragged item
+                                    if (state.mode === 'TEST') {
+                                        drop.onclick = (e) => { 
+                                            e.stopPropagation(); 
+                                            delete state.answers[subQ.id]; 
+                                            refreshDrop(); 
+                                            refreshPool(); 
+                                            updateNavigator(); 
+                                        };
+                                    }
+                                } else {
+                                    drop.classList.add('border-dashed', 'border-gray-300');
+                                    drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                                    if (state.mode === 'TEST') {
+                                        drop.onclick = () => { 
+                                            if (state.activeDragItem) { 
+                                                state.answers[subQ.id] = state.activeDragItem; 
+                                                state.activeDragItem = null; 
+                                                refreshDrop(); 
+                                                refreshPool(); 
+                                                updateNavigator(); 
+                                            } 
+                                        };
+                                    }
+                                }
+
+                                if (state.mode === 'TEST') {
+                                    drop.ondragover = (e) => {
+                                        e.preventDefault();
+                                        drop.classList.add('bg-pink-50', 'border-pink-400');
+                                    };
+                                    drop.ondragleave = (e) => {
+                                        drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                    };
+                                    drop.ondrop = (e) => {
+                                        e.preventDefault();
+                                        drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                        const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                        if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                            state.answers[subQ.id] = draggedId;
+                                            state.activeDragItem = null;
+                                            refreshDrop();
+                                            refreshPool();
+                                            updateNavigator();
+                                        }
+                                    };
+                                }
+                            };
+                            
+                            refreshDrop();
+
+                            // Explanation container
+                            const exp = document.createElement('div');
+                            exp.id = `exp_${subQ.id}`;
+                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100 result-element';
+                            
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem ? (correctItem.text.length > 2 ? '' : '') : ''}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            row.appendChild(label); 
+                            row.appendChild(drop);
+                            row.appendChild(exp);
+                            qList.appendChild(row);
+                        });
+                        wrapper.appendChild(qList); 
+                    }
+                    qDiv.appendChild(wrapper);
+                } 
+                // -> Render Checkbox Groups
+                else if (q.displayType === 'checkbox_group') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-4 text-sm leading-snug';
+                    header.textContent = q.text;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    optsContainer.className = 'space-y-3';
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'checkbox-label flex items-start p-4 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="checkbox" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 rounded focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100 hidden">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}_${opt.id.toLowerCase()}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+
+                            if (!state.answers[q.id]) state.answers[q.id] = [];
+                            const input = label.querySelector('input');
+                            
+                            if (state.answers[q.id].includes(opt.id)) {
+                                state.answers[q.id] = state.answers[q.id].filter(id => id !== opt.id);
+                                label.classList.remove('border-pink-500', 'bg-pink-50');
+                                label.classList.add('border-gray-100');
+                                input.checked = false;
+                            } else {
+                                // Assume 2 selections max based on instructions
+                                if (state.answers[q.id].length < 2) {
+                                    state.answers[q.id].push(opt.id);
+                                    label.classList.remove('border-gray-100');
+                                    label.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                }
+                            }
+                            updateNavigator();
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+                // -> Render Inline Blanks
+                else if (q.displayType === 'inline_blanks') {
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = q.html;
+                    
+                    wrap.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        input.value = state.answers[qid] || '';
+                        input.addEventListener('input', (e) => {
+                            if(state.mode === 'TEST') {
+                                state.answers[qid] = e.target.value;
+                                updateNavigator();
+                            }
+                        });
+                    });
+                    qDiv.appendChild(wrap);
+
+                    const expContainer = document.createElement('div');
+                    expContainer.className = 'mt-8 space-y-3 result-element';
+                    q.blanks.forEach(b => {
+                        const exp = document.createElement('div');
+                        exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                        const absNum = state.questionsList.find(x => x.qId === b.id)?.absNum || '';
+                        exp.innerHTML = `
+                            <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${b.correct}</div>
+                            <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                            <div class="mt-3 text-right">
+                                <button onclick="locateInPassage('loc_${b.parentId || b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                            </div>
+                        `;
+                        expContainer.appendChild(exp);
+                    });
+                    qDiv.appendChild(expContainer);
+                } 
+                // -> Render Radios
+                else if (q.displayType === 'radio') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                    const qMeta = state.questionsList.find(x => x.qId === q.id);
+                    const qNum = qMeta ? qMeta.absNum : (qIdx + 1);
+                    // Wrapped text in a span to prevent flexbox from splitting marked highlight sentences
+                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qNum}</span> <span>${q.text}</span>`;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'radio-label flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+                            
+                            state.answers[q.id] = opt.id;
+                            updateNavigator();
+                            
+                            optsContainer.querySelectorAll('.radio-label').forEach(l => {
+                                const input = l.querySelector('input');
+                                if (l.dataset.optId === opt.id) {
+                                    l.classList.remove('border-gray-100');
+                                    l.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                } else {
+                                    l.classList.remove('border-pink-500', 'bg-pink-50');
+                                    l.classList.add('border-gray-100');
+                                    input.checked = false;
+                                }
+                            });
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+
+                questionsWrapper.appendChild(qDiv);
+            });
+
+            if (state.mode === 'RESULT') {
+                applyResultStylesToCachedNode(idx, { passage: passageWrapper, questions: questionsWrapper });
+            }
+
+            return { passage: passageWrapper, questions: questionsWrapper };
+        }
+
+        function showSubmitModal() {
+            // Recalculate unique questions answered
+            let answeredCount = 0;
+            const checkboxCounts = {};
+
+            state.questionsList.forEach(q => {
+                if (q.displayType === 'checkbox') {
+                    if (!checkboxCounts[q.parentId]) checkboxCounts[q.parentId] = 0;
+                    
+                    if (state.answers[q.parentId] && state.answers[q.parentId].length > checkboxCounts[q.parentId]) {
+                        answeredCount++;
+                        checkboxCounts[q.parentId]++;
+                    }
+                } else {
+                    const ans = state.answers[q.qId];
+                    if (ans && ans.toString().trim() !== '') answeredCount++;
+                }
+            });
+
+            DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function getBandScore(rawScore) {
+            if (rawScore >= 39) return "9.0";
+            if (rawScore >= 37) return "8.5";
+            if (rawScore >= 35) return "8.0";
+            if (rawScore >= 33) return "7.5";
+            if (rawScore >= 30) return "7.0";
+            if (rawScore >= 27) return "6.5";
+            if (rawScore >= 23) return "6.0";
+            if (rawScore >= 19) return "5.5";
+            if (rawScore >= 15) return "5.0";
+            if (rawScore >= 13) return "4.5";
+            if (rawScore >= 10) return "4.0";
+            if (rawScore >= 8) return "3.5";
+            if (rawScore >= 6) return "3.0";
+            if (rawScore >= 4) return "2.5";
+            if (rawScore >= 2) return "2.0";
+            if (rawScore >= 1) return "1.0";
+            return "0.0";
+        }
+
+        function finishTest() {
+            state.mode = 'RESULT';
+            clearInterval(state.timerInterval);
+            DOM.modal.container.classList.add('hidden');
+            DOM.header.actions.classList.add('hidden');
+            DOM.result.banner.classList.remove('hidden');
+            DOM.result.banner.classList.add('flex');
+            
+            document.body.classList.add('is-result-mode');
+
+            let score = 0;
+            state.questionsList.forEach(q => {
+                if (q.displayType === 'checkbox') {
+                    if (state.answers[q.parentId] && state.answers[q.parentId].includes(q.qId.split('_').pop())) {
+                        score++;
+                    }
+                } else if (q.displayType === 'inline_blank') {
+                    const ans = state.answers[q.qId];
+                    if (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) score++;
+                } else {
+                    const ans = state.answers[q.qId];
+                    if (ans === q.isCorrect) score++;
+                }
+            });
+
+            const totalQuestions = state.questionsList.length || 40;
+            DOM.result.score.textContent = `${score}/${totalQuestions}`;
+            DOM.result.band.textContent = getBandScore(score);
+            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            
+            Object.keys(state.cachedPanes).forEach(partIdxStr => {
+                applyResultStylesToCachedNode(parseInt(partIdxStr), state.cachedPanes[partIdxStr]);
+            });
+
+            updateNavigator();
+            loadPart(state.currentPart);
+        }
+
+        function applyResultStylesToCachedNode(idx, cachedNodes) {
+            const data = TEST_DATA.parts[idx];
+            
+            cachedNodes.passage.querySelectorAll('.vocab-word').forEach(w => w.classList.add('mode-result'));
+
+            data.questions.forEach(q => {
+                const qContainer = cachedNodes.questions.querySelector(`#container_${q.id}`);
+                if (!qContainer) return;
+
+                if (q.displayType === 'inline_blanks') {
+                    qContainer.querySelectorAll('input').forEach(input => {
+                        input.disabled = true;
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        
+                        if (input.value.trim().toLowerCase() === info.correct.toLowerCase()) {
+                            input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                        } else {
+                            input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                            if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('correction-badge')) {
+                                const corr = document.createElement('span');
+                                corr.className = 'correction-badge text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                corr.textContent = info.correct;
+                                input.after(corr);
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'checkbox_group') {
+                     qContainer.querySelectorAll('.checkbox-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] && state.answers[q.id].includes(optId);
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            expBlock.classList.remove('hidden'); // Show explanations in result mode
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                            input.checked = true; // Ensure correct answers are checked for review
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'radio') {
+                    qContainer.querySelectorAll('.radio-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] === optId;
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'drag_drop') {
+                    qContainer.querySelectorAll('.pool-item').forEach(item => {
+                        item.removeAttribute('draggable');
+                        item.onclick = null;
+                        item.classList.remove('cursor-pointer', 'hover:border-pink-300', 'hover:bg-pink-50');
+                    });
+                    
+                    q.questions.forEach(subQ => {
+                        const drop = qContainer.querySelector(`#drop_${subQ.id}`);
+                        if(drop) {
+                            drop.onclick = null;
+                            drop.ondragover = null;
+                            drop.ondragleave = null;
+                            drop.ondrop = null;
+                            
+                            drop.classList.remove('text-pink-600', 'border-pink-200', 'cursor-pointer', 'hover:bg-white');
+                            const currentAnsId = state.answers[subQ.id];
+                            const isCorrect = currentAnsId === subQ.correct;
+                            
+                            if (isCorrect) {
+                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                            } else {
+                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                                
+                                if (q.html && !drop.nextElementSibling?.classList.contains('correction-badge')) {
+                                    const corr = document.createElement('span');
+                                    corr.className = 'correction-badge text-green-600 font-bold ml-2 text-xs bg-green-50 px-2 py-1 rounded-md border border-green-200 align-middle inline-block';
+                                    const correctItem = q.pool.find(p => p.id === subQ.correct);
+                                    corr.textContent = correctItem ? correctItem.text : subQ.correct;
+                                    drop.after(corr);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            
+            if(state.questionsList.length === 0) {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+                return;
+            }
+
+            let currentPart = -1;
+            let currentGroup = null;
+            const checkboxAssignments = {};
+
+            state.questionsList.forEach(q => {
+                if (q.partIndex !== currentPart) {
+                    currentPart = q.partIndex;
+                    currentGroup = document.createElement('div');
+                    currentGroup.className = 'flex items-center gap-2 border-r border-gray-200 pr-4 last:border-0 last:pr-0';
+                    
+                    const groupLabel = document.createElement('span');
+                    groupLabel.className = 'text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap mr-1';
+                    groupLabel.textContent = `Passage ${currentPart + 1}:`;
+                    currentGroup.appendChild(groupLabel);
+                    
+                    DOM.navigator.grid.appendChild(currentGroup);
+                }
+
+                let isAnswered = false;
+                let isCorrect = false;
+
+                if (q.displayType === 'checkbox') {
+                     if (!checkboxAssignments[q.parentId]) checkboxAssignments[q.parentId] = 0;
+                     
+                     const ansArr = state.answers[q.parentId];
+                     if (ansArr && ansArr.length > checkboxAssignments[q.parentId]) {
+                         isAnswered = true;
+                         const optId = q.qId.split('_').pop();
+                         isCorrect = ansArr.includes(optId);
+                         checkboxAssignments[q.parentId]++;
+                     }
+                } else {
+                     const ans = state.answers[q.qId];
+                     isAnswered = ans && ans.toString().trim() !== '';
+                     isCorrect = (q.displayType === 'inline_blank') ? (ans?.trim().toLowerCase() === q.isCorrect.toLowerCase()) : (ans === q.isCorrect);
+                }
+
+                let bg = '';
+                
+                if (state.mode === 'TEST') {
+                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
+                } else {
+                    bg = isCorrect ? 'bg-green-500 text-white border-green-500' : isAnswered ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors flex-shrink-0 ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { 
+                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
+                    setTimeout(() => {
+                        const targetId = 'container_' + (q.parentId || q.qId);
+                        const targetEl = DOM.panes.qContainer.querySelector(`#${targetId}`);
+                        if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100); 
+                };
+                currentGroup.appendChild(btn);
+            });
+
+            if(state.mode === 'TEST') DOM.panes.floatingSubmit.classList.remove('hidden');
+            else DOM.panes.floatingSubmit.classList.add('hidden');
+        }
+
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+
+        window.locateInPassage = function(targetId) {
+            document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+            
+            const mappings = {
+                'loc_p1_q1': ['loc_p1_q1'],
+                'loc_p1_q2': ['loc_p1_q2'],
+                'loc_p1_q3': ['loc_p1_q3'],
+                'loc_p1_q4': ['loc_p1_q4'],
+                'loc_p1_q5': ['loc_p1_q5'],
+                'loc_p1_q6': ['loc_p1_q6'],
+                'loc_p1_q7': ['loc_p1_q7'],
+                'loc_p1_q8': ['loc_p1_q8'],
+                'loc_p1_q9': ['loc_p1_q9'],
+                'loc_p1_q10': ['loc_p1_q10'],
+                'loc_p1_q11': ['loc_p1_q11'],
+                'loc_p1_q12': ['loc_p1_q12'],
+                'loc_p1_q13': ['loc_p1_q13']
+            };
+
+            const targetIds = mappings[targetId] || [targetId];
+            let found = false;
+
+            targetIds.forEach(id => {
+                const targetEl = DOM.panes.pContainer.querySelector(`#${id}`);
+                if (targetEl) {
+                    if (!found) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found = true;
+                    }
+                    targetEl.classList.add('highlight-active');
+                    setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+                }
+            });
+
+            if (!found) {
+                console.warn('Passage location target not found for:', targetId);
+                const pane = document.getElementById('pane-passage');
+                if (pane) pane.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
