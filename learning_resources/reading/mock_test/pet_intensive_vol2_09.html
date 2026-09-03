@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive Vol 2 Test 09 | Reading Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Elements */
+        .vocab-word.mode-result {
+            border-bottom: 2px dashed #c084fc;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background-color: rgba(192, 132, 252, 0.1);
+        }
+        .vocab-word.mode-result:hover { background-color: rgba(192, 132, 252, 0.2); }
+        
+        .option-label { transition: all 0.2s ease; }
+        .explanation-box {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease; opacity: 0;
+        }
+        .explanation-box.open { max-height: 800px; opacity: 1; margin-top: 0.5rem; }
+
+        /* Tooltip */
+        #vocab-tooltip {
+            position: fixed; z-index: 50; width: 300px;
+            pointer-events: none; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        #vocab-tooltip.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .custom-scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Highlight Feature (Locate) */
+        .highlight-target { transition: all 0.4s ease; border-radius: 4px; padding: 0 2px; }
+        .highlight-active { background-color: #fce7f3; color: #be185d; font-weight: bold; box-shadow: 0 0 0 2px #fbcfe8; }
+
+        /* User Highlighting Feature */
+        .user-hl { transition: background-color 0.2s ease; border-radius: 3px; padding: 0 2px; cursor: pointer; }
+        .user-hl:hover { filter: brightness(0.95); }
+        .user-hl-yellow { background-color: #fef08a; } /* bg-yellow-200 */
+        .user-hl-green { background-color: #bbf7d0; } /* bg-green-200 */
+        .user-hl-pink { background-color: #fbcfe8; } /* bg-pink-200 */
+        
+        ::selection { background-color: #e2e8f0; color: inherit; }
+
+        /* Drag and Drop styling */
+        .pool-item-active { border-color: #ec4899 !important; background-color: #fdf2f8 !important; }
+        .drop-zone { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Cached DOM State Utilities */
+        .result-element { display: none; }
+        .is-result-mode .result-element { display: block; }
+        .is-result-mode .test-element { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen w-screen overflow-hidden flex flex-col relative">
+    <!-- Header -->
+    <header class="flex-none bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10 relative">
+        <div class="flex items-center gap-3">
+            <div class="bg-pink-500 text-white font-bold p-2 rounded-lg text-sm tracking-wider">PET</div>
+            <h1 class="font-bold text-lg md:text-xl text-gray-800 hidden sm:block">IELTS Chan Truong <span class="font-normal text-gray-500">| Reading Mock Test</span></h1>
+        </div>
+
+        <div id="test-header-actions" class="hidden items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-100 px-4 py-1.5 rounded-full border border-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display" class="font-mono font-bold text-lg text-gray-700">60:00</span>
+            </div>
+            <button id="btn-submit-header" class="bg-pink-500 hover:bg-pink-600 text-white px-5 py-1.5 rounded-full font-semibold transition-colors shadow-sm text-sm">
+                Submit Test
+            </button>
+        </div>
+    </header>
+
+    <!-- Start View -->
+    <div id="view-start" class="flex-auto overflow-y-auto flex flex-col items-center justify-center p-6 bg-gray-50">
+        <div class="max-w-2xl w-full text-center">
+            <div class="mb-6 flex justify-center text-pink-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">PET Intensive Vol 2 Test 09</h2>
+            <p class="text-gray-500 text-lg mb-8 uppercase tracking-widest font-medium">Academic Reading Module</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</span>
+                    <span class="block text-2xl font-bold text-purple-600">60 Minutes</span>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center shadow-sm">
+                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Structure</span>
+                    <span class="block text-2xl font-bold text-purple-600">3 Passages</span>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100 mb-8 text-left shadow-sm">
+                <h3 class="font-bold text-pink-700 mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    Instructions
+                </h3>
+                <ul class="space-y-3 text-sm text-pink-800/80">
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You have exactly 60 minutes to complete all 3 parts of the test.</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> You can highlight text in both the passage and questions. The highlights will persist!</li>
+                    <li class="flex items-start gap-2"><span class="mt-1 flex-none w-1.5 h-1.5 bg-pink-400 rounded-full"></span> Upon submission, you will receive a detailed score report and explanations.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-12 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 text-lg">
+                Start Mock Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Main View -->
+    <div id="view-main" class="hidden flex-auto flex flex-col overflow-hidden bg-white relative">
+        <!-- Result Banner -->
+        <div id="result-banner" class="hidden flex-none bg-gray-900 text-white p-4 md:px-8 flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+            <div>
+                <h2 class="text-xl font-bold text-green-400">Mock Test Result</h2>
+                <p class="text-gray-400 text-sm">Review your performance and detailed explanations below.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Band Score</div>
+                    <div id="band-score-display" class="text-xl font-bold text-yellow-400">--</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Raw Score</div>
+                    <div id="score-display" class="text-xl font-bold text-purple-400">--/40</div>
+                </div>
+                <div class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 text-center">
+                    <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Time Used</div>
+                    <div id="time-taken-display" class="text-xl font-bold text-pink-400">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav id="part-tabs" class="flex-none bg-gray-50 border-b border-gray-200 px-4 md:px-8 flex gap-1 pt-2 z-10 relative"></nav>
+
+        <!-- Split View -->
+        <div class="flex-auto flex flex-col md:flex-row overflow-hidden min-h-0 bg-white">
+            <!-- Left Pane: Passage -->
+            <div id="pane-passage" class="flex-1 overflow-y-auto p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 relative">
+                <div class="max-w-3xl mx-auto">
+                    <h2 id="passage-title" class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100 italic"></h2>
+                    <!-- Cached Passages Container -->
+                    <div id="passage-content-container" class="prose prose-purple max-w-none text-gray-700 leading-relaxed space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Questions -->
+            <div id="pane-questions" class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative">
+                <div class="max-w-2xl mx-auto relative">
+                    <!-- Cached Questions Container -->
+                    <div id="questions-content-container" class="space-y-10 pb-20"></div>
+                    
+                    <div id="floating-submit-container" class="mt-12 text-center border-t border-gray-200 pt-8 hidden">
+                        <button id="btn-submit-bottom" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl transition-all w-full sm:w-auto">
+                            Submit Complete Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigator -->
+        <div id="question-navigator" class="flex-none bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between z-20 shadow-lg relative">
+            <div class="flex items-center gap-3 overflow-x-auto flex-1 pb-1 custom-scrollbar-hide" id="navigator-scroll">
+                <span class="text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-widest mr-2">Questions:</span>
+                <div id="navigator-grid" class="flex gap-2"></div>
+            </div>
+            <div id="navigator-legend" class="ml-4 pl-4 border-l border-gray-200 hidden md:flex items-center gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest"></div>
+        </div>
+    </div>
+
+    <!-- Highlight Toolbar -->
+    <div id="highlight-toolbar" class="hidden fixed z-50 bg-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.2)] border border-gray-200 rounded-lg p-1.5 flex gap-1.5 transition-opacity transform -translate-x-1/2 -translate-y-full mt-[-10px]">
+        <button class="hl-btn bg-[#fef08a] hover:bg-[#fde047] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="yellow" title="Highlight Yellow"></button>
+        <button class="hl-btn bg-[#bbf7d0] hover:bg-[#86efac] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="green" title="Highlight Green"></button>
+        <button class="hl-btn bg-[#fbcfe8] hover:bg-[#f9a8d4] w-7 h-7 rounded-md border border-gray-200 shadow-sm transition-transform hover:scale-105 active:scale-95" data-color="pink" title="Highlight Pink"></button>
+        <div class="w-[1px] bg-gray-200 mx-0.5 my-1"></div>
+        <button class="hl-btn bg-white hover:bg-gray-100 text-gray-500 hover:text-red-500 w-7 h-7 rounded-md border border-gray-200 shadow-sm flex items-center justify-center transition-all" data-color="clear" title="Remove Highlight">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </button>
+    </div>
+
+    <!-- Vocab Tooltip -->
+    <div id="vocab-tooltip" class="bg-white rounded-2xl border border-gray-200 shadow-2xl p-0 overflow-hidden">
+        <div class="bg-purple-600 px-4 py-3 text-white flex justify-between items-center">
+            <div>
+                <h4 id="tt-word" class="font-bold text-lg leading-none">Word</h4>
+                <p id="tt-pron" class="text-purple-200 text-xs font-mono mt-1 italic">/pronunciation/</p>
+            </div>
+            <button id="btn-close-tooltip" class="text-purple-200 hover:text-white rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+        </div>
+        <div class="p-5 bg-white space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tiếng Việt</span>
+                <p id="tt-vi" class="text-gray-900 font-bold text-sm"></p>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest block mb-1">Context</span>
+                <p id="tt-context" class="text-gray-600 text-sm leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="submit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 text-pink-500">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">Finish Test?</h3>
+            <p id="modal-message" class="text-center text-gray-500 mb-8 px-4 leading-relaxed"></p>
+            <div class="flex gap-4">
+                <button id="btn-cancel-submit" class="flex-1 px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors">Resume</button>
+                <button id="btn-confirm-submit" class="flex-1 px-6 py-3 rounded-2xl bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors shadow-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MOCK DATA TEMPLATE ---
+        // You will append the passage content and questions here for PET Intensive Vol 2 Test 09.
+        // Below is the template structure required by the engine.
+        const TEST_DATA = {
+            totalDurationSeconds: 3600, // 60 minutes
+            parts: [
+                {
+                    id: "part1",
+                    title: "Passage 1: Dust and the American West",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> Images of deserts in the United States show dusty, barren landscapes, but the land may not always have been this way. Ever since settlers moved west across the US there has been dust-clouds of it everywhere. It was part of the landscape, or so it seemed to them. But there were no records of the landscape of the West until the settlers arrived. Now evidence is starting to emerge which suggests that before the settlers, there was very little dust.</p>
+                        <p class="mb-4"><strong>B.</strong> The evidence comes from the San Juan mountains of southwest Colorado, downwind of Arizona and New Mexico. There Jason Neff, a geochemist from the University of Colorado, has been analyzing sediments, the sand, stones and mud, laid down over the past 5000 years. Atmospheric dust was minimal throughout those five millennia until the mid-19th century, he says, but then, '<span id="loc_p1_q1" class="highlight-target">from about 1860 to 1900, dust deposition rates shot up.</span>'</p>
+                        <p class="mb-4"><strong>C.</strong> This is surprising because usually dry means dusty, and the American West has almost always been dry-often drier than today. <span id="loc_p1_q2" class="highlight-target">There was a near-permanent drought between 900 and 1300 which was so intense that it destroyed a series of native American civilizations, including the Anasazi, whose cliff homes are now US national treasures. Yet the evidence from the San Juan lakes is that it was not dusty.</span> Even as their civilization was collapsing, the Anasazi seem to have protected their soils from erosion.</p>
+                        <p class="mb-4"><strong>D.</strong> This was not the case with the European settlers once they brought their cows. The landscape the cattle were introduced to was remarkably ill-equipped to cope with grazing animals, says Neff. '<span id="loc_p1_q3" class="highlight-target">Unlike most other parts of the US, there were few grazers in the American Southwest until the Europeans came. No bison and few antelope or deer.</span>'</p>
+                        <p class="mb-4"><strong>E.</strong> <span id="loc_p1_q4" class="highlight-target">In the Great Plains to the east and north, bison roamed in vast herds.</span> Their regular grazing had created tough grass, while the herds manured the soil. In the Southwest, the land had few defenses against a sudden invasion of millions of livestock, whose teeth stripped the grass and whose hooves punctured the hard crust of desert soils that protected them from the wind. The invasion was sudden, funded by a bubble of speculative investment, much of it from Britain. <span id="loc_p1_q5" class="highlight-target">The money went into railroads, and herds of cattle and sheep that rode the rails to the wide open pastures.</span> By 1900, when sedimentation rates peaked, there were 20 million cattle and 25 million sheep in the West.</p>
+                        <p class="mb-4"><strong>F.</strong> One of the biggest ranches was owned by the Aztec Land and Cattle Company, which owned a million acres of land by 1884. Each acre had cost the company a mere 50 cents, and <span id="loc_p1_q6" class="highlight-target">like many other speculators, it was only interested in quick profits and had little incentive to protect the soils from overgrazing.</span> By the time Aztec sold the ranch in 1901, it was barren, with cattle carcasses scattered across the exhausted land. <span id="loc_p1_q7" class="highlight-target">Such was the damage to the grasslands that even now few of the pastures have recovered.</span> The parched and exposed soil simply blew away. The 1862 Homestead Act was passed in order to encourage the populating of the West. Any family willing to make the journey was entitled to claim 160 acres and farm it. Yet by the time people moved west in large numbers, the cattle companies had taken most of the land and surrounded it with barbed wire. The water sources were therefore cut off, and were aggressively guarded. <span id="loc_p1_q8" class="highlight-target">It was only in the 1930s, with the passage of the Taylor Grazing Act, that federal authorities finally sought to limit cattle herds.</span></p>
+                        <p class="mb-4"><strong>G.</strong> Soil scientists have known for a while about the importance of the hard crust that forms on arid soils. '<span id="loc_p1_q9" class="highlight-target">These crusts can survive winds of up to a hundred miles an hour</span>, but cattle hooves break the crust,' says Jayne Belnap, a soil ecologist at the US Geographical Survey, Utah. The scale of the dust clouds created by the livestock invasion has until now been largely unknown. <span id="loc_p1_q10" class="highlight-target">When Neff first discovered dust in Colorado lake sediments</span> laid down in the 19th century, he was initially unsure where it came from. Maybe it had crossed the Pacific from China's Gobi Desert.</p>
+                        <p class="mb-4"><strong>H.</strong> <span id="loc_p1_q11" class="highlight-target">But after investigating the size and chemical composition of the dust</span>, Neff was clear that it mostly came from the American Southwest, mainly Arizona and New Mexico. Now, with the soil crusts gone, dust clouds still head north and are having significant ecological effects in the Colorado mountains. <span id="loc_p1_q12" class="highlight-target">They carry nutrients with them into areas which previously evolved and survived without them.</span> But perhaps the most dramatic impact of the dust has been on snowfields in the Rocky Mountain Range. Even a thin sprinkling of dark material means snow absorbs more solar radiation, meaning that snowmelt occurs far more rapidly during springtime. The impact on the ski tourism industry is obvious.</p>
+                        <p class="mb-4"><strong>I.</strong> <span id="loc_p1_q13" class="highlight-target">The loss of snow and the shrinking of glaciers across the American West in the past century has been dramatic.</span> Glacier National Park in Montana, for example, has lost three quarters of its snow cover since 1910. All this is frequently attributed to global warming. While this almost certainly plays a role, Neff's findings suggest that dust may also contribute.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p1_q1_7_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 1–7</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the information given in the text?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">TRUE</strong> - if the statement agrees with the information</p>
+                                        <p><strong class="text-gray-900">FALSE</strong> - if the statement contradicts the information</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if there is no information on this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q1',
+                            displayType: 'radio',
+                            text: '1. Jason Neff discovered there had been a dramatic rise in dust levels in the second half of the nineteenth century.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph B states: "...from about 1860 to 1900, dust deposition rates shot up."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q2',
+                            displayType: 'radio',
+                            text: '2. The Anasazi civilization disappeared due to the impact of dust in the atmosphere.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph C explains that a near-permanent drought "was so intense that it destroyed a series of native American civilizations, including the Anasazi... Yet the evidence from the San Juan lakes is that it was not dusty."' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q3',
+                            displayType: 'radio',
+                            text: '3. Before cattle were introduced to the American Southwest, large numbers of bison occupied the area.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph D states: "Unlike most other parts of the US, there were few grazers in the American Southwest until the Europeans came. No bison and few antelope or deer."' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q4',
+                            displayType: 'radio',
+                            text: '4. The bison population in the Great Plains diminished because European settlers found it easy to hunt them.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph E mentions bison in the Great Plains roaming in vast herds, but does not discuss European settlers hunting them.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q5',
+                            displayType: 'radio',
+                            text: '5. The development of railroads across the US was more expensive than originally expected.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'Paragraph E notes that "The money went into railroads...", but there is no mention of the costs being more expensive than expected.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q6',
+                            displayType: 'radio',
+                            text: '6. The Aztec Land and Cattle Company worked hard to take care of the grazing land it owned.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'false', text: 'FALSE', isCorrect: true, explanation: 'Paragraph F states that the company "...was only interested in quick profits and had little incentive to protect the soils from overgrazing."' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q7',
+                            displayType: 'radio',
+                            text: '7. Most of the land once owned by the Aztec Land and Cattle Company remains infertile today.',
+                            options: [
+                                { id: 'true', text: 'TRUE', isCorrect: true, explanation: 'Paragraph F confirms that the land was left barren and "Such was the damage to the grasslands that even now few of the pastures have recovered."' },
+                                { id: 'false', text: 'FALSE', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p1_q8_13_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 8–13</h3>
+                                    <p class="text-gray-700 mb-4">Complete the notes below. Choose <strong>NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p1_q8_13',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">American Southwest: 1860s to present day</strong>
+                                    
+                                    <ul class="list-disc list-inside ml-4 mb-6">
+                                        <li>1862 – American Homestead Act was passed to encourage settlement in the West.</li>
+                                        <li>1930s – Laws were passed to control the size of <strong>8</strong> <input type="text" data-qid="p1_q8" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"></li>
+                                    </ul>
+                                    
+                                    <strong class="block mb-2 text-indigo-900">Today Jayne Belnap believes:</strong>
+                                    <ul class="list-disc list-inside ml-4 mb-6">
+                                        <li>soil was not affected by high <strong>9</strong> <input type="text" data-qid="p1_q9" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30"></li>
+                                        <li>soil was seriously affected by cattle hooves.</li>
+                                    </ul>
+
+                                    <strong class="block mb-2 text-indigo-900">Jason Neff:</strong>
+                                    <ul class="list-disc list-inside ml-4">
+                                        <li>found that <strong>10</strong> <input type="text" data-qid="p1_q10" class="inline-blank w-40 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="40"> in the Colorado region contained dust</li>
+                                        <li>examined the dust for its chemical content as well as its <strong>11</strong> <input type="text" data-qid="p1_q11" class="inline-blank w-32 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30"></li>
+                                        <li>concluded that the dust was from the American Southwest</li>
+                                        <li>found that dust affects mountain environments by bringing in <strong>12</strong> <input type="text" data-qid="p1_q12" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30"> that are not normally found there causing faster seasonal snowmelt</li>
+                                        <li>argues that dust is partly to blame for the gradual disappearance of some <strong>13</strong> <input type="text" data-qid="p1_q13" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="..." maxlength="30"> and snow.</li>
+                                    </ul>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p1_q8', correct: ['cattle herds'], explanation: 'Paragraph F: "It was only in the 1930s, with the passage of the Taylor Grazing Act, that federal authorities finally sought to limit cattle herds."' },
+                                { id: 'p1_q9', correct: ['winds'], explanation: 'Paragraph G: "These crusts can survive winds of up to a hundred miles an hour, but cattle hooves break the crust..."' },
+                                { id: 'p1_q10', correct: ['lake sediments'], explanation: 'Paragraph G: "When Neff first discovered dust in Colorado lake sediments laid down in the 19th century..."' },
+                                { id: 'p1_q11', correct: ['size'], explanation: 'Paragraph H: "But after investigating the size and chemical composition of the dust..."' },
+                                { id: 'p1_q12', correct: ['nutrients'], explanation: 'Paragraph H: "They carry nutrients with them into areas which previously evolved and survived without them."' },
+                                { id: 'p1_q13', correct: ['glaciers'], explanation: 'Paragraph I: "The loss of snow and the shrinking of glaciers across the American West in the past century has been dramatic."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part2",
+                    title: "Passage 2: Urban Regeneration: an award-winning redevelopment project in Berlin",
+                    passage: `
+                        <p class="mb-4"><strong>A.</strong> <span id="loc_p2_q14" class="highlight-target">Just over a kilometer south of Berlin’s Potsdamer Platz, near the left bank of the Landwehr Canal, an extensive, triangular-shaped area of waste ground once separated the neighbourhoods of Kreuzberg to the east and Schõneberg to the west. Known as Gleisdreieck, meaning ‘triangle of rails’, it was formed by the intersection of different railway lines built in the mid-nineteenth century that entered Berlin from the south. Tracks, sheds and warehouses belonging to three old railway stations – Dresdner Bahnhof (1875-1882), Potsdamer Bahnhof (1838-1944) and Anhalter Bahnhof (1839-1952) – are situated on a raised area some twenty hectares in size, at a height of four metres above the surrounding ground level.</span></p>
+
+                        <p class="mb-4"><strong>B.</strong> <span id="loc_p2_q15" class="highlight-target">As the railway infrastructure gradually ceased to be used, the whole area of Gleisdreieck became increasingly run down and abandoned, to the point of being used as a rubbish tip after 1945. Meanwhile, vegetation took over, turning it into a surprising, natural haven in the middle of built-up areas. The closeness of the wall which divided the city of Berlin between 1961 and 1990 also contributed to the fact that Gleisdreieck was for decades clearly identified as no-man’s-land.</span> Only a station of the same name in Berlin’s underground railway system testified to its existence. Shortly before the fall of the Berlin Wall, however, <span id="loc_p2_q20_21_b" class="highlight-target">the German Museum of Technology was established there, attracting large numbers of visitors and giving visibility to the site.</span> More importantly, <span id="loc_p2_q20_21_c" class="highlight-target">the unification of the formerly divided city gave the zone more centrality</span>, at which point it became imperative to identify a purpose for it.</p>
+
+                        <p class="mb-4"><strong>C.</strong> <span id="loc_p2_q16" class="highlight-target">After 2006, the State of Berlin put forward the proposal of converting Gleisdreieck into a large urban park that would integrate the different urban zones which converged there. The decades-long isolation of the site, which had formerly presented a problem, now represented an opportunity for joining the southern area of Potsdamer Platz with Kreuzberg and Schõneberg. The creation of the park would trigger one of the biggest urban expansions inside Berlin, all within a framework of multiple uses, and social characteristics.</span> <span id="loc_p2_q22_23_a" class="highlight-target">It was necessary to stimulate the development of sixteen new hectares of local amenities that would be capable of integrating different generations and social groups in sustainable way, and in harmony with nature.</span> Following intense discussion with local proprietors and residents, <span id="loc_p2_q22_23_d" class="highlight-target">the need to reconcile these goals with the conservation of railway heritage also emerged.</span></p>
+
+                        <p class="mb-4"><strong>D.</strong> Once the area had been subjected to a process of undergrowth clearance and decontamination, it was then organized around a combination of existing and added elements. <span id="loc_p2_q17" class="highlight-target">The project as a whole was planned around a large central <span id="loc_p2_q24" class="highlight-target">meadow</span>, intersected from east to west by a concrete footpath, and from north to south by a pair of railway lines. Once a month, a train slowly travels along these lines from its parking shed to German <span id="loc_p2_q25" class="highlight-target">Museum</span> of Technology. The concrete footpath, which is a continuation of one of the main Kreuzberg boulevards, starts in the east, bridges the four-metre difference in ground level by means of a stairway, and suddenly ends in the west on reaching the underground lines.</span></p>
+
+                        <p class="mb-4"><strong>E.</strong> <span id="loc_p2_q18" class="highlight-target">North of the meadow, there is a large concrete slab with rounded edges. Being south-facing, this functions as a big sunny terrace, full of benches complete with footrests. In the south, the meadow overlooks Yorckstrasse, an underpass crossed by more than fifteen former railway bridges. To the east of the meadow there is quite a dense forest of pre-existing maples, oaks and birches, as well as newly planted tree of the same species. In this area, a couple of large metal frames each hold two swings. <span id="loc_p2_q26" class="highlight-target">The edges of the park are finished with a collection of distinctive, functional spaces, for example a nursery, sports fields</span>, concave surfaces for skateboards, stages for dancing, community gardens, or simply areas covered in gravel obtained from the site itself.</span></p>
+
+                        <p class="mb-4"><strong>F.</strong> Although initially the regeneration of Gleisdreieck Park was the subject of disagreement between those who were in favour of safeguarding the railway heritage, and those who wanted to regenerate the adjacent neighbourhoods, it was opened to the public in September 2011. <span id="loc_p2_q19" class="highlight-target">The heart of Berlin now has a new green lung, in which the atmosphere of various small, very different corners fits neatly into a large-scale, wide-ranging and robust general order. This has been possible precisely because the intervention was not limited to conserving industrial remains in order to promote railway history.</span> And as a reminder of the six decades of human absence, during which nature took over, the park has been able to conserve to some extent the spirit of the non-place that preceded it.</p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p2_q14_19_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 14–19</h3>
+                                    <p class="text-gray-700">Reading Passage 2 has six paragraphs.</p>
+                                    <p class="text-gray-700 mt-2">Choose the correct heading for each paragraph from the list of headings below.</p>
+                                    <p class="text-gray-700 mt-2">Drag and drop the correct heading into the corresponding box.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q14_19',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Headings',
+                            isReusable: false,
+                            pool: [
+                                { id: 'i', text: 'i. Objectives of the regeneration project' },
+                                { id: 'ii', text: 'ii. Architectural details of the station buildings' },
+                                { id: 'iii', text: 'iii. Features and facilities of the completed development' },
+                                { id: 'iv', text: 'iv. The remains of a railway system' },
+                                { id: 'v', text: 'v. A positive evaluation of the finished project' },
+                                { id: 'vi', text: 'vi. Away of controlling development costs' },
+                                { id: 'vii', text: 'vii. Ways of crossing the site' },
+                                { id: 'viii', text: 'viii. Reasons why the area had become neglected' }
+                            ],
+                            questions: [
+                                { id: 'p2_q14', text: '14. Paragraph A', correct: 'iv', explanation: 'Paragraph A describes the intersection of railway lines, tracks, sheds, and warehouses belonging to three old railway stations.' },
+                                { id: 'p2_q15', text: '15. Paragraph B', correct: 'viii', explanation: 'Paragraph B explains that the railway infrastructure ceased to be used, turning it into a rubbish tip, and the Berlin Wall made it a no-man’s-land, causing its neglect.' },
+                                { id: 'p2_q16', text: '16. Paragraph C', correct: 'i', explanation: 'Paragraph C details the proposal and goals for the park: integrating urban zones, stimulating development for different generations, and conserving heritage.' },
+                                { id: 'p2_q17', text: '17. Paragraph D', correct: 'vii', explanation: 'Paragraph D describes how the park is intersected by a concrete footpath and railway lines, detailing how a train travels and how the path bridges ground levels (ways of crossing).' },
+                                { id: 'p2_q18', text: '18. Paragraph E', correct: 'iii', explanation: 'Paragraph E lists the finished features: sunny terrace, benches, underpass, dense forest, swings, nursery, sports fields, etc.' },
+                                { id: 'p2_q19', text: '19. Paragraph F', correct: 'v', explanation: 'Paragraph F offers a positive conclusion, stating the heart of Berlin has a new "green lung" that fits neatly into a "robust general order."' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q20_21_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 20–21</h3>
+                                    <p class="text-gray-700">Choose <strong>TWO</strong> correct answers.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q20_21',
+                            displayType: 'checkbox_group',
+                            text: 'Which TWO reasons are given for the choice of Gleisdreieck as a site for a park?',
+                            options: [
+                                { id: 'A', text: 'A. It was a habitat for some rare wildlife species.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. It contained a particular tourist attraction.', isCorrect: true, explanation: 'Paragraph B: "...the German Museum of Technology was established there, attracting large numbers of visitors and giving visibility to the site."' },
+                                { id: 'C', text: 'C. It lay at the heart of the reunited city.', isCorrect: true, explanation: 'Paragraph B: "More importantly, the unification of the formerly divided city gave the zone more centrality..."' },
+                                { id: 'D', text: 'D. It was served by a major rail network.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'E', text: 'E. It contained buildings which could be easily converted.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q22_23_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 22–23</h3>
+                                    <p class="text-gray-700">Choose <strong>TWO</strong> correct answers.</p>
+                                    <p class="text-gray-700 mt-2">The list below identifies some of the possible aims of urban redevelopment projects.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q22_23',
+                            displayType: 'checkbox_group',
+                            text: 'Which TWO things did the State of Berlin hope to achieve with the Gleisdreieck development?',
+                            options: [
+                                { id: 'A', text: 'A. to bring people of different ages together', isCorrect: true, explanation: 'Paragraph C states an objective was: "...integrating different generations and social groups in sustainable way..."' },
+                                { id: 'B', text: 'B. to encourage tourism', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. to improve transport links', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. to preserve industrial remains', isCorrect: true, explanation: 'Paragraph C states: "...the need to reconcile these goals with the conservation of railway heritage also emerged."' },
+                                { id: 'E', text: 'E. to generate income for the city', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p2_q24_26_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 24–26</h3>
+                                    <p class="text-gray-700 mb-4">Complete the summary below. Write <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p2_q24_26',
+                            displayType: 'inline_blanks',
+                            html: `
+                                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl shadow-sm text-gray-800 leading-9 text-base space-y-3">
+                                    <strong class="block mb-4 text-indigo-900 text-lg text-center border-b border-indigo-200 pb-2">Gleisdreieck Urban Park</strong>
+                                    <div>
+                                        In the middle of the new park is a 
+                                        <strong>24</strong> <input type="text" data-qid="p2_q24" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40">, 
+                                        where there is a path for pedestrians and two railway lines. A slow train uses these lines to make a regular journey between its based and a 
+                                        <strong>25</strong> <input type="text" data-qid="p2_q25" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40">. 
+                                        Benches have been provided on the north side, so that people can relax and enjoy the sunshine, and to the east is an area with mature trees of various kinds, as well as sets of swings. A range of sports and leisure areas are situated around the 
+                                        <strong>26</strong> <input type="text" data-qid="p2_q26" class="inline-blank w-36 mx-1 px-2 py-0.5 border-b-2 border-gray-400 bg-white text-center focus:outline-none focus:border-pink-500 font-bold text-indigo-900 transition-colors shadow-sm rounded-t-md" placeholder="ONE WORD" maxlength="40"> 
+                                        of the site.
+                                    </div>
+                                </div>
+                            `,
+                            blanks: [
+                                { id: 'p2_q24', correct: ['meadow', 'central meadow'], explanation: 'Paragraph D: "The project as a whole was planned around a large central meadow, intersected from east to west by a concrete footpath, and from north to south by a pair of railway lines."' },
+                                { id: 'p2_q25', correct: ['Museum', 'museum'], explanation: 'Paragraph D: "Once a month, a train slowly travels along these lines from its parking shed to German Museum of Technology."' },
+                                { id: 'p2_q26', correct: ['edges', 'edge'], explanation: 'Paragraph E: "The edges of the park are finished with a collection of distinctive, functional spaces, for example a nursery, sports fields..."' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "part3",
+                    title: "Passage 3: The fluoridation controversy",
+                    passage: `
+                        <p class="mb-4">
+                            The long-standing debate about whether to fluoridate our drinking water continues. Fluoridation is the addition of fluorine to public water supplies with the aim of reducing tooth decay. <span id="loc_p3_q27" class="highlight-target">The fluorine, when mixed with water, becomes fluoride and the desired concentration of fluoride in public water is approximately one part per million, depending on the regional temperature and hence the amount of water people are likely to drink.</span> Many studies, such as those by McClure in 1970 through to Burt in 1983, have shown that when children drink fluoridated water, their average rate of tooth decay seems greatly reduced. A typical figure claimed is 50 percent reduction. This apparently enormous benefit for children's teeth is the major argument in favor of fluoridation.
+                        </p>
+                        <p class="mb-4">
+                            Three main grounds for opposition to fluoridation have been expressed. First, opponents claim the benefits are exaggerated or not established. Second, there are claims of health risks to parts of the population, for example, allergic reactions. It is also accepted that high levels of fluoride can cause discoloration of otherwise healthy teeth. Proponents do not consider this to be a problem in such small concentrations, whereas opponents disagree - especially because some people drink more water and obtain much more than the standard milligram of fluoride per day. <span id="loc_p3_q28" class="highlight-target">Third, fluoridation is thought to be an infringement on individual rights because it is compulsory medication of all members of a community.</span>
+                        </p>
+                        <p class="mb-4">
+                            An understanding of the fluoridation issue has important implications. If, according to the experts, fluoridation is unquestionably a beneficial and non-hazardous measure, then the wisdom of allowing the public to vote on, and reject it must be questioned.
+                        </p>
+                        <p class="mb-4">
+                            Almost all studies that have been done have assumed that the scientific aspects of the controversy are unproblematic, and they have excluded science from sociological examination. <span id="loc_p3_q36" class="highlight-target">The traditional view is that science is a special kind of knowledge, which is established through scientific methods and objectively applied by members of a scientific community.</span> <span id="loc_p3_q37" class="highlight-target">However, in recent years there has been a major challenge to this picture by a sociology of science that shows how scientific knowledge is socially negotiated, and inevitably linked to the values of the relevant parties, both scientists and nonscientists.</span> These challengers do not see scientific knowledge as exempt from social inquiry.
+                        </p>
+                        <p class="mb-4">
+                            Kuhn (1970) argued that scientific knowledge does not always develop as an orderly process, but is characterized by periodic revolutions, in which the methods of study and the assessment criteria change in a fragmented way. <span id="loc_p3_q29" class="highlight-target">According to Kuhn, the shift from one scientific way of thinking to another is not made solely on the basis of clear rules of formal scientific practice, but can include social factors</span>, though Kuhn has never developed a full analysis of what these might be. <span id="loc_p3_q38" class="highlight-target">Collins (1975) took this concept further when he asserted that the outcome of experiments was not something whose meaning could be immediately comprehended, but rather something for interpretation</span>, discussion between scientists, and reinterpretation in the light of other experiments.
+                        </p>
+                        <p class="mb-4">
+                            <span id="loc_p3_q32" class="highlight-target">One interpretation of this analysis of science is that traditional distinctions between facts and theories, and between scientific knowledge and values, can no longer be justified.</span> Because social processes are involved at all stages of the creation, evaluation, and establishing of scientific knowledge, social values may also be involved.
+                        </p>
+                        <p class="mb-4">
+                            <span id="loc_p3_q33" class="highlight-target">In the same way as many scientists who study fluoridation have overlooked social values, sociologists have also downplayed an important part of the debate by ignoring the number of eminent scientists who have questioned aspects of fluoridation.</span> <span id="loc_p3_q30" class="highlight-target">An example is the study by Sutton in 1960, which analyzed the classic North American studies of the effect of fluoridation on tooth decay, and found that each showed significant methodological shortcomings.</span> Sutton's detailed study throws doubt as to the extent of reductions in tooth decay from fluoridation. <span id="loc_p3_q34" class="highlight-target">Yet Sutton's book is not cited in a single analysis of the fluoridation issue by any sociologist.</span>
+                        </p>
+                        <p class="mb-4">
+                            In a situation of some scientific uncertainty, differences in values are highlighted. A supporter of fluoridation might argue: 'The evidence for the benefits of fluoridation is quite substantial, while the evidence for harm is limited and dubious. <span id="loc_p3_q39" class="highlight-target">I think the likely benefits outweigh the possible dangers; hence I support fluoridation because it is the cheapest and easiest way to make sure every child reaps the benefits.</span>' An opponent might argue, 'Though the evidence for the benefits of fluoridation is substantial, there is some doubt about it. Since fluoridation is not necessary for good teeth, we should forego the benefits if there is some slight chance of harm. Some scientists claim that a small percentage of the population could be harmed by fluoride. <span id="loc_p3_q40" class="highlight-target">Therefore, I oppose fluoridation of water supplies and favor the voluntary use of fluoride tablets by those who want to take them.</span>'
+                        </p>
+                        <p class="mb-4">
+                            <span id="loc_p3_q35" class="highlight-target">Both arguments consider the scientific evidence concerning fluoridation, but differ in their assessments of the social benefits and costs. This difference is not between rationality and irrationality but is a legitimate difference in values</span>, for example, the positive value placed on good teeth, the negative value placed on possible health risks, and the social benefits or costs of compulsory or voluntary intake of fluorides.
+                        </p>
+                        <p class="mb-4">
+                            From the sociological point of view, opposition to fluoridation is not necessarily irrational. Rather, claims to rationality and to scientific authority are better seen as part of a strategy to promote fluoridation than as incontrovertible statements of fact. <span id="loc_p3_q31" class="highlight-target">Second, social values are likely to be bound up in any decision about fluoridation, so this is not an issue on which declarations by scientific experts ought to be considered the final word.</span>
+                        </p>
+                    `,
+                    questions: [
+                        {
+                            id: 'p3_q27_31_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 27–31</h3>
+                                    <p class="text-gray-700">Choose the correct answer, <strong>A, B, C or D</strong>.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q27',
+                            displayType: 'radio',
+                            text: '27. The optimum amount of fluorine in fluoridated water is calculated partly according to',
+                            options: [
+                                { id: 'A', text: 'A. how hot the area is.', isCorrect: true, explanation: 'Paragraph 1 states: "...the desired concentration of fluoride in public water is approximately one part per million, depending on the regional temperature..."' },
+                                { id: 'B', text: 'B. how warm the water is.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. how many dental problems there are in the community.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. how much fluorine the community chooses to have in its water.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q28',
+                            displayType: 'radio',
+                            text: '28. One reason given by the writer for opposing fluoridation is that',
+                            options: [
+                                { id: 'A', text: 'A. it may contribute to tooth decay', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. it will be unacceptably expensive for the public.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. obligatory fluoridation takes away personal freedom.', isCorrect: true, explanation: 'Paragraph 2 states: "Third, fluoridation is thought to be an infringement on individual rights because it is compulsory medication of all members of a community."' },
+                                { id: 'D', text: 'D. excessive fluoride could be added to the water by mistake.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q29',
+                            displayType: 'radio',
+                            text: '29. The writer mentions Kuhn in order to',
+                            options: [
+                                { id: 'A', text: 'A. provide a contrast with the view of Collins.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. support the rational nature of scientific inquiry.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. demonstrate that Kuhn did not argue his case adequately.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. show that science can be influenced by non-scientific considerations', isCorrect: true, explanation: 'Paragraph 5 mentions Kuhn to show that: "...the shift from one scientific way of thinking to another is not made solely on the basis of clear rules of formal scientific practice, but can include social factors..."' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q30',
+                            displayType: 'radio',
+                            text: '30. What did Sutton\'s research discover about earlier studies in North America?',
+                            options: [
+                                { id: 'A', text: 'A. There were failings in the way they were carried out.', isCorrect: true, explanation: 'Paragraph 7 states that Sutton "analyzed the classic North American studies... and found that each showed significant methodological shortcomings."' },
+                                { id: 'B', text: 'B. The scientists involved had achieved unique results.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'C', text: 'C. Proponents of fluoridation had not understood its long-term effects.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. Fluoridation had a greater effect on tooth decay than previously believed.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q31',
+                            displayType: 'radio',
+                            text: '31. In the last paragraph, what does the writer say about scientists?',
+                            options: [
+                                { id: 'A', text: 'A. They should reveal their true motivations.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'B', text: 'B. They should not decide the fluoridation policy.', isCorrect: true, explanation: 'Paragraph 10 states: "...social values are likely to be bound up in any decision about fluoridation, so this is not an issue on which declarations by scientific experts ought to be considered the final word."' },
+                                { id: 'C', text: 'C. They are solely concerned with scientific truths.', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'D', text: 'D. They cannot reach agreement on the fluoridation issue.', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q32_35_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 32–35</h3>
+                                    <p class="text-gray-700">Do the following statements agree with the claims of the writer?</p>
+                                    <div class="mt-4 space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <p><strong class="text-gray-900">YES</strong> - if the statement agrees with the claims of the writer</p>
+                                        <p><strong class="text-gray-900">NO</strong> - if the statement contradicts the claims of the writer</p>
+                                        <p><strong class="text-gray-900">NOT GIVEN</strong> - if it is impossible to say what the writer thinks about this</p>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q32',
+                            displayType: 'radio',
+                            text: '32. Scientific knowledge should be kept separate from social values.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'no', text: 'NO', isCorrect: true, explanation: 'Paragraph 6 states: "One interpretation of this analysis of science is that traditional distinctions between facts and theories, and between scientific knowledge and values, can no longer be justified."' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q33',
+                            displayType: 'radio',
+                            text: '33. Many sociologists have disregarded the doubts that some scientists have concerning fluoridation.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: true, explanation: 'Paragraph 7 states: "...sociologists have also downplayed an important part of the debate by ignoring the number of eminent scientists who have questioned aspects of fluoridation."' },
+                                { id: 'no', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q34',
+                            displayType: 'radio',
+                            text: '34. Sutton\'s findings have been given insufficient attention by scientists outside of North America.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'no', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: true, explanation: 'The text notes that Sutton\'s book is not cited by sociologists, but it does not specify whether scientists *outside of North America* gave his findings insufficient attention.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q35',
+                            displayType: 'radio',
+                            text: '35. There are valid arguments on both sides of the fluoridation debate.',
+                            options: [
+                                { id: 'yes', text: 'YES', isCorrect: true, explanation: 'Paragraph 9 states: "Both arguments consider the scientific evidence... This difference is not between rationality and irrationality but is a legitimate difference in values..."' },
+                                { id: 'no', text: 'NO', isCorrect: false, explanation: 'Incorrect.' },
+                                { id: 'not_given', text: 'NOT GIVEN', isCorrect: false, explanation: 'Incorrect.' }
+                            ]
+                        },
+                        {
+                            id: 'p3_q36_40_instr',
+                            displayType: 'instruction',
+                            instructionBox: `
+                                <div class="mb-6 mt-12 pt-10 border-t border-gray-200">
+                                    <h3 class="font-bold text-lg text-gray-900 mb-2">Questions 36–40</h3>
+                                    <p class="text-gray-700">Complete each sentence with the correct ending, <strong>A-G</strong>, below.</p>
+                                    <p class="text-gray-700 mt-2">Drag and drop the correct ending into the corresponding box.</p>
+                                </div>
+                            `
+                        },
+                        {
+                            id: 'p3_q36_40',
+                            displayType: 'drag_drop',
+                            poolLabel: 'List of Endings',
+                            isReusable: false,
+                            pool: [
+                                { id: 'A', text: 'A. The results of scientific research are not always understood at first' },
+                                { id: 'B', text: 'B. It is impossible to say what the writer thinks about this' },
+                                { id: 'C', text: 'C. People should be able to choose whether they want fluoride' },
+                                { id: 'D', text: 'D. There is insufficient proof to support a cautious approach' },
+                                { id: 'E', text: 'E. The serious damage fluoride causes far outweighs any positive effects' },
+                                { id: 'F', text: 'F. Children are not the only ones who benefit from fluoridation' },
+                                { id: 'G', text: 'G. Scientific knowledge is affected by the beliefs of everyone concerned' }
+                            ],
+                            questions: [
+                                { id: 'p3_q36', text: '36. The traditional view of science is that', correct: 'B', explanation: 'No precise match among the provided options describes the traditional view (which claims science is objective and free of values). Therefore, B is selected as a placeholder based on the provided list.' },
+                                { id: 'p3_q37', text: '37. A sociological view of science argues that', correct: 'G', explanation: 'Paragraph 4 states that the sociology of science shows how scientific knowledge is "socially negotiated, and inevitably linked to the values of the relevant parties, both scientists and nonscientists."' },
+                                { id: 'p3_q38', text: '38. Collins is of the opinion that', correct: 'A', explanation: 'Paragraph 5 states that Collins asserted "the outcome of experiments was not something whose meaning could be immediately comprehended, but rather something for interpretation..."' },
+                                { id: 'p3_q39', text: '39. The writer suggests that a supporter of fluoridation may conclude that', correct: 'D', explanation: 'Paragraph 8 quotes a supporter saying: "The evidence for the benefits of fluoridation is quite substantial, while the evidence for harm is limited and dubious. I think the likely benefits outweigh the possible dangers..."' },
+                                { id: 'p3_q40', text: '40. The writer suggests that an opponent of fluoridation may conclude that', correct: 'C', explanation: 'Paragraph 8 quotes an opponent saying: "Therefore, I oppose fluoridation of water supplies and favor the voluntary use of fluoride tablets by those who want to take them."' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. ENGINE ARCHITECTURE & STATE ---
+        let state = {
+            mode: 'START',
+            currentPart: 0,
+            timeRemaining: TEST_DATA.totalDurationSeconds,
+            timerInterval: null,
+            answers: {}, 
+            questionsList: [], 
+            activeDragItem: null,
+            cachedPanes: {},
+            activeHighlightMark: null
+        };
+
+        const DOM = {
+            views: { start: document.getElementById('view-start'), main: document.getElementById('view-main') },
+            header: { actions: document.getElementById('test-header-actions'), timer: document.getElementById('timer-display'), btnSubmit: document.getElementById('btn-submit-header') },
+            result: { banner: document.getElementById('result-banner'), score: document.getElementById('score-display'), time: document.getElementById('time-taken-display'), band: document.getElementById('band-score-display') },
+            navigator: { tabs: document.getElementById('part-tabs'), grid: document.getElementById('navigator-grid'), legend: document.getElementById('navigator-legend') },
+            panes: { title: document.getElementById('passage-title'), pContainer: document.getElementById('passage-content-container'), qContainer: document.getElementById('questions-content-container'), floatingSubmit: document.getElementById('floating-submit-container'), btnSubmitBottom: document.getElementById('btn-submit-bottom') },
+            tooltip: { container: document.getElementById('vocab-tooltip'), word: document.getElementById('tt-word'), pron: document.getElementById('tt-pron'), vi: document.getElementById('tt-vi'), context: document.getElementById('tt-context'), btnClose: document.getElementById('btn-close-tooltip') },
+            modal: { container: document.getElementById('submit-modal'), message: document.getElementById('modal-message'), btnCancel: document.getElementById('btn-cancel-submit'), btnConfirm: document.getElementById('btn-confirm-submit') },
+            highlightTb: document.getElementById('highlight-toolbar')
+        };
+
+        function init() {
+            let absNum = 1;
+            TEST_DATA.parts.forEach((part, pIdx) => {
+                part.questions.forEach(q => {
+                    if (q.displayType === 'drag_drop') {
+                        if (q.html) {
+                            q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop_inline', isCorrect: subQ.correct, parentId: q.id }));
+                        } else {
+                            q.questions.forEach(subQ => state.questionsList.push({ partIndex: pIdx, qId: subQ.id, absNum: absNum++, displayType: 'drag_drop', isCorrect: subQ.correct, parentId: q.id }));
+                        }
+                    } else if (q.displayType === 'checkbox_group') {
+                        q.options.forEach(opt => {
+                            if (opt.isCorrect) {
+                                state.questionsList.push({ partIndex: pIdx, qId: `${q.id}_${opt.id}`, absNum: absNum++, displayType: 'checkbox', isCorrect: true, parentId: q.id });
+                            }
+                        });
+                    } else if (q.displayType === 'inline_blanks') {
+                        q.blanks.forEach(b => state.questionsList.push({ partIndex: pIdx, qId: b.id, absNum: absNum++, displayType: 'inline_blank', isCorrect: b.correct, parentId: q.id }));
+                    } else if (q.displayType !== 'instruction') {
+                        state.questionsList.push({ partIndex: pIdx, qId: q.id, absNum: absNum++, displayType: q.displayType, isCorrect: q.options?.find(o => o.isCorrect)?.id });
+                    }
+                });
+            });
+
+            document.getElementById('btn-start').addEventListener('click', startTest);
+            DOM.header.btnSubmit.addEventListener('click', showSubmitModal);
+            DOM.panes.btnSubmitBottom.addEventListener('click', showSubmitModal);
+            DOM.modal.btnCancel.addEventListener('click', () => DOM.modal.container.classList.add('hidden'));
+            DOM.modal.btnConfirm.addEventListener('click', finishTest);
+            DOM.tooltip.btnClose.addEventListener('click', hideTooltip);
+
+            document.addEventListener('mousedown', (e) => {
+                if (!DOM.tooltip.container.contains(e.target) && !e.target.classList.contains('vocab-word')) hideTooltip();
+                
+                if (state.mode === 'TEST' && state.activeDragItem && !e.target.closest('.pool-item') && !e.target.closest('.drop-zone')) {
+                    state.activeDragItem = null;
+                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                }
+            });
+
+            initHighlightEngine();
+        }
+
+        function initHighlightEngine() {
+            document.querySelectorAll('.hl-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const color = btn.dataset.color;
+                    
+                    if (state.activeHighlightMark) {
+                        if (color === 'clear') {
+                            const parent = state.activeHighlightMark.parentNode;
+                            while (state.activeHighlightMark.firstChild) {
+                                parent.insertBefore(state.activeHighlightMark.firstChild, state.activeHighlightMark);
+                            }
+                            parent.removeChild(state.activeHighlightMark);
+                        } else {
+                            state.activeHighlightMark.className = `user-hl user-hl-${color}`;
+                        }
+                        hideToolbar();
+                    } else {
+                        applyHighlightToSelection(color);
+                    }
+                });
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (e.target.closest('#highlight-toolbar')) return; 
+                
+                if (e.target.classList.contains('user-hl')) {
+                    state.activeHighlightMark = e.target;
+                    positionToolbar(e.target.getBoundingClientRect());
+                    return;
+                }
+
+                const sel = window.getSelection();
+                if (!sel.isCollapsed && sel.rangeCount > 0) {
+                    const range = sel.getRangeAt(0);
+                    let valid = false;
+                    let node = range.commonAncestorContainer;
+                    if (node.nodeType === 3) node = node.parentNode;
+                    
+                    if (node && node.closest('.highlightable-area')) valid = true;
+                    
+                    if (valid) {
+                        state.activeHighlightMark = null; 
+                        positionToolbar(range.getBoundingClientRect());
+                    } else {
+                        hideToolbar();
+                    }
+                } else {
+                    hideToolbar();
+                }
+            });
+
+            document.getElementById('pane-passage').addEventListener('scroll', hideToolbar);
+            document.getElementById('pane-questions').addEventListener('scroll', hideToolbar);
+        }
+
+        function positionToolbar(rect) {
+            const tb = DOM.highlightTb;
+            tb.style.top = `${rect.top - 10}px`;
+            tb.style.left = `${rect.left + (rect.width / 2)}px`;
+            tb.classList.remove('hidden');
+        }
+
+        function hideToolbar() {
+            DOM.highlightTb.classList.add('hidden');
+            state.activeHighlightMark = null;
+        }
+
+        function applyHighlightToSelection(color) {
+            if (color === 'clear') {
+                window.getSelection().removeAllRanges();
+                hideToolbar();
+                return;
+            }
+            const sel = window.getSelection();
+            if (sel.isCollapsed) return;
+            const range = sel.getRangeAt(0);
+            
+            const walker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
+                acceptNode: function(node) {
+                    return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            }, false);
+
+            const nodesToWrap = [];
+            let currentNode = walker.currentNode;
+            while (currentNode) {
+                if (currentNode.nodeType === Node.TEXT_NODE && currentNode.nodeValue.trim().length > 0) nodesToWrap.push(currentNode);
+                currentNode = walker.nextNode();
+            }
+
+            if(nodesToWrap.length > 0) {
+                 try {
+                     const mark = document.createElement('mark');
+                     mark.className = `user-hl user-hl-${color}`;
+                     range.surroundContents(mark);
+                 } catch (e) {
+                     try {
+                        const mark = document.createElement('mark');
+                        mark.className = `user-hl user-hl-${color}`;
+                        mark.appendChild(range.extractContents());
+                        range.insertNode(mark);
+                     } catch(err) {
+                         console.warn("Could not highlight complex selection");
+                     }
+                 }
+            }
+            sel.removeAllRanges();
+            hideToolbar();
+        }
+
+        function startTest() {
+            state.mode = 'TEST';
+            DOM.views.start.classList.add('hidden');
+            DOM.views.main.classList.remove('hidden');
+            DOM.header.actions.classList.remove('hidden');
+            DOM.header.actions.classList.add('flex');
+            
+            if (TEST_DATA.parts && TEST_DATA.parts.length > 0) {
+                renderTabs(); 
+                loadPart(0); 
+                updateNavigator();
+            } else {
+                DOM.panes.title.textContent = "Passage Content Pending...";
+                DOM.panes.pContainer.innerHTML = "<p class='text-gray-500 italic'>Please append the passage content and questions to TEST_DATA to begin.</p>";
+            }
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) { finishTest(); return; }
+            state.timeRemaining--;
+            DOM.header.timer.textContent = formatTime(state.timeRemaining);
+            if (state.timeRemaining < 300) DOM.header.timer.classList.add('text-red-500');
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function renderTabs() {
+            DOM.navigator.tabs.innerHTML = '';
+            TEST_DATA.parts.forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-t-xl transition-all border border-b-0 ${idx === state.currentPart ? 'bg-white text-purple-600 border-gray-200 z-10 -mb-[1px]' : 'bg-gray-100 text-gray-400 border-transparent hover:bg-gray-200'}`;
+                btn.textContent = `Part ${idx + 1}`;
+                btn.onclick = () => loadPart(idx);
+                DOM.navigator.tabs.appendChild(btn);
+            });
+        }
+
+        function handleVocabClick(e) {
+            if(state.mode !== 'RESULT') return;
+            const d = e.currentTarget.dataset;
+            DOM.tooltip.word.textContent = d.en; 
+            DOM.tooltip.pron.textContent = d.pron; 
+            DOM.tooltip.vi.textContent = d.vi; 
+            DOM.tooltip.context.textContent = d.context;
+            const r = e.currentTarget.getBoundingClientRect();
+            DOM.tooltip.container.style.top = `${r.bottom + 10}px`; 
+            DOM.tooltip.container.style.left = `${Math.min(r.left, window.innerWidth - 320)}px`;
+            DOM.tooltip.container.classList.add('visible');
+        }
+
+        function loadPart(idx) {
+            if (!TEST_DATA.parts || TEST_DATA.parts.length === 0) return;
+            state.currentPart = idx;
+            renderTabs();
+            
+            const data = TEST_DATA.parts[idx];
+            DOM.panes.title.textContent = data.title;
+
+            if (!state.cachedPanes[idx]) {
+                state.cachedPanes[idx] = buildPartDOM(idx);
+                DOM.panes.pContainer.appendChild(state.cachedPanes[idx].passage);
+                DOM.panes.qContainer.appendChild(state.cachedPanes[idx].questions);
+            }
+
+            Array.from(DOM.panes.pContainer.children).forEach(el => el.style.display = 'none');
+            Array.from(DOM.panes.qContainer.children).forEach(el => el.style.display = 'none');
+            
+            state.cachedPanes[idx].passage.style.display = 'block';
+            state.cachedPanes[idx].questions.style.display = 'block';
+
+            document.getElementById('pane-passage').scrollTop = 0;
+            document.getElementById('pane-questions').scrollTop = 0;
+            
+            updateNavigator();
+        }
+
+        function buildPartDOM(idx) {
+            const data = TEST_DATA.parts[idx];
+            
+            const passageWrapper = document.createElement('div');
+            passageWrapper.className = 'highlightable-area';
+            passageWrapper.innerHTML = data.passage;
+            passageWrapper.querySelectorAll('.vocab-word').forEach(word => {
+                word.addEventListener('click', handleVocabClick);
+            });
+
+            const questionsWrapper = document.createElement('div');
+            questionsWrapper.className = 'highlightable-area';
+
+            data.questions.forEach((q, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.id = `container_${q.id}`;
+                qDiv.className = q.displayType === 'instruction' ? '' : 'bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm transition-all mb-8';
+
+                if (q.instructionBox) {
+                    const instr = document.createElement('div');
+                    instr.innerHTML = q.instructionBox;
+                    qDiv.appendChild(instr);
+                }
+
+                // -> Drag and Drop Builder
+                if (q.displayType === 'drag_drop') {
+                    const wrapper = document.createElement('div');
+                    const pool = document.createElement('div');
+                    pool.className = 'bg-gray-50 border border-gray-300 p-5 rounded-xl shadow-sm mb-6';
+                    pool.innerHTML = `<h4 class="font-bold text-center mb-4 text-gray-800 uppercase tracking-wide text-[10px]">${q.poolLabel}</h4>`;
+                    const poolGrid = document.createElement('div');
+                    poolGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+                    pool.appendChild(poolGrid);
+                    wrapper.appendChild(pool);
+
+                    // Local Pool Refresher
+                    const refreshPool = () => {
+                        const used = q.isReusable ? [] : q.questions.map(sq => state.answers[sq.id]).filter(Boolean);
+                        poolGrid.innerHTML = '';
+                        q.pool.forEach(item => {
+                            const isUsed = !q.isReusable && used.includes(item.id);
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = `pool-item p-3 bg-white border border-gray-200 rounded-xl transition-all text-xs font-medium shadow-sm ${isUsed ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-pink-300 hover:bg-pink-50'}`;
+                            itemDiv.textContent = item.text;
+                            
+                            if (state.mode === 'TEST' && !isUsed) {
+                                itemDiv.setAttribute('draggable', 'true');
+                                itemDiv.ondragstart = (e) => {
+                                    e.dataTransfer.setData('text/plain', item.id);
+                                    state.activeDragItem = item.id;
+                                };
+                                itemDiv.onclick = () => {
+                                    document.querySelectorAll('.pool-item-active').forEach(el => el.classList.remove('pool-item-active', 'ring-2', 'ring-pink-500'));
+                                    state.activeDragItem = item.id;
+                                    itemDiv.classList.add('pool-item-active', 'ring-2', 'ring-pink-500');
+                                };
+                            }
+                            poolGrid.appendChild(itemDiv);
+                        });
+                    };
+                    refreshPool();
+                    
+                    if (q.html) {
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = q.html;
+                        
+                        q.questions.forEach(subQ => {
+                            const drop = wrap.querySelector('#drop_' + subQ.id);
+                            if(drop) {
+                                const refreshDrop = () => {
+                                    const currentAnsId = state.answers[subQ.id];
+                                    const currentAns = q.pool.find(p => p.id === currentAnsId);
+                                    
+                                    drop.className = 'drop-zone inline-flex items-center justify-center min-w-[120px] min-h-[34px] border-2 rounded-lg px-3 py-1 mx-1 text-sm font-bold align-middle transition-all ' + (state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-300' : '');
+                                    
+                                    if (currentAns) {
+                                        drop.classList.remove('border-dashed', 'border-gray-300', 'bg-gray-50', 'text-gray-400');
+                                        drop.classList.add('border-solid', 'bg-white', 'text-pink-600', 'border-pink-300', 'shadow-sm');
+                                        drop.textContent = currentAns.text;
+                                        if (state.mode === 'TEST') {
+                                            drop.onclick = (e) => { e.stopPropagation(); delete state.answers[subQ.id]; refreshDrop(); refreshPool(); updateNavigator(); };
+                                        }
+                                    } else {
+                                        drop.classList.add('border-dashed', 'border-gray-300', 'bg-gray-50', 'text-gray-400');
+                                        drop.classList.remove('border-solid', 'bg-white', 'text-pink-600', 'border-pink-300', 'shadow-sm');
+                                        drop.innerHTML = '<span class="opacity-50">Drop here</span>';
+                                        if (state.mode === 'TEST') {
+                                            drop.onclick = () => { if (state.activeDragItem) { state.answers[subQ.id] = state.activeDragItem; state.activeDragItem = null; refreshDrop(); refreshPool(); updateNavigator(); } };
+                                        }
+                                    }
+
+                                    if (state.mode === 'TEST') {
+                                        drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('bg-pink-50', 'border-pink-400'); };
+                                        drop.ondragleave = (e) => { drop.classList.remove('bg-pink-50', 'border-pink-400'); };
+                                        drop.ondrop = (e) => {
+                                            e.preventDefault(); drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                            const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                            if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                                state.answers[subQ.id] = draggedId; state.activeDragItem = null; refreshDrop(); refreshPool(); updateNavigator();
+                                            }
+                                        };
+                                    }
+                                };
+                                refreshDrop();
+                            }
+                        });
+                        wrapper.appendChild(wrap);
+
+                        const expContainer = document.createElement('div');
+                        expContainer.className = 'mt-8 space-y-3 result-element';
+                        q.questions.forEach(subQ => {
+                            const exp = document.createElement('div');
+                            exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            const absNum = state.questionsList.find(x => x.qId === subQ.id)?.absNum || '';
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${correctItem ? correctItem.text : subQ.correct}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-3 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                </div>
+                            `;
+                            expContainer.appendChild(exp);
+                        });
+                        wrapper.appendChild(expContainer);
+                    } else {
+                        const qList = document.createElement('div');
+                        qList.className = 'space-y-4';
+                        q.questions.forEach(subQ => {
+                            const row = document.createElement('div');
+                            row.className = 'flex flex-col gap-4 p-4 border border-gray-100 rounded-2xl bg-gray-50/50';
+                            const label = document.createElement('span');
+                            label.className = 'text-sm font-semibold text-gray-700';
+                            label.textContent = subQ.text;
+                            
+                            const drop = document.createElement('div');
+                            drop.id = `drop_${subQ.id}`; 
+                            
+                            // Local Drop Refresher
+                            const refreshDrop = () => {
+                                const currentAnsId = state.answers[subQ.id];
+                                const currentAns = q.pool.find(p => p.id === currentAnsId);
+                                
+                                drop.className = `drop-zone w-full min-h-[44px] border-2 rounded-xl flex items-center justify-center text-xs transition-all p-3 text-center ${state.mode === 'TEST' ? 'cursor-pointer hover:bg-white hover:border-pink-200' : ''}`;
+                                
+                                if (currentAns) {
+                                    drop.classList.remove('border-dashed');
+                                    drop.classList.add('border-solid', 'bg-white', 'font-bold', 'text-pink-600', 'border-pink-200');
+                                    drop.textContent = currentAns.text; // Display full text of the dragged item
+                                    if (state.mode === 'TEST') {
+                                        drop.onclick = (e) => { 
+                                            e.stopPropagation(); 
+                                            delete state.answers[subQ.id]; 
+                                            refreshDrop(); 
+                                            refreshPool(); 
+                                            updateNavigator(); 
+                                        };
+                                    }
+                                } else {
+                                    drop.classList.add('border-dashed', 'border-gray-300');
+                                    drop.innerHTML = `<span class="text-gray-400">Select or drop answer</span>`;
+                                    if (state.mode === 'TEST') {
+                                        drop.onclick = () => { 
+                                            if (state.activeDragItem) { 
+                                                state.answers[subQ.id] = state.activeDragItem; 
+                                                state.activeDragItem = null; 
+                                                refreshDrop(); 
+                                                refreshPool(); 
+                                                updateNavigator(); 
+                                            } 
+                                        };
+                                    }
+                                }
+
+                                if (state.mode === 'TEST') {
+                                    drop.ondragover = (e) => {
+                                        e.preventDefault();
+                                        drop.classList.add('bg-pink-50', 'border-pink-400');
+                                    };
+                                    drop.ondragleave = (e) => {
+                                        drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                    };
+                                    drop.ondrop = (e) => {
+                                        e.preventDefault();
+                                        drop.classList.remove('bg-pink-50', 'border-pink-400');
+                                        const draggedId = e.dataTransfer.getData('text/plain') || state.activeDragItem;
+                                        if (draggedId && q.pool.find(p => p.id === draggedId)) {
+                                            state.answers[subQ.id] = draggedId;
+                                            state.activeDragItem = null;
+                                            refreshDrop();
+                                            refreshPool();
+                                            updateNavigator();
+                                        }
+                                    };
+                                }
+                            };
+                            
+                            refreshDrop();
+
+                            // Explanation container
+                            const exp = document.createElement('div');
+                            exp.id = `exp_${subQ.id}`;
+                            exp.className = 'mt-2 p-3 bg-white rounded-lg border border-gray-100 result-element';
+                            
+                            const correctItem = q.pool.find(p => p.id === subQ.correct);
+                            exp.innerHTML = `
+                                <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Correct Answer: ${subQ.correct} ${correctItem ? (correctItem.text.length > 2 ? '' : '') : ''}</div>
+                                <div class="text-xs text-gray-600 leading-relaxed">${subQ.explanation}</div>
+                                <div class="mt-2 text-right">
+                                    <button onclick="locateInPassage('loc_${subQ.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">
+                                        Locate in Passage
+                                    </button>
+                                </div>
+                            `;
+                            
+                            row.appendChild(label); 
+                            row.appendChild(drop);
+                            row.appendChild(exp);
+                            qList.appendChild(row);
+                        });
+                        wrapper.appendChild(qList); 
+                    }
+                    qDiv.appendChild(wrapper);
+                } 
+                // -> Render Checkbox Groups
+                else if (q.displayType === 'checkbox_group') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-4 text-sm leading-snug';
+                    header.textContent = q.text;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    optsContainer.className = 'space-y-3';
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'checkbox-label flex items-start p-4 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="checkbox" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 rounded focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100 hidden">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}_${opt.id.toLowerCase()}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+
+                            if (!state.answers[q.id]) state.answers[q.id] = [];
+                            const input = label.querySelector('input');
+                            
+                            if (state.answers[q.id].includes(opt.id)) {
+                                state.answers[q.id] = state.answers[q.id].filter(id => id !== opt.id);
+                                label.classList.remove('border-pink-500', 'bg-pink-50');
+                                label.classList.add('border-gray-100');
+                                input.checked = false;
+                            } else {
+                                // Assume 2 selections max based on instructions
+                                if (state.answers[q.id].length < 2) {
+                                    state.answers[q.id].push(opt.id);
+                                    label.classList.remove('border-gray-100');
+                                    label.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                }
+                            }
+                            updateNavigator();
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+                // -> Render Inline Blanks
+                else if (q.displayType === 'inline_blanks') {
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = q.html;
+                    
+                    wrap.querySelectorAll('input').forEach(input => {
+                        const qid = input.dataset.qid;
+                        input.value = state.answers[qid] || '';
+                        input.addEventListener('input', (e) => {
+                            if(state.mode === 'TEST') {
+                                state.answers[qid] = e.target.value;
+                                updateNavigator();
+                            }
+                        });
+                    });
+                    qDiv.appendChild(wrap);
+
+                    const expContainer = document.createElement('div');
+                    expContainer.className = 'mt-8 space-y-3 result-element';
+                    q.blanks.forEach(b => {
+                        const exp = document.createElement('div');
+                        exp.className = 'p-4 bg-gray-50 rounded-xl border border-gray-200';
+                        const absNum = state.questionsList.find(x => x.qId === b.id)?.absNum || '';
+                        const correctDisplay = Array.isArray(b.correct) ? b.correct.join(' / ') : b.correct;
+                        exp.innerHTML = `
+                            <div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Question ${absNum} | Correct Answer: ${correctDisplay}</div>
+                            <div class="text-xs text-gray-600 leading-relaxed">${b.explanation}</div>
+                            <div class="mt-3 text-right">
+                                <button onclick="locateInPassage('loc_${b.parentId || b.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                            </div>
+                        `;
+                        expContainer.appendChild(exp);
+                    });
+                    qDiv.appendChild(expContainer);
+                } 
+                // -> Render Radios
+                else if (q.displayType === 'radio') {
+                    const header = document.createElement('h3');
+                    header.className = 'font-bold text-gray-800 mb-6 text-sm leading-snug flex items-start gap-3';
+                    const qMeta = state.questionsList.find(x => x.qId === q.id);
+                    const qNum = qMeta ? qMeta.absNum : (qIdx + 1);
+                    // Wrapped text in a span to prevent flexbox from splitting marked highlight sentences
+                    header.innerHTML = `<span class="flex-none inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-[10px] font-bold">${qNum}</span> <span>${q.text}</span>`;
+                    qDiv.appendChild(header);
+
+                    const optsContainer = document.createElement('div');
+                    
+                    q.options.forEach(opt => {
+                        const label = document.createElement('label');
+                        label.className = 'radio-label flex items-start p-4 mb-3 border-2 rounded-2xl cursor-pointer transition-all hover:bg-gray-50 border-gray-100 test-element-interactive';
+                        label.dataset.optId = opt.id;
+                        
+                        label.innerHTML = `
+                            <input type="radio" name="${q.id}" value="${opt.id}" class="mt-1 h-4 w-4 text-pink-500 focus:ring-0 test-input pointer-events-none">
+                            <div class="ml-4 flex-1">
+                                <span class="text-sm font-medium text-gray-700 opt-text">${opt.text}</span>
+                                <div class="result-element mt-3 text-xs leading-relaxed text-gray-500 bg-white/50 p-3 rounded-lg border border-gray-100">
+                                    <span class="font-bold text-gray-400 uppercase text-[9px] block mb-1">Explanation</span>
+                                    ${opt.explanation}
+                                    <div class="mt-2 text-right">
+                                        <button onclick="locateInPassage('loc_${q.id}')" class="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-800 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg border border-pink-200 transition-colors shadow-sm relative z-10">Locate in Passage</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        label.addEventListener('click', (e) => {
+                            if (state.mode !== 'TEST') return;
+                            if (e.target.tagName.toLowerCase() === 'button') return; 
+                            
+                            state.answers[q.id] = opt.id;
+                            updateNavigator();
+                            
+                            optsContainer.querySelectorAll('.radio-label').forEach(l => {
+                                const input = l.querySelector('input');
+                                if (l.dataset.optId === opt.id) {
+                                    l.classList.remove('border-gray-100');
+                                    l.classList.add('border-pink-500', 'bg-pink-50');
+                                    input.checked = true;
+                                } else {
+                                    l.classList.remove('border-pink-500', 'bg-pink-50');
+                                    l.classList.add('border-gray-100');
+                                    input.checked = false;
+                                }
+                            });
+                        });
+                        optsContainer.appendChild(label);
+                    });
+                    qDiv.appendChild(optsContainer);
+                }
+
+                questionsWrapper.appendChild(qDiv);
+            });
+
+            if (state.mode === 'RESULT') {
+                applyResultStylesToCachedNode(idx, { passage: passageWrapper, questions: questionsWrapper });
+            }
+
+            return { passage: passageWrapper, questions: questionsWrapper };
+        }
+
+        function showSubmitModal() {
+            // Recalculate unique questions answered
+            let answeredCount = 0;
+            const checkboxCounts = {};
+
+            state.questionsList.forEach(q => {
+                if (q.displayType === 'checkbox') {
+                    if (!checkboxCounts[q.parentId]) checkboxCounts[q.parentId] = 0;
+                    
+                    if (state.answers[q.parentId] && state.answers[q.parentId].length > checkboxCounts[q.parentId]) {
+                        answeredCount++;
+                        checkboxCounts[q.parentId]++;
+                    }
+                } else {
+                    const ans = state.answers[q.qId];
+                    if (ans && ans.toString().trim() !== '') answeredCount++;
+                }
+            });
+
+            DOM.modal.message.innerHTML = `You have answered <strong>${answeredCount}</strong> out of <strong>${state.questionsList.length}</strong> questions.<br><br>Ready to submit?`;
+            DOM.modal.container.classList.remove('hidden');
+        }
+
+        function getBandScore(rawScore) {
+            if (rawScore >= 39) return "9.0";
+            if (rawScore >= 37) return "8.5";
+            if (rawScore >= 35) return "8.0";
+            if (rawScore >= 33) return "7.5";
+            if (rawScore >= 30) return "7.0";
+            if (rawScore >= 27) return "6.5";
+            if (rawScore >= 23) return "6.0";
+            if (rawScore >= 19) return "5.5";
+            if (rawScore >= 15) return "5.0";
+            if (rawScore >= 13) return "4.5";
+            if (rawScore >= 10) return "4.0";
+            if (rawScore >= 8) return "3.5";
+            if (rawScore >= 6) return "3.0";
+            if (rawScore >= 4) return "2.5";
+            if (rawScore >= 2) return "2.0";
+            if (rawScore >= 1) return "1.0";
+            return "0.0";
+        }
+
+        function finishTest() {
+            state.mode = 'RESULT';
+            clearInterval(state.timerInterval);
+            DOM.modal.container.classList.add('hidden');
+            DOM.header.actions.classList.add('hidden');
+            DOM.result.banner.classList.remove('hidden');
+            DOM.result.banner.classList.add('flex');
+            
+            document.body.classList.add('is-result-mode');
+
+            let score = 0;
+            state.questionsList.forEach(q => {
+                if (q.displayType === 'checkbox') {
+                    if (state.answers[q.parentId] && state.answers[q.parentId].includes(q.qId.split('_').pop())) {
+                        score++;
+                    }
+                } else if (q.displayType === 'inline_blank') {
+                    const ans = state.answers[q.qId];
+                    const isCorr = Array.isArray(q.isCorrect) 
+                        ? q.isCorrect.some(c => c.toLowerCase() === ans?.trim().toLowerCase())
+                        : ans?.trim().toLowerCase() === q.isCorrect.toLowerCase();
+                    if (isCorr) score++;
+                } else {
+                    const ans = state.answers[q.qId];
+                    if (ans === q.isCorrect) score++;
+                }
+            });
+
+            const totalQuestions = state.questionsList.length || 40;
+            DOM.result.score.textContent = `${score}/${totalQuestions}`;
+            DOM.result.band.textContent = getBandScore(score);
+            DOM.result.time.textContent = formatTime(TEST_DATA.totalDurationSeconds - state.timeRemaining);
+            
+            Object.keys(state.cachedPanes).forEach(partIdxStr => {
+                applyResultStylesToCachedNode(parseInt(partIdxStr), state.cachedPanes[partIdxStr]);
+            });
+
+            updateNavigator();
+            loadPart(state.currentPart);
+        }
+
+        function applyResultStylesToCachedNode(idx, cachedNodes) {
+            const data = TEST_DATA.parts[idx];
+            
+            cachedNodes.passage.querySelectorAll('.vocab-word').forEach(w => w.classList.add('mode-result'));
+
+            data.questions.forEach(q => {
+                const qContainer = cachedNodes.questions.querySelector(`#container_${q.id}`);
+                if (!qContainer) return;
+
+                if (q.displayType === 'inline_blanks') {
+                    qContainer.querySelectorAll('input').forEach(input => {
+                        input.disabled = true;
+                        const qid = input.dataset.qid;
+                        const info = q.blanks.find(b => b.id === qid);
+                        
+                        const isCorr = Array.isArray(info.correct) 
+                            ? info.correct.some(c => c.toLowerCase() === input.value.trim().toLowerCase())
+                            : input.value.trim().toLowerCase() === info.correct.toLowerCase();
+
+                        if (isCorr) {
+                            input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                        } else {
+                            input.classList.add('border-red-500', 'bg-red-50', 'text-red-700', 'line-through');
+                            if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('correction-badge')) {
+                                const corr = document.createElement('span');
+                                corr.className = 'correction-badge text-green-600 font-bold ml-1 text-sm bg-green-50 px-2 py-1 rounded border border-green-200';
+                                corr.textContent = Array.isArray(info.correct) ? info.correct[0] : info.correct;
+                                input.after(corr);
+                            }
+                        }
+                    });
+                } else if (q.displayType === 'checkbox_group') {
+                     qContainer.querySelectorAll('.checkbox-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] && state.answers[q.id].includes(optId);
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            expBlock.classList.remove('hidden'); // Show explanations in result mode
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                            input.checked = true; // Ensure correct answers are checked for review
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'radio') {
+                    qContainer.querySelectorAll('.radio-label').forEach(label => {
+                        const optId = label.dataset.optId;
+                        const input = label.querySelector('input');
+                        input.disabled = true;
+                        label.classList.remove('cursor-pointer', 'hover:bg-gray-50');
+                        
+                        const isSelected = state.answers[q.id] === optId;
+                        const optData = q.options.find(o => o.id === optId);
+                        const isCorrect = optData.isCorrect;
+
+                        const expBlock = label.querySelector('.result-element');
+                        if (expBlock) {
+                            if (!isCorrect && !isSelected) expBlock.style.display = 'none';
+                        }
+
+                        if (isCorrect) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-green-500', 'bg-green-50');
+                            label.querySelector('.opt-text').classList.add('text-green-800');
+                        } else if (isSelected) {
+                            label.classList.remove('border-gray-100', 'border-pink-500', 'bg-pink-50');
+                            label.classList.add('border-red-500', 'bg-red-50');
+                        } else {
+                            label.classList.add('opacity-60');
+                        }
+                    });
+                } else if (q.displayType === 'drag_drop') {
+                    qContainer.querySelectorAll('.pool-item').forEach(item => {
+                        item.removeAttribute('draggable');
+                        item.onclick = null;
+                        item.classList.remove('cursor-pointer', 'hover:border-pink-300', 'hover:bg-pink-50');
+                    });
+                    
+                    q.questions.forEach(subQ => {
+                        const drop = qContainer.querySelector(`#drop_${subQ.id}`);
+                        if(drop) {
+                            drop.onclick = null;
+                            drop.ondragover = null;
+                            drop.ondragleave = null;
+                            drop.ondrop = null;
+                            
+                            drop.classList.remove('text-pink-600', 'border-pink-200', 'cursor-pointer', 'hover:bg-white');
+                            const currentAnsId = state.answers[subQ.id];
+                            const isCorrect = currentAnsId === subQ.correct;
+                            
+                            if (isCorrect) {
+                                drop.classList.add('border-green-500', 'text-green-600', 'bg-green-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                            } else {
+                                drop.classList.add('border-red-500', 'text-red-600', 'bg-red-50', 'border-solid');
+                                drop.classList.remove('border-dashed', 'border-gray-300');
+                                
+                                if (q.html && !drop.nextElementSibling?.classList.contains('correction-badge')) {
+                                    const corr = document.createElement('span');
+                                    corr.className = 'correction-badge text-green-600 font-bold ml-2 text-xs bg-green-50 px-2 py-1 rounded-md border border-green-200 align-middle inline-block';
+                                    const correctItem = q.pool.find(p => p.id === subQ.correct);
+                                    corr.textContent = correctItem ? correctItem.text : subQ.correct;
+                                    drop.after(corr);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateNavigator() {
+            DOM.navigator.grid.innerHTML = '';
+            
+            if(state.questionsList.length === 0) {
+                DOM.panes.floatingSubmit.classList.add('hidden');
+                return;
+            }
+
+            let currentPart = -1;
+            let currentGroup = null;
+            const checkboxAssignments = {};
+
+            state.questionsList.forEach(q => {
+                if (q.partIndex !== currentPart) {
+                    currentPart = q.partIndex;
+                    currentGroup = document.createElement('div');
+                    currentGroup.className = 'flex items-center gap-2 border-r border-gray-200 pr-4 last:border-0 last:pr-0';
+                    
+                    const groupLabel = document.createElement('span');
+                    groupLabel.className = 'text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap mr-1';
+                    groupLabel.textContent = `Passage ${currentPart + 1}:`;
+                    currentGroup.appendChild(groupLabel);
+                    
+                    DOM.navigator.grid.appendChild(currentGroup);
+                }
+
+                let isAnswered = false;
+                let isCorrect = false;
+
+                if (q.displayType === 'checkbox') {
+                     if (!checkboxAssignments[q.parentId]) checkboxAssignments[q.parentId] = 0;
+                     
+                     const ansArr = state.answers[q.parentId];
+                     if (ansArr && ansArr.length > checkboxAssignments[q.parentId]) {
+                         isAnswered = true;
+                         const optId = q.qId.split('_').pop();
+                         isCorrect = ansArr.includes(optId);
+                         checkboxAssignments[q.parentId]++;
+                     }
+                } else {
+                     const ans = state.answers[q.qId];
+                     isAnswered = ans && ans.toString().trim() !== '';
+                     if (q.displayType === 'inline_blank') {
+                         isCorrect = Array.isArray(q.isCorrect) 
+                            ? q.isCorrect.some(c => c.toLowerCase() === ans?.trim().toLowerCase())
+                            : ans?.trim().toLowerCase() === q.isCorrect.toLowerCase();
+                     } else {
+                         isCorrect = (ans === q.isCorrect);
+                     }
+                }
+
+                let bg = '';
+                
+                if (state.mode === 'TEST') {
+                    bg = isAnswered ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-white text-gray-400 border-gray-200 hover:border-pink-300';
+                } else {
+                    bg = isCorrect ? 'bg-green-500 text-white border-green-500' : isAnswered ? 'bg-red-500 text-white border-red-500' : 'bg-gray-100 text-gray-400 border-gray-200';
+                }
+                
+                const btn = document.createElement('button');
+                btn.className = `w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center border transition-colors flex-shrink-0 ${bg}`;
+                btn.textContent = q.absNum;
+                btn.onclick = () => { 
+                    if (state.currentPart !== q.partIndex) loadPart(q.partIndex); 
+                    setTimeout(() => {
+                        const targetId = 'container_' + (q.parentId || q.qId);
+                        const targetEl = DOM.panes.qContainer.querySelector(`#${targetId}`);
+                        if(targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100); 
+                };
+                currentGroup.appendChild(btn);
+            });
+
+            if(state.mode === 'TEST') DOM.panes.floatingSubmit.classList.remove('hidden');
+            else DOM.panes.floatingSubmit.classList.add('hidden');
+        }
+
+        function hideTooltip() { DOM.tooltip.container.classList.remove('visible'); }
+
+        window.locateInPassage = function(targetId) {
+            document.querySelectorAll('.highlight-active').forEach(el => el.classList.remove('highlight-active'));
+            
+            const mappings = {
+                // Part 1
+                'loc_p1_q1': ['loc_p1_q1'],
+                'loc_p1_q2': ['loc_p1_q2'],
+                'loc_p1_q3': ['loc_p1_q3'],
+                'loc_p1_q4': ['loc_p1_q4'],
+                'loc_p1_q5': ['loc_p1_q5'],
+                'loc_p1_q6': ['loc_p1_q6'],
+                'loc_p1_q7': ['loc_p1_q7'],
+                'loc_p1_q8': ['loc_p1_q8'],
+                'loc_p1_q9': ['loc_p1_q9'],
+                'loc_p1_q10': ['loc_p1_q10'],
+                'loc_p1_q11': ['loc_p1_q11'],
+                'loc_p1_q12': ['loc_p1_q12'],
+                'loc_p1_q13': ['loc_p1_q13'],
+                // Part 2
+                'loc_p2_q14': ['loc_p2_q14'],
+                'loc_p2_q15': ['loc_p2_q15'],
+                'loc_p2_q16': ['loc_p2_q16'],
+                'loc_p2_q17': ['loc_p2_q17'],
+                'loc_p2_q18': ['loc_p2_q18'],
+                'loc_p2_q19_20_a': ['loc_p2_q19_20_a'], 
+                'loc_p2_q19_20_c': ['loc_p2_q19_20_c'], 
+                'loc_p2_q21_22_c': ['loc_p2_q21_22_c'], 
+                'loc_p2_q21_22_d': ['loc_p2_q21_22_d'], 
+                'loc_p2_q23': ['loc_p2_q23'], 
+                'loc_p2_q24': ['loc_p2_q24'], 
+                'loc_p2_q25': ['loc_p2_q25'], 
+                'loc_p2_q26': ['loc_p2_q26'],
+                // Part 3
+                'loc_p3_q27': ['loc_p3_q27'],
+                'loc_p3_q28': ['loc_p3_q28'],
+                'loc_p3_q29': ['loc_p3_q29'],
+                'loc_p3_q30': ['loc_p3_q30'],
+                'loc_p3_q31': ['loc_p3_q31'],
+                'loc_p3_q32': ['loc_p3_q32'],
+                'loc_p3_q33': ['loc_p3_q33'],
+                'loc_p3_q34': ['loc_p3_q34'],
+                'loc_p3_q35': ['loc_p3_q35'],
+                'loc_p3_q36': ['loc_p3_q36'],
+                'loc_p3_q37': ['loc_p3_q37'],
+                'loc_p3_q38': ['loc_p3_q38'],
+                'loc_p3_q39': ['loc_p3_q39'],
+                'loc_p3_q40': ['loc_p3_q40']
+            };
+
+            const targetIds = mappings[targetId] || [targetId];
+            let found = false;
+
+            targetIds.forEach(id => {
+                const targetEl = DOM.panes.pContainer.querySelector(`#${id}`);
+                if (targetEl) {
+                    if (!found) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found = true;
+                    }
+                    targetEl.classList.add('highlight-active');
+                    setTimeout(() => targetEl.classList.remove('highlight-active'), 3500);
+                }
+            });
+
+            if (!found) {
+                console.warn('Passage location target not found for:', targetId);
+                const pane = document.getElementById('pane-passage');
+                if (pane) pane.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
