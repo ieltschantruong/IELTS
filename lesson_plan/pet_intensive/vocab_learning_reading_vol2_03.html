@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive Vol 2 Test 3 - Vocabulary</title>
+    <style>
+        :root {
+            /* Theme: Soft Pastel Lavender/Lilac */
+            --primary: #6d28d9; 
+            --primary-light: #f3e8ff;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #4c1d95;
+            --border: #d8b4fe;
+            --badge-bg: #e9d5ff;
+            --badge-text: #3b0764;
+            --success: #0d9488; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Search Bar */
+        .search-container { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; max-width: 500px; padding: 0.75rem 1.5rem; font-size: 1rem; border: 2px solid var(--border); border-radius: 25px; outline: none; transition: border-color 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-input:focus { border-color: var(--primary); }
+
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(109, 40, 217, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none !important; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-transform: capitalize; }
+        .word-form-main { font-size: 0.9rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .audio-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 0.2rem; border-radius: 50%; transition: transform 0.2s; align-self: center; }
+        .audio-btn:hover { transform: scale(1.2); background-color: var(--primary-light); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem; display: block;}
+        
+        .definition { font-size: 1rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 0.5rem; font-weight: 500; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold; }
+        .extra-example { background-color: #f1f5f9; border-left-color: #64748b; margin-top: 0.5rem; }
+        .extra-example span { color: #475569; }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; }
+        .flashcard-front .word-container { margin-bottom: 1rem; display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .flashcard-front .word { font-size: 2.5rem; color: var(--primary); text-transform: capitalize; margin-bottom: 0;}
+        .flashcard-front .fc-word-form { font-size: 1.2rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .flashcard-front .audio-btn { font-size: 1.8rem; background: var(--primary-light); padding: 0.5rem; }
+        .flashcard-back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .flashcard-back .definition { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .flashcard-back .translation { font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--success); font-weight: 500;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 0.75rem 1rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .fc-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; font-weight: 600; cursor: pointer; padding: 0.5rem 1rem; border-radius: 20px; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary-light); color: var(--primary); }
+        .fc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .fc-counter { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 60px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">&copy; IELTS Chan Truong</div>
+
+<div class="container">
+    <header>
+        <h1>PET Intensive Vol 2 Test 3 - Vocabulary</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a word..." oninput="handleSearch()">
+    </div>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Reef Fish Study')">Passage 1: Reef Fish Study</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Calorie Restriction')">Passage 2: Calorie Restriction</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Saving the Skink')">Passage 3: Saving the Skink</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Intermediate)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcard Study</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <div class="word-container">
+                        <h2 class="word" id="fc-word">Word</h2>
+                        <span class="fc-word-form" id="fc-word-form">(Noun)</span>
+                    </div>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="word-families" id="fc-forms" style="margin-top: 1rem; max-width: 80%;">Families</div>
+                    <span class="topic-tag" id="fc-topic" style="margin-top: 1rem;">Topic: General</span>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / X</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: #cbd5e1; margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Intensive Vol 2 Test 3)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- PASSAGE 1: Reef Fish Study ---
+        { topic: "Reef Fish Study", level: "C1", word: "Convey", form: "Verb", phonetic: "/kənˈveɪ/", forms: "N/A", def: "To communicate or express a thought, feeling, or idea so that it is understood by other people.", translation: "Truyền đạt, mang lại", example: "It is a widely held belief among those who study animals that larger size conveys some form of advantage...", extraExample: "I tried to convey my gratitude for her help." },
+        { topic: "Reef Fish Study", level: "B2", word: "Habitat", form: "Noun", phonetic: "/ˈhæbɪtæt/", forms: "N/A", def: "The natural home or environment of an animal, plant, or other organism.", translation: "Môi trường sống", example: "...and has been applied to a wide range of both animals and habitats.", extraExample: "The panda's natural habitat is the bamboo forest." },
+        { topic: "Reef Fish Study", level: "C1", word: "Subsequently", form: "Adverb", phonetic: "/ˈsʌbsɪkwəntli/", forms: "Adj: Subsequent", def: "After a particular thing has happened; afterwards.", translation: "Sau đó, tiếp theo", example: "Of these, body size has received the most attention... which has subsequently led to the development of a number of theories...", extraExample: "He was arrested and subsequently convicted of the crime." },
+        { topic: "Reef Fish Study", level: "C1", word: "Hypothesis", form: "Noun", phonetic: "/haɪˈpɒθəsɪs/", forms: "Plural: Hypotheses", def: "A supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation.", translation: "Giả thuyết", example: "One of the most popular of these is known as the 'bigger is better' hypothesis.", extraExample: "Our experiment was designed to test this hypothesis." },
+        { topic: "Reef Fish Study", level: "B2", word: "Ecosystem", form: "Noun", phonetic: "/ˈiːkəʊsɪstəm/", forms: "N/A", def: "A biological community of interacting organisms and their physical environment.", translation: "Hệ sinh thái", example: "Compared with other habitats and ecosystems, not a great deal is known about predator-prey relationships...", extraExample: "Pollution can have disastrous effects on the delicate ecosystem." },
+        { topic: "Reef Fish Study", level: "C2", word: "Larval", form: "Adjective", phonetic: "/ˈlɑːvl/", forms: "N: Larva", def: "Relating to the active immature form of an insect, especially one that differs greatly from the adult.", translation: "Thuộc về ấu trùng", example: "We want to examine the predator-prey relationship during the 'early juvenile' or larval phase...", extraExample: "The larval stage of the butterfly lasts for several weeks." },
+        { topic: "Reef Fish Study", level: "C1", word: "Juvenile", form: "Noun / Adjective", phonetic: "/ˈdʒuːvənaɪl/", forms: "N/A", def: "A young animal, plant, or person.", translation: "Con non, vị thành niên", example: "...as these characteristics vary from individual to individual at the beginning of the juvenile stage.", extraExample: "Juvenile crime rates have decreased in the city." },
+        { topic: "Reef Fish Study", level: "C1", word: "Transition", form: "Noun", phonetic: "/trænˈzɪʃn/", forms: "V: Transition", def: "The process or a period of changing from one state or condition to another.", translation: "Sự chuyển tiếp, quá độ", example: "The transition between the two stages is marked by rapid and dramatic changes...", extraExample: "The transition from school to university can be challenging." },
+        { topic: "Reef Fish Study", level: "C1", word: "Mortality", form: "Noun", phonetic: "/mɔːˈtæləti/", forms: "Adj: Mortal", def: "The state of being subject to death; death, especially on a large scale.", translation: "Tỷ lệ tử vong, sự tử vong", example: "It is also characterised by increased levels of mortality in the first 48 hours...", extraExample: "Infant mortality rates have dropped significantly." },
+        { topic: "Reef Fish Study", level: "C2", word: "Daunting", form: "Adjective", phonetic: "/ˈdɔːntɪŋ/", forms: "V: Daunt", def: "Seeming difficult to deal with in anticipation; intimidating.", translation: "Làm nản chí, đáng sợ", example: "These short windows of opportunity... often make research a daunting task.", extraExample: "Writing a book can be a daunting prospect." },
+        { topic: "Reef Fish Study", level: "C1", word: "Persistence", form: "Noun", phonetic: "/pəˈsɪstəns/", forms: "Adj: Persistent | V: Persist", def: "Firm or obstinate continuance in a course of action in spite of difficulty or opposition.", translation: "Sự kiên trì, bền bỉ", example: "These obstacles are overcome using a combination of innovative techniques... and a measure of sheer persistence.", extraExample: "Her persistence eventually paid off and she got the job." },
+        { topic: "Reef Fish Study", level: "C1", word: "Prior to", form: "Phrase", phonetic: "/ˈpraɪə tuː/", forms: "N/A", def: "Before.", translation: "Trước khi", example: "We collect the larval fish immediately prior to settlement...", extraExample: "Passengers must board the plane 20 minutes prior to departure." },
+        { topic: "Reef Fish Study", level: "B2", word: "Abundant", form: "Adjective", phonetic: "/əˈbʌndənt/", forms: "N: Abundance", def: "Existing or available in large quantities; plentiful.", translation: "Phong phú, dồi dào", example: "Species that are abundant in one location may be particularly rare in a similar habitat just 100 metres away.", extraExample: "There is abundant evidence to support the theory." },
+        { topic: "Reef Fish Study", level: "C1", word: "Foraging", form: "Noun", phonetic: "/ˈfɒrɪdʒɪŋ/", forms: "V: Forage", def: "The act of searching for food or provisions.", translation: "Sự tìm kiếm thức ăn", example: "The answer may well lie in an alternative hypothesis known as 'optimal foraging theory'.", extraExample: "The pigs spend most of their day foraging for acorns." },
+        { topic: "Reef Fish Study", level: "C1", word: "Trade-off", form: "Noun", phonetic: "/ˈtreɪd ɒf/", forms: "N/A", def: "A balance achieved between two desirable but incompatible features; a compromise.", translation: "Sự đánh đổi", example: "This is generally a trade-off between the potential energy intake from eating a fish and the amount of energy required to catch it.", extraExample: "There is always a trade-off between speed and quality." },
+        { topic: "Reef Fish Study", level: "C1", word: "Distinct", form: "Adjective", phonetic: "/dɪˈstɪŋkt/", forms: "N: Distinction", def: "Recognizably different in nature from something else of a similar type; unmistakably clear.", translation: "Rõ rệt, khác biệt", example: "Our research hopes to show that larger size may, in fact, be a distinct disadvantage during certain life stages.", extraExample: "There is a distinct smell of gas in the room." },
+        { topic: "Reef Fish Study", level: "B2", word: "Confer", form: "Verb", phonetic: "/kənˈfɜːr/", forms: "N: Conferment", def: "To grant or bestow (a title, degree, benefit, or right).", translation: "Trao, mang lại", example: "Larger size is generally thought to confer an advantage...", extraExample: "The Queen conferred a knighthood on him." },
+        { topic: "Reef Fish Study", level: "C1", word: "Settlement", form: "Noun", phonetic: "/ˈsetlmənt/", forms: "V: Settle", def: "The action or process of settling (in biology, organisms establishing themselves in a new environment).", translation: "Sự định cư, định cư", example: "This point is commonly known as 'settlement'.", extraExample: "The settlement of the new colony was fraught with challenges." },
+        { topic: "Reef Fish Study", level: "B2", word: "Aquarium", form: "Noun", phonetic: "/əˈkweəriəm/", forms: "Plural: Aquariums/Aquaria", def: "A transparent tank of water in which live fish and other water creatures and plants are kept.", translation: "Thủy cung, bể cá", example: "These fish are subsequently transported to an aquarium...", extraExample: "We spent the afternoon looking at the sharks in the aquarium." },
+        { topic: "Reef Fish Study", level: "C1", word: "Disadvantage", form: "Noun", phonetic: "/ˌdɪsədˈvɑːntɪdʒ/", forms: "Adj: Disadvantaged", def: "An unfavorable circumstance or condition that reduces the chances of success or effectiveness.", translation: "Bất lợi", example: "Our research hopes to show that larger size may, in fact, be a distinct disadvantage...", extraExample: "Being tall can sometimes be a disadvantage in small spaces." },
+
+        // --- PASSAGE 2: Calorie Restriction ---
+        { topic: "Calorie Restriction", level: "C2", word: "Primate", form: "Noun", phonetic: "/ˈpraɪmeɪt/", forms: "N/A", def: "Any member of the group of animals that includes human beings, apes, and monkeys.", translation: "Động vật linh trưởng", example: "...but the picture for primates, including humans, is not so clear.", extraExample: "Chimpanzees are highly intelligent primates." },
+        { topic: "Calorie Restriction", level: "C1", word: "Onset", form: "Noun", phonetic: "/ˈɒnset/", forms: "N/A", def: "The beginning of something, especially something unpleasant.", translation: "Sự khởi phát", example: "We study it because it is so effective at delaying aging and the onset of age-related disease.", extraExample: "The early onset of the disease can be treated with medication." },
+        { topic: "Calorie Restriction", level: "C1", word: "Vulnerability", form: "Noun", phonetic: "/ˌvʌlnərəˈbɪləti/", forms: "Adj: Vulnerable", def: "The quality or state of being exposed to the possibility of being attacked or harmed.", translation: "Sự dễ bị tổn thương", example: "It’s a way to tease out what it is that creates increased disease vulnerability...", extraExample: "The earthquake highlighted the vulnerability of the city's infrastructure." },
+        { topic: "Calorie Restriction", level: "B2", word: "Nutrient", form: "Noun", phonetic: "/ˈnjuːtriənt/", forms: "Adj: Nutritious", def: "A substance that provides nourishment essential for growth and the maintenance of life.", translation: "Chất dinh dưỡng", example: "...cut it by 30% (while continuing to supply all essential nutrients)...", extraExample: "Plants draw minerals and other nutrients from the soil." },
+        { topic: "Calorie Restriction", level: "C1", word: "Preliminary", form: "Adjective", phonetic: "/prɪˈlɪmɪnəri/", forms: "N/A", def: "Denoting an action or event preceding or in preparation for something fuller or more important.", translation: "Sơ bộ, mở đầu", example: "In 2009... preliminary findings of the two trials started coming in.", extraExample: "Preliminary results show that the vaccine is effective." },
+        { topic: "Calorie Restriction", level: "C1", word: "Lean", form: "Adjective", phonetic: "/liːn/", forms: "N/A", def: "(Of a person or animal) thin, especially healthily so; having no superfluous fat.", translation: "Nạc, gầy (khỏe mạnh)", example: "Compared to well-fed control animals, the lean monkeys were living longer...", extraExample: "Athletes typically have very lean bodies." },
+        { topic: "Calorie Restriction", level: "B2", word: "Processed", form: "Adjective", phonetic: "/ˈprəʊsest/", forms: "V: Process | N: Processing", def: "Having had some sort of chemical or industrial treatment in order to preserve it, improve its taste or appearance.", translation: "Đã qua chế biến", example: "Second, whereas the Wisconsin monkeys were given highly processed food high in sucrose...", extraExample: "A diet high in processed meats is bad for your heart." },
+        { topic: "Calorie Restriction", level: "C2", word: "Standardise", form: "Verb", phonetic: "/ˈstændədaɪz/", forms: "N: Standardization", def: "Cause (something) to conform to a standard.", translation: "Tiêu chuẩn hóa", example: "...highly processed food high in sucrose, making it easy to standardise...", extraExample: "The educational curriculum was standardised across all schools." },
+        { topic: "Calorie Restriction", level: "C1", word: "Longevity", form: "Noun", phonetic: "/lɒnˈdʒevəti/", forms: "N/A", def: "Long life.", translation: "Tuổi thọ cao, sự sống lâu", example: "...and saw that longevity for monkeys that were fed 30% less was the same.", extraExample: "The islanders are famous for their remarkable longevity." },
+        { topic: "Calorie Restriction", level: "C2", word: "Intervention", form: "Noun", phonetic: "/ˌɪntəˈvenʃn/", forms: "V: Intervene", def: "Action taken to improve a situation, especially a medical disorder.", translation: "Sự can thiệp", example: "That’s the maximum lifespan ever detected... so the idea that their intervention is doing nothing is really at odds with the data...", extraExample: "Early medical intervention can save lives." },
+        { topic: "Calorie Restriction", level: "C2", word: "At odds with", form: "Phrase", phonetic: "/ət ɒdz wɪð/", forms: "N/A", def: "In conflict or disagreement with.", translation: "Mâu thuẫn với, trái ngược với", example: "...so the idea that their intervention is doing nothing is really at odds with the data...", extraExample: "His behavior is completely at odds with his usual character." },
+        { topic: "Calorie Restriction", level: "C1", word: "Raw", form: "Adjective", phonetic: "/rɔː/", forms: "N/A", def: "(Of data) not analyzed, evaluated, or processed for use.", translation: "Thô (chưa xử lý)", example: "Anderson and Mattison are currently working together to compare the two studies’ raw data.", extraExample: "We need to analyze the raw data before drawing conclusions." },
+        { topic: "Calorie Restriction", level: "B2", word: "Semi-starvation", form: "Noun", phonetic: "/ˌsemi stɑːˈveɪʃn/", forms: "V: Starve", def: "A condition of partial or incomplete starvation.", translation: "Bán đói, nhịn ăn một phần", example: "Calorie restriction, or 'semi-starvation' as some refer to it...", extraExample: "The volunteers underwent a period of semi-starvation for the study." },
+        { topic: "Calorie Restriction", level: "B2", word: "Organism", form: "Noun", phonetic: "/ˈɔːɡənɪzəm/", forms: "Adj: Organic", def: "An individual animal, plant, or single-celled life form.", translation: "Sinh vật", example: "...has been proven to extend lifespan in many living organisms from yeast to mice...", extraExample: "The amoeba is a very simple single-celled organism." },
+        { topic: "Calorie Restriction", level: "C1", word: "Monumentally", form: "Adverb", phonetic: "/ˌmɒnjuˈmentəli/", forms: "Adj: Monumental", def: "To a very great or extreme degree.", translation: "Vô cùng, cực kỳ", example: "'I find the idea monumentally unattractive!' she says.", extraExample: "The project was a monumentally difficult task." },
+        { topic: "Calorie Restriction", level: "C1", word: "Tease out", form: "Phrasal Verb", phonetic: "/tiːz aʊt/", forms: "N/A", def: "To extract or discover information or a meaning with difficulty.", translation: "Tìm ra, vạch trần", example: "It's a way to tease out what it is that creates increased disease vulnerability...", extraExample: "It took a while to tease out the truth from the conflicting reports." },
+        { topic: "Calorie Restriction", level: "B2", word: "Control", form: "Noun", phonetic: "/kənˈtrəʊl/", forms: "V: Control", def: "(In a scientific experiment) a group or individual used as a standard of comparison.", translation: "Nhóm đối chứng", example: "Compared to well-fed control animals, the lean monkeys were living longer...", extraExample: "The control group received a placebo instead of the real drug." },
+        { topic: "Calorie Restriction", level: "C1", word: "Incidence", form: "Noun", phonetic: "/ˈɪnsɪdəns/", forms: "N/A", def: "The occurrence, rate, or frequency of a disease, crime, or something else undesirable.", translation: "Tỷ lệ mắc, sự phát sinh", example: "...and had a much lower incidence of age-related diseases...", extraExample: "There is a high incidence of asthma in this city." },
+        { topic: "Calorie Restriction", level: "C1", word: "Lifespan", form: "Noun", phonetic: "/ˈlaɪfspæn/", forms: "N/A", def: "The length of time for which a person or animal lives or a thing functions.", translation: "Tuổi thọ", example: "...to determine whether calorie restriction would extend the lifespan of primates.", extraExample: "The natural lifespan of a dog is usually 10 to 15 years." },
+        { topic: "Calorie Restriction", level: "C2", word: "Glucose", form: "Noun", phonetic: "/ˈɡluːkəʊs/", forms: "N/A", def: "A simple sugar which is an important energy source in living organisms.", translation: "Đường glucose", example: "...they have more normal blood glucose levels...", extraExample: "The body converts carbohydrates into glucose for energy." },
+
+        // --- PASSAGE 3: Saving the Skink ---
+        { topic: "Saving the Skink", level: "C2", word: "Minutiae", form: "Noun (Plural)", phonetic: "/maɪˈnjuːʃiaɪ/", forms: "Adj: Minute", def: "The small, precise, or trivial details of something.", translation: "Chi tiết vụn vặt", example: "Identification depends on where specimens are found, and such minutiae as the number of scales on their toes.", extraExample: "The contract was full of legal minutiae." },
+        { topic: "Saving the Skink", level: "C1", word: "Hibernate", form: "Verb", phonetic: "/ˈhaɪbəneɪt/", forms: "N: Hibernation", def: "(Of an animal or plant) spend the winter in a dormant state.", translation: "Ngủ đông", example: "However, the grand and Otago are the only kinds that do not hibernate through winter...", extraExample: "Bears and hedgehogs hibernate during the cold months." },
+        { topic: "Saving the Skink", level: "C2", word: "Dormant", form: "Adjective", phonetic: "/ˈdɔːmənt/", forms: "N: Dormancy", def: "(Of an animal) having normal physical functions suspended or slowed down for a period of time; in or as if in a deep sleep.", translation: "Nằm im, (ngủ) đông", example: "...there is no point in them lying dormant for extended periods.", extraExample: "The volcano has been dormant for hundreds of years." },
+        { topic: "Saving the Skink", level: "C1", word: "Predation", form: "Noun", phonetic: "/prɪˈdeɪʃn/", forms: "N: Predator", def: "The preying of one animal on others.", translation: "Sự ăn thịt, sự săn mồi", example: "With any decline in New Zealand fauna, predation is always suspected...", extraExample: "The birds are highly vulnerable to predation by cats." },
+        { topic: "Saving the Skink", level: "C2", word: "Feral", form: "Adjective", phonetic: "/ˈferəl/", forms: "N/A", def: "(Especially of an animal) in a wild state, especially after escape from captivity or domestication.", translation: "Sống hoang dã", example: "An example was a six-year project to control the feral cats on the Otago Skink Reserve...", extraExample: "Feral dogs roamed the abandoned streets." },
+        { topic: "Saving the Skink", level: "C1", word: "Deterioration", form: "Noun", phonetic: "/dɪˌtɪəriəˈreɪʃn/", forms: "V: Deteriorate", def: "The process of becoming progressively worse.", translation: "Sự suy giảm, tồi tệ đi", example: "...as it may signal a subtle deterioration in the skinks' living environment.", extraExample: "There has been a steady deterioration in his health." },
+        { topic: "Saving the Skink", level: "C1", word: "Inhibit", form: "Verb", phonetic: "/ɪnˈhɪbɪt/", forms: "N: Inhibition", def: "Hinder, restrain, or prevent (an action or process).", translation: "Kìm hãm, cản trở", example: "Infection with mites is suspected of inhibiting reproduction among captive animals.", extraExample: "Fear of failure often inhibits people from trying new things." },
+        { topic: "Saving the Skink", level: "C2", word: "Predominance", form: "Noun", phonetic: "/prɪˈdɒmɪnəns/", forms: "Adj: Predominant", def: "The state or condition of being greater in number or amount.", translation: "Sự chiếm ưu thế, phần lớn", example: "...nor what their habitat was in the earlier environment, with its predominance of shrubs and trees.", extraExample: "There is a predominance of female students in the nursing class." },
+        { topic: "Saving the Skink", level: "C2", word: "Eradication", form: "Noun", phonetic: "/ɪˌrædɪˈkeɪʃn/", forms: "V: Eradicate", def: "The complete destruction of every trace of something.", translation: "Sự diệt trừ tận gốc", example: "Even if we had the answer to the eradication of predators...", extraExample: "The global eradication of smallpox was a major medical triumph." },
+        { topic: "Saving the Skink", level: "C1", word: "Handicap", form: "Noun", phonetic: "/ˈhændɪkæp/", forms: "Adj: Handicapped", def: "A circumstance that makes progress or success difficult.", translation: "Bất lợi, trở ngại", example: "Taking five years before you can breed is a handicap, since there is little likelihood of surviving that long.", extraExample: "Not speaking the language was a major handicap for him." },
+        { topic: "Saving the Skink", level: "C2", word: "Complacency", form: "Noun", phonetic: "/kəmˈpleɪsnsi/", forms: "Adj: Complacent", def: "A feeling of smug or uncritical satisfaction with oneself or one's achievements.", translation: "Sự tự mãn, chủ quan", example: "Not that there is room for complacency concerning these species.", extraExample: "We cannot afford complacency when dealing with climate change." },
+        { topic: "Saving the Skink", level: "C2", word: "Imminent", form: "Adjective", phonetic: "/ˈɪmɪnənt/", forms: "N/A", def: "About to happen.", translation: "Sắp xảy ra, cận kề", example: "Because of the danger of imminent extinction, the team has also had to develop emergency captive-management techniques.", extraExample: "The dark clouds warned of an imminent storm." },
+        { topic: "Saving the Skink", level: "C1", word: "Plight", form: "Noun", phonetic: "/plaɪt/", forms: "N/A", def: "A dangerous, difficult, or otherwise unfortunate situation.", translation: "Hoàn cảnh khốn khổ", example: "Getting the public to understand the plight of these creatures is essential.", extraExample: "We must draw attention to the plight of the refugees." },
+        { topic: "Saving the Skink", level: "C2", word: "Refuge", form: "Noun", phonetic: "/ˈrefjuːdʒ/", forms: "N/A", def: "A condition of being safe or sheltered from pursuit, danger, or trouble.", translation: "Nơi trú ẩn", example: "Central Otago Ecological Trust (COET) aims to establish a refuge for the reintroduction of native species.", extraExample: "The hikers sought refuge in a cave during the blizzard." },
+        { topic: "Saving the Skink", level: "C1", word: "Fauna", form: "Noun", phonetic: "/ˈfɔːnə/", forms: "Adj: Faunal", def: "The animals of a particular region, habitat, or geological period.", translation: "Hệ động vật", example: "With any decline in New Zealand fauna, predation is always suspected...", extraExample: "The island has a very unique and diverse flora and fauna." },
+        { topic: "Saving the Skink", level: "C1", word: "Ecology", form: "Noun", phonetic: "/iˈkɒlədʒi/", forms: "Adj: Ecological", def: "The branch of biology that deals with the relations of organisms to one another and to their physical surroundings.", translation: "Sinh thái học", example: "A lack of fundamental knowledge about their ecology... makes effective conservation planning difficult.", extraExample: "The oil spill had a devastating effect on the local ecology." },
+        { topic: "Saving the Skink", level: "B2", word: "Microhabitat", form: "Noun", phonetic: "/ˌmaɪkrəʊˈhæbɪtæt/", forms: "N/A", def: "A habitat which is of small or limited extent and which differs in character from some surrounding more extensive habitat.", translation: "Vi môi trường", example: "...and their precise microhabitat needs—makes effective conservation planning difficult.", extraExample: "A rotting log creates a microhabitat for various insects." },
+        { topic: "Saving the Skink", level: "C1", word: "Captive", form: "Adjective", phonetic: "/ˈkæptɪv/", forms: "N: Captivity", def: "Kept in a confined space.", translation: "Bị nuôi nhốt", example: "Infection with mites is suspected of inhibiting reproduction among captive animals.", extraExample: "The zoo has a successful captive breeding program for pandas." },
+        { topic: "Saving the Skink", level: "B2", word: "Apathy", form: "Noun", phonetic: "/ˈæpəθi/", forms: "Adj: Apathetic", def: "Lack of interest, enthusiasm, or concern.", translation: "Sự thờ ơ", example: "What does the writer identify as a major obstacle to conserving the skinks? Public apathy.", extraExample: "There was widespread apathy among the voters during the election." },
+        { topic: "Saving the Skink", level: "B2", word: "Obstacle", form: "Noun", phonetic: "/ˈɒbstəkl/", forms: "N/A", def: "A thing that blocks one's way or prevents or hinders progress.", translation: "Trở ngại", example: "What does the writer identify as a major obstacle to conserving the skinks?", extraExample: "A lack of qualifications can be a major obstacle to finding a job." }
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+    let searchQuery = '';
+
+    function handleSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase();
+        applyFilters();
+    }
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const cardWord = card.querySelector('.word').textContent.toLowerCase();
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            const matchSearch = (searchQuery === '' || cardWord.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="word-form-main">(${item.form})</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const word = item.word.toLowerCase();
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            const matchSearch = (searchQuery === '' || word.includes(searchQuery));
+            if (matchTopic && matchLevel && matchSearch) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Words Match Filters";
+            document.getElementById('fc-word-form').textContent = "";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-word-form').textContent = `(${data.form})`;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed #d8b4fe; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: #4c1d95;">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: #4c1d95;">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: #f3e8ff; padding: 1rem; border-left: 4px solid #4c1d95; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #4c1d95; margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: #1e293b;">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
