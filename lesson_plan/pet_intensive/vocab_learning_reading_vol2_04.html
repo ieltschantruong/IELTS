@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Intensive Vol 2 Test 4 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Sunny Orange & Cerulean Blue reflecting Energy and Optimism */
+            --primary: #f97316; /* Orange 500 - Cheerful and vibrant */
+            --primary-light: #ffedd5; /* Orange 100 - Soft, warm light */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #fffbeb; /* Amber 50 - Very light, warm sunny background */
+            --card-bg: #ffffff;
+            --accent: #0ea5e9; /* Sky Blue 500 - Optimistic contrast */
+            --border: #fed7aa; /* Orange 200 */
+            --badge-bg: #e0f2fe; /* Sky Blue 100 */
+            --badge-text: #0369a1; /* Sky Blue 700 */
+            --success: #10b981; /* Emerald 500 for translation */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--primary); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Search Bar */
+        .search-container { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; max-width: 500px; padding: 0.75rem 1.5rem; font-size: 1rem; border: 2px solid var(--border); border-radius: 25px; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 2px 10px rgba(249, 115, 22, 0.15); }
+
+        /* Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--card-bg); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(249, 115, 22, 0.3); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 6px rgba(249, 115, 22, 0.2); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid var(--primary-light); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(249, 115, 22, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none !important; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px dashed var(--primary-light); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 800; color: var(--primary); text-transform: capitalize; letter-spacing: -0.01em; }
+        .word-form-main { font-size: 0.9rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .audio-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); cursor: pointer; font-size: 1.1rem; padding: 0.3rem; border-radius: 50%; transition: all 0.2s; align-self: center; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+        .audio-btn:hover { transform: scale(1.1); background-color: var(--primary); color: white; border-color: var(--primary); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; border-left: 3px solid var(--border); }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.75rem; color: var(--badge-text); font-weight: bold; margin-bottom: 0.5rem; display: inline-block; background: var(--badge-bg); padding: 0.2rem 0.6rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .definition { font-size: 1.05rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 1rem; font-weight: 600; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--primary); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: 0.25rem; font-weight: 800; }
+        .extra-example { background-color: #f1f5f9; border-left-color: var(--text-muted); margin-top: 0.5rem; }
+        .extra-example span { color: var(--text-muted); }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(249, 115, 22, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; background: linear-gradient(135deg, #ffffff 0%, var(--primary-light) 100%); border-color: var(--primary-light); }
+        .flashcard-front .word-container { margin-bottom: 1rem; display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .flashcard-front .word { font-size: 3rem; color: var(--primary); text-transform: capitalize; margin-bottom: 0;}
+        .flashcard-front .fc-word-form { font-size: 1.2rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .audio-btn { font-size: 2rem; width: 60px; height: 60px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid var(--border); }
+        .flashcard-back { transform: rotateY(180deg); background: #ffffff; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.5rem; width: 100%; }
+        
+        .flashcard-back .definition { font-size: 1.2rem; margin-bottom: 0.5rem; line-height: 1.5; }
+        .flashcard-back .translation { font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--success); font-weight: 600;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 1rem 1.25rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1.5rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; font-weight: bold; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 5px 15px rgba(249, 115, 22, 0.08); border: 1px solid var(--border); }
+        .fc-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); font-size: 1rem; font-weight: 700; cursor: pointer; padding: 0.6rem 1.2rem; border-radius: 25px; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(249, 115, 22, 0.2); }
+        .fc-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+        .fc-counter { font-weight: 800; font-size: 1.2rem; color: var(--primary); min-width: 80px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">PET Intensive Vol 2 Test 4 - Vocabulary Learning Tool</div>
+
+<div class="container">
+    <header>
+        <h1>Reading Vocabulary Bank</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a word or meaning..." oninput="handleSearch()">
+    </div>
+
+    <!-- Topic Filter -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Plastics Development')">Passage 1: Plastics</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Lean Production')">Passage 2: Manufacturing</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Sports & the Brain')">Passage 3: Sports & Brain</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Int.)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcards</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="topic-tag" id="fc-topic">Topic: General</span>
+                    <div class="word-container">
+                        <h2 class="word" id="fc-word">Word</h2>
+                        <span class="fc-word-form" id="fc-word-form">(Noun)</span>
+                    </div>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1.5rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / X</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: var(--border); margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀 Shuffle</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Intensive Vol 2 Test 4)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- PASSAGE 1: The development of plastics ---
+        { topic: "Plastics Development", level: "B2", word: "Substitute", form: "Noun / Verb", phonetic: "/ˈsʌbstɪtjuːt/", forms: "N: Substitution", def: "A person or thing acting or serving in place of another.", translation: "Vật thay thế", example: "The first plastics were developed as a substitute for natural rubber.", extraExample: "Soy milk is a common substitute for dairy milk." },
+        { topic: "Plastics Development", level: "C1", word: "Polymer", form: "Noun", phonetic: "/ˈpɒlɪmə/", forms: "V: Polymerize | N: Polymerization", def: "A substance that has a molecular structure consisting chiefly or entirely of a large number of similar units bonded together.", translation: "Cao phân tử, polyme", example: "Chemically, rubber is a polymer—a compound containing large molecules...", extraExample: "Plastic is essentially a synthetic polymer." },
+        { topic: "Plastics Development", level: "C1", word: "Compound", form: "Noun", phonetic: "/ˈkɒmpaʊnd/", forms: "N/A", def: "A thing that is composed of two or more separate elements; a mixture.", translation: "Hợp chất", example: "...a compound containing large molecules that are formed by the bonding of many smaller units...", extraExample: "Water is a chemical compound of hydrogen and oxygen." },
+        { topic: "Plastics Development", level: "C2", word: "Decline", form: "Verb", phonetic: "/dɪˈklaɪn/", forms: "N: Decline", def: "To become smaller, fewer, or less; decrease.", translation: "Suy giảm", example: "...to anybody who could replace ivory—supplies of which were declining...", extraExample: "The number of wild tigers continues to decline." },
+        { topic: "Plastics Development", level: "C1", word: "Dissolve", form: "Verb", phonetic: "/dɪˈzɒlv/", forms: "N: Dissolution", def: "Become or cause to become incorporated into a liquid so as to form a solution.", translation: "Hòa tan", example: "Celluloid was made by dissolving cellulose... in a solution of camphor...", extraExample: "Sugar easily dissolves in hot water." },
+        { topic: "Plastics Development", level: "B2", word: "Manufacture", form: "Noun / Verb", phonetic: "/ˌmænjuˈfæktʃə/", forms: "N: Manufacturer", def: "The making of articles on a large scale using machinery.", translation: "Sự sản xuất", example: "This new material rapidly found other applications in the manufacture of everyday products...", extraExample: "The company manufactures parts for airplane engines." },
+        { topic: "Plastics Development", level: "C1", word: "Take off", form: "Phrasal Verb", phonetic: "/teɪk ɒf/", forms: "N/A", def: "(Of an enterprise) become successful or popular.", translation: "Phát triển mạnh, cất cánh", example: "...without which the film industry could never have taken off at the end of the 19th century.", extraExample: "Her singing career really took off after she won the competition." },
+        { topic: "Plastics Development", level: "C2", word: "Mould", form: "Verb", phonetic: "/məʊld/", forms: "N: Mould", def: "Form (an object) out of malleable material.", translation: "Đúc, tạo khuôn", example: "...plastic that can be cast and moulded while hot...", extraExample: "The hot glass is moulded into various shapes." },
+        { topic: "Plastics Development", level: "C1", word: "Insulator", form: "Noun", phonetic: "/ˈɪnsjʊleɪtə/", forms: "V: Insulate | N: Insulation", def: "A substance or device which does not readily conduct electricity or heat.", translation: "Vật liệu cách điện/cách nhiệt", example: "Bakelite was a good insulator, and was resistant to water and acid.", extraExample: "Rubber is an excellent electrical insulator." },
+        { topic: "Plastics Development", level: "C1", word: "Resistant", form: "Adjective", phonetic: "/rɪˈzɪstənt/", forms: "N: Resistance | V: Resist", def: "Offering resistance to something or someone.", translation: "Có sức đề kháng, chống lại được", example: "Bakelite was a good insulator, and was resistant to water and acid.", extraExample: "These plants are highly resistant to drought." },
+        { topic: "Plastics Development", level: "C1", word: "Rigid", form: "Adjective", phonetic: "/ˈrɪdʒɪd/", forms: "N: Rigidity", def: "Unable to bend or be forced out of shape; not flexible.", translation: "Cứng nhắc, không uốn cong được", example: "A small change... produced rigid PVC, a fireproof plastic suitable for drains and gutters.", extraExample: "The rigid structure of the building survived the earthquake." },
+        { topic: "Plastics Development", level: "C2", word: "Friction", form: "Noun", phonetic: "/ˈfrɪkʃn/", forms: "N/A", def: "The resistance that one surface or object encounters when moving over another.", translation: "Ma sát", example: "It produces very little friction, making it ideal for products such as non-stick frying pans.", extraExample: "Adding oil to the engine reduces friction." },
+        { topic: "Plastics Development", level: "C1", word: "Glossy", form: "Adjective", phonetic: "/ˈɡlɒsi/", forms: "N: Gloss", def: "Shiny and smooth.", translation: "Bóng loáng", example: "...stretched to form long glossy threads that could be woven like silk.", extraExample: "The magazine is printed on high-quality glossy paper." },
+        { topic: "Plastics Development", level: "B2", word: "Garment", form: "Noun", phonetic: "/ˈɡɑːmənt/", forms: "N/A", def: "An item of clothing.", translation: "Quần áo, trang phục", example: "Today most garments are made of a blend of natural fibres...", extraExample: "The store sells fine silk garments." },
+        { topic: "Plastics Development", level: "B2", word: "Blend", form: "Noun / Verb", phonetic: "/blend/", forms: "N/A", def: "A mixture of different things or qualities.", translation: "Sự pha trộn", example: "Today most garments are made of a blend of natural fibres...", extraExample: "This coffee is a delicious blend of Brazilian and Colombian beans." },
+        { topic: "Plastics Development", level: "B2", word: "Drawback", form: "Noun", phonetic: "/ˈdrɔːbæk/", forms: "N/A", def: "A feature that renders something less acceptable; a disadvantage or problem.", translation: "Hạn chế, nhược điểm", example: "Despite its enormous usefulness, plastic has its drawbacks.", extraExample: "The main drawback of the plan is its high cost." },
+        { topic: "Plastics Development", level: "C2", word: "Indestructibility", form: "Noun", phonetic: "/ˌɪndɪˌstrʌktəˈbɪləti/", forms: "Adj: Indestructible | V: Destroy", def: "The quality of being impossible to destroy.", translation: "Tính không thể phá hủy", example: "In fact one its great strengths-its indestructibility- is its greatest disadvantage.", extraExample: "The superhero is known for his apparent indestructibility." },
+        { topic: "Plastics Development", level: "C2", word: "Litter", form: "Verb", phonetic: "/ˈlɪtə/", forms: "N: Litter", def: "Make (a place) untidy with rubbish or a large number of objects left lying about.", translation: "Vứt rác bừa bãi, rải rác rác rưởi", example: "Beaches all over the world... are littered with plastic bottles that nothing can destroy.", extraExample: "The park was littered with paper after the concert." },
+        { topic: "Plastics Development", level: "C1", word: "Biodegradable", form: "Adjective", phonetic: "/ˌbaɪəʊdɪˈɡreɪdəbl/", forms: "N/A", def: "(Of a substance or object) capable of being decomposed by bacteria or other living organisms.", translation: "Có thể phân hủy sinh học", example: "Plastics can be made biodegradable by incorporating into their structure a material such as starch...", extraExample: "We should use biodegradable packaging to protect the environment." },
+        { topic: "Plastics Development", level: "C1", word: "Incorporate", form: "Verb", phonetic: "/ɪnˈkɔːpəreɪt/", forms: "N: Incorporation", def: "Take in or contain (something) as part of a whole; include.", translation: "Đưa vào, kết hợp vào", example: "Plastics can be made biodegradable by incorporating into their structure a material such as starch...", extraExample: "The new design incorporates all the latest safety features." },
+        { topic: "Plastics Development", level: "B2", word: "Decay", form: "Verb", phonetic: "/dɪˈkeɪ/", forms: "N: Decay", def: "Rot or decompose through the action of bacteria and fungi.", translation: "Phân hủy, mục nát", example: "Other materials can be incorporated that gradually decay in sunlight...", extraExample: "Sugar can cause your teeth to decay." },
+        { topic: "Plastics Development", level: "C1", word: "Disintegrate", form: "Verb", phonetic: "/dɪsˈɪntɪɡreɪt/", forms: "N: Disintegration", def: "Break up into small parts, typically as the result of impact or decay.", translation: "Rã ra, phân rã", example: "...to ensure they do not disintegrate before they have been used.", extraExample: "The old paper had started to disintegrate from age." },
+
+        // --- PASSAGE 2: Lean Production innovation ---
+        { topic: "Lean Production", level: "B2", word: "Dominate", form: "Verb", phonetic: "/ˈdɒmɪneɪt/", forms: "N: Domination | Adj: Dominant", def: "Have a commanding influence on; exercise control over.", translation: "Thống trị, chiếm ưu thế", example: "Largely as a result of this, the United States soon dominated the world economy.", extraExample: "The invading army dominated the entire region." },
+        { topic: "Lean Production", level: "C1", word: "Pioneer", form: "Verb / Noun", phonetic: "/ˌpaɪəˈnɪə/", forms: "Adj: Pioneering", def: "Develop or be the first to use or apply (a new method, area of knowledge, or activity).", translation: "Tiên phong", example: "...Eiji Toyoda and Taiichi Ohno pioneered the concept of lean production at the Toyota car company.", extraExample: "She pioneered the use of this new surgical technique." },
+        { topic: "Lean Production", level: "C2", word: "Superimpose", form: "Verb", phonetic: "/ˌsuːpərɪmˈpəʊz/", forms: "N/A", def: "Place or lay (one thing) over another, typically so that both are still evident.", translation: "Chồng lên, áp đặt lên", example: "And now, although superimposing the method on existing mass production systems causes pain and upheaval...", extraExample: "The artist superimposed a modern image onto a classic painting." },
+        { topic: "Lean Production", level: "C2", word: "Upheaval", form: "Noun", phonetic: "/ʌpˈhiːvl/", forms: "N/A", def: "A violent or sudden change or disruption to something.", translation: "Sự biến động, sự thay đổi lớn gây khó khăn", example: "...superimposing the method on existing mass production systems causes pain and upheaval...", extraExample: "The political revolution caused massive social upheaval." },
+        { topic: "Lean Production", level: "C1", word: "Embrace", form: "Verb", phonetic: "/ɪmˈbreɪs/", forms: "N/A", def: "Accept or support (a belief, theory, or change) willingly and enthusiastically.", translation: "Đón nhận, áp dụng", example: "...manufacturers around the world are trying to embrace this innovative system.", extraExample: "The school eagerly embraced the new teaching methods." },
+        { topic: "Lean Production", level: "C1", word: "Exotic", form: "Adjective", phonetic: "/ɪɡˈzɒtɪk/", forms: "N/A", def: "Originating in or characteristic of a distant foreign country; attractive or striking because out of the ordinary.", translation: "Kỳ lạ, đắt tiền (xe cộ)", example: "A present day example of this method is the customised production of a few exotic sports cars.", extraExample: "The wealthy collector owned several exotic sports cars." },
+        { topic: "Lean Production", level: "B2", word: "Exclusively", form: "Adverb", phonetic: "/ɪkˈskluːsɪvli/", forms: "Adj: Exclusive | N: Exclusion", def: "To the exclusion of others; only.", translation: "Độc quyền, duy nhất", example: "Goods produced by the craft method – as cars once exclusively were – cost too much...", extraExample: "The VIP lounge is exclusively for first-class passengers." },
+        { topic: "Lean Production", level: "C1", word: "Churn out", form: "Phrasal Verb", phonetic: "/tʃɜːn aʊt/", forms: "N/A", def: "Produce something routinely and in large quantities.", translation: "Sản xuất hàng loạt (thường máy móc)", example: "These churn out standardised products in very high volumes.", extraExample: "The factory churns out thousands of plastic toys every day." },
+        { topic: "Lean Production", level: "C2", word: "Dispiriting", form: "Adjective", phonetic: "/dɪˈspɪrɪtɪŋ/", forms: "V: Dispirit | N: Spirit", def: "Causing someone to lose enthusiasm and hope; disheartening.", translation: "Làm chán nản, mất tinh thần", example: "...by means of work methods which most employees find boring and dispiriting.", extraExample: "It was a dispiriting loss for the team." },
+        { topic: "Lean Production", level: "C1", word: "Rigidity", form: "Noun", phonetic: "/rɪˈdʒɪdəti/", forms: "Adj: Rigid", def: "Inability to be to changed or adapted.", translation: "Sự cứng nhắc", example: "...combines the advantages of craft and mass production, while avoiding... the rigidity of the latter.", extraExample: "The rigidity of the school curriculum leaves no room for creativity." },
+        { topic: "Lean Production", level: "C1", word: "Automated", form: "Adjective", phonetic: "/ˈɔːtəmeɪtɪd/", forms: "N: Automation | V: Automate", def: "Operated by largely automatic equipment.", translation: "Tự động hóa", example: "...and use highly flexible and increasingly automated machines to produce goods...", extraExample: "The car assembly process is now highly automated." },
+        { topic: "Lean Production", level: "C1", word: "Defect", form: "Noun", phonetic: "/ˈdiːfekt/", forms: "Adj: Defective", def: "A shortcoming, imperfection, or lack.", translation: "Lỗi, khuyết điểm", example: "It also results in far fewer defects.", extraExample: "The items were returned to the factory because of a manufacturing defect." },
+        { topic: "Lean Production", level: "C1", word: "Compromise", form: "Verb", phonetic: "/ˈkɒmprəmaɪz/", forms: "N: Compromise", def: "Accept standards that are lower than is desirable.", translation: "Thỏa hiệp, nhượng bộ", example: "Lean producers, on the other hand, are unwilling to compromise standards in any of these areas.", extraExample: "We cannot compromise on the safety of our passengers." },
+        { topic: "Lean Production", level: "C1", word: "Fluctuation", form: "Noun", phonetic: "/ˌflʌktʃuˈeɪʃn/", forms: "V: Fluctuate", def: "An irregular rising and falling in number or amount; a variation.", translation: "Sự dao động, biến động", example: "Firstly, the system must be able to adapt to daily and monthly fluctuations in demand.", extraExample: "There are frequent fluctuations in currency exchange rates." },
+        { topic: "Lean Production", level: "C1", word: "Subsequent", form: "Adjective", phonetic: "/ˈsʌbsɪkwənt/", forms: "Adv: Subsequently", def: "Coming after something in time; following.", translation: "Tiếp theo, xảy ra sau", example: "Secondly, each separate process must supply only good units to the subsequent process.", extraExample: "The mistakes were corrected in subsequent editions of the book." },
+        { topic: "Lean Production", level: "C1", word: "Attain", form: "Verb", phonetic: "/əˈteɪn/", forms: "N: Attainment", def: "Succeed in achieving (something that one desires and has worked for).", translation: "Đạt được", example: "Thirdly, in as far as the system uses human resources to attain its cost objectives...", extraExample: "He has attained the highest grade in his music exams." },
+        { topic: "Lean Production", level: "C1", word: "Component", form: "Noun", phonetic: "/kəmˈpəʊnənt/", forms: "N/A", def: "A part or element of a larger whole, especially a part of a machine or vehicle.", translation: "Linh kiện, bộ phận", example: "...components from the preceding process should arrive at the next part of the line at exactly the right time...", extraExample: "The motherboard is a vital component of any computer." },
+        { topic: "Lean Production", level: "C2", word: "Superfluous", form: "Adjective", phonetic: "/suːˈpɜːfluəs/", forms: "N/A", def: "Unnecessary, especially through being more than enough.", translation: "Dư thừa, vô dụng", example: "If just-in-time is fully realised... superfluous inventories are completely eliminated...", extraExample: "The editor deleted all the superfluous words from the text." },
+        { topic: "Lean Production", level: "C1", word: "Eliminate", form: "Verb", phonetic: "/ɪˈlɪmɪneɪt/", forms: "N: Elimination", def: "Completely remove or get rid of (something).", translation: "Loại bỏ", example: "...superfluous inventories are completely eliminated from the factory...", extraExample: "The new diet helped him eliminate sugar from his meals." },
+        { topic: "Lean Production", level: "C1", word: "Simultaneously", form: "Adverb", phonetic: "/ˌsɪmlˈteɪniəsli/", forms: "Adj: Simultaneous", def: "At the same time.", translation: "Đồng thời", example: "...relying solely on a central planning approach to control schedules... simultaneously is very difficult...", extraExample: "The fireworks exploded simultaneously across the city." },
+        { topic: "Lean Production", level: "C1", word: "Withdraw", form: "Verb", phonetic: "/wɪðˈdrɔː/", forms: "N: Withdrawal", def: "Remove or take away (something) from a particular place or position.", translation: "Rút ra, lấy ra", example: "...employees go to the preceding process to withdraw the necessary quantity of units...", extraExample: "He decided to withdraw his savings from the bank." },
+        { topic: "Lean Production", level: "C2", word: "Requisite", form: "Adjective", phonetic: "/ˈrekwɪzɪt/", forms: "N: Requisite", def: "Made necessary by particular circumstances or regulations.", translation: "Cần thiết, tất yếu", example: "...and in turn withdraws the requisite number of components from the process that precedes it.", extraExample: "She lacks the requisite experience for this senior management role." },
+
+        // --- PASSAGE 3: How Does Watching Sport Influence the Brain? ---
+        { topic: "Sports & the Brain", level: "C2", word: "Epoch", form: "Noun", phonetic: "/ˈiːpɒk/", forms: "N/A", def: "A period of time in history or a person's life, typically one marked by notable events or particular characteristics.", translation: "Kỷ nguyên, thời kỳ", example: "During the epoch when the poet Homer unveiled his grand epic...", extraExample: "The invention of the internet marked the beginning of a new epoch in communication." },
+        { topic: "Sports & the Brain", level: "C2", word: "Transcend", form: "Verb", phonetic: "/trænˈsend/", forms: "Adj: Transcendent", def: "Be or go beyond the range or limits of (something abstract, typically a conceptual field or division).", translation: "Vượt qua, siêu việt", example: "This event, known as the Olympics, has transcended its humble origins...", extraExample: "His desire for peace transcended political boundaries." },
+        { topic: "Sports & the Brain", level: "C1", word: "Captivating", form: "Adjective", phonetic: "/ˈkæptɪveɪtɪŋ/", forms: "V: Captivate | N: Captivation", def: "Capable of attracting and holding interest; charming.", translation: "Lôi cuốn, hấp dẫn", example: "The captivating nature of these games raises an intriguing question...", extraExample: "She has a captivating smile that lights up the room." },
+        { topic: "Sports & the Brain", level: "C1", word: "Intriguing", form: "Adjective", phonetic: "/ɪnˈtriːɡɪŋ/", forms: "V: Intrigue", def: "Arousing one's curiosity or interest; fascinating.", translation: "Hấp dẫn, gây tò mò", example: "The captivating nature of these games raises an intriguing question...", extraExample: "The plot of the mystery novel is highly intriguing." },
+        { topic: "Sports & the Brain", level: "C2", word: "Repository", form: "Noun", phonetic: "/rɪˈpɒzətri/", forms: "N/A", def: "A place, building, or receptacle where things are or may be stored.", translation: "Kho chứa, nơi lưu trữ", example: "They revealed a cluster of cells that act as a repository for motor actions...", extraExample: "The library is a vast repository of historical knowledge." },
+        { topic: "Sports & the Brain", level: "C2", word: "Meticulously", form: "Adverb", phonetic: "/məˈtɪkjələsli/", forms: "Adj: Meticulous", def: "In a way that shows great attention to detail; very thoroughly.", translation: "Một cách tỉ mỉ", example: "These cellular networks represent the 'sentences' of full-body motions that our brains meticulously retain...", extraExample: "The model ship was meticulously crafted by hand." },
+        { topic: "Sports & the Brain", level: "C2", word: "Deceptively", form: "Adverb", phonetic: "/dɪˈseptɪvli/", forms: "Adj: Deceptive | N: Deception", def: "In a way or to an extent that gives a misleading impression.", translation: "Trông có vẻ (nhưng không phải vậy)", example: "For those who only watch the Masters Tournament on television, playing golf may appear deceptively effortless.", extraExample: "The calm surface of the river was deceptively dangerous." },
+        { topic: "Sports & the Brain", level: "C2", word: "Asymmetrical", form: "Adjective", phonetic: "/ˌæsiˈmetrɪkl/", forms: "N: Asymmetry", def: "Having parts that fail to correspond to one another in shape, size, or arrangement; lacking symmetry.", translation: "Không đối xứng", example: "However, for novices, smoothly manoeuvring the asymmetrical metal club presents a nearly impossible challenge.", extraExample: "The designer created an asymmetrical dress that was very modern." },
+        { topic: "Sports & the Brain", level: "C2", word: "Ingrained", form: "Adjective", phonetic: "/ɪnˈɡreɪnd/", forms: "V: Ingrain", def: "(Of a habit, belief, or attitude) firmly fixed or established; difficult to change.", translation: "Ăn sâu, bắt rễ", example: "...as their actions are deeply ingrained and intertwined with neurons in the premotor cortex.", extraExample: "The fear of failure was deeply ingrained in his mind." },
+        { topic: "Sports & the Brain", level: "C1", word: "Serenity", form: "Noun", phonetic: "/səˈrenəti/", forms: "Adj: Serene", def: "The state of being calm, peaceful, and untroubled.", translation: "Sự thanh bình, tĩnh lặng", example: "Their swing occurs with the serenity of a refined autopilot...", extraExample: "I love the absolute serenity of the lake in the early morning." },
+        { topic: "Sports & the Brain", level: "C2", word: "Bestow", form: "Verb", phonetic: "/bɪˈstəʊ/", forms: "N/A", def: "Confer or present (an honour, right, or gift).", translation: "Ban tặng, gán cho", example: "...that prompted Rizzolatti, Fogassi, and Gallese to bestow upon them the exalted label of 'mirror neuron'.", extraExample: "The queen bestowed a knighthood on the brave soldier." },
+        { topic: "Sports & the Brain", level: "C2", word: "Internalise", form: "Verb", phonetic: "/ɪnˈtɜːnəlaɪz/", forms: "N: Internalisation", def: "Make (attitudes or behaviour) part of one's nature by learning or unconscious assimilation.", translation: "Tiếp thu, tiếp nhận (thành của mình)", example: "...enabling us to intemalise the behaviours of others.", extraExample: "Children quickly internalise the values of their parents." },
+        { topic: "Sports & the Brain", level: "C2", word: "Dissipate", form: "Verb", phonetic: "/ˈdɪsɪpeɪt/", forms: "N: Dissipation", def: "Disappear or cause to disappear.", translation: "Tiêu tan, tan biến", example: "...remaining active during periods of bodily stillness but dissipating when we undertake active pursuits...", extraExample: "The morning fog slowly dissipated as the sun rose." },
+        { topic: "Sports & the Brain", level: "C1", word: "Subdued", form: "Adjective", phonetic: "/səbˈdjuːd/", forms: "V: Subdue", def: "(Of a person or their manner) quiet and rather reflective or depressed; (of light or color) soft and restrained.", translation: "Bị kìm nén, dịu đi", example: "Notably, the mu signal also remains subdued while we observe someone else in action...", extraExample: "The lighting in the restaurant was dim and subdued." },
+        { topic: "Sports & the Brain", level: "C1", word: "Simulate", form: "Verb", phonetic: "/ˈsɪmjuleɪt/", forms: "N: Simulation", def: "Imitate the appearance or character of.", translation: "Mô phỏng", example: "This suggests that our brains do not simply passively register what we see, but actively simulate it...", extraExample: "The computer program can simulate how the disease spreads." },
+        { topic: "Sports & the Brain", level: "C2", word: "Delineate", form: "Verb", phonetic: "/dɪˈlɪnieɪt/", forms: "N: Delineation", def: "Describe or portray (something) precisely.", translation: "Vạch ra, mô tả chi tiết", example: "Rizzolatti, Fogassi, and Gallese have coined the term 'direct matching hypothesis' to delineate the concept of mirror neurons.", extraExample: "The report carefully delineates the duties of each department." },
+        { topic: "Sports & the Brain", level: "C2", word: "Comprehend", form: "Verb", phonetic: "/ˌkɒmprɪˈhend/", forms: "N: Comprehension | Adj: Comprehensible", def: "Grasp mentally; understand.", translation: "Hiểu, lĩnh hội", example: "They asserted that to comprehend the movements of sports stars, we need to align the visual representation...", extraExample: "It is difficult to fully comprehend the scale of the universe." },
+        { topic: "Sports & the Brain", level: "C1", word: "Evoke", form: "Verb", phonetic: "/ɪˈvəʊk/", forms: "N: Evocation | Adj: Evocative", def: "Bring or recall to the conscious mind.", translation: "Gợi lên", example: "According to this theory, watching an Olympic athlete can evoke a resonance in the observer's motor system.", extraExample: "That old song always evokes strong memories of my childhood." },
+        { topic: "Sports & the Brain", level: "C1", word: "Resonance", form: "Noun", phonetic: "/ˈrezənəns/", forms: "V: Resonate | Adj: Resonant", def: "The quality in a sound of being deep, full, and reverberating; the ability to evoke or suggest images, memories, and emotions.", translation: "Sự cộng hưởng, sự vang vọng", example: "According to this theory, watching an Olympic athlete can evoke a resonance in the observer's motor system.", extraExample: "His powerful speech had a deep resonance with the audience." },
+        { topic: "Sports & the Brain", level: "C2", word: "Harness", form: "Verb", phonetic: "/ˈhɑːnɪs/", forms: "N/A", def: "Control and make use of (natural resources), especially to produce energy.", translation: "Khai thác, tận dụng", example: "The observer's 'motor knowledge' is harnessed to decipher the observed action.", extraExample: "We must learn how to efficiently harness solar energy." },
+        { topic: "Sports & the Brain", level: "C2", word: "Decipher", form: "Verb", phonetic: "/dɪˈsaɪfə/", forms: "N/A", def: "Convert (a text written in code, or a hidden meaning) into normal language.", translation: "Giải mã", example: "The observer's 'motor knowledge' is harnessed to decipher the observed action.", extraExample: "It took the team months to decipher the ancient hieroglyphics." },
+        { topic: "Sports & the Brain", level: "C1", word: "Bolster", form: "Verb", phonetic: "/ˈbəʊlstə/", forms: "N/A", def: "Support or strengthen; prop up.", translation: "Củng cố, tăng cường", example: "It turns out that watching a remarkable golfer improves our own golfing skills, and witnessing a skilled sprinter actually bolsters our running speed.", extraExample: "The positive review really bolstered the team's confidence." },
+        { topic: "Sports & the Brain", level: "C2", word: "Acquisition", form: "Noun", phonetic: "/ˌækwɪˈzɪʃn/", forms: "V: Acquire", def: "The learning or developing of a skill, habit, or quality.", translation: "Sự tiếp thu (ngôn ngữ, kỹ năng)", example: "From language acquisition in infancy to understanding facial expressions, mimicking plays a fundamental role...", extraExample: "First language acquisition happens naturally in childhood." },
+        { topic: "Sports & the Brain", level: "C2", word: "Coalesce", form: "Verb", phonetic: "/ˌkəʊəˈles/", forms: "N/A", def: "Come together to form one mass or whole.", translation: "Hợp nhất, kết hợp", example: "In this way, action and imagination coalesce to drive performance.", extraExample: "The separate groups eventually coalesced into a single political party." },
+        { topic: "Sports & the Brain", level: "C1", word: "Encompass", form: "Verb", phonetic: "/ɪnˈkʌmpəs/", forms: "N/A", def: "Surround and have or hold within; include comprehensively.", translation: "Bao gồm, chứa đựng", example: "Most spectators tune in for the emotional roller coaster, the human drama it encompasses.", extraExample: "The festival encompasses a wide range of musical styles." },
+        { topic: "Sports & the Brain", level: "C2", word: "Resonate", form: "Verb", phonetic: "/ˈrezəneɪt/", forms: "N: Resonance", def: "Produce or be filled with a deep, full, reverberating sound; evoke images, memories, and emotions.", translation: "Cộng hưởng, tạo tiếng vang", example: "During the Olympics, mirror neurons in individuals around the world resonate in unison...", extraExample: "The message of the movie really resonated with teenagers." },
+        { topic: "Sports & the Brain", level: "C2", word: "Unison", form: "Noun", phonetic: "/ˈjuːnɪsn/", forms: "N/A", def: "Simultaneous performance or utterance of action or speech.", translation: "Sự đồng thanh, cùng lúc", example: "During the Olympics, mirror neurons in individuals around the world resonate in unison...", extraExample: "The choir sang the final chorus in perfect unison." },
+        { topic: "Sports & the Brain", level: "C1", word: "Flawlessly", form: "Adverb", phonetic: "/ˈflɔːləsli/", forms: "Adj: Flawless | N: Flaw", def: "In a manner free from imperfections or defects; perfectly.", translation: "Một cách hoàn hảo, không tì vết", example: "Yet, as we gather around our televisions, we all briefly get a taste of the feeling of executing something flawlessly.", extraExample: "She played the difficult piano sonata flawlessly." },
+        { topic: "Sports & the Brain", level: "C2", word: "Fleeting", form: "Adjective", phonetic: "/ˈfliːtɪŋ/", forms: "N/A", def: "Lasting for a very short time.", translation: "Thoáng qua, chớp nhoáng", example: "In those fleeting moments, sport becomes more than entertainment...", extraExample: "He caught a fleeting glimpse of the deer before it ran away." }
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+    let searchQuery = '';
+
+    function handleSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase();
+        applyFilters();
+    }
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const cardWord = card.querySelector('.word').textContent.toLowerCase();
+            const cardDef = card.querySelector('.definition').textContent.toLowerCase();
+            const cardTrans = card.querySelector('.translation').textContent.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            const matchSearch = (searchQuery === '' || cardWord.includes(searchQuery) || cardDef.includes(searchQuery) || cardTrans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="word-form-main">(${item.form})</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const word = item.word.toLowerCase();
+            const def = item.def.toLowerCase();
+            const trans = item.translation.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            const matchSearch = (searchQuery === '' || word.includes(searchQuery) || def.includes(searchQuery) || trans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Match";
+            document.getElementById('fc-word-form').textContent = "";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-word-form').textContent = `(${data.form})`;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed var(--border); padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: var(--text-muted);">
+                    <strong style="color: var(--accent);">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: var(--accent);">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--primary); border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid var(--text-muted); border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
