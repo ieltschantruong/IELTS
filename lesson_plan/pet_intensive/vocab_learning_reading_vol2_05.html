@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Reading Mock Test 5 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Soft Sage Green & Muted Gold reflecting Nature, Brain Science, and Art */
+            --primary: #4d7c0f; /* Lime 700 - Earthy Green */
+            --primary-light: #fef08a; /* Yellow 200 - Soft Gold */
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --accent: #ca8a04; /* Yellow 600 - Deeper Gold */
+            --border: #bef264; /* Lime 300 */
+            --badge-bg: #d9f99d; /* Lime 200 */
+            --badge-text: #3f6212; /* Lime 800 */
+            --success: #0284c7; /* Ocean Blue for translations */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background-color: var(--text-main); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Search Bar */
+        .search-container { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; max-width: 500px; padding: 0.75rem 1.5rem; font-size: 1rem; border: 2px solid var(--border); border-radius: 25px; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 2px 10px rgba(77, 124, 15, 0.15); }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(77, 124, 15, 0.3); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); color: var(--accent); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 6px rgba(77, 124, 15, 0.2); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(77, 124, 15, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none !important; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px dashed var(--border); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 800; color: var(--primary); text-transform: capitalize; letter-spacing: -0.01em; }
+        .word-form-main { font-size: 0.9rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .audio-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); cursor: pointer; font-size: 1.1rem; padding: 0.3rem; border-radius: 50%; transition: all 0.2s; align-self: center; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+        .audio-btn:hover { transform: scale(1.1); background-color: var(--primary); color: white; border-color: var(--primary); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; border-left: 3px solid var(--border); }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.75rem; color: var(--badge-text); font-weight: bold; margin-bottom: 0.5rem; display: inline-block; background: var(--badge-bg); padding: 0.2rem 0.6rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .definition { font-size: 1.05rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 1rem; font-weight: 600; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: 800; }
+        .extra-example { background-color: #f1f5f9; border-left-color: var(--text-muted); margin-top: 0.5rem; }
+        .extra-example span { color: var(--text-muted); }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(77, 124, 15, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; background: linear-gradient(135deg, #ffffff 0%, var(--primary-light) 100%); border-color: var(--primary-light); }
+        .flashcard-front .word-container { margin-bottom: 1rem; display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .flashcard-front .word { font-size: 3rem; color: var(--primary); text-transform: capitalize; margin-bottom: 0;}
+        .flashcard-front .fc-word-form { font-size: 1.2rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .audio-btn { font-size: 2rem; width: 60px; height: 60px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid var(--border); }
+        .flashcard-back { transform: rotateY(180deg); background: #ffffff; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.5rem; width: 100%; }
+        
+        .flashcard-back .definition { font-size: 1.2rem; margin-bottom: 0.5rem; line-height: 1.5; }
+        .flashcard-back .translation { font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--success); font-weight: 600;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 1rem 1.25rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1.5rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; font-weight: bold; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 5px 15px rgba(77, 124, 15, 0.08); border: 1px solid var(--border); }
+        .fc-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); font-size: 1rem; font-weight: 700; cursor: pointer; padding: 0.6rem 1.2rem; border-radius: 25px; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(77, 124, 15, 0.2); }
+        .fc-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+        .fc-counter { font-weight: 800; font-size: 1.2rem; color: var(--primary); min-width: 80px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">PET Intensive Vol 2 Test 5 - Vocabulary Learning Tool</div>
+
+<div class="container">
+    <header>
+        <h1>Reading Vocabulary Bank</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a word or meaning..." oninput="handleSearch()">
+    </div>
+
+    <!-- Topic Filter Controls -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'History of Olive Oil')">Passage 1: Olive Oil</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Multi-tasking')">Passage 2: Multi-tasking</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Australian Landscapes')">Passage 3: Art Landscapes</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Int.)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcards</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="topic-tag" id="fc-topic">Topic: General</span>
+                    <div class="word-container">
+                        <h2 class="word" id="fc-word">Word</h2>
+                        <span class="fc-word-form" id="fc-word-form">(Noun)</span>
+                    </div>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1.5rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / X</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: var(--border); margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀 Shuffle</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    // ---------------------------------------------------------
+    // Vocabulary Bank (PET Intensive Vol 2 Test 5)
+    // ---------------------------------------------------------
+    const vocabBank = [
+        // --- PASSAGE 1: The Early History of Olive Oil ---
+        { topic: "History of Olive Oil", level: "C1", word: "Domestication", form: "Noun", phonetic: "/dəˌmestɪˈkeɪʃn/", forms: "V: Domesticate", def: "The process of taming an animal and keeping it as a pet or on a farm, or the cultivation of a plant for food.", translation: "Sự thuần hóa, sự lai giống (cây trồng)", example: "Archaeologists today are divided over exactly where the first domestication of the olive occurred...", extraExample: "The domestication of wild wheat changed human history." },
+        { topic: "History of Olive Oil", level: "C1", word: "Contend", form: "Verb", phonetic: "/kənˈtend/", forms: "N: Contention", def: "Assert something as a position in an argument.", translation: "Cho rằng, lập luận rằng", example: "...while others contend it was in mainland Greece or on the island of Crete.", extraExample: "The lawyer contended that his client was completely innocent." },
+        { topic: "History of Olive Oil", level: "C1", word: "Cultivation", form: "Noun", phonetic: "/ˌkʌltɪˈveɪʃn/", forms: "V: Cultivate", def: "The action of cultivating land, or the state of being cultivated.", translation: "Sự trồng trọt, canh tác", example: "The one thing that can be said with certainty is that cultivation began at least 6,000 years ago...", extraExample: "The cultivation of rice requires a lot of water." },
+        { topic: "History of Olive Oil", level: "C2", word: "Pharmacological", form: "Adjective", phonetic: "/ˌfɑːməkəˈlɒdʒɪkl/", forms: "N: Pharmacology", def: "Relating to the branch of medicine concerned with the uses, effects, and modes of action of drugs.", translation: "Thuộc dược lý học", example: "Olive oil was used for a variety of purposes... including as a pharmacological ointment...", extraExample: "The plant has unique pharmacological properties." },
+        { topic: "History of Olive Oil", level: "C2", word: "Ointment", form: "Noun", phonetic: "/ˈɔɪntmənt/", forms: "N/A", def: "A smooth oily preparation that is rubbed on the skin for medicinal purposes or as a cosmetic.", translation: "Thuốc mỡ", example: "Olive oil was used for a variety of purposes... including as a pharmacological ointment...", extraExample: "He applied a soothing ointment to the burn." },
+        { topic: "History of Olive Oil", level: "C2", word: "Anoint", form: "Verb", phonetic: "/əˈnɔɪnt/", forms: "N/A", def: "Smear or rub with oil, typically as part of a religious ceremony.", translation: "Xức dầu (trong nghi lễ)", example: "...and in rituals for anointing royalty.", extraExample: "The high priest anointed the new king." },
+        { topic: "History of Olive Oil", level: "C1", word: "Sacred", form: "Adjective", phonetic: "/ˈseɪkrɪd/", forms: "N/A", def: "Connected with God (or the gods) or dedicated to a religious purpose.", translation: "Thiêng liêng", example: "The ancient Greeks believed the olive tree was a priceless gift... and used its oil in sacred religious rituals.", extraExample: "Cows are considered sacred in Hinduism." },
+        { topic: "History of Olive Oil", level: "B2", word: "Punishable", form: "Adjective", phonetic: "/ˈpʌnɪʃəbl/", forms: "V: Punish | N: Punishment", def: "(Of an act or offence) subject to a judicial punishment.", translation: "Có thể bị trừng phạt", example: "...Greek law forbade the cutting down of olive trees and made it punishable by death.", extraExample: "Treason is a crime punishable by life in prison." },
+        { topic: "History of Olive Oil", level: "C1", word: "Ingrained", form: "Adjective", phonetic: "/ɪnˈɡreɪnd/", forms: "V: Ingrain", def: "(Of a habit, belief, or attitude) firmly fixed or established; difficult to change.", translation: "Ăn sâu, bắt rễ", example: "Its use as an aid to beauty and health later became ingrained in many Mediterranean cultures.", extraExample: "The idea of working hard was ingrained in him from a young age." },
+        { topic: "History of Olive Oil", level: "C1", word: "Commodity", form: "Noun", phonetic: "/kəˈmɒdəti/", forms: "N/A", def: "A raw material or primary agricultural product that can be bought and sold.", translation: "Hàng hóa", example: "With the spread of the Roman Empire, olive oil became a major commodity...", extraExample: "Coffee is an important agricultural commodity for many countries." },
+        { topic: "History of Olive Oil", level: "C1", word: "Artefact", form: "Noun", phonetic: "/ˈɑːtɪfækt/", forms: "N/A", def: "An object made by a human being, typically an item of cultural or historical interest.", translation: "Đồ tạo tác, cổ vật", example: "Artefacts found at various Mediterranean archaeological sites include olive oil storage vessels...", extraExample: "The museum holds many ancient Egyptian artefacts." },
+        { topic: "History of Olive Oil", level: "C1", word: "Residue", form: "Noun", phonetic: "/ˈrezɪdjuː/", forms: "Adj: Residual", def: "A small amount of something that remains after the main part has gone or been taken or used.", translation: "Cặn, phần còn dư lại", example: "...include olive oil storage vessels with olive plant residue still in them.", extraExample: "Wash the apples to remove any chemical residue." },
+        { topic: "History of Olive Oil", level: "C2", word: "Laborious", form: "Adjective", phonetic: "/ləˈbɔːriəs/", forms: "N: Labour", def: "Requiring considerable effort and time.", translation: "Gian khổ, cần cù", example: "Making olive oil in those early days was a laborious process...", extraExample: "Collecting all the data by hand was a highly laborious task." },
+        { topic: "History of Olive Oil", level: "C1", word: "Mechanisation", form: "Noun", phonetic: "/ˌmekənaɪˈzeɪʃn/", forms: "V: Mechanise", def: "The introduction of machines or automatic devices into a process, activity, or place.", translation: "Sự cơ giới hóa", example: "...a laborious process accomplished without mechanisation.", extraExample: "The mechanisation of agriculture reduced the need for manual labour." },
+        { topic: "History of Olive Oil", level: "C1", word: "Refine", form: "Verb", phonetic: "/rɪˈfaɪn/", forms: "N: Refinement", def: "Remove impurities or unwanted elements from (a substance), typically as part of an industrial process.", translation: "Tinh chế, lọc", example: "Therefore, this impure mixture was allowed once more to settle in vats and then separated in order to refine the product.", extraExample: "Crude oil must be refined before it can be used as petrol." },
+        { topic: "History of Olive Oil", level: "B2", word: "Discard", form: "Verb", phonetic: "/dɪsˈkɑːd/", forms: "N/A", def: "Get rid of (someone or something) as no longer useful or desirable.", translation: "Vứt bỏ, loại bỏ", example: "In many ancient civilisations it was often simply discarded, causing serious pollution...", extraExample: "You should discard any food that smells bad." },
+        { topic: "History of Olive Oil", level: "C1", word: "Malnutrition", form: "Noun", phonetic: "/ˌmælnjuˈtrɪʃn/", forms: "Adj: Malnourished", def: "Lack of proper nutrition, caused by not having enough to eat, not eating enough of the right things, or being unable to use the food that one does eat.", translation: "Sự suy dinh dưỡng", example: "It could also be eaten by farm animals and was, in fact, fed to livestock suffering from malnutrition.", extraExample: "Many children in the drought-stricken area suffered from severe malnutrition." },
+        { topic: "History of Olive Oil", level: "C1", word: "Pesticide", form: "Noun", phonetic: "/ˈpestɪsaɪd/", forms: "N/A", def: "A substance used for destroying insects or other organisms harmful to cultivated plants or to animals.", translation: "Thuốc trừ sâu", example: "According to ancient texts, amurca was also utilised in moderate amounts by farmers as a fertiliser or as a pesticide...", extraExample: "Organic farmers avoid using artificial pesticides." },
+        { topic: "History of Olive Oil", level: "C2", word: "Rodent", form: "Noun", phonetic: "/ˈrəʊdnt/", forms: "N/A", def: "A gnawing mammal of an order that includes rats, mice, squirrels, hamsters, porcupines, and their relatives.", translation: "Động vật gặm nhấm", example: "...helping them to protect their crops from insects and even small rodents.", extraExample: "Owls are very useful for keeping the rodent population under control." },
+
+        // --- PASSAGE 2: Multi-tasking and the brain ---
+        { topic: "Multi-tasking", level: "B2", word: "Capable", form: "Adjective", phonetic: "/ˈkeɪpəbl/", forms: "N: Capability", def: "Having the ability, fitness, or quality necessary to do or achieve a specified thing.", translation: "Có khả năng", example: "...research shows that your brain isn't capable of paying close attention to more than one complex task at a time.", extraExample: "She is highly capable of managing the entire department." },
+        { topic: "Multi-tasking", level: "C1", word: "Simultaneously", form: "Adverb", phonetic: "/ˌsɪmlˈteɪniəsli/", forms: "Adj: Simultaneous", def: "At the same time.", translation: "Đồng thời, cùng lúc", example: "...a mythical activity in which people believe they can perform two or more tasks simultaneously...", extraExample: "The fireworks exploded simultaneously across the city." },
+        { topic: "Multi-tasking", level: "C1", word: "Innate", form: "Adjective", phonetic: "/ɪˈneɪt/", forms: "Adv: Innately", def: "Inborn; natural.", translation: "Bẩm sinh", example: "But innate activities like walking, chewing, and breathing do not require you to pay attention...", extraExample: "He has an innate ability to learn languages quickly." },
+        { topic: "Multi-tasking", level: "C2", word: "Cognitive", form: "Adjective", phonetic: "/ˈkɒɡnətɪv/", forms: "N: Cognition", def: "Relating to cognition (the mental action or process of acquiring knowledge and understanding through thought, experience, and the senses).", translation: "Thuộc về nhận thức", example: "Says Associate Professor Paul E Dux, a cognitive neuroscientist at the University of Queensland...", extraExample: "As children grow older, their cognitive abilities develop significantly." },
+        { topic: "Multi-tasking", level: "C1", word: "Concurrently", form: "Adverb", phonetic: "/kənˈkʌrəntli/", forms: "Adj: Concurrent", def: "At the same time; simultaneously.", translation: "Cùng một lúc", example: "When you do only one thing at a time, you're better at that task than when you're doing multiple things concurrently.", extraExample: "He is concurrently studying for two different degrees." },
+        { topic: "Multi-tasking", level: "C1", word: "Scenario", form: "Noun", phonetic: "/səˈnɑːriəʊ/", forms: "N/A", def: "A postulated sequence or development of events; a setting.", translation: "Viễn cảnh, tình huống", example: "Take the classic multi-tasking scenario of talking on a mobile phone while driving...", extraExample: "We must consider the worst-case scenario before making a decision." },
+        { topic: "Multi-tasking", level: "C1", word: "Ill-advised", form: "Adjective", phonetic: "/ˌɪl ədˈvaɪzd/", forms: "N/A", def: "Unwise or imprudent.", translation: "Thiếu khôn ngoan, khờ dại", example: "...talking on a mobile phone while driving - an ill-advised activity that many people believe they have mastered.", extraExample: "It would be ill-advised to travel during the severe storm." },
+        { topic: "Multi-tasking", level: "B2", word: "Impair", form: "Verb", phonetic: "/ɪmˈpeə/", forms: "N: Impairment", def: "Weaken or damage something (especially a human faculty or function).", translation: "Làm suy yếu, làm hỏng", example: "Even with both eyes on the road and both hands on the wheel, drivers' performance was impaired.", extraExample: "Loud noise can permanently impair your hearing." },
+        { topic: "Multi-tasking", level: "C1", word: "Deteriorate", form: "Verb", phonetic: "/dɪˈtɪəriəreɪt/", forms: "N: Deterioration", def: "Become progressively worse.", translation: "Xấu đi, tồi tệ đi", example: "Strayer's research shows that performance deteriorates drastically when attention is split between tasks...", extraExample: "His health began to deteriorate rapidly after the operation." },
+        { topic: "Multi-tasking", level: "C1", word: "Drastically", form: "Adverb", phonetic: "/ˈdræstɪkli/", forms: "Adj: Drastic", def: "In a way that is likely to have a strong or far-reaching effect.", translation: "Một cách đáng kể, quyết liệt", example: "Strayer's research shows that performance deteriorates drastically when attention is split...", extraExample: "Our budget has been drastically reduced this year." },
+        { topic: "Multi-tasking", level: "C1", word: "Coordinate", form: "Verb", phonetic: "/kəʊˈɔːdɪneɪt/", forms: "N: Coordination", def: "Bring the different elements of (a complex activity or organization) into a relationship that will ensure efficiency or harmony.", translation: "Phối hợp, điều phối", example: "The prefrontal cortex is the brain region responsible for... coordinating inputs from other brain areas.", extraExample: "We need someone to coordinate the whole event." },
+        { topic: "Multi-tasking", level: "B2", word: "Juggle", form: "Verb", phonetic: "/ˈdʒʌɡl/", forms: "N: Juggler", def: "Continuously toss into the air and catch (a number of objects) so as to keep at least one in the air while handling the others; to cope with by balancing.", translation: "Tung hứng, xoay xở cùng lúc", example: "...we might be in great trouble when we try to juggle more than two tasks...", extraExample: "Working mothers often have to juggle their careers and childcare." },
+        { topic: "Multi-tasking", level: "C1", word: "Superior", form: "Adjective", phonetic: "/suːˈpɪəriə/", forms: "N: Superiority", def: "Higher in rank, status, or quality.", translation: "Vượt trội", example: "...believe there might be some truth to the claim that women are superior multi-taskers.", extraExample: "This new model is vastly superior to the older version." },
+        { topic: "Multi-tasking", level: "C2", word: "Extraordinary", form: "Adjective", phonetic: "/ɪkˈstrɔːdnri/", forms: "N/A", def: "Very unusual or remarkable.", translation: "Phi thường, kỳ lạ", example: "However, David Strayer's research uncovered that some rare people possess extraordinary multi-tasking ability.", extraExample: "He showed extraordinary courage during the rescue." },
+        { topic: "Multi-tasking", level: "C1", word: "Efficiency", form: "Noun", phonetic: "/ɪˈfɪʃnsi/", forms: "Adj: Efficient", def: "The state or quality of being efficient; achieving maximum productivity with minimum wasted effort.", translation: "Hiệu suất, tính hiệu quả", example: "...suggesting their brains are functioning with a high level of efficiency.", extraExample: "We need to improve the energy efficiency of our homes." },
+        { topic: "Multi-tasking", level: "C1", word: "Elite", form: "Adjective", phonetic: "/ɪˈliːt/", forms: "N: Elite", def: "A select part of a group that is superior to the rest in terms of ability or qualities.", translation: "Ưu tú, tinh hoa", example: "...and elite doctors in hospital emergency rooms might all be more likely to be super-taskers.", extraExample: "Only elite athletes qualify for the Olympic Games." },
+        { topic: "Multi-tasking", level: "C1", word: "Inherit", form: "Verb", phonetic: "/ɪnˈherɪt/", forms: "N: Inheritance", def: "Derive (a quality, characteristic, or predisposition) genetically from one's parents or ancestors.", translation: "Thừa kế, di truyền", example: "The ability to multi-task probably comes down to the DNA you inherit from your parents...", extraExample: "He inherited his mother's musical talent." },
+        { topic: "Multi-tasking", level: "C1", word: "Neural", form: "Adjective", phonetic: "/ˈnjʊərəl/", forms: "N: Neurology", def: "Relating to a nerve or the nervous system.", translation: "Thuộc về thần kinh", example: "'You are either born with the neural structure that allows you to overcome the usual multi-tasking challenges, or you aren't.'", extraExample: "Researchers are mapping the neural pathways of the brain." },
+
+        // --- PASSAGE 3: Australian Landscapes ---
+        { topic: "Australian Landscapes", level: "C1", word: "Spectacular", form: "Adjective", phonetic: "/spekˈtækjələ/", forms: "Adv: Spectacularly", def: "Beautiful in a dramatic and eye-catching way.", translation: "Ngoạn mục, tráng lệ", example: "For the casual viewer, the exhibition... will be a spectacular guide through Australian art history.", extraExample: "The fireworks display was truly spectacular." },
+        { topic: "Australian Landscapes", level: "C2", word: "Culminate", form: "Verb", phonetic: "/ˈkʌlmɪneɪt/", forms: "N: Culmination", def: "Reach a climax or point of highest development.", translation: "Đạt đến đỉnh điểm, kết thúc bằng", example: "...progressing through expressionism and modernism... culminating with the current generation of Australian artists.", extraExample: "The festival will culminate with a grand parade." },
+        { topic: "Australian Landscapes", level: "C1", word: "Landmark", form: "Noun", phonetic: "/ˈlændmɑːk/", forms: "N/A", def: "An event, discovery, or change marking an important stage or turning point in something.", translation: "Cột mốc quan trọng, bước ngoặt", example: "But this landmark exhibition gives rise to some questions...", extraExample: "The invention of the internet was a landmark in human history." },
+        { topic: "Australian Landscapes", level: "C2", word: "Condescending", form: "Adjective", phonetic: "/ˌkɒndɪˈsendɪŋ/", forms: "V: Condescend", def: "Having or showing a feeling of patronizing superiority.", translation: "Trịch thượng, kẻ cả", example: "To consider it condescending is perhaps too strong...", extraExample: "I hate his condescending tone when he explains things." },
+        { topic: "Australian Landscapes", level: "C1", word: "Conservative", form: "Adjective", phonetic: "/kənˈsɜːvətɪv/", forms: "N: Conservatism", def: "Averse to change or innovation and holding traditional values.", translation: "Bảo thủ", example: "What Mendelssohn found surprising... was that the underlying rules for the selection of works seemed to have been so conservative.", extraExample: "Older generations tend to have more conservative views." },
+        { topic: "Australian Landscapes", level: "C1", word: "Genre", form: "Noun", phonetic: "/ˈʒɒ̃rə/", forms: "N/A", def: "A category of artistic composition, as in music or literature, characterized by similarities in form, style, or subject matter.", translation: "Thể loại", example: "In reviewing Australia, the British insisted on looking at the genre of landscape painting.", extraExample: "Science fiction is my favorite literary genre." },
+        { topic: "Australian Landscapes", level: "C1", word: "Inevitable", form: "Adjective", phonetic: "/ɪnˈevɪtəbl/", forms: "Adv: Inevitably", def: "Certain to happen; unavoidable.", translation: "Không thể tránh khỏi", example: "Because of colonial ties, it was inevitable during Australian art’s formative years that it would reflect Britain’s devotion...", extraExample: "It is inevitable that technology will continue to advance." },
+        { topic: "Australian Landscapes", level: "C2", word: "Formative", form: "Adjective", phonetic: "/ˈfɔːmətɪv/", forms: "N: Formation", def: "Serving to form something, especially having a profound and lasting influence on a person's development.", translation: "Hình thành, kiến tạo", example: "Because of colonial ties, it was inevitable during Australian art’s formative years...", extraExample: "His formative years were spent traveling around Asia." },
+        { topic: "Australian Landscapes", level: "C2", word: "Idiosyncrasy", form: "Noun", phonetic: "/ˌɪdiəˈsɪŋkrəsi/", forms: "Adj: Idiosyncratic", def: "A mode of behavior or way of thought peculiar to an individual.", translation: "Đặc điểm riêng, phong cách riêng", example: "...before its own character and idiosyncrasies took shape.", extraExample: "One of his little idiosyncrasies is always wearing mismatched socks." },
+        { topic: "Australian Landscapes", level: "C1", word: "Embrace", form: "Verb", phonetic: "/ɪmˈbreɪs/", forms: "N/A", def: "Accept or support (a belief, theory, or change) willingly and enthusiastically.", translation: "Đón nhận", example: "...the Academy is nevertheless embracing the peculiarities of Australian art from the mid-19th century onward...", extraExample: "The school eagerly embraced the new teaching methods." },
+        { topic: "Australian Landscapes", level: "C2", word: "Albeit", form: "Conjunction", phonetic: "/ɔːlˈbiːɪt/", forms: "N/A", def: "Although.", translation: "Mặc dù", example: "...embracing the peculiarities of Australian art from the mid-19th century onward, albeit within the boundaries of landscape.", extraExample: "He finally agreed, albeit reluctantly." },
+        { topic: "Australian Landscapes", level: "C1", word: "Curate", form: "Verb", phonetic: "/kjʊəˈreɪt/", forms: "N: Curator", def: "Select, organize, and look after the items in a collection or exhibition.", translation: "Lựa chọn và tổ chức (triển lãm)", example: "Australia is curated by Kathleen Soriano, director of exhibitions at the Royal Academy.", extraExample: "He curated a fantastic collection of modern photographs." },
+        { topic: "Australian Landscapes", level: "C1", word: "Distinctiveness", form: "Noun", phonetic: "/dɪˈstɪŋktɪvnəs/", forms: "Adj: Distinctive", def: "The quality of being characteristic of one person or thing, and so serving to distinguish it from others.", translation: "Sự khác biệt, tính đặc thù", example: "What I wanted to show was how Australian art develops a real distinctiveness...", extraExample: "The distinctiveness of her voice makes her instantly recognizable." },
+        { topic: "Australian Landscapes", level: "C1", word: "Fusion", form: "Noun", phonetic: "/ˈfjuːʒn/", forms: "V: Fuse", def: "The process or result of joining two or more things together to form a single entity.", translation: "Sự dung hợp, sự kết hợp", example: "The fusion of tradition of the European kind with something more specifically Australian...", extraExample: "Her cooking is a fusion of Asian and French styles." },
+        { topic: "Australian Landscapes", level: "C1", word: "Contemporary", form: "Adjective", phonetic: "/kənˈtemprəri/", forms: "N/A", def: "Living or occurring at the same time; belonging to or occurring in the present.", translation: "Đương đại", example: "...and extends particularly to some of the more contemporary artists involved.", extraExample: "The museum holds a large collection of contemporary art." },
+        { topic: "Australian Landscapes", level: "C2", word: "Linger", form: "Verb", phonetic: "/ˈlɪŋɡə/", forms: "Adj: Lingering", def: "Stay in a place longer than necessary because of a reluctance to leave.", translation: "Nấn ná, kéo dài, nán lại", example: "...a video of Gladwell skateboarding on the Bondi seafront as one of Sydney’s signature brutal storms lingers offshore.", extraExample: "The smell of fresh coffee lingered in the kitchen." },
+        { topic: "Australian Landscapes", level: "C1", word: "Imagery", form: "Noun", phonetic: "/ˈɪmɪdʒəri/", forms: "N: Image", def: "Visually descriptive or figurative language, especially in a literary work or art.", translation: "Hình ảnh (được mường tượng)", example: "But he didn’t want to just embark on borrowing imagery from elsewhere.", extraExample: "The poet uses vivid imagery to describe the winter landscape." },
+        { topic: "Australian Landscapes", level: "C2", word: "Warrant", form: "Verb", phonetic: "/ˈwɒrənt/", forms: "N/A", def: "Justify or necessitate (a certain course of action).", translation: "Cho thấy là chính đáng, đảm bảo", example: "...the idea being that these works warrant a prominent position because they were ‘first’.", extraExample: "The severe weather warrants the cancellation of the event." },
+        { topic: "Australian Landscapes", level: "C2", word: "Meshing", form: "Noun", phonetic: "/ˈmeʃɪŋ/", forms: "V: Mesh", def: "The entanglement or combining of things together.", translation: "Sự đan xen, sự hòa quyện", example: "[The exhibition] is a beautiful meshing of the two different kinds of art...", extraExample: "The plan requires a careful meshing of resources and personnel." },
+        { topic: "Australian Landscapes", level: "C1", word: "Authentic", form: "Adjective", phonetic: "/ɔːˈθentɪk/", forms: "N: Authenticity", def: "Of undisputed origin; genuine.", translation: "Đích thực, xác thực", example: "...I felt it was most authentic that it was seen as part of Australian art history...", extraExample: "The restaurant serves authentic Italian pizza." },
+        { topic: "Australian Landscapes", level: "C2", word: "Periphery", form: "Noun", phonetic: "/pəˈrɪfəri/", forms: "Adj: Peripheral", def: "The outer limits or edge of an area or object.", translation: "Vùng ngoại biên, ngoại vi", example: "There’s no such thing as the centre and the periphery like there used to be.", extraExample: "The new housing estates were built on the periphery of the city." }
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+    let searchQuery = '';
+
+    function handleSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase();
+        applyFilters();
+    }
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const cardWord = card.querySelector('.word').textContent.toLowerCase();
+            const cardDef = card.querySelector('.definition').textContent.toLowerCase();
+            const cardTrans = card.querySelector('.translation').textContent.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            const matchSearch = (searchQuery === '' || cardWord.includes(searchQuery) || cardDef.includes(searchQuery) || cardTrans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="word-form-main">(${item.form})</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const word = item.word.toLowerCase();
+            const def = item.def.toLowerCase();
+            const trans = item.translation.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            const matchSearch = (searchQuery === '' || word.includes(searchQuery) || def.includes(searchQuery) || trans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Match";
+            document.getElementById('fc-word-form').textContent = "";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-word-form').textContent = `(${data.form})`;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed var(--border); padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: var(--accent);">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: var(--accent);">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
