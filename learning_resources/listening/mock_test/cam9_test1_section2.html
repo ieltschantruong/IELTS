@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening | Cam 9 | Test 1 | Section 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            light: '#f0fdfa', // teal-50
+                            muted: '#ccfbf1', // teal-100
+                            accent: '#2dd4bf', // teal-400
+                            dark: '#0f766e',   // teal-700
+                            text: '#134e4a'    // teal-900
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f0fdfa; color: #134e4a; }
+        
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f0fdfa; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #2dd4bf; }
+
+        .ielts-input {
+            border: none;
+            border-bottom: 2px dashed #94a3b8;
+            background-color: transparent;
+            padding: 2px 8px;
+            transition: all 0.3s;
+            outline: none;
+            color: #0f766e;
+            font-weight: bold;
+            text-align: center;
+        }
+        .ielts-input:focus { border-bottom-color: #0f766e; background-color: #f0fdfa; border-bottom-style: solid; }
+
+        .res-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 2px solid #cbd5e1;
+            background: white;
+            min-height: 30px;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .res-correct { border-color: #10b981; background-color: #d1fae5; color: #065f46; }
+        .res-incorrect { border-color: #ef4444; background-color: #fee2e2; color: #991b1b; text-decoration: line-through; }
+        .res-correction { color: #065f46; font-weight: 700; font-size: 0.9rem; background: #d1fae5; padding: 2px 8px; border-radius: 6px; border: 1px dashed #10b981; }
+
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #0f766e; cursor: pointer; margin-top: -4px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #99f6e4; border-radius: 2px; }
+        input[type=range]:focus { outline: none; }
+
+        .focus-highlight { animation: highlightFlash 2s ease-out; border-left-color: #0f766e !important; background-color: #ccfbf1 !important; }
+        .transcript-highlight { animation: transcriptFlash 3s ease-out; background-color: #fef08a !important; border-radius: 4px; padding: 2px; }
+
+        @keyframes highlightFlash { 0% { background-color: #99f6e4; border-left-color: #0f766e; } 100% { background-color: transparent; border-left-color: transparent; } }
+        @keyframes transcriptFlash { 0% { background-color: #fef08a; } 70% { background-color: #fef08a; } 100% { background-color: transparent; } }
+        
+        .list-disc-custom li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .list-disc-custom li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.6rem;
+            width: 0.4rem;
+            height: 0.4rem;
+            border-radius: 50%;
+            background-color: #134e4a;
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col overflow-hidden">
+
+    <header class="h-14 bg-slate-900 flex items-center justify-between px-6 shrink-0 z-30 shadow-md">
+        <div class="font-bold text-lg tracking-wider text-white flex items-center gap-3">
+            <i class="fa-solid fa-headphones text-pastel-accent"></i> IELTS Chan Truong
+        </div>
+        <div class="flex items-center gap-6">
+            <button onclick="location.reload()" class="text-sm font-bold text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> Retake Test
+            </button>
+        </div>
+    </header>
+
+    <div id="result-header" class="hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-20 shadow-sm relative">
+        <div class="flex items-center gap-4">
+            <div class="text-lg font-bold text-slate-800 hidden md:block">Cam 9 | Test 1</div>
+            <div class="text-sm bg-teal-100 text-teal-800 px-3 py-1 rounded-full font-semibold border border-teal-200">Section 2</div>
+        </div>
+        <div class="flex items-center gap-4 sm:gap-8">
+            <div class="text-center flex items-center gap-2 sm:gap-3">
+                <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">Score:</span>
+                <span class="text-xl sm:text-2xl font-bold text-pastel-dark" id="score-display">--/10</span>
+            </div>
+            <div class="w-px h-8 bg-slate-300"></div>
+            <div class="text-center flex items-center gap-2 sm:gap-3">
+                <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">Accuracy:</span>
+                <span class="text-lg sm:text-xl font-bold text-slate-800 bg-slate-100 px-3 py-1 rounded border border-slate-300 shadow-inner" id="band-display">--%</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center z-40 overflow-y-auto py-10 px-4 bg-pastel-light">
+            <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl border border-teal-200 overflow-hidden transform transition-all">
+                <div class="bg-teal-50 p-8 text-center border-b border-teal-200 relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 text-teal-200 opacity-50">
+                        <i class="fa-solid fa-microphone text-9xl"></i>
+                    </div>
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-pastel-dark text-2xl shadow-sm border border-teal-200 relative z-10">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2 relative z-10">Listening Test</h2>
+                    <h3 class="text-lg text-pastel-dark font-medium relative z-10">Cam 9 | Test 1 | Section 2</h3>
+                </div>
+                <div class="p-8">
+                    <div class="bg-white border-l-4 border-pastel-dark p-6 rounded-r-lg mb-8 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-3 flex items-center text-lg">
+                            <i class="fa-solid fa-circle-info mr-2 text-pastel-dark"></i> Instructions
+                        </h4>
+                        <ul class="space-y-3 text-slate-600 text-sm md:text-base">
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-3 shrink-0"></i> 10 questions to complete (Questions 11-20).</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-3 shrink-0"></i> Read the specific instructions for each question type.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-500 mt-1 mr-3 shrink-0"></i> Audio plays automatically upon starting.</li>
+                        </ul>
+                    </div>
+                    <div class="flex justify-center">
+                        <button id="start-btn" class="bg-pastel-dark hover:bg-teal-800 text-white text-lg font-bold py-3 px-10 rounded-full shadow-lg transition-transform transform hover:-translate-y-1 focus:ring-4 focus:ring-teal-300 flex items-center gap-3">
+                            <i class="fa-solid fa-play"></i> Start Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="test-view" class="hidden absolute inset-0 overflow-y-auto pb-24 pt-8 bg-white z-20 custom-scrollbar px-4 sm:px-6">
+            <div id="test-content-wrapper" class="max-w-4xl mx-auto">
+                
+                <div class="mb-10 bg-slate-50 p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                    <!-- PART 1: Q11-16 -->
+                    <div class="flex items-center justify-between border-b-2 border-teal-200 pb-3 mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">Questions 11-16</h2>
+                    </div>
+                    
+                    <p class="italic text-slate-700 mb-4 font-medium">Complete the notes below.</p>
+                    <p class="font-bold text-slate-800 mb-8 bg-white inline-block px-4 py-2 rounded-lg shadow-sm border border-slate-200">Write <strong class="text-pastel-dark uppercase">ONE WORD AND/OR A NUMBER</strong> for each answer.</p>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden mb-10">
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800 p-4 sm:p-6 text-center border-b border-teal-100 bg-teal-50 tracking-widest uppercase">SPORTS WORLD</h3>
+                        
+                        <div class="p-6 sm:p-8 text-base sm:text-lg text-slate-800 space-y-6">
+                            
+                            <ul class="list-disc-custom ml-2 space-y-5">
+                                
+                                <li>
+                                    <div class="q-wrapper relative inline-flex items-baseline gap-2 flex-wrap" id="q-block-11">
+                                        <span>a new</span>
+                                        <strong class="text-pastel-dark text-sm">11</strong> 
+                                        <input type="text" class="ielts-input w-40" data-qid="11" autocomplete="off">
+                                        <span>of an international sports goods company</span>
+                                    </div>
+                                </li>
+                                
+                                <li>
+                                    <div class="q-wrapper relative inline-flex items-baseline gap-2 flex-wrap" id="q-block-12">
+                                        <span>located in the shopping centre to the</span>
+                                        <strong class="text-pastel-dark text-sm">12</strong> 
+                                        <input type="text" class="ielts-input w-40" data-qid="12" autocomplete="off">
+                                        <span>of Bradcaster</span>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="q-wrapper relative inline-flex items-baseline gap-2 flex-wrap" id="q-block-13">
+                                        <span>has sports</span>
+                                        <strong class="text-pastel-dark text-sm">13</strong> 
+                                        <input type="text" class="ielts-input w-40" data-qid="13" autocomplete="off">
+                                        <span>and equipment on floors 1 - 3</span>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="q-wrapper relative inline-flex items-baseline gap-2 flex-wrap" id="q-block-14">
+                                        <span>can get you any item within</span>
+                                        <strong class="text-pastel-dark text-sm">14</strong> 
+                                        <input type="text" class="ielts-input w-32" data-qid="14" autocomplete="off">
+                                        <span>days</span>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="q-wrapper relative inline-flex items-baseline gap-2 flex-wrap" id="q-block-15">
+                                        <span>shop specialises in equipment for</span>
+                                        <strong class="text-pastel-dark text-sm">15</strong> 
+                                        <input type="text" class="ielts-input w-40" data-qid="15" autocomplete="off">
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="q-wrapper relative inline-flex items-baseline gap-2 flex-wrap" id="q-block-16">
+                                        <span>has a special section which just sells</span>
+                                        <strong class="text-pastel-dark text-sm">16</strong> 
+                                        <input type="text" class="ielts-input w-40" data-qid="16" autocomplete="off">
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- PART 2: Q17-18 -->
+                    <div class="flex items-center justify-between border-b-2 border-teal-200 pb-3 mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">Questions 17 and 18</h2>
+                    </div>
+                    <p class="italic text-slate-700 mb-8 font-medium">Choose the correct letter, <strong class="font-bold">A, B</strong> or <strong class="font-bold">C</strong>.</p>
+                    
+                    <div class="space-y-8 mb-10 bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-teal-100">
+                        <div class="q-wrapper" id="q-block-17">
+                            <div class="font-bold mb-3 text-lg flex items-start gap-2">
+                                <strong class="text-pastel-dark mt-1">17</strong> 
+                                <span>A champion athlete will be in the shop</span>
+                            </div>
+                            <div class="space-y-3 ml-8 text-base sm:text-lg">
+                                <label class="flex items-start gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                    <input type="radio" name="q17" data-qid="17" value="A" class="ielts-radio mt-1.5 w-4 h-4 text-pastel-dark accent-pastel-dark">
+                                    <span><strong class="mr-3 font-semibold text-slate-600">A</strong>on Saturday morning only.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                    <input type="radio" name="q17" data-qid="17" value="B" class="ielts-radio mt-1.5 w-4 h-4 text-pastel-dark accent-pastel-dark">
+                                    <span><strong class="mr-3 font-semibold text-slate-600">B</strong>all day Saturday.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                    <input type="radio" name="q17" data-qid="17" value="C" class="ielts-radio mt-1.5 w-4 h-4 text-pastel-dark accent-pastel-dark">
+                                    <span><strong class="mr-3 font-semibold text-slate-600">C</strong>for the whole weekend.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="q-wrapper" id="q-block-18">
+                            <div class="font-bold mb-3 text-lg flex items-start gap-2">
+                                <strong class="text-pastel-dark mt-1">18</strong> 
+                                <span>The first person to answer 20 quiz questions correctly will win</span>
+                            </div>
+                            <div class="space-y-3 ml-8 text-base sm:text-lg">
+                                <label class="flex items-start gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                    <input type="radio" name="q18" data-qid="18" value="A" class="ielts-radio mt-1.5 w-4 h-4 text-pastel-dark accent-pastel-dark">
+                                    <span><strong class="mr-3 font-semibold text-slate-600">A</strong>gym membership.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                    <input type="radio" name="q18" data-qid="18" value="B" class="ielts-radio mt-1.5 w-4 h-4 text-pastel-dark accent-pastel-dark">
+                                    <span><strong class="mr-3 font-semibold text-slate-600">B</strong>a video.</span>
+                                </label>
+                                <label class="flex items-start gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                    <input type="radio" name="q18" data-qid="18" value="C" class="ielts-radio mt-1.5 w-4 h-4 text-pastel-dark accent-pastel-dark">
+                                    <span><strong class="mr-3 font-semibold text-slate-600">C</strong>a calendar.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PART 3: Q19-20 -->
+                    <div class="flex items-center justify-between border-b-2 border-teal-200 pb-3 mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">Questions 19 and 20</h2>
+                    </div>
+                    <p class="italic text-slate-700 mb-8 font-medium">Choose <strong class="font-bold">TWO</strong> letters, <strong class="font-bold">A-E</strong>.</p>
+                    
+                    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-teal-100" id="q-block-19-20">
+                        <div class="title-wrap font-bold mb-6 text-lg flex flex-wrap items-center gap-2">
+                            <div class="w-full sm:w-auto mr-2">
+                                <strong class="text-pastel-dark mr-1">19-20</strong> 
+                                Which TWO pieces of information does the speaker give about the fitness test?
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4 ml-2 text-base sm:text-lg">
+                            <label class="flex items-start gap-4 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                <input type="checkbox" name="q19_20" value="A" class="ielts-checkbox mt-1 w-5 h-5 text-pastel-dark accent-pastel-dark rounded">
+                                <span><strong class="w-6 inline-block shrink-0 text-slate-600">A</strong>You need to reserve a place.</span>
+                            </label>
+                            <label class="flex items-start gap-4 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                <input type="checkbox" name="q19_20" value="B" class="ielts-checkbox mt-1 w-5 h-5 text-pastel-dark accent-pastel-dark rounded">
+                                <span><strong class="w-6 inline-block shrink-0 text-slate-600">B</strong>It is free to account holders.</span>
+                            </label>
+                            <label class="flex items-start gap-4 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                <input type="checkbox" name="q19_20" value="C" class="ielts-checkbox mt-1 w-5 h-5 text-pastel-dark accent-pastel-dark rounded">
+                                <span><strong class="w-6 inline-block shrink-0 text-slate-600">C</strong>You get advice on how to improve your health.</span>
+                            </label>
+                            <label class="flex items-start gap-4 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                <input type="checkbox" name="q19_20" value="D" class="ielts-checkbox mt-1 w-5 h-5 text-pastel-dark accent-pastel-dark rounded">
+                                <span><strong class="w-6 inline-block shrink-0 text-slate-600">D</strong>It takes place in a special clinic.</span>
+                            </label>
+                            <label class="flex items-start gap-4 cursor-pointer p-2 hover:bg-slate-50 rounded transition-colors w-fit">
+                                <input type="checkbox" name="q19_20" value="E" class="ielts-checkbox mt-1 w-5 h-5 text-pastel-dark accent-pastel-dark rounded">
+                                <span><strong class="w-6 inline-block shrink-0 text-slate-600">E</strong>It is cheaper this month.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="fixed bottom-6 right-6 z-30">
+                <button id="test-submit-btn" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-full shadow-2xl transition-transform transform hover:scale-105 flex items-center gap-2 border-2 border-white">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Test
+                </button>
+            </div>
+        </div>
+
+        <div id="result-view" class="hidden absolute inset-0 flex flex-col md:flex-row w-full z-10">
+            
+            <!-- LEFT PANEL: TRANSCRIPT & AUDIO -->
+            <div class="w-full md:w-1/2 h-full flex flex-col bg-white border-r border-slate-300 relative z-10 shadow-[2px_0_10px_rgba(0,0,0,0.05)]">
+                
+                <div class="h-20 bg-teal-50 border-b border-teal-200 p-4 shrink-0 flex flex-col justify-center">
+                    <div class="flex items-center gap-4">
+                        <button id="btn-play-pause" class="w-10 h-10 rounded-full bg-pastel-dark text-white flex items-center justify-center hover:bg-teal-800 focus:outline-none shadow-md shrink-0 transition-colors">
+                            <i id="icon-play" class="fa-solid fa-play ml-1"></i>
+                            <i id="icon-pause" class="fa-solid fa-pause hidden"></i>
+                        </button>
+                        <div class="flex-1 flex flex-col justify-center">
+                            <div class="flex justify-between text-xs font-bold text-pastel-dark mb-1">
+                                <span id="time-current">0:00</span>
+                                <span id="time-total">0:00</span>
+                            </div>
+                            <input type="range" id="audio-progress" value="0" min="0" max="100" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 md:p-8 pb-12 text-base leading-relaxed text-slate-800 custom-scrollbar" id="transcript-scroll">
+                    <div class="mb-6 pb-2 border-b-2 border-teal-100 flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines text-pastel-dark"></i>
+                        <h2 class="font-bold text-lg text-slate-700 uppercase tracking-wide">Audio Transcript</h2>
+                    </div>
+
+                    <div id="transcript-content" class="space-y-4">
+                        <p class="mb-4 text-slate-800 leading-relaxed"><strong class="text-slate-900">ANDREW:</strong> Now we go to Jane who is going to tell us about what's happening in town this weekend.</p>
+                        
+                        <p id="t-q11" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[00:52]</span> <strong class="text-slate-900">JANE:</strong> Right, thanks Andrew, and now on to what's new, and do we really need yet another sports shop in Bradcaster? Well, most of you probably know Sports World - the <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">branch [Q11]</span> of a Danish sports goods company that opened a few years ago – it's attracted a lot of custom, and so the company has now decided to open another branch in the area.</p>
+                        
+                        <p id="t-q12" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[01:16]</span> <strong class="text-slate-900">JANE:</strong> It's going to be in the shopping centre to the <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">west [Q12]</span> of Bradcaster, so that will be good news for all of you who've found the original shop in the north of the town hard to get to.</p>
+
+                        <p id="t-q13" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[01:27]</span> <strong class="text-slate-900">JANE:</strong> I was invited to a special preview and I can promise you, this is the ultimate in sports retailing. The whole place has been given a new minimalist look with the company's signature colours of black and red. The first three floors have a huge range of sports <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">clothing [Q13]</span> as well as equipment, and on the top floor there's a café and a book and DVD section.</p>
+
+                        <p id="t-q14" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[01:53]</span> <strong class="text-slate-900">JANE:</strong> You'll find all the well-known names as well as some less well-known ones. If they haven't got exactly what you want in stock they promise to get it for you in <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">ten [Q14]</span> days. Unlike the other store, where it can take up to fourteen days.</p>
+
+                        <p id="t-q15" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[02:09]</span> <strong class="text-slate-900">JANE:</strong> They cover all the major sports, including football, tennis and swimming, but they particularly focus on <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">running [Q15]</span>, and they claim to have the widest range of equipment in the country.</p>
+
+                        <p id="t-q16" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[02:22]</span> <strong class="text-slate-900">JANE:</strong> As well as that, a whole section of the third floor is devoted to sports <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">bags [Q16]</span>, including the latest designs from the States - if you can't find what you want here, it doesn't exist!</p>
+
+                        <p id="t-q17" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[03:17]</span> <strong class="text-slate-900">JANE:</strong> The shop will be open from 9.00 am this Saturday and if you go along to the opening then you'll have the chance to meet the national 400 metres running champion Paul King, who's coming along to open the shop, and <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">he will be staying around until about midday [Q17]</span> to chat to any fans who want to meet him and sign autographs.</p>
+
+                        <p id="t-q18" class="mb-4 text-slate-800 leading-relaxed"><span class="text-slate-400 text-sm mr-2 font-mono">[03:38]</span> <strong class="text-slate-900">JANE:</strong> Then there will be a whole range of special attractions all weekend. There will be free tickets for local sporting events for the first 50 customers, and also a special competition open to all. Just answer fifteen out of twenty sports questions correctly to win a signed copy of Paul King's DVD 'Spring Tips', while <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">the first person to get all the questions correct gets a year's free membership of the Bradcaster Gym [Q18]</span>. All entrants will receive a special Sports calendar with details of all Bradcaster fixtures in the coming year.</p>
+
+                        <p id="t-q19" class="mb-4 text-slate-800 leading-relaxed"><span id="t-q20"></span><span class="text-slate-400 text-sm mr-2 font-mono">[04:17]</span> <strong class="text-slate-900">JANE:</strong> One of the special opening offers is a fitness test - a complete review of your cardiac fitness and muscle tone, actually done in the shop by qualified staff. This would normally cost £30.00 but is <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">available at half price for this month only [Q19-E]</span>. There are only a limited number of places available for this, so <span class="font-bold text-pastel-dark bg-teal-50 px-1 rounded border-b border-teal-200">to make a booking [Q20-A]</span> phone 560341. In addition, if you open an account you get lots more special offers including the chance to try out equipment at special open evenings ...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: REVIEW & SCORE -->
+            <div class="w-full md:w-1/2 h-full flex flex-col bg-pastel-light">
+                <div class="flex border-b border-slate-200 px-4 shrink-0 bg-white pt-4 shadow-sm z-10">
+                    <button class="px-6 py-3 font-semibold text-sm transition-colors rounded-t-lg border-t-[3px] border-[#0f766e] text-[#0f766e] bg-white">Test Review</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 sm:p-6 pb-12 custom-scrollbar" id="review-area">
+                    <!-- Cloned and injected by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="result-footer" class="hidden bg-white border-t border-slate-300 w-full shrink-0 z-30 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <div class="w-full overflow-x-auto p-3 flex justify-start lg:justify-center border-b border-slate-100">
+            <div id="pagination-grid" class="flex flex-nowrap items-center gap-4 px-4 w-max">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+        <div class="h-10 bg-slate-50 flex justify-center items-center px-4 gap-4 sm:gap-6">
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
+                <span class="w-3 h-3 bg-emerald-100 border border-emerald-500 inline-block rounded-sm"></span> Correct
+            </div>
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
+                <span class="w-3 h-3 bg-red-100 border border-red-500 inline-block rounded-sm"></span> Incorrect
+            </div>
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
+                <span class="w-3 h-3 bg-white border border-slate-400 inline-block rounded-sm"></span> Not Answered
+            </div>
+        </div>
+    </footer>
+
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900 bg-opacity-40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform scale-95 transition-all duration-300" id="modal-content">
+            <div class="p-8 text-center border-t-8 border-pastel-dark">
+                <div class="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-5 text-pastel-dark text-4xl border-4 border-white shadow-sm">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-3">Submit Test?</h3>
+                <p class="text-slate-600 mb-8 leading-relaxed">Are you sure you want to submit your answers? The audio will stop, and you will be taken to the review screen.</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="cancel-submit-btn" class="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-bold hover:bg-slate-50 transition-colors w-full sm:w-auto">Keep Working</button>
+                    <button id="confirm-submit-btn" class="px-6 py-2.5 rounded-xl bg-pastel-dark hover:bg-teal-800 text-white font-bold shadow-md transition-colors w-full sm:w-auto flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Yes, Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioUrl = "https://ieltschantruong.github.io/IELTS/src/listening_audios/cam9_test1_section2.mp3";
+        let userAnswers = {};
+        let questionResults = {};
+        let score = 0;
+
+        const answerKey = {
+            11: ["branch"],
+            12: ["west"],
+            13: ["clothing", "clothes"],
+            14: ["10", "ten"],
+            15: ["running"],
+            16: ["bags", "bag"],
+            17: ["a"],
+            18: ["a"],
+            19: ["e", "a"],
+            20: ["a", "e"]
+        };
+
+        const explanationData = {
+            11: { time: 52 }, 
+            12: { time: 76 }, 
+            13: { time: 87 }, 
+            14: { time: 113 }, 
+            15: { time: 129 }, 
+            16: { time: 142 }, 
+            17: { time: 197 }, 
+            18: { time: 218 }, 
+            19: { time: 257 }, 
+            20: { time: 257 } 
+        };
+
+        const audio = new Audio(audioUrl);
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const iconPlay = document.getElementById('icon-play');
+        const iconPause = document.getElementById('icon-pause');
+        const progress = document.getElementById('audio-progress');
+        const timeCurrent = document.getElementById('time-current');
+        const timeTotal = document.getElementById('time-total');
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        audio.addEventListener('loadedmetadata', () => {
+            progress.max = audio.duration;
+            timeTotal.innerText = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            progress.value = audio.currentTime;
+            timeCurrent.innerText = formatTime(audio.currentTime);
+        });
+
+        progress.addEventListener('input', () => {
+            audio.currentTime = progress.value;
+        });
+
+        btnPlayPause.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+            } else {
+                audio.pause();
+                iconPause.classList.add('hidden');
+                iconPlay.classList.remove('hidden');
+            }
+        });
+
+        document.querySelectorAll('.ielts-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                userAnswers[e.target.dataset.qid] = e.target.value;
+            });
+        });
+
+        document.querySelectorAll('.ielts-radio').forEach(input => {
+            input.addEventListener('change', (e) => {
+                if(e.target.checked) {
+                    userAnswers[e.target.dataset.qid] = e.target.value;
+                }
+            });
+        });
+
+        // Add listener for multiple choice checkboxes (Questions 19 and 20)
+        document.querySelectorAll('.ielts-checkbox').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const checkedBoxes = Array.from(document.querySelectorAll('.ielts-checkbox:checked'));
+                
+                // Allow exactly up to 2 items checked
+                if (checkedBoxes.length > 2) {
+                    e.target.checked = false; 
+                    return;
+                }
+                
+                // Dynamically map selected checkboxes to question 19 and 20
+                const vals = checkedBoxes.map(cb => cb.value);
+                userAnswers[19] = vals[0] || "";
+                userAnswers[20] = vals[1] || "";
+            });
+        });
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            
+            audio.play().then(() => {
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+            }).catch(e => console.log("Auto-play blocked by browser policy"));
+        });
+
+        const showModal = () => {
+            const confirmModal = document.getElementById('confirm-modal');
+            const modalContent = document.getElementById('modal-content');
+            confirmModal.classList.remove('hidden');
+            setTimeout(() => {
+                confirmModal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        };
+        
+        const hideModal = () => {
+            const confirmModal = document.getElementById('confirm-modal');
+            const modalContent = document.getElementById('modal-content');
+            confirmModal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => confirmModal.classList.add('hidden'), 300);
+        };
+
+        document.getElementById('test-submit-btn').addEventListener('click', showModal);
+        document.getElementById('cancel-submit-btn').addEventListener('click', hideModal);
+        document.getElementById('confirm-submit-btn').addEventListener('click', () => {
+            hideModal();
+            setTimeout(handleFinalSubmit, 300); 
+        });
+
+        function cleanString(str) {
+            return (str || "").toString().trim().toLowerCase().replace(/[\s-]/g, '');
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
+        function handleFinalSubmit() {
+            audio.pause();
+            iconPause.classList.add('hidden');
+            iconPlay.classList.remove('hidden');
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('result-header').classList.remove('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            document.getElementById('result-footer').classList.remove('hidden');
+            
+            gradeTest();
+        }
+
+        function gradeTest() {
+            score = 0;
+            questionResults = {};
+            const reviewArea = document.getElementById('review-area');
+            
+            reviewArea.innerHTML = document.getElementById('test-content-wrapper').innerHTML;
+            
+            for (let i = 11; i <= 20; i++) {
+                let userAnsRaw = (userAnswers[i] || "").toString().trim();
+                let userAnsClean = cleanString(userAnsRaw);
+                const correctList = answerKey[i] || [""];
+                const mainCorrectAns = correctList[0];
+                
+                let isCorrect = false;
+                if (userAnsClean && correctList.map(cleanString).includes(userAnsClean)) {
+                    if ((i === 19 || i === 20) && userAnsClean === cleanString(userAnswers[i === 19 ? 20 : 19])) {
+                        if (i === 19) isCorrect = true; 
+                        else isCorrect = false; 
+                    } else {
+                        isCorrect = true;
+                    }
+                }
+                
+                if (isCorrect) score++;
+                questionResults[i] = { correct: isCorrect, answered: !!userAnsRaw };
+                
+                let resBoxHTML = `<div class="inline-flex items-center flex-wrap gap-2 relative my-1 ml-2 w-full sm:w-auto" id="review-${i}">`;
+                
+                if (isCorrect) {
+                    resBoxHTML += `<span class="res-box res-correct shadow-sm">${escapeHTML(userAnsRaw)}</span>`;
+                } else {
+                    resBoxHTML += `<span class="res-box res-incorrect shadow-sm">${userAnsRaw ? escapeHTML(userAnsRaw) : '<span class="text-slate-400 font-normal">No Answer</span>'}</span>`;
+                    resBoxHTML += `<span class="res-correction shadow-sm uppercase">${mainCorrectAns}</span>`;
+                }
+                
+                resBoxHTML += `<button onclick="explainAnswer(${i})" class="text-xs bg-teal-100 text-teal-800 px-3 py-1.5 rounded font-bold hover:bg-teal-200 transition-colors shadow-sm focus:outline-none flex items-center shrink-0 ml-1 border border-teal-200"><i class="fa-solid fa-lightbulb mr-1"></i> Explain</button>`;
+                resBoxHTML += `</div>`;
+                
+                const qBlockInReview = reviewArea.querySelector(`#q-block-${i}`);
+                if (qBlockInReview) {
+                    const radios = qBlockInReview.querySelectorAll(`input[type="radio"]`);
+                    if (radios.length > 0) {
+                        const titleEl = qBlockInReview.querySelector('.font-bold');
+                        if (titleEl) titleEl.insertAdjacentHTML('beforeend', resBoxHTML);
+                        radios.forEach(r => {
+                            r.disabled = true;
+                            if (r.value === userAnsRaw) r.checked = true;
+                        });
+                    } else {
+                        const textInput = qBlockInReview.querySelector(`input[data-qid="${i}"]`);
+                        if (textInput) textInput.outerHTML = resBoxHTML;
+                    }
+                } else if (i === 19 || i === 20) {
+                    // Logic for appending multiple choice Checkbox results to the unified block
+                    const combinedBlock = reviewArea.querySelector(`#q-block-19-20`);
+                    if (combinedBlock) {
+                        const titleWrap = combinedBlock.querySelector('.title-wrap');
+                        if (titleWrap) titleWrap.insertAdjacentHTML('beforeend', resBoxHTML);
+                        
+                        const checkboxes = combinedBlock.querySelectorAll(`input[type="checkbox"]`);
+                        checkboxes.forEach(cb => {
+                            cb.disabled = true;
+                            if (userAnsRaw && cb.value === userAnsRaw) cb.checked = true;
+                        });
+                    }
+                }
+            }
+            
+            reviewArea.querySelectorAll('p.italic, p.font-bold.bg-white').forEach(el => el.remove());
+            
+            document.getElementById('score-display').innerText = `${score}/10`;
+            document.getElementById('band-display').innerText = `${(score/10 * 100).toFixed(0)}%`;
+            updatePaginationGrid();
+        }
+
+        function updatePaginationGrid() {
+            const grid = document.getElementById('pagination-grid');
+            grid.innerHTML = '';
+            
+            const sectionGroup = document.createElement('div');
+            sectionGroup.className = 'flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 shadow-sm shrink-0';
+            
+            const sectionLabel = document.createElement('span');
+            sectionLabel.className = 'text-[11px] font-bold text-slate-500 mr-2 uppercase tracking-wider whitespace-nowrap';
+            sectionLabel.innerText = "Sec 2"; 
+            sectionGroup.appendChild(sectionLabel);
+            
+            const btnRow = document.createElement('div');
+            btnRow.className = 'flex flex-nowrap items-center gap-1'; 
+            
+            for (let i = 11; i <= 20; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'w-7 h-7 flex items-center justify-center border rounded text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300';
+                btn.innerText = i;
+                
+                const res = questionResults[i];
+                if (res && res.answered) {
+                    if (res.correct) {
+                        btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800', 'hover:bg-emerald-200');
+                    } else {
+                        btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700', 'hover:bg-red-200');
+                    }
+                } else {
+                    btn.classList.add('bg-white', 'border-slate-400', 'text-slate-700', 'hover:bg-slate-100');
+                }
+
+                btn.onclick = () => explainAnswer(i);
+                btnRow.appendChild(btn);
+            }
+            
+            sectionGroup.appendChild(btnRow);
+            grid.appendChild(sectionGroup);
+        }
+
+        window.explainAnswer = function(qNum) {
+            const data = explanationData[qNum];
+            if (!data) return;
+
+            const tEl = document.getElementById(`t-q${qNum}`);
+            if (tEl) {
+                tEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.querySelectorAll('.transcript-highlight').forEach(el => el.classList.remove('transcript-highlight'));
+                tEl.classList.add('transcript-highlight');
+                setTimeout(() => tEl.classList.remove('transcript-highlight'), 3000);
+            }
+
+            if (window.innerWidth >= 768) {
+                const qEl = document.getElementById(`review-${qNum}`);
+                if (qEl) {
+                    const block = qEl.closest('li') || qEl.closest('.q-wrapper') || qEl.closest('#q-block-19-20');
+                    block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.querySelectorAll('.focus-highlight').forEach(el => el.classList.remove('focus-highlight'));
+                    block.classList.add('focus-highlight');
+                    setTimeout(() => block.classList.remove('focus-highlight'), 2000);
+                }
+            }
+
+            audio.currentTime = data.time;
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    iconPlay.classList.add('hidden');
+                    iconPause.classList.remove('hidden');
+                }).catch(e => console.error("Play error:", e));
+            }
+        };
+    </script>
+</body>
+</html>
