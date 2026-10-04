@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Passage 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Checkbox Styling */
+        input[type="checkbox"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .checkbox-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+        }
+        
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 140px;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">20:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+        <div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+            <div id="highlight-tooltip">Highlight</div>
+            
+            <div class="max-w-2xl mx-auto pb-12">
+                <div class="mb-8 border-b-2 border-brand-100 pb-5">
+                    <span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Passage 2</span>
+                    <h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">Russia's boreal forests and wild grasses could combat climate change</h2>
+                </div>
+
+                <div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+                    <p><strong>A.</strong> Scientists assert that Russia's ancient boreal forests are a crucial natural defense against climate change, despite the risk of carbon release from the vast subterranean stores. A recent study highlights that these permafrost regions hold roughly half of the world's soil carbon, with Russia containing about two-thirds of this amount. Josep Canadell, a co-author of the study, warns that <span id="exp-q2" class="explanation-target">thawing permafrost could increase carbon emissions by ten percent annually</span> over several centuries, <span id="exp-q8" class="explanation-target">significantly exceeding past predictions</span>. He emphasizes that while mitigating these emissions will be expensive, the cost of inaction will be even higher.</p>
+
+                    <p><strong>B.</strong> The study, published in *Global Biogeochemical Cycles*, reveals that this region <span id="exp-q5" class="explanation-target">contains 1,672 billion tons of organic carbon</span>, primarily stored deep underground, representing approximately half of the global below-ground organic carbon. <span id="exp-q3" class="explanation-target">Furthermore, a paper in *Nature* challenges the traditional view that old-growth forests are carbon-neutral</span>, demonstrating that they continue to accumulate carbon. <span id="exp-q7" class="explanation-target">Sebastiaan Luyssaert, a biologist at the University of Antwerp, notes that these forests absorb more carbon than is released through natural disturbances like fires and insect infestations.</span> Canadell, executive director of the Global Carbon Project, adds that Russia's boreal forests absorb 500 million tons of carbon annually, roughly one-fifth of the total absorbed by the world's landmass.</p>
+
+                    <p><strong>C.</strong> Jing Ming Chen, a geography professor at the University of Toronto, points out the long-term consequences of logging in the boreal region. <span id="exp-q9" class="explanation-target">He explains that removing trees releases carbon into the atmosphere, and it takes 50 to 100 years for that carbon to be sequestered back into the ground.</span> Luyssaert and Chen advocate for the preservation of these old-growth forests to maintain their carbon storage capacity. Luyssaert stresses the urgency of controlling emissions in the next few decades to prevent irreversible consequences like permafrost melting. Nigel Roulet, a carbon cycle specialist at McGill University, anticipates that as the region warms, <span id="exp-q6" class="explanation-target">increased accessibility will heighten pressure on these forests</span>, increasing their value as other resources dwindle.</p>
+
+                    <p><strong>D.</strong> Scientists also propose that Russia and Kazakhstan could leverage <span id="exp-q10" class="explanation-target">wild grasses growing on abandoned agricultural lands</span> to combat global warming. Nicolas Vuichard, lead author of a study in *Environmental Science and Technology*, suggests these grasses could be <span id="exp-q11" class="explanation-target">harvested to produce ethanol</span> or burned in coal-fueled power plants. Converting these grasses to ethanol could sequester about 10 million tons of carbon annually over 60 years. While this represents a small fraction of global fossil fuel emissions, Vuichard considers it a substantial contribution.</p>
+
+                    <p><strong>E.</strong> Renton Righelato, a visiting research fellow at the University of Reading, agrees that <span id="exp-q1" class="explanation-target">biofuels are not a practical long-term replacement for transport fuels</span>, given the immense land requirements. However, he acknowledges that using grasses from abandoned croplands as biofuels could be beneficial. <span id="exp-q4" class="explanation-target">Adam Wolf, a study co-author from the Carnegie Institution for Science, cites research by Elliott Campbell in *Science* magazine</span>, indicating that <span id="exp-q12" class="explanation-target">burning grasses in a coal-fueled plant</span> doubles the carbon emission savings compared to ethanol production. Wolf advocates for using these grasses to <span id="exp-q13" class="explanation-target">generate electricity, offsetting coal use. He notes that both Russia and Kazakhstan have existing coal-fueled power plants, allowing for rapid implementation</span>, potentially making them leaders in green energy exports.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto pb-24">
+                
+                <!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <!-- Section 1: Matching Information -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 1-5</h3>
+                        <p class="text-sm text-gray-800 mb-2">The reading passage has five paragraphs, <strong>A-E</strong>.</p>
+                        <p class="text-sm text-gray-800 mb-2">Which paragraph contains the following information?</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a letter, OR click a letter then click a dashed box to apply.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-1 block">NB You may use any letter more than once.</p>
+                    </div>
+
+                    <!-- Letters Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <div class="flex flex-wrap gap-2 justify-center" id="letters-bank-1">
+                            <div draggable="true" data-type="paragraph" data-val="A" data-display="A" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">A</div>
+                            <div draggable="true" data-type="paragraph" data-val="B" data-display="B" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">B</div>
+                            <div draggable="true" data-type="paragraph" data-val="C" data-display="C" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">C</div>
+                            <div draggable="true" data-type="paragraph" data-val="D" data-display="D" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">D</div>
+                            <div draggable="true" data-type="paragraph" data-val="E" data-display="E" class="draggable-item flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm font-bold text-gray-700">E</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const q1To5 = [
+                                { q: 1, text: "a view concerning what can and what cannot replace something", exp: ['exp-q1'] },
+                                { q: 2, text: "a mention of the amount by which carbon emissions might increase in the future", exp: ['exp-q2'] },
+                                { q: 3, text: "a reference to an established belief that researchers say is incorrect", exp: ['exp-q3'] },
+                                { q: 4, text: "evidence from one study that supports the conclusions of another study", exp: ['exp-q4'] },
+                                { q: 5, text: "how much carbon is currently located in a particular part of the world", exp: ['exp-q5'] }
+                            ];
+                            q1To5.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-start gap-3 flex-1">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-1">${item.q}</span>
+                                            <span class="text-sm text-gray-700 leading-relaxed mt-1">${item.text}</span>
+                                        </div>
+                                        <div class="flex flex-col items-end shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                                            <div class="drop-zone w-16 h-10 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="paragraph" data-q="${item.q}"></div>
+                                            <div class="feedback-container hidden flex-col items-end w-full mt-2">
+                                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 2: Matching Features -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 6-9</h3>
+                        <p class="text-sm text-gray-800 mb-2">Look at the following statements (Questions 6-9) and the list of scientists below.</p>
+                        <p class="text-sm text-gray-800 mb-2">Match each statement with the correct scientist, <strong>A-D</strong>.</p>
+                        <p class="text-xs text-brand-700 font-medium italic mt-2 bg-white/50 inline-block px-2 py-1 rounded">Drag & drop a scientist, OR click a scientist then click a dashed box to apply.</p>
+                    </div>
+
+                    <!-- Researchers Word Bank -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm mb-6">
+                        <h4 class="font-bold text-sm text-gray-700 mb-3 text-center uppercase tracking-wider">List of Scientists</h4>
+                        <div class="flex flex-wrap gap-3 justify-center text-sm font-medium" id="scientists-bank">
+                            <div draggable="true" data-type="scientist" data-val="A" data-display="A. Josep Canadell" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">A</span> <span class="leading-tight">Josep Canadell</span>
+                            </div>
+                            <div draggable="true" data-type="scientist" data-val="B" data-display="B. Sebastiaan Luyssaert" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">B</span> <span class="leading-tight">Sebastiaan Luyssaert</span>
+                            </div>
+                            <div draggable="true" data-type="scientist" data-val="C" data-display="C. Jing Ming Chen" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">C</span> <span class="leading-tight">Jing Ming Chen</span>
+                            </div>
+                            <div draggable="true" data-type="scientist" data-val="D" data-display="D. Nigel Roulet" class="draggable-item flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-grab active:cursor-grabbing hover:bg-brand-50 hover:border-brand-400 hover:text-brand-700 transition-all duration-200 shadow-sm">
+                                <span class="font-bold text-brand-600 w-6 shrink-0 text-center">D</span> <span class="leading-tight">Nigel Roulet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <script>
+                            const q6To9 = [
+                                { q: 6, text: "More attention will be paid to the situation in the boreal forests in the future.", exp: ['exp-q6'] },
+                                { q: 7, text: "Boreal forests are able to deal with some of the damage that is done to them.", exp: ['exp-q7'] },
+                                { q: 8, text: "Earlier research may have underestimated the scale of a future problem.", exp: ['exp-q8'] },
+                                { q: 9, text: "The damage done by destroying boreal forests lasts for a very long time.", exp: ['exp-q9'] }
+                            ];
+                            q6To9.forEach(item => {
+                                document.write(`
+                                    <div class="q-row flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+                                        <div class="flex items-start gap-3 w-full sm:w-2/3">
+                                            <span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm mt-0.5">${item.q}</span>
+                                            <span class="text-sm text-gray-700 leading-relaxed">${item.text}</span>
+                                        </div>
+                                        <div class="flex flex-col items-start sm:items-end shrink-0 w-full sm:w-auto">
+                                            <div class="drop-zone w-full sm:w-48 min-h-[40px] px-3 py-2 border-2 border-dashed border-gray-400 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-bold text-brand-700 transition-all duration-200 cursor-pointer shadow-inner hover:bg-gray-200" data-type="scientist" data-q="${item.q}"></div>
+                                            <div class="feedback-container hidden flex-col items-start sm:items-end w-full mt-2">
+                                                <button class="exp-btn text-[10px] text-brand-600 font-bold bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition-colors uppercase tracking-wider" onclick='showExplanation(${JSON.stringify(item.exp)})'>View Explanation</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Section 3: Summary Completion -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner">
+                        <h3 class="font-bold text-gray-900 mb-2">Questions 10-13</h3>
+                        <p class="text-sm text-gray-800">Complete the summary below.</p>
+                        <p class="text-sm text-gray-800">Choose <strong class="text-brand-700">NO MORE THAN TWO WORDS</strong> from the passage for each answer.</p>
+                    </div>
+
+                    <div class="text-gray-800 leading-loose text-justify text-[15px] space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h4 class="font-bold text-center text-lg mb-4 text-gray-900 border-b border-gray-300 pb-2">Wild grasses in Russia and Kazakhstan</h4>
+                        <p>
+                            Scientists believe that wild grasses which are currently growing on former 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-block align-middle" data-q="10">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">10</strong>
+                                    <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q10"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            in Russia and Kazakhstan could be useful in combating environmental problems. There are two different ideas concerning how this could happen.
+                        </p>
+                        <p>
+                            With the first idea, approximately ten million tons of carbon would be stored in the ground, and three-quarters of this would create 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-block align-middle" data-q="11">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">11</strong>
+                                    <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q11"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            that could be used instead of petroleum-based fuels. The second idea is to burn the grasses in 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-block align-middle" data-q="12">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">12</strong>
+                                    <input type="text" id="input-q12" onkeyup="updateTextInput(12, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q12"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            power plants. Supporters of this idea say that the effect in reducing carbon emissions would be twice as great as if the first idea was carried out. The grasses would be used to produce 
+                            <span class="inline-flex flex-col items-center mx-1 gap-1 q-block align-middle" data-q="13">
+                                <span class="flex items-center gap-1">
+                                    <strong class="text-[11px] bg-brand-200 text-brand-800 w-5 h-5 flex items-center justify-center rounded-full">13</strong>
+                                    <input type="text" id="input-q13" onkeyup="updateTextInput(13, this.value)" autocomplete="off">
+                                </span>
+                                <span class="feedback-container hidden flex-col items-center w-full">
+                                    <button class="exp-btn text-[9px] text-brand-600 font-bold bg-white px-2 py-0.5 rounded border border-brand-200 hover:bg-brand-50 mt-1" onclick='showExplanation(["exp-q13"])'>Explanation</button>
+                                </span>
+                            </span> 
+                            and production of this could begin in a short period of time.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+
+    <script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {
+            // Drag and Drop (Paragraphs)
+            1: "E", 2: "A", 3: "B", 4: "E", 5: "B",
+            // Drag and Drop (Scientists)
+            6: "D", 7: "B", 8: "A", 9: "C",
+            // Text Input (Multiple acceptable variations)
+            10: ["agricultural lands"],
+            11: ["ethanol"],
+            12: ["coal-fuelled"],
+            13: ["clean electricity", "electricity"]
+        };
+
+        const SCIENTIST_DISPLAYS = {
+            "A": "A. Josep Canadell",
+            "B": "B. Sebastiaan Luyssaert",
+            "C": "C. Jing Ming Chen",
+            "D": "D. Nigel Roulet"
+        };
+
+        let userAnswers = {};
+        for(let i=1; i<=13; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 20 * 60; // 20 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=13; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        // Dual Drag & Drop + Click-to-Apply
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            let activeSelection = null;
+
+            function clearActiveSelection() {
+                if(activeSelection) {
+                    activeSelection.el.classList.remove('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    activeSelection = null;
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (activeSelection && !e.target.closest('.draggable-item') && !e.target.closest('.drop-zone')) {
+                    clearActiveSelection();
+                }
+            });
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    clearActiveSelection();
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        val: draggable.dataset.val,
+                        display: draggable.dataset.display,
+                        type: draggable.dataset.type
+                    }));
+                    draggable.classList.add('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+                draggable.addEventListener('dragend', () => {
+                    draggable.classList.remove('opacity-50', 'ring-2', 'ring-brand-500');
+                });
+
+                // Click to select
+                draggable.addEventListener('click', (e) => {
+                    if (isSubmitted) return;
+                    if (activeSelection && activeSelection.el === draggable) {
+                        clearActiveSelection(); 
+                    } else {
+                        clearActiveSelection();
+                        activeSelection = {
+                            el: draggable,
+                            val: draggable.dataset.val,
+                            display: draggable.dataset.display,
+                            type: draggable.dataset.type
+                        };
+                        draggable.classList.add('ring-4', 'ring-brand-500', 'bg-brand-100', 'scale-[1.02]');
+                    }
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragenter', (e) => { 
+                    e.preventDefault(); 
+                    if (!isSubmitted && (!activeSelection || activeSelection.type === zone.dataset.type)) {
+                        zone.classList.add('ring-4', 'ring-brand-300'); 
+                    }
+                });
+                zone.addEventListener('dragover', (e) => { 
+                    e.preventDefault(); 
+                });
+                zone.addEventListener('dragleave', () => { 
+                    zone.classList.remove('ring-4', 'ring-brand-300'); 
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('ring-4', 'ring-brand-300');
+                    if (isSubmitted) return;
+                    try {
+                        const dataStr = e.dataTransfer.getData('text/plain');
+                        if(!dataStr) return;
+                        const data = JSON.parse(dataStr);
+                        if (data.type === zone.dataset.type) {
+                            applyToZone(zone, data);
+                        }
+                    } catch(err) { }
+                });
+                
+                // Click to apply or clear
+                zone.addEventListener('click', () => {
+                    if (isSubmitted) return;
+
+                    if (activeSelection) {
+                        // Check if the type matches (e.g. don't drop a scientist into a paragraph question)
+                        if (activeSelection.type === zone.dataset.type) {
+                            applyToZone(zone, activeSelection);
+                            clearActiveSelection();
+                        } else {
+                            clearActiveSelection(); // Mismatched type, just clear
+                        }
+                    } else {
+                        // Clear the zone if nothing is selected
+                        if (zone.textContent) {
+                            zone.textContent = '';
+                            zone.classList.remove('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                            zone.classList.add('border-dashed', 'border-gray-400', 'bg-gray-100');
+                            const qNum = zone.dataset.q;
+                            userAnswers[qNum] = "";
+                            updateMapStatus(qNum, false);
+                        }
+                    }
+                });
+            });
+
+            function applyToZone(zone, data) {
+                zone.textContent = data.display;
+                zone.classList.remove('border-dashed', 'border-gray-400', 'bg-gray-100');
+                zone.classList.add('border-solid', 'border-brand-500', 'bg-white', 'shadow-md');
+                const qNum = zone.dataset.q;
+                userAnswers[qNum] = data.val;
+                updateMapStatus(qNum, true);
+            }
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded border border-green-300 w-fit text-center flex items-center justify-center gap-1 mt-1`;
+            el.innerHTML = `<svg class="w-3 h-3 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Ans: ${text}`;
+            return el;
+        }
+        
+        function createDropCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+            });
+            document.querySelectorAll('.draggable-item').forEach(el => {
+                el.removeAttribute('draggable');
+                el.classList.add('cursor-default', 'opacity-50');
+                el.classList.remove('cursor-grab', 'active:cursor-grabbing');
+            });
+            document.querySelectorAll('.drop-zone').forEach(el => el.classList.remove('cursor-pointer'));
+
+            // Grade Q1-Q5 (Matching Paragraphs)
+            for (let i = 1; i <= 5; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                feedbackContainer.classList.remove('hidden');
+                
+                if (!isCorrect) {
+                    feedbackContainer.insertBefore(createDropCorrectMarker(key), feedbackContainer.firstChild);
+                }
+            }
+
+            // Grade Q6-Q9 (Matching Scientists)
+            for (let i = 6; i <= 9; i++) {
+                const uAns = userAnswers[i];
+                const key = ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const isCorrect = (uAns === key);
+                
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                    qRow.classList.replace('border-gray-200', 'border-yellow-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-yellow-50');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    qRow.classList.replace('border-gray-200', 'border-green-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-green-50');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    qRow.classList.replace('border-gray-200', 'border-red-400');
+                    qRow.classList.replace('bg-gray-50', 'bg-red-50');
+                }
+                
+                const feedbackContainer = qRow.querySelector('.feedback-container');
+                feedbackContainer.classList.remove('hidden');
+                
+                if (!isCorrect) {
+                    feedbackContainer.insertBefore(createDropCorrectMarker(SCIENTIST_DISPLAYS[key]), feedbackContainer.firstChild);
+                }
+            }
+
+            // Grade Q10-Q13 (Text Inputs inline)
+            for (let i = 10; i <= 13; i++) {
+                const inputEl = document.getElementById(`input-q${i}`);
+                const uAns = userAnswers[i].toLowerCase();
+                const acceptableKeys = ANSWER_KEYS[i].map(k => k.toLowerCase());
+                const isCorrect = acceptableKeys.includes(uAns);
+                
+                const qBlock = document.querySelector(`.q-block[data-q="${i}"]`);
+                const feedbackContainer = qBlock.querySelector('.feedback-container');
+
+                if (uAns === '') {
+                    styleMapBox(i, 'blank');
+                } else if (isCorrect) {
+                    score++;
+                    styleMapBox(i, 'correct');
+                    inputEl.classList.add('correct');
+                } else {
+                    styleMapBox(i, 'incorrect');
+                    inputEl.classList.add('incorrect');
+                }
+
+                // Show correct answer badge if wrong OR blank
+                if (!isCorrect || uAns === '') {
+                    feedbackContainer.insertBefore(createCorrectMarker(ANSWER_KEYS[i][0]), feedbackContainer.firstChild);
+                }
+                
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.add('flex');
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            initDragAndDrop();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
