@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Reading Mock Test 7 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Pastel Mint & Peach */
+            --primary: #2f8f83; /* Lime 700 - Earthy Green */
+            --primary-light: #eafaf6; /* Yellow 200 - Soft Gold */
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #f6fffc;
+            --card-bg: #ffffff;
+            --accent: #e8895a; /* Yellow 600 - Deeper Gold */
+            --border: #bfe8dd; /* Lime 300 */
+            --badge-bg: #ffe3d1; /* Lime 200 */
+            --badge-text: #b04e1f; /* Lime 800 */
+            --success: #5b6fd6; /* Ocean Blue for translations */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background: linear-gradient(90deg,#7fd1c0,#ffc9a8); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Search Bar */
+        .search-container { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; max-width: 500px; padding: 0.75rem 1.5rem; font-size: 1rem; border: 2px solid var(--border); border-radius: 25px; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 2px 10px rgba(47, 143, 131, 0.15); }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(47, 143, 131, 0.3); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); color: var(--accent); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 6px rgba(47, 143, 131, 0.2); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(47, 143, 131, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none !important; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px dashed var(--border); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 800; color: var(--primary); text-transform: capitalize; letter-spacing: -0.01em; }
+        .word-form-main { font-size: 0.9rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .audio-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); cursor: pointer; font-size: 1.1rem; padding: 0.3rem; border-radius: 50%; transition: all 0.2s; align-self: center; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+        .audio-btn:hover { transform: scale(1.1); background-color: var(--primary); color: white; border-color: var(--primary); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #f6fffc; border: 1px solid #e2e8f0; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; border-left: 3px solid var(--border); }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.75rem; color: var(--badge-text); font-weight: bold; margin-bottom: 0.5rem; display: inline-block; background: var(--badge-bg); padding: 0.2rem 0.6rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .definition { font-size: 1.05rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 1rem; font-weight: 600; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: 800; }
+        .extra-example { background-color: #f1f5f9; border-left-color: var(--text-muted); margin-top: 0.5rem; }
+        .extra-example span { color: var(--text-muted); }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(47, 143, 131, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; background: linear-gradient(135deg, #ffffff 0%, var(--primary-light) 100%); border-color: var(--primary-light); }
+        .flashcard-front .word-container { margin-bottom: 1rem; display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .flashcard-front .word { font-size: 3rem; color: var(--primary); text-transform: capitalize; margin-bottom: 0;}
+        .flashcard-front .fc-word-form { font-size: 1.2rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .audio-btn { font-size: 2rem; width: 60px; height: 60px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid var(--border); }
+        .flashcard-back { transform: rotateY(180deg); background: #ffffff; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.5rem; width: 100%; }
+        
+        .flashcard-back .definition { font-size: 1.2rem; margin-bottom: 0.5rem; line-height: 1.5; }
+        .flashcard-back .translation { font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--success); font-weight: 600;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 1rem 1.25rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1.5rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; font-weight: bold; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 5px 15px rgba(47, 143, 131, 0.08); border: 1px solid var(--border); }
+        .fc-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); font-size: 1rem; font-weight: 700; cursor: pointer; padding: 0.6rem 1.2rem; border-radius: 25px; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(47, 143, 131, 0.2); }
+        .fc-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+        .fc-counter { font-weight: 800; font-size: 1.2rem; color: var(--primary); min-width: 80px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">PET Intensive Vol 2 Test 7 - Vocabulary Learning Tool</div>
+
+<div class="container">
+    <header>
+        <h1>Reading Vocabulary Bank</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a word or meaning..." oninput="handleSearch()">
+    </div>
+
+    <!-- Topic Filter Controls -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Oldest Leather Shoe')">Passage 1: Leather Shoe</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Goya\'s Portraits')">Passage 2: Goya Portraits</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Memory Champions')">Passage 3: Memory Champions</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Int.)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcards</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="topic-tag" id="fc-topic">Topic: General</span>
+                    <div class="word-container">
+                        <h2 class="word" id="fc-word">Word</h2>
+                        <span class="fc-word-form" id="fc-word-form">(Noun)</span>
+                    </div>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1.5rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / X</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: var(--border); margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀 Shuffle</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    const P1 = "Oldest Leather Shoe", P2 = "Goya's Portraits", P3 = "Memory Champions";
+    const V = (topic, level, word, form, phonetic, forms, def, translation, example, extraExample) => ({ topic, level, word, form, phonetic, forms, def, translation, example, extraExample });
+    const vocabBank = [
+        // --- PASSAGE 1: The Oldest Leather Shoe ---
+        V(P1,"C1","Excavate","Verb","/ˈekskəveɪt/","N: Excavation","To dig in the ground carefully to find buried objects of historical interest.","Khai quật","...found by scientists excavating a huge cave, designated Areni-1, in Armenia...","Archaeologists excavated the ancient burial site."),
+        V(P1,"C1","Designate","Verb","/ˈdezɪɡneɪt/","N: Designation","To officially name or choose something for a particular purpose.","Chỉ định, đặt tên","...a huge cave, designated Areni-1, in Armenia near the border of Turkey and Iran.","The area was designated a national park."),
+        V(P1,"C2","Treasure trove","Noun","/ˈtreʒə trəʊv/","N/A","A collection of valuable or interesting things that have been found.","Kho báu","The shoe was part of a treasure trove of artefacts...","The old attic was a treasure trove of family photographs."),
+        V(P1,"C1","Artefact","Noun","/ˈɑːtɪfækt/","N/A","An object made by a person, especially one of historical interest.","Cổ vật, đồ tạo tác","...a treasure trove of artefacts that experts say provide unprecedented information...","The museum displays artefacts from ancient Egypt."),
+        V(P1,"C2","Unprecedented","Adjective","/ʌnˈpresɪdentɪd/","N: Precedent","Never done or known before.","Chưa từng có","...artefacts that experts say provide unprecedented information about an important... era.","The city faced an unprecedented level of flooding."),
+        V(P1,"C2","Sparsely","Adverb","/ˈspɑːsli/","Adj: Sparse","In small amounts or numbers, spread over a wide area.","Một cách thưa thớt, ít ỏi","...an important and sparsely documented era: the Chalcolithic period or Copper Age...","The region is sparsely populated."),
+        V(P1,"C1","Domesticate","Verb","/dəˈmestɪkeɪt/","N: Domestication","To tame an animal so that it can live with or be used by humans.","Thuần hóa","...humans are believed to have invented the wheel, as well as domesticating horses...","Wolves were domesticated to become dogs."),
+        V(P1,"B2","Innovation","Noun","/ˌɪnəˈveɪʃn/","V: Innovate | Adj: Innovative","A new idea, method or invention.","Sự đổi mới, phát minh","...producing other important innovations.","The smartphone was a major innovation."),
+        V(P1,"C1","Yield","Verb","/jiːld/","N: Yield","To produce or provide something, such as a result or crop.","Cho ra, mang lại","...the cave yielded horns and bones of wild goats and red deer...","The experiment yielded surprising results."),
+        V(P1,"B2","Intentionally","Adverb","/ɪnˈtenʃənəli/","Adj: Intentional","On purpose; deliberately.","Một cách có chủ ý","...the oldest known intentionally dried fruits: apricots, grapes and plums.","She did not intentionally break the vase."),
+        V(P1,"C1","Ritual","Noun","/ˈrɪtʃuəl/","Adj: Ritual","A set of actions performed in a fixed way, often for religious reasons.","Nghi lễ","...keeping this Chalcolithic community's ritual objects...","The ritual is performed once a year."),
+        V(P1,"B2","Status","Noun","/ˈsteɪtəs/","N/A","A person's social or professional position.","Địa vị","...used primarily by powerful people of high status...","Doctors usually enjoy a high social status."),
+        V(P1,"B2","Assume","Verb","/əˈsjuːm/","N: Assumption","To suppose that something is true without proof.","Cho rằng, giả định","...so he had assumed the shoe would be 600 to 700 years old.","I assumed you knew about the meeting."),
+        V(P1,"B2","Ancient","Adjective","/ˈeɪnʃənt/","N/A","Belonging to the very distant past.","Cổ xưa","'We couldn't believe that a shoe could be so ancient.'","They visited the ancient ruins of Rome."),
+        V(P1,"B2","Preserve","Verb","/prɪˈzɜːv/","N: Preservation","To keep something in its original or good condition.","Bảo quản, bảo tồn","Perfectly preserved under a layer of sheep dung and thus sealed...","The old building has been carefully preserved."),
+        V(P1,"C2","Dung","Noun","/dʌŋ/","N/A","The waste matter of animals.","Phân (động vật)","...preserved under a layer of sheep dung...","Farmers use dung as natural fertiliser."),
+        V(P1,"C1","Comprise","Verb","/kəmˈpraɪz/","N/A","To consist of or be made up of.","Bao gồm, cấu thành","The pieces of leather comprising the shoe were joined using leather cords...","The committee comprises ten members."),
+        V(P1,"B2","Thread","Verb","/θred/","N: Thread","To pass a string or cord through a hole.","Luồn (chỉ, dây)","...these were threaded through numerous holes in the body of the shoe.","She threaded the needle carefully."),
+        V(P1,"C2","Eyelet","Noun","/ˈaɪlət/","N/A","A small hole in cloth or leather for a lace or cord to pass through.","Lỗ xỏ dây (giày)","...some of the eyelets had been torn and replaced.","The laces came loose from the eyelets."),
+        V(P1,"C1","Imprint","Noun","/ˈɪmprɪnt/","V: Imprint","A mark made on a surface by pressure.","Dấu vết, dấu in","'You can see the imprint of the big toe,' said another team leader...","The imprint of a foot was left in the mud."),
+        V(P1,"B2","Deliberately","Adverb","/dɪˈlɪbərətli/","Adj: Deliberate","In a way that is planned and intended.","Một cách cố ý","The shoe had been deliberately placed in the pit where the archeologists found it.","He deliberately ignored the warning."),
+        V(P1,"C1","Terrain","Noun","/təˈreɪn/","N/A","An area of land, considered in terms of its natural features.","Địa hình","...the terrain around Areni-1 is very rugged and would have been difficult to walk on.","The vehicle can cross rough terrain."),
+        V(P1,"C1","Rugged","Adjective","/ˈrʌɡɪd/","N/A","(Of land) rough, uneven and rocky.","Gồ ghề, hiểm trở","...the terrain around Areni-1 is very rugged...","The rugged coastline attracts many hikers."),
+        V(P1,"B2","Cope with","Phrasal verb","/kəʊp wɪð/","N/A","To deal successfully with a difficult situation.","Đối phó với","...shoes like this would have enabled people to cope with the extremes of temperature...","She coped well with the stress of exams."),
+        V(P1,"B2","Extreme","Noun","/ɪkˈstriːm/","Adj: Extreme","The highest or most severe degree of something.","Mức cực đoan","...to cope with the extremes of temperature in the region...","The desert has extremes of heat and cold."),
+        V(P1,"C1","Distinguish","Verb","/dɪˈstɪŋɡwɪʃ/","Adj: Distinct","To recognise or show the difference between things or people.","Phân biệt","...the clothing which the wearer used to distinguish their identity.","It is hard to distinguish the twins."),
+        V(P1,"C2","Plausible","Adjective","/ˈplɔːzəbl/","N: Plausibility","Seeming reasonable or likely to be true.","Hợp lý, đáng tin","Drs Pinhasi and Areshian think it is plausible that shoes as we know them today originated... around Armenia.","Her explanation sounded plausible."),
+        V(P1,"C1","Originate","Verb","/əˈrɪdʒɪneɪt/","N: Origin","To begin or start from a particular place or cause.","Bắt nguồn","...shoes as we know them today originated somewhere in the Near East...","Many sports originated in Britain."),
+        V(P1,"C2","Prototype","Noun","/ˈprəʊtətaɪp/","N/A","The first or original model of something from which others are developed.","Nguyên mẫu","...the earliest clue to a 'prototype' shoe, which later spread to other parts of the world.","Engineers tested a prototype of the new car."),
+        V(P1,"C1","Subsequent","Adjective","/ˈsʌbsɪkwənt/","Adv: Subsequently","Coming after something in time.","Tiếp theo, sau đó","...those found across Europe at subsequent periods...","Subsequent events proved him right."),
+        V(P1,"B2","Diverse","Adjective","/daɪˈvɜːs/","N: Diversity","Showing a great deal of variety.","Đa dạng","...worn for thousands of years across a large and environmentally diverse region.","The city has a diverse population."),
+
+        // --- PASSAGE 2: From princes to paupers: Goya's portraits ---
+        V(P2,"C1","Scholarship","Noun","/ˈskɒləʃɪp/","N: Scholar","Serious academic study and the knowledge it produces.","Học thuật, nghiên cứu","There are, according to current scholarship, 160 existing portraits by Francisco de Goya...","The book is a work of fine scholarship."),
+        V(P2,"C1","Relentlessly","Adverb","/rɪˈlentləsli/","Adj: Relentless","In a way that never stops or weakens.","Không ngừng nghỉ","...captured so comprehensively and relentlessly.","The press followed the star relentlessly."),
+        V(P2,"C1","Trauma","Noun","/ˈtrɔːmə/","Adj: Traumatic","A deeply distressing experience or event.","Chấn thương tâm lý","...a nation's people, history, traumas, folk traditions, and superstitions...","The war left the country with deep trauma."),
+        V(P2,"C1","Superstition","Noun","/ˌsuːpəˈstɪʃn/","Adj: Superstitious","A belief in magic or luck that is not based on reason.","Sự mê tín","...folk traditions, and superstitions so comprehensively and relentlessly captured.","It is a superstition that black cats bring bad luck."),
+        V(P2,"C1","Comprehensively","Adverb","/ˌkɒmprɪˈhensɪvli/","Adj: Comprehensive","In a thorough and complete way.","Một cách toàn diện","...so comprehensively and relentlessly captured.","The report covers the topic comprehensively."),
+        V(P2,"C1","Authoritarian","Adjective","/ɔːˌθɒrɪˈteəriən/","N: Authority","Demanding strict obedience to authority and limiting personal freedom.","Độc đoán, chuyên chế","...a succession of authoritarian and liberal governments...","The country was ruled by an authoritarian regime."),
+        V(P2,"C1","Restoration","Noun","/ˌrestəˈreɪʃn/","V: Restore","The return of something, such as a monarchy, to a former state.","Sự phục hồi, phục vị","...the Napoleonic wars, and the restoration of the monarchy...","The restoration of the old church took years."),
+        V(P2,"C1","Sinister","Adjective","/ˈsɪnɪstə/","N/A","Seeming evil or threatening.","Đáng ngại, nham hiểm","...the unsettling and sinister etching series...","There was something sinister about the empty house."),
+        V(P2,"C2","Etching","Noun","/ˈetʃɪŋ/","V: Etch","A print made from a metal plate on which a design has been cut with acid.","Tranh khắc axit","...the unsettling and sinister etching series...","The museum has a fine etching of the old city."),
+        V(P2,"C2","Swagger","Noun","/ˈswæɡə/","V: Swagger","A confident, arrogant way of walking or behaving.","Dáng điệu vênh vang","...the majos and majas who gave Madrid its street swagger...","He walked in with a swagger."),
+        V(P2,"C2","Palette","Noun","/ˈpælət/","N/A","The range of colours used by a particular artist or in a painting.","Bảng màu","The pictures have a light, rococo palette...","The painter used a warm palette of reds and golds."),
+        V(P2,"C2","Satirise","Verb","/ˈsætəraɪz/","N: Satire","To criticise someone or something by making fun of them.","Châm biếm","...he has been seen as satirising the Bourbon monarchy...","The show satirises modern politics."),
+        V(P2,"C2","Obeisance","Noun","/əʊˈbeɪsns/","N/A","Deep respect or obedience shown to someone powerful.","Sự phục tùng, cúi chào","...without showing obeisance to the usual flattering conventions.","The courtiers bowed in obeisance to the king."),
+        V(P2,"C1","Convention","Noun","/kənˈvenʃn/","Adj: Conventional","A traditional way of doing something that most people follow.","Quy ước, lệ thường","...the usual flattering conventions.","He broke with convention and wore jeans to the ceremony."),
+        V(P2,"C1","Subversive","Adjective","/səbˈvɜːsɪv/","V: Subvert","Trying to weaken or overturn an established system or idea.","Có tính lật đổ, phá cách","...his main message to his students was subversive - 'there are no rules in painting'.","The film contains a subversive message."),
+        V(P2,"C1","Enviable","Adjective","/ˈenviəbl/","V: Envy","Causing others to feel jealous because it is desirable.","Đáng ghen tị","'I have now established an enviable way of living...'","She has an enviable talent for languages."),
+        V(P2,"C1","Resent","Verb","/rɪˈzent/","N: Resentment","To feel bitter or angry about something unfair.","Bực bội, oán giận","...he did not resent portraiture as an economically necessary chore...","He resented having to work at weekends."),
+        V(P2,"B2","Chore","Noun","/tʃɔː/","N/A","A routine or boring task.","Việc vặt nhàm chán","...portraiture as an economically necessary chore that ate away at the time...","Washing dishes is my least favourite chore."),
+        V(P2,"C2","Repose","Noun","/rɪˈpəʊz/","N/A","A state of rest or calm.","Trạng thái nghỉ ngơi, tĩnh lặng","...he worked hard to give his sitters in repose a sense of latent movement...","Her face looked peaceful in repose."),
+        V(P2,"C2","Latent","Adjective","/ˈleɪtnt/","N/A","Existing but not yet visible or active.","Tiềm ẩn","...a sense of latent movement...","The test revealed a latent talent for music."),
+        V(P2,"C2","Impasto","Noun","/ɪmˈpɑːstəʊ/","N/A","A technique of laying paint on very thickly so that it stands out from the surface.","Kỹ thuật sơn dày (impasto)","...sketched in thick impasto rather than being laboriously defined.","The artist used impasto to create texture."),
+        V(P2,"C2","Coalesce","Verb","/ˌkəʊəˈles/","N/A","To come together to form one mass or whole.","Hợp lại, hòa quyện","...from a distance, they coalesce into silks, braiding, and gauze.","The small groups coalesced into a single movement."),
+        V(P2,"C2","Eschew","Verb","/ɪsˈtʃuː/","N/A","To deliberately avoid or give up something.","Tránh, né tránh","...he eschewed entirely the grandeur of majesty...","She eschews fashion trends and wears simple clothes."),
+        V(P2,"C2","Motley","Adjective","/ˈmɒtli/","N/A","Made up of many different and often unsuited types.","Hỗn tạp, lẫn lộn","...a motley grouping... in fancy clothes.","A motley crew of volunteers arrived."),
+        V(P2,"C1","Jeopardise","Verb","/ˈdʒepədaɪz/","N: Jeopardy","To put something in danger of being harmed or lost.","Gây nguy hiểm cho","...he wouldn't have jeopardised his hard-won new position as first court painter...","Don't jeopardise your health by working so hard."),
+        V(P2,"C1","Patron","Noun","/ˈpeɪtrən/","N: Patronage","A person who gives financial support to an artist or cause.","Người bảo trợ","...to score political points at the expense of his patrons.","The artist found a wealthy patron."),
+        V(P2,"C2","Unprepossessing","Adjective","/ˌʌnpriːpəˈzesɪŋ/","N/A","Not attractive or impressive in appearance.","Không bắt mắt, kém ấn tượng","Ferdinand himself was physically unprepossessing, tyrannical, vicious, and small-minded...","The hotel was small and unprepossessing."),
+        V(P2,"C1","Tyrannical","Adjective","/tɪˈrænɪkl/","N: Tyrant | N: Tyranny","Using power in a cruel and unfair way.","Chuyên chế, bạo ngược","Ferdinand himself was physically unprepossessing, tyrannical, vicious...","The tyrannical ruler punished all critics."),
+        V(P2,"C2","Malignity","Noun","/məˈlɪɡnəti/","Adj: Malignant","A strong desire to do harm to others.","Sự ác ý","If Ferdinand represents human malignity and Goya its frailty...","The malignity of the rumour hurt her deeply."),
+        V(P2,"C1","Frailty","Noun","/ˈfreɪlti/","Adj: Frail","Physical or moral weakness.","Sự yếu đuối","...human malignity and Goya its frailty...","The frailty of old age made travel difficult."),
+        V(P2,"C1","Innate","Adjective","/ɪˈneɪt/","N/A","Inborn; existing from birth rather than learned.","Bẩm sinh","...Arrieta stands for man's innate kindness.","Children have an innate curiosity."),
+        V(P2,"C1","Debilitating","Adjective","/dɪˈbɪlɪteɪtɪŋ/","V: Debilitate","Making someone very weak or unable to do things.","Làm suy nhược","...the 73-year-old painter in the throes of a debilitating illness...","He suffers from a debilitating disease."),
+        V(P2,"C2","Guise","Noun","/ɡaɪz/","N/A","An outward appearance that hides the real nature of something.","Vỏ bọc, danh nghĩa","...in the guise of representing individuals he showed... man as a universal being.","The spy entered the country under the guise of a tourist."),
+
+        // --- PASSAGE 3: Memory Champions … or just good at tricks ---
+        V(P3,"B2","Contestant","Noun","/kənˈtestənt/","N: Contest","A person who takes part in a competition.","Thí sinh","...34 contestants gathered at the World Memory Championships.","Each contestant had five minutes to answer."),
+        V(P3,"C2","Austere","Adjective","/ɒˈstɪə/","N: Austerity","Plain, severe and without decoration or comfort.","Giản dị, khắc khổ","...known for its austere yet grandiose setting of oak-paneled rooms...","The monastery has an austere design."),
+        V(P3,"C2","Grandiose","Adjective","/ˈɡrændiəʊs/","N/A","Impressive and grand, often more than necessary.","Hoành tráng, phô trương","...its austere yet grandiose setting...","The architect drew up a grandiose plan for the palace."),
+        V(P3,"C1","Loom","Verb","/luːm/","N/A","To appear as a large, often threatening shape.","Hiện lên sừng sững","...large Gothic windows, and looming portraits of eminent dukes and earls.","Dark clouds loomed over the city."),
+        V(P3,"C1","Eminent","Adjective","/ˈemɪnənt/","N/A","Famous and respected, especially in a profession.","Lỗi lạc, xuất chúng","...looming portraits of eminent dukes and earls.","She is an eminent scientist."),
+        V(P3,"C2","Mnemonic","Adjective","/nɪˈmɒnɪk/","N: Mnemonic","Helping or intended to help the memory.","Thuộc về trí nhớ, hỗ trợ ghi nhớ","...to demonstrate their exceptional mnemonic abilities.","A mnemonic device can help you remember the list."),
+        V(P3,"B2","Recite","Verb","/rɪˈsaɪt/","N: Recital","To say aloud something learned by heart.","Đọc thuộc lòng","Reciting poems, memorizing digit sequences, and recalling faces... are just a few of the tasks...","The children recited a poem to the class."),
+        V(P3,"C1","Integral","Adjective","/ˈɪntɪɡrəl/","N/A","Necessary and forming an essential part of a whole.","Không thể thiếu, thiết yếu","...has become an integral part of historical and modern memory training.","Teamwork is integral to our success."),
+        V(P3,"C1","Facilitate","Verb","/fəˈsɪlɪteɪt/","N: Facility","To make an action or process easier.","Tạo điều kiện, làm dễ dàng","...creating a mental map that facilitates recall.","Technology can facilitate learning."),
+        V(P3,"B2","Embrace","Verb","/ɪmˈbreɪs/","N: Embrace","To accept an idea or method with enthusiasm.","Đón nhận","...the loci method became widely embraced across ancient Greece...","Many schools have embraced online learning."),
+        V(P3,"B2","Fundamental","Adjective","/ˌfʌndəˈmentl/","N/A","Forming the basic and most important part of something.","Cơ bản, nền tảng","...serving as a fundamental technique for orators and scholars.","Respect is fundamental to any relationship."),
+        V(P3,"C2","Orator","Noun","/ˈɒrətə/","N: Oratory","A person who is skilled at making public speeches.","Nhà hùng biện","...a fundamental technique for orators and scholars.","The orator moved the crowd with his speech."),
+        V(P3,"C1","Cornerstone","Noun","/ˈkɔːnəstəʊn/","N/A","An essential part on which something is based.","Nền tảng, viên đá tảng","...became a cornerstone of rhetorical training.","Trust is the cornerstone of a good partnership."),
+        V(P3,"C2","Rhetorical","Adjective","/rɪˈtɒrɪkl/","N: Rhetoric","Relating to the art of effective or persuasive speaking.","Thuộc về hùng biện","...became a cornerstone of rhetorical training.","The politician used rhetorical skill to win support."),
+        V(P3,"C2","Treatise","Noun","/ˈtriːtɪs/","N/A","A formal written work dealing with a subject in depth.","Luận văn, chuyên luận","...a number of treatises on the art of memory were published in Rome...","He wrote a treatise on political philosophy."),
+        V(P3,"C1","Cement","Verb","/sɪˈment/","N: Cement","To make a relationship or position firm and strong.","Củng cố","...further cementing its importance and utility in memory training.","The victory cemented her place in history."),
+        V(P3,"B2","Retrieve","Verb","/rɪˈtriːv/","N: Retrieval","To get something back or bring it out of storage.","Truy xuất, lấy lại","...enhances the ability to retrieve information by navigating through these mental loci...","He retrieved his keys from the drawer."),
+        V(P3,"C1","Underpinnings","Noun","/ˈʌndəpɪnɪŋz/","V: Underpin","The basic ideas or structure that support something.","Cơ sở nền tảng","...explore the neural underpinnings that might explain the exceptional memory skills...","The study examines the economic underpinnings of the crisis."),
+        V(P3,"C1","Neural","Adjective","/ˈnjʊərəl/","N: Neuron","Relating to nerves or the nervous system.","Thuộc thần kinh","...explore the neural underpinnings...","Neural activity increases during problem solving."),
+        V(P3,"C1","Composite","Adjective","/ˈkɒmpəzɪt/","N: Composite","Made up of several different parts.","Tổng hợp, ghép","...forming a composite picture of a person doing something to an object.","The poster was a composite of three photographs."),
+        V(P3,"B2","Vivid","Adjective","/ˈvɪvɪd/","Adv: Vividly","Producing strong, clear images in the mind.","Sống động","...creating a vivid mental journey that he can easily traverse.","She has vivid memories of her childhood."),
+        V(P3,"C2","Traverse","Verb","/trəˈvɜːs/","N/A","To travel across or through an area.","Băng qua, đi xuyên","...a vivid mental journey that he can easily traverse.","The path traverses a dense forest."),
+        V(P3,"C1","Encode","Verb","/ɪnˈkəʊd/","V: Decode","To convert information into a form that can be stored or sent.","Mã hóa","...rapidly encode and decode information during competitions.","The brain encodes new memories during sleep."),
+        V(P3,"C1","Feat","Noun","/fiːt/","N/A","An action or achievement that shows great skill or strength.","Kỳ tích, thành tựu","...the sophisticated strategies they employ to achieve their remarkable feats.","Climbing Everest is an incredible feat."),
+        V(P3,"C1","Contention","Noun","/kənˈtenʃn/","Adj: Contentious","Disagreement or argument; a point that people argue about.","Sự tranh cãi","The belief in 'photographic memory' remains a point of contention among the public and scientists alike.","The budget is a point of contention."),
+        V(P3,"B2","Myth","Noun","/mɪθ/","Adj: Mythical","A widely held belief that is false.","Lầm tưởng, huyền thoại","If it is indeed a myth, it highlights how learned strategies are often more effective...","It's a myth that we only use ten percent of our brains."),
+        V(P3,"C1","Endure","Verb","/ɪnˈdjʊə/","Adj: Enduring","To continue to exist for a long time.","Tồn tại lâu dài","...this myth endures, reflecting how society's fascination with remarkable memory...","Their friendship has endured for decades."),
+        V(P3,"C1","Renowned","Adjective","/rɪˈnaʊnd/","N: Renown","Known and admired by many people.","Nổi tiếng","The most renowned of the naturals was the Russian journalist S.V. Shereshevski...","The city is renowned for its food."),
+        V(P3,"C2","Synesthesia","Noun","/ˌsɪnəsˈθiːziə/","Adj: Synesthetic","A condition in which one sense triggers another, e.g. seeing colours when hearing sounds.","Hiện tượng đồng cảm giác","Shereshevski also experienced synesthesia, a rare sensory condition where the senses are interconnected...","People with synesthesia may taste words."),
+        V(P3,"C1","Interconnected","Adjective","/ˌɪntəkəˈnektɪd/","V: Interconnect","Linked or related to each other.","Liên kết với nhau","...a rare sensory condition where the senses are interconnected...","The world's economies are deeply interconnected."),
+        V(P3,"C1","Innately","Adverb","/ɪˈneɪtli/","Adj: Innate","In a way that exists from birth.","Một cách bẩm sinh","...there is no such thing as an innately superior memory.","Humans are innately social."),
+        V(P3,"B2","Comparable","Adjective","/ˈkɒmpərəbl/","V: Compare","Similar enough to be compared; of equal level.","Có thể so sánh","...develop memory abilities comparable to those of memory champions...","Her skills are comparable to a professional's."),
+        V(P3,"C1","Exhibit","Verb","/ɪɡˈzɪbɪt/","N: Exhibition","To show a quality or ability clearly.","Thể hiện, biểu lộ","...naturals exhibit strong memory across many types of tasks...","The patient exhibited signs of stress."),
+        V(P3,"B2","Retain","Verb","/rɪˈteɪn/","N: Retention","To keep or continue to have something.","Giữ lại, ghi nhớ","...naturals... can retain those memories more easily.","Students retain more when they practise regularly."),
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+    let searchQuery = '';
+
+    function handleSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase();
+        applyFilters();
+    }
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const cardWord = card.querySelector('.word').textContent.toLowerCase();
+            const cardDef = card.querySelector('.definition').textContent.toLowerCase();
+            const cardTrans = card.querySelector('.translation').textContent.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            const matchSearch = (searchQuery === '' || cardWord.includes(searchQuery) || cardDef.includes(searchQuery) || cardTrans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="word-form-main">(${item.form})</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const word = item.word.toLowerCase();
+            const def = item.def.toLowerCase();
+            const trans = item.translation.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            const matchSearch = (searchQuery === '' || word.includes(searchQuery) || def.includes(searchQuery) || trans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Match";
+            document.getElementById('fc-word-form').textContent = "";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-word-form').textContent = `(${data.form})`;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed var(--border); padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: var(--accent);">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: var(--accent);">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
