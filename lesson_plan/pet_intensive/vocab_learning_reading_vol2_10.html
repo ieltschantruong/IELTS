@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET Reading Mock Test 10 - Vocabulary Learning</title>
+    <style>
+        :root {
+            /* Theme: Pastel Rose & Sage */
+            --primary: #c2577f; /* Lime 700 - Earthy Green */
+            --primary-light: #fdf0f5; /* Yellow 200 - Soft Gold */
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --bg-body: #fffafc;
+            --card-bg: #ffffff;
+            --accent: #5f9e7f; /* Yellow 600 - Deeper Gold */
+            --border: #f4cfdd; /* Lime 300 */
+            --badge-bg: #dff0e6; /* Lime 200 */
+            --badge-text: #2f6b4d; /* Lime 800 */
+            --success: #7a6ac4; /* Ocean Blue for translations */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; padding-bottom: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .copyright-banner { background: linear-gradient(90deg,#f7b5cf,#b8dcc6); color: white; text-align: center; padding: 0.6rem 1rem; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+        /* Search Bar */
+        .search-container { display: flex; justify-content: center; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; max-width: 500px; padding: 0.75rem 1.5rem; font-size: 1rem; border: 2px solid var(--border); border-radius: 25px; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 2px 10px rgba(194, 87, 127, 0.15); }
+
+        /* Topic Filter Controls */
+        .filter-controls { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; background: var(--bg-body); color: var(--primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(194, 87, 127, 0.3); }
+        .filter-btn:hover:not(.active) { background: var(--primary-light); color: var(--accent); }
+
+        .level-badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: bold; font-size: 0.75rem; color: white; display: inline-block; vertical-align: middle; margin-left: 0.5rem; }
+        .badge-b2 { background-color: #10b981; } /* Emerald */
+        .badge-c1 { background-color: #f59e0b; } /* Amber */
+        .badge-c2 { background-color: #8b5cf6; } /* Violet */
+
+        /* View Toggles */
+        .view-controls { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; margin-top: 1rem; }
+        .view-btn { padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; background: var(--card-bg); color: var(--text-muted); border: 2px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .view-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 6px rgba(194, 87, 127, 0.2); }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+        /* Grid View Styles */
+        #grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .vocab-card { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+        .vocab-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(194, 87, 127, 0.15); border-color: var(--border); }
+        .vocab-card.hidden { display: none !important; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; border-bottom: 2px dashed var(--border); padding-bottom: 0.75rem; }
+        .word-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .word { font-size: 1.4rem; font-weight: 800; color: var(--primary); text-transform: capitalize; letter-spacing: -0.01em; }
+        .word-form-main { font-size: 0.9rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .audio-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); cursor: pointer; font-size: 1.1rem; padding: 0.3rem; border-radius: 50%; transition: all 0.2s; align-self: center; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+        .audio-btn:hover { transform: scale(1.1); background-color: var(--primary); color: white; border-color: var(--primary); }
+        .meta-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+        
+        .word-families { background-color: #fffafc; border: 1px solid #e2e8f0; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; border-left: 3px solid var(--border); }
+        .word-families strong { color: var(--accent); }
+
+        .topic-tag { font-size: 0.75rem; color: var(--badge-text); font-weight: bold; margin-bottom: 0.5rem; display: inline-block; background: var(--badge-bg); padding: 0.2rem 0.6rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .definition { font-size: 1.05rem; margin-bottom: 0.25rem; }
+        .definition strong { color: var(--text-main); }
+        
+        /* Translation and Usage */
+        .translation { font-size: 0.95rem; color: var(--success); margin-bottom: 1rem; font-weight: 600; }
+
+        .example-box { background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main); margin-top: auto; }
+        .example-box span { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: 800; }
+        .extra-example { background-color: #f1f5f9; border-left-color: var(--text-muted); margin-top: 0.5rem; }
+        .extra-example span { color: var(--text-muted); }
+
+        /* Flashcard View Styles */
+        #flashcard-view { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .flashcard-scene { width: 100%; max-width: 650px; height: 550px; perspective: 1000px; cursor: pointer; margin-bottom: 2rem; }
+        .flashcard-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard-scene.is-flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; box-shadow: 0 10px 25px rgba(194, 87, 127, 0.08); border: 2px solid #e2e8f0; background: var(--card-bg); padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
+        .flashcard-front { text-align: center; background: linear-gradient(135deg, #ffffff 0%, var(--primary-light) 100%); border-color: var(--primary-light); }
+        .flashcard-front .word-container { margin-bottom: 1rem; display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .flashcard-front .word { font-size: 3rem; color: var(--primary); text-transform: capitalize; margin-bottom: 0;}
+        .flashcard-front .fc-word-form { font-size: 1.2rem; color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .flashcard-front .meta-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .flashcard-front .audio-btn { font-size: 2rem; width: 60px; height: 60px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid var(--border); }
+        .flashcard-back { transform: rotateY(180deg); background: #ffffff; align-items: flex-start; text-align: left; }
+        .flashcard-back h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--primary-light); padding-bottom: 0.5rem; width: 100%; }
+        
+        .flashcard-back .definition { font-size: 1.2rem; margin-bottom: 0.5rem; line-height: 1.5; }
+        .flashcard-back .translation { font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--success); font-weight: 600;}
+        .flashcard-back .example-box { width: 100%; font-size: 1rem; padding: 1rem 1.25rem; }
+        
+        .flashcard-hint { position: absolute; bottom: 1.5rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; font-weight: bold; }
+
+        .flashcard-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--card-bg); padding: 1rem 2rem; border-radius: 50px; box-shadow: 0 5px 15px rgba(194, 87, 127, 0.08); border: 1px solid var(--border); }
+        .fc-btn { background: var(--bg-body); border: 1px solid var(--border); color: var(--primary); font-size: 1rem; font-weight: 700; cursor: pointer; padding: 0.6rem 1.2rem; border-radius: 25px; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .fc-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(194, 87, 127, 0.2); }
+        .fc-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+        .fc-counter { font-weight: 800; font-size: 1.2rem; color: var(--primary); min-width: 80px; text-align: center; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.8rem; } 
+            #grid-view { grid-template-columns: 1fr; } 
+            .flashcard-scene { height: 620px; } 
+            .flashcard-front .word { font-size: 2rem; } 
+            .flashcard-back .definition { font-size: 1rem; }
+            .flashcard-face { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copyright-banner">PET Intensive Vol 2 Test 10 - Vocabulary Learning Tool</div>
+
+<div class="container">
+    <header>
+        <h1>Reading Vocabulary Bank</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search for a word or meaning..." oninput="handleSearch()">
+    </div>
+
+    <!-- Topic Filter Controls -->
+    <div class="filter-controls" id="topic-filters">
+        <button class="filter-btn active" onclick="filterTopic(event, 'all')">All Passages</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'New Zealand Wood Industry')">Passage 1: NZ Wood Industry</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Biophilic Design')">Passage 2: Biophilic Design</button>
+        <button class="filter-btn" onclick="filterTopic(event, 'Biology of Bitterness')">Passage 3: Biology of Bitterness</button>
+    </div>
+
+    <!-- Level Filter -->
+    <div class="filter-controls" id="level-filters">
+        <button class="filter-btn active" onclick="filterLevel(event, 'all')">All Levels</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'B2')">B2 (Upper Int.)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C1')">C1 (Advanced)</button>
+        <button class="filter-btn" onclick="filterLevel(event, 'C2')">C2 (Proficient)</button>
+    </div>
+
+    <div class="view-controls">
+        <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">📄 List View</button>
+        <button class="view-btn" id="btn-flashcards" onclick="switchView('flashcards')">🗂️ Flashcards</button>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+        <div class="flashcard-scene" id="flashcard-scene" onclick="flipCard()">
+            <div class="flashcard-inner">
+                <div class="flashcard-face flashcard-front">
+                    <span class="topic-tag" id="fc-topic">Topic: General</span>
+                    <div class="word-container">
+                        <h2 class="word" id="fc-word">Word</h2>
+                        <span class="fc-word-form" id="fc-word-form">(Noun)</span>
+                    </div>
+                    <span id="fc-level" class="level-badge" style="margin-left: 0; margin-bottom: 1.5rem;">B2</span>
+                    <div class="meta-row">
+                        <button class="audio-btn" id="fc-audio" onclick="playAudioFromCard(event)" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <span class="flashcard-hint">Click card to flip</span>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <h3>Meaning & Usage</h3>
+                    <p class="definition" id="fc-definition">Definition goes here.</p>
+                    <p class="translation" id="fc-translation">Vietnamese goes here.</p>
+                    <div id="fc-example-container" style="width: 100%; margin-top: 1rem;">
+                        <!-- Examples will be injected here -->
+                    </div>
+                    <span class="flashcard-hint" style="left: 50%; transform: translateX(-50%);">Click card to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard-controls">
+            <button class="fc-btn" id="fc-prev" onclick="prevCard()">◀ Prev</button>
+            <span class="fc-counter" id="fc-counter">1 / X</span>
+            <button class="fc-btn" id="fc-next" onclick="nextCard()">Next ▶</button>
+            <div style="width: 2px; height: 24px; background: var(--border); margin: 0 0.5rem;"></div>
+            <button class="fc-btn" onclick="shuffleCards()" title="Shuffle Order">🔀 Shuffle</button>
+        </div>
+    </div>
+
+    <!-- GRID VIEW -->
+    <main id="grid-view">
+        <!-- Injected via JavaScript -->
+    </main>
+</div>
+
+<script>
+    const P1 = "New Zealand Wood Industry", P2 = "Biophilic Design", P3 = "Biology of Bitterness";
+    const V = (topic, level, word, form, phonetic, forms, def, translation, example, extraExample) => ({ topic, level, word, form, phonetic, forms, def, translation, example, extraExample });
+    const vocabBank = [
+        // --- PASSAGE 1: Wood: a valuable resource in New Zealand's economy ---
+        V(P1,"B2","Settlement","Noun","/ˈsetlmənt/","V: Settle | N: Settler","The process of people making their home in a new place.","Sự định cư","During the settlement of New Zealand by European immigrants, natural timbers played a major role.","The settlement of the region began in 1850."),
+        V(P1,"B2","Accessible","Adjective","/əkˈsesəbl/","N: Access","Easy to reach, get or use.","Dễ tiếp cận","Wood was easily accessible and relatively cheap.","The museum is accessible by public transport."),
+        V(P1,"B2","Collapse","Verb","/kəˈlæps/","N: Collapse","To fall down or fail suddenly.","Sụp đổ","...they were less likely to collapse suddenly during earthquakes...","The old bridge collapsed in the storm."),
+        V(P1,"C1","Domestic market","Noun","/dəˈmestɪk ˈmɑːkɪt/","Adj: Domestic","The buying and selling of goods within a company's own country.","Thị trường nội địa","...in addition to demand from the domestic market, there was also a demand for forest products from overseas.","The firm sells mostly to the domestic market."),
+        V(P1,"C1","Vessel","Noun","/ˈvesl/","N/A","A ship or large boat.","Tàu thuyền","...suitability of the tall, straight trunks of the kauri for constructing sailing vessels.","The fishing vessel returned to port."),
+        V(P1,"C2","Coniferous","Adjective","/kəˈnɪfərəs/","N: Conifer","(Of trees) bearing cones and usually evergreen.","Thuộc cây lá kim","The kauri is a species of coniferous tree found only in small areas of the southern hemisphere.","Pine is a coniferous tree."),
+        V(P1,"B2","Species","Noun","/ˈspiːʃiːz/","N/A","A group of living things that share common characteristics and can breed together.","Loài","The kauri is a species of coniferous tree...","Many species of birds live in the forest."),
+        V(P1,"B2","Hemisphere","Noun","/ˈhemɪsfɪə/","N/A","One half of the Earth, divided by the equator or a meridian.","Bán cầu","...found only in small areas of the southern hemisphere.","Australia is in the southern hemisphere."),
+        V(P1,"B2","Harvest","Noun","/ˈhɑːvɪst/","V: Harvest","The gathering of a crop or resource; the amount gathered.","Việc thu hoạch, sản lượng","...the rate of harvest was unsustainable...","The wheat harvest was poor this year."),
+        V(P1,"C1","Unsustainable","Adjective","/ˌʌnsəˈsteɪnəbl/","N: Sustainability","Not able to be continued at the same level without causing harm or running out.","Không bền vững","...the rate of harvest was unsustainable...","Fishing at this rate is unsustainable."),
+        V(P1,"C1","Indigenous","Adjective","/ɪnˈdɪdʒənəs/","N/A","Naturally existing in a place; native.","Bản địa","...indigenous timber exports were rapidly declining.","Indigenous plants grow well in this climate."),
+        V(P1,"C1","Plantation","Noun","/plænˈteɪʃn/","V: Plant","A large area where trees or crops are grown commercially.","Đồn điền, rừng trồng","...newly established plantations of an imported species of tree called radiata pine...","The coffee plantation employs hundreds of workers."),
+        V(P1,"C1","Pulp","Noun","/pʌlp/","N/A","Wood crushed until soft, used to make paper.","Bột giấy","It makes excellent pulp, and is frequently used for posts, poles, furnishings...","Paper is made from wood pulp."),
+        V(P1,"C1","By-product","Noun","/ˈbaɪ prɒdʌkt/","N/A","A secondary product made while making something else.","Sản phẩm phụ","Pine by-products are used in the chemical and pharmaceutical industries...","Sawdust is a by-product of cutting wood."),
+        V(P1,"C1","Residue","Noun","/ˈrezɪdjuː/","N/A","What remains after something has been removed or used.","Phần dư, chất thải còn lại","...residues are consumed for fuel.","The residue from the process is burned for energy."),
+        V(P1,"C1","Versatility","Noun","/ˌvɜːsəˈtɪləti/","Adj: Versatile","The ability to be used for many different purposes.","Tính đa năng","This amazing versatility has encouraged the development of an integrated forest-products industry...","The versatility of the tool makes it popular."),
+        V(P1,"C1","Integrated","Adjective","/ˈɪntɪɡreɪtɪd/","V: Integrate","Combined so that the parts work together as a whole.","Tích hợp, liên hoàn","...an integrated forest-products industry which is almost unique in the world.","The company has an integrated supply chain."),
+        V(P1,"C1","Principal","Adjective","/ˈprɪnsəpl/","N/A","Most important; main.","Chính, chủ yếu","...the construction industry is the principal user of solid wood products...","Tourism is the island's principal industry."),
+        V(P1,"C2","Remanufacturing","Noun","/ˌriːmænjuˈfæktʃərɪŋ/","V: Remanufacture","The process of making new products from used or semi-finished ones.","Tái sản xuất","...its small manufacturing and remanufacturing base, limit the forestry industry's domestic opportunities.","Remanufacturing reduces waste."),
+        V(P1,"B2","Accordingly","Adverb","/əˈkɔːdɪŋli/","N/A","As a result; in a way that suits the situation.","Do đó, vì vậy","Accordingly, the development of the export market is the key to the industry's growth...","The rules have changed, so we must act accordingly."),
+        V(P1,"C1","Receipts","Noun","/rɪˈsiːts/","N/A","Money received by a business or country.","Doanh thu, khoản thu","In 2004, forestry export receipts were about 11 percent of the country's total export income...","Tourist receipts rose sharply last year."),
+        V(P1,"C1","Fluctuation","Noun","/ˌflʌktʃuˈeɪʃn/","V: Fluctuate","An irregular rise and fall in price or amount.","Sự biến động","...affected by the exchange fluctuations and shipping costs of recent years.","Currency fluctuations affect trade."),
+        V(P1,"C1","Capacity","Noun","/kəˈpæsəti/","N/A","The maximum amount that something can produce or hold.","Công suất, năng lực","...it is operating well below its capacity...","The factory is working at full capacity."),
+        V(P1,"B2","Peak","Noun","/piːk/","N: Peak","The highest point or level.","Đỉnh điểm","...with the domestic market already at its peak...","Sales reached their peak in July."),
+        V(P1,"C1","Value-added","Adjective","/ˌvæljuː ˈædɪd/","N/A","(Of a product) improved or processed so that it is worth more.","Giá trị gia tăng","...the industry must be based on value-added products in future.","Value-added goods earn more than raw materials."),
+        V(P1,"C1","Infrastructure","Noun","/ˈɪnfrəstrʌktʃə/","N/A","The basic systems and structures needed by a country or industry.","Cơ sở hạ tầng","...processing, infrastructure and investment strategies...","Poor infrastructure slows economic growth."),
+        V(P1,"C1","Regulatory","Adjective","/ˈreɡjələtəri/","V: Regulate","Relating to the rules and control of an activity.","Thuộc quy định, quản lý","...a suitable political, regulatory and investment environment.","A regulatory body checks food safety."),
+        V(P1,"B2","Renewable","Adjective","/rɪˈnjuːəbl/","V: Renew","(Of a resource) able to be replaced naturally.","Có thể tái tạo","...its ability to source large quantities of softwood from renewable forests.","Wind is a renewable source of energy."),
+        V(P1,"B2","Softwood","Noun","/ˈsɒftwʊd/","N: Hardwood","Wood from coniferous trees such as pine.","Gỗ mềm","...large quantities of softwood from renewable forests.","Pine is a common softwood."),
+        V(P1,"B2","Substitute","Noun","/ˈsʌbstɪtjuːt/","V: Substitute","A thing used in place of another.","Vật thay thế","...competition from goods such as wood substitutes.","Margarine is a substitute for butter."),
+        V(P1,"C1","Competitive","Adjective","/kəmˈpetətɪv/","N: Competition","Able to compete successfully with others, especially on price or quality.","Có tính cạnh tranh","...internationally competitive processing...","The firm offers competitive prices."),
+        V(P1,"C1","Underline","Verb","/ˌʌndəˈlaɪn/","N/A","To emphasise that something is important.","Nhấn mạnh","This further underlines the necessity for globally competitive production and marketing strategies.","The accident underlines the need for safety."),
+        V(P1,"C1","Target","Verb","/ˈtɑːɡɪt/","N: Target","To aim at or direct efforts towards a particular group or market.","Nhắm tới","Exporters of wood products have largely targeted the rapidly growing markets of South and East Asia...","The campaign targets young consumers."),
+
+        // --- PASSAGE 2: Biophilic Design ---
+        V(P2,"C1","Momentum","Noun","/məˈmentəm/","N/A","The force or speed that grows as a process continues.","Đà phát triển","Biophilic design... has gained much momentum within the building community in recent years.","The campaign is gaining momentum."),
+        V(P2,"C1","Premise","Noun","/ˈpremɪs/","N/A","An idea or belief on which a theory or action is based.","Tiền đề, luận điểm cơ bản","The premise of biophilic design seeks both to avoid or minimize harmful impacts...","The film's premise is simple."),
+        V(P2,"B2","Minimise","Verb","/ˈmɪnɪmaɪz/","N: Minimum","To reduce something to the smallest possible amount.","Giảm thiểu","...seeks both to avoid or minimize harmful impacts on the natural environment...","We must minimise the risk of fire."),
+        V(P2,"C1","Restore","Verb","/rɪˈstɔː/","N: Restoration","To bring something back to a former good condition.","Khôi phục","...to provide and restore beneficial contacts between people and nature...","The old theatre was restored to its former glory."),
+        V(P2,"C2","Commune","Verb","/kəˈmjuːn/","N: Communion","To feel very close to something, such as nature, in a spiritual way.","Hòa mình, giao hòa","People have a psychologically developed need to commune with nature...","He walks in the hills to commune with nature."),
+        V(P2,"C1","Neglect","Verb","/nɪˈɡlekt/","N: Neglect","To fail to give enough care or attention to something.","Bỏ bê, xao nhãng","...this has frequently been neglected.","She neglected her studies."),
+        V(P2,"C2","Scant","Adjective","/skænt/","N/A","Very little; hardly enough.","Ít ỏi, thiếu thốn","...with scant regard for emotional, as well as practical, considerations.","The report paid scant attention to costs."),
+        V(P2,"C1","Advocate","Verb","/ˈædvəkeɪt/","N: Advocate","To publicly support a particular idea or policy.","Ủng hộ, chủ trương","Biophilic design does not advocate tree houses or cave-dwelling...","He advocates a four-day working week."),
+        V(P2,"C1","Contemporary","Noun","/kənˈtemprəri/","Adj: Contemporary","A person living at the same time as another.","Người cùng thời","...than the box-like blocks of flats designed by his contemporary Le Corbusier.","Mozart and his contemporaries wrote many symphonies."),
+        V(P2,"C1","Obstruct","Verb","/əbˈstrʌkt/","N: Obstruction","To block something or make progress difficult.","Cản trở","...much of our built environment is obstructing the age-old connection between humans and nature.","Fallen trees obstructed the road."),
+        V(P2,"C1","Age-old","Adjective","/ˌeɪdʒ ˈəʊld/","N/A","Having existed for a very long time.","Lâu đời","...obstructing the age-old connection between humans and nature.","This is an age-old problem."),
+        V(P2,"C1","Alleviate","Verb","/əˈliːvieɪt/","N: Alleviation","To make pain or a problem less severe.","Làm dịu bớt, giảm nhẹ","...it can alleviate the difficulties caused by the brain's constant attempts to function in a modern environment...","Medicine can alleviate the symptoms."),
+        V(P2,"C2","Evolutionarily","Adverb","/ˌiːvəˈluːʃənərəli/","N: Evolution","In a way relating to biological evolution.","Xét về mặt tiến hóa","We are evolutionarily programmed to respond positively to sunny areas...","Humans are evolutionarily adapted to walking."),
+        V(P2,"C1","Foster","Verb","/ˈfɒstə/","N/A","To encourage the development of something.","Thúc đẩy, nuôi dưỡng","...sense that they will foster restoration, improve emotional well-being and promote health.","The school fosters creativity."),
+        V(P2,"C1","Overcast","Adjective","/ˌəʊvəˈkɑːst/","N/A","(Of the sky) covered with cloud.","U ám, nhiều mây","...respond positively to sunny areas over dark or overcast ones...","It was a grey, overcast day."),
+        V(P2,"B2","Vital","Adjective","/ˈvaɪtl/","N: Vitality","Absolutely necessary or extremely important.","Thiết yếu","...biophilic design plays a vital role in healthcare and healthcare delivery.","Water is vital for life."),
+        V(P2,"B2","Flaw","Noun","/flɔː/","Adj: Flawed","A fault or weakness.","Khiếm khuyết","The current healthcare system contains many flaws...","The plan has a serious flaw."),
+        V(P2,"C2","Analgesic","Noun","/ˌænlˈdʒiːzɪk/","N/A","A drug that relieves pain.","Thuốc giảm đau","...required fewer analgesics, and had slightly fewer post-operative complications.","Aspirin is a common analgesic."),
+        V(P2,"C1","Post-operative","Adjective","/ˌpəʊst ˈɒpərətɪv/","N: Operation","Occurring after a surgical operation.","Sau phẫu thuật","...slightly fewer post-operative complications.","Post-operative care is very important."),
+        V(P2,"C1","Complication","Noun","/ˌkɒmplɪˈkeɪʃn/","V: Complicate","A medical problem that arises during an illness or treatment.","Biến chứng","...had slightly fewer post-operative complications.","The surgery had no complications."),
+        V(P2,"C1","Boast","Verb","/bəʊst/","N: Boast","(Of a place) to have a good feature that it is proud of.","Tự hào có","DHMC in New Hampshire boasts an atrium design, illuminating the entire facility.","The hotel boasts a rooftop pool."),
+        V(P2,"C2","Atrium","Noun","/ˈeɪtriəm/","N/A","A large central hall or space, often with a glass roof, in a building.","Giếng trời, sảnh trung tâm","...boasts an atrium design, illuminating the entire facility.","The shops are built around a bright atrium."),
+        V(P2,"C1","Permeate","Verb","/ˈpɜːmieɪt/","N/A","To spread through and be present in every part of something.","Thấm vào, lan tỏa","Natural elements also permeate the building, including wood, stone, and numerous live plants.","The smell of coffee permeated the room."),
+        V(P2,"C1","Incorporate","Verb","/ɪnˈkɔːpəreɪt/","N: Incorporation","To include something as part of a whole.","Kết hợp, đưa vào","...DHMC was built to incorporate these qualities...","The design incorporates natural light."),
+        V(P2,"C1","Harness","Verb","/ˈhɑːnɪs/","N: Harness","To control and use natural forces or resources.","Khai thác, tận dụng","It harnesses solar power, utilizes both active and passive air systems...","The dam harnesses the power of the river."),
+        V(P2,"C1","Passive","Adjective","/ˈpæsɪv/","N: Passivity","Not using extra energy or active effort; accepting rather than acting.","Thụ động","...utilizes both active and passive air systems...","Passive solar heating needs no machinery."),
+        V(P2,"C1","Irrigation","Noun","/ˌɪrɪˈɡeɪʃn/","V: Irrigate","The supply of water to land to help crops grow.","Việc tưới tiêu","...producing water that can be used in the toilets and for irrigation.","Irrigation transformed the desert into farmland."),
+        V(P2,"C1","Wetland","Noun","/ˈwetlænd/","N/A","An area of land covered with shallow water or marsh.","Vùng đất ngập nước","...combining traditional wastewater technology with wetland ecosystems' purification processes...","Wetlands provide a home for many birds."),
+        V(P2,"C2","Foliage","Noun","/ˈfəʊliɪdʒ/","N/A","The leaves of a plant or tree.","Tán lá","The wall is covered in dense foliage...","Thick foliage hid the path."),
+        V(P2,"C1","Purify","Verb","/ˈpjʊərɪfaɪ/","Adj: Pure | N: Purification","To make something clean by removing harmful substances.","Làm sạch, lọc","The wall purifies the air and has the potential to fulfill the building's fresh air intake requirements.","The system purifies drinking water."),
+        V(P2,"C1","Mimic","Verb","/ˈmɪmɪk/","N: Mimicry","To copy the appearance or behaviour of something.","Bắt chước","They mimicked nature's forms, producing magnificent structures...","Parrots can mimic human speech."),
+        V(P2,"C1","Novel","Adjective","/ˈnɒvl/","N/A","New and different from anything known before.","Mới lạ","...though biophilic design is a novel concept...","They found a novel way to save energy."),
+
+        // --- PASSAGE 3: Biology of Bitterness ---
+        V(P3,"C2","Palatable","Adjective","/ˈpælətəbl/","N: Palate","Pleasant to taste; acceptable.","Dễ ăn, vừa miệng","To many people, grapefruit is palatable only when doused in sugar.","The medicine was made more palatable with honey."),
+        V(P3,"C2","Douse","Verb","/daʊs/","N/A","To cover something completely with a liquid.","Rưới đẫm, nhúng","...grapefruit is palatable only when doused in sugar.","He doused the fries in ketchup."),
+        V(P3,"C1","Compound","Noun","/ˈkɒmpaʊnd/","N/A","A substance formed from two or more elements.","Hợp chất","Naringin, a natural chemical compound found in grapefruit, tastes bitter.","Water is a compound of hydrogen and oxygen."),
+        V(P3,"C1","Enhance","Verb","/ɪnˈhɑːns/","N: Enhancement","To improve the quality or value of something.","Làm tăng, cải thiện","...believe it enhances the general flavor...","Spices enhance the flavour of food."),
+        V(P3,"C1","Contend","Verb","/kənˈtend/","N: Contention","To claim or argue that something is true.","Cho rằng, khẳng định","...antioxidant properties that some nutritionists contend may help prevent cancer...","Experts contend that exercise improves memory."),
+        V(P3,"C1","Antioxidant","Noun","/ˌæntiˈɒksɪdənt/","N/A","A substance that protects cells from damage caused by oxygen.","Chất chống oxy hóa","...the compound has antioxidant properties...","Blueberries are rich in antioxidants."),
+        V(P3,"C2","Arteriosclerosis","Noun","/ɑːˌtɪəriəʊsklɪəˈrəʊsɪs/","N/A","A disease in which the walls of the arteries become hard and thick.","Chứng xơ cứng động mạch","...may help prevent cancer and arteriosclerosis.","Arteriosclerosis can lead to heart attacks."),
+        V(P3,"C1","Cleanse","Verb","/klenz/","N/A","To make something clean; to remove a taste or dirt.","Làm sạch","...cleansing our palates between tastes with water and a soda cracker.","Cleanse the wound with warm water."),
+        V(P3,"C2","Palate","Noun","/ˈpælət/","N/A","A person's ability to taste and judge flavours.","Vị giác","...cleansing our palates between tastes with water and a soda cracker.","She has a refined palate for wine."),
+        V(P3,"C1","Unmistakable","Adjective","/ˌʌnmɪˈsteɪkəbl/","N/A","So clear that it cannot be confused with anything else.","Không thể nhầm lẫn","Even the smallest sip of 304 had grapefruit's unmistakable bitter bite.","The unmistakable smell of fresh bread filled the air."),
+        V(P3,"C1","Delve","Verb","/delv/","N/A","To search deeply for information.","Đào sâu, nghiên cứu kỹ","...scientists delving into all five basics - sweet, bitter, sour, salty, and umami...","The report delves into the causes of the crisis."),
+        V(P3,"C1","Untapped","Adjective","/ʌnˈtæpt/","N/A","Not yet used or exploited.","Chưa được khai thác","Bitterness is of special interest to industry because of its untapped potential in food.","The country has untapped oil reserves."),
+        V(P3,"C2","Foolproof","Adjective","/ˈfuːlpruːf/","N/A","So well designed that it cannot go wrong.","Chắc chắn, không thể hỏng","But the system isn't foolproof.","This is a foolproof recipe for beginners."),
+        V(P3,"C2","Cruciferous","Adjective","/kruːˈsɪfərəs/","N/A","Belonging to the cabbage family of vegetables.","Thuộc họ cải","...cruciferous vegetables like Brussels sprouts and kale are nutritious...","Broccoli is a cruciferous vegetable."),
+        V(P3,"C2","Averse","Adjective","/əˈvɜːs/","N: Aversion","Strongly disliking or opposed to something.","Ghê sợ, không ưa","Every other species is averse to bitterness because it means bad news.","He is not averse to hard work."),
+        V(P3,"C2","Repellent","Adjective","/rɪˈpelənt/","V: Repel","Causing strong dislike or disgust.","Đáng ghê tởm, xua đuổi","...bitterness can be pleasing in small quantities but repellent when intense...","The smell was repellent."),
+        V(P3,"C2","Shun","Verb","/ʃʌn/","N/A","To deliberately avoid someone or something.","Tránh xa","Supertasters tend to shun all kinds of bitter-tasting things...","She shuns publicity."),
+        V(P3,"B2","Taste bud","Noun","/ˈteɪst bʌd/","N/A","One of the tiny organs on the tongue that detect flavour.","Chồi vị giác","...they have an unusually high number of taste buds.","Children have more taste buds than adults."),
+        V(P3,"C1","Elongated","Adjective","/ˈiːlɒŋɡeɪtɪd/","V: Elongate","Long and thin; stretched out.","Dài, thon","...50 to 100 elongated cells running from the top of the bud to the bottom.","The elongated shadow stretched across the road."),
+        V(P3,"C1","Clump","Noun","/klʌmp/","N/A","A small group of things close together.","Cụm, đám","At the top is a little clump of receptors that capture the taste molecules...","A clump of trees stood on the hill."),
+        V(P3,"C1","Receptor","Noun","/rɪˈseptə/","N/A","A cell or organ that senses a stimulus and sends signals.","Thụ thể","...a little clump of receptors that capture the taste molecules...","Pain receptors send signals to the brain."),
+        V(P3,"C1","Relay","Verb","/ˈriːleɪ/","N: Relay","To pass a message or signal from one place or person to another.","Chuyển tiếp, truyền","Once a bitter signal has been received, it is relayed via proteins known as G proteins.","The satellite relays TV signals."),
+        V(P3,"C2","Cascade","Noun","/kæˈskeɪd/","N/A","A series of events or reactions, each causing the next.","Chuỗi phản ứng dây chuyền","...the protein triggers a cascade of chemical reactions...","The news set off a cascade of protests."),
+        V(P3,"C2","Bucket brigade","Noun","/ˈbʌkɪt brɪˌɡeɪd/","N/A","A line of people passing buckets of water from hand to hand; a process passed along in steps.","Chuỗi chuyền tay","'The signaling system is like a bucket brigade,' Margolskee says.","Villagers formed a bucket brigade to fight the fire."),
+        V(P3,"B2","Intensity","Noun","/ɪnˈtensəti/","Adj: Intense","The strength or force of something.","Cường độ","The only variation derives from its intensity and the ways in which it can be flavored by the sense of smell.","The intensity of the light hurt my eyes."),
+        V(P3,"C1","Dampen","Verb","/ˈdæmpən/","N/A","To make something weaker or less strong.","Làm giảm bớt","AMP may not be able to dampen every type of bitter taste...","Bad news dampened our excitement."),
+        V(P3,"C2","Coax","Verb","/kəʊks/","N/A","To gently persuade someone or something to do something.","Dỗ dành, khéo thuyết phục","Researchers start by coaxing cells in culture to activate bitter-taste receptors.","She coaxed the cat out from under the bed."),
+        V(P3,"C2","Cull","Verb","/kʌl/","N/A","To select something from a large number of sources.","Chọn lọc","...candidate substances, culled from chemical compound libraries...","The data was culled from many surveys."),
+        V(P3,"C1","Mask","Verb","/mɑːsk/","N/A","To hide a taste, smell or feeling.","Che đậy, át đi","The salt masks the bitterness created by the high temperatures used in the canning process...","Sugar masked the bitter taste of the medicine."),
+        V(P3,"B2","Scarce","Adjective","/skeəs/","N: Scarcity","Not available in large enough amounts.","Khan hiếm","...potassium chloride, which tends to be scarce in some people's diets.","Food was scarce during the winter."),
+        V(P3,"B2","Aftertaste","Noun","/ˈɑːftəteɪst/","N/A","A taste that remains in the mouth after eating or drinking.","Dư vị","Potassium chloride has a bitter aftertaste...","The coffee leaves a bitter aftertaste."),
+        V(P3,"C1","Sprinkle","Verb","/ˈsprɪŋkl/","N/A","To scatter small drops or pieces over a surface.","Rắc, rưới","...a bitter blocker in a bottle that any of us can sprinkle on our brussels sprouts...","Sprinkle some sugar on the top."),
+    ];
+
+    // --- State and Filtering Logic ---
+    let currentTopic = 'all';
+    let currentLevel = 'all';
+    let searchQuery = '';
+
+    function handleSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase();
+        applyFilters();
+    }
+
+    function filterTopic(event, topicName) {
+        document.querySelectorAll('#topic-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentTopic = topicName;
+        applyFilters();
+    }
+
+    function filterLevel(event, levelName) {
+        document.querySelectorAll('#level-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        currentLevel = levelName;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const allCards = document.querySelectorAll('.vocab-card');
+        allCards.forEach(card => {
+            const cardWord = card.querySelector('.word').textContent.toLowerCase();
+            const cardDef = card.querySelector('.definition').textContent.toLowerCase();
+            const cardTrans = card.querySelector('.translation').textContent.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || card.getAttribute('data-topic') === currentTopic);
+            const matchLevel = (currentLevel === 'all' || card.getAttribute('data-level') === currentLevel);
+            const matchSearch = (searchQuery === '' || cardWord.includes(searchQuery) || cardDef.includes(searchQuery) || cardTrans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        if(document.getElementById('flashcard-view').style.display === 'flex') {
+             extractDataFromGrid();
+             currentCardIndex = 0;
+             updateFlashcardUI();
+        }
+    }
+
+    // --- DOM Injection ---
+    function renderGrid() {
+        const grid = document.getElementById('grid-view');
+        grid.innerHTML = '';
+        vocabBank.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'vocab-card';
+            article.setAttribute('data-topic', item.topic);
+            article.setAttribute('data-level', item.level);
+            
+            article.innerHTML = `
+                <div class="word-header">
+                    <div class="word-main">
+                        <span class="word">${item.word}</span>
+                        <span class="word-form-main">(${item.form})</span>
+                        <span class="level-badge badge-${item.level.toLowerCase()}">${item.level}</span>
+                        <button class="audio-btn" onclick="playAudio('${item.word.replace(/'/g, "\\'")}')" title="Listen to pronunciation">🔊</button>
+                    </div>
+                    <div class="meta-info">
+                        <span class="phonetic">${item.phonetic}</span>
+                    </div>
+                </div>
+                <div class="word-families"><strong>Word Forms:</strong> ${item.forms}</div>
+                <span class="topic-tag">${item.topic}</span>
+                <p class="definition"><strong>Definition:</strong> ${item.def}</p>
+                <p class="translation"><strong>Vietnamese:</strong> ${item.translation}</p>
+                
+                <div class="example-box">
+                    <span>Reading Context</span>"${item.example}"
+                </div>
+                <div class="example-box extra-example">
+                    <span>General Example</span>"${item.extraExample}"
+                </div>
+            `;
+            grid.appendChild(article);
+        });
+    }
+
+    // Initialize Grid
+    renderGrid();
+
+    // --- Audio Synthesis ---
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech pronunciation.");
+        }
+    }
+
+    function playAudioFromCard(event) {
+        event.stopPropagation();
+        const word = document.getElementById('fc-word').textContent;
+        playAudio(word);
+    }
+
+    // --- View Toggling ---
+    function switchView(viewName) {
+        const gridView = document.getElementById('grid-view');
+        const flashcardView = document.getElementById('flashcard-view');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnFlashcards = document.getElementById('btn-flashcards');
+
+        if (viewName === 'grid') {
+            gridView.style.display = 'grid';
+            flashcardView.style.display = 'none';
+            btnGrid.classList.add('active');
+            btnFlashcards.classList.remove('active');
+        } else {
+            gridView.style.display = 'none';
+            flashcardView.style.display = 'flex';
+            btnFlashcards.classList.add('active');
+            btnGrid.classList.remove('active');
+            
+            extractDataFromGrid();
+            currentCardIndex = 0;
+            updateFlashcardUI();
+        }
+    }
+
+    // --- Flashcard Logic ---
+    let flashcardData = [];
+    let currentCardIndex = 0;
+    const flashcardScene = document.getElementById('flashcard-scene');
+
+    function extractDataFromGrid() {
+        flashcardData = [];
+        vocabBank.forEach(item => {
+            const word = item.word.toLowerCase();
+            const def = item.def.toLowerCase();
+            const trans = item.translation.toLowerCase();
+            
+            const matchTopic = (currentTopic === 'all' || item.topic === currentTopic);
+            const matchLevel = (currentLevel === 'all' || item.level === currentLevel);
+            const matchSearch = (searchQuery === '' || word.includes(searchQuery) || def.includes(searchQuery) || trans.includes(searchQuery));
+            
+            if (matchTopic && matchLevel && matchSearch) {
+                flashcardData.push(item);
+            }
+        });
+    }
+
+    function updateFlashcardUI() {
+        if (flashcardData.length === 0) {
+            document.getElementById('fc-word').textContent = "No Match";
+            document.getElementById('fc-word-form').textContent = "";
+            document.getElementById('fc-level').style.display = 'none';
+            document.getElementById('fc-definition').textContent = "";
+            document.getElementById('fc-translation').textContent = "";
+            document.getElementById('fc-example-container').innerHTML = "";
+            document.getElementById('fc-counter').textContent = "0 / 0";
+            document.getElementById('fc-prev').disabled = true;
+            document.getElementById('fc-next').disabled = true;
+            return;
+        }
+
+        const data = flashcardData[currentCardIndex];
+        flashcardScene.classList.remove('is-flipped');
+        
+        setTimeout(() => {
+            document.getElementById('fc-word').textContent = data.word;
+            document.getElementById('fc-word-form').textContent = `(${data.form})`;
+            
+            const levelBadge = document.getElementById('fc-level');
+            levelBadge.textContent = data.level;
+            levelBadge.className = `level-badge badge-${data.level.toLowerCase()}`;
+            levelBadge.style.display = 'inline-block';
+            
+            document.getElementById('fc-topic').textContent = `Topic: ${data.topic}`;
+            document.getElementById('fc-definition').textContent = data.def;
+            document.getElementById('fc-translation').textContent = data.translation;
+            
+            const examplesHTML = `
+                <div class="word-families" style="margin-bottom: 1rem; width: 100%; text-align: center; border: 1px dashed var(--border); padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+                    <strong style="color: var(--accent);">Phonetic:</strong> ${data.phonetic} &nbsp;|&nbsp; <strong style="color: var(--accent);">Word Forms:</strong> ${data.forms}
+                </div>
+                <div class="example-box" style="margin-bottom: 0.5rem; background-color: var(--primary-light); padding: 1rem; border-left: 4px solid var(--accent); border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.25rem; font-weight: bold;">Reading Context</span>"${data.example}"
+                </div>
+                <div class="example-box extra-example" style="background-color: #f1f5f9; padding: 1rem; border-left: 4px solid #64748b; border-radius: 4px; font-size: 0.95rem; color: var(--text-main);">
+                    <span style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: bold;">General Example</span>"${data.extraExample}"
+                </div>
+            `;
+            document.getElementById('fc-example-container').innerHTML = examplesHTML;
+            
+            document.getElementById('fc-counter').textContent = `${currentCardIndex + 1} / ${flashcardData.length}`;
+            
+            document.getElementById('fc-prev').disabled = currentCardIndex === 0;
+            document.getElementById('fc-next').disabled = currentCardIndex === flashcardData.length - 1;
+        }, 150);
+    }
+
+    function flipCard() { flashcardScene.classList.toggle('is-flipped'); }
+    function nextCard() { if (currentCardIndex < flashcardData.length - 1) { currentCardIndex++; updateFlashcardUI(); } }
+    function prevCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcardUI(); } }
+    
+    function shuffleCards() {
+        for (let i = flashcardData.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [flashcardData[i], flashcardData[j]] = [flashcardData[j], flashcardData[i]];
+        }
+        currentCardIndex = 0;
+        updateFlashcardUI();
+    }
+</script>
+</body>
+</html>
