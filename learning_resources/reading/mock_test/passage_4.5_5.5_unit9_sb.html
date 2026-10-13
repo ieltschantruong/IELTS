@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Unit 09 SB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    
+        select.match-select{border:2px solid #e5e7eb;border-radius:6px;padding:4px 8px;font-weight:700;color:#d75872;background:#fff;outline:none;cursor:pointer}
+        select.match-select:focus{border-color:#d75872;box-shadow:0 0 0 3px #fce8eb}
+        select.match-select.correct{border-color:#22c55e;background:#f0fdf4;color:#166534}
+        select.match-select.incorrect{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+    
+        .radio-wrapper.res-correct{background:#dcfce7!important;border-color:#4ade80!important;color:#166534!important;font-weight:700}
+        .radio-wrapper.res-wrong{background:#fee2e2!important;border-color:#f87171!important;color:#991b1b!important;font-weight:700;text-decoration:line-through}
+        .ans-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:2px 8px;white-space:nowrap}
+    
+        input[type="checkbox"]{accent-color:#d75872;width:1.1rem;height:1.1rem;cursor:pointer}
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+<header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">20:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+<div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+<div id="highlight-tooltip">Highlight</div><div class="max-w-2xl mx-auto pb-12"><div class="mb-8 border-b-2 border-brand-100 pb-5"><span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Reading Passage</span>
+<h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">The burden of thirst</h2>
+<p class="text-gray-500 mt-2 font-medium italic">Millions of women carry water long distances. If they had a tap by their door, whole societies would be transformed.</p></div>
+<div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+<p class="text-sm text-gray-500 not-italic font-sans">by Tina Rosenberg</p>
+
+<p><strong class="text-brand-600 mr-2">A</strong>Aylito Binayo’s feet know the mountain. Even at four in the morning, she can run down the rocks to the river by starlight alone and climb the steep mountain back up to her village with a container of water on her back. <span id="exp-q1" class="explanation-target">She has made this journey three times a day since she was a small child. So has every other woman in her village of Foro</span> in the Konso district of south-western Ethiopia in Africa. Binayo left school when she was eight years old, in part because she had to help her mother fetch water from the Toiro River. The water is unsafe to drink; <span id="exp-q7" class="explanation-target">every year that the drought continues, the river carries less water,</span> and its flow is reduced. But it is the only water Foro has ever had.</p>
+
+<p><strong class="text-brand-600 mr-2">B</strong>In developed parts of the world, people turn on a tap and out pours abundant, clean water. <span id="exp-q2" class="explanation-target">Yet nearly 900 million people in the world have no access to clean water. Furthermore, 2.5 billion people have no safe way to get rid of human waste.</span> <span id="exp-q8" class="explanation-target">Polluted water and lack of proper hygiene cause disease and kill 3.3 million people around the world annually, most of them children.</span> In southern Ethiopia and in northern Kenya, a lack of rain over the past few years has made even dirty water hard to find. But soon, for the first time, things are going to change.</p>
+
+<p><strong class="text-brand-600 mr-2">C</strong>Bringing clean water close to villagers’ homes is the key to the problem. <span id="exp-q3" class="explanation-target">Communities where clean water becomes accessible and plentiful are transformed.</span> <span id="exp-q9" class="explanation-target">All the hours previously spent hauling water can be used to cultivate more crops,</span> raise more animals or even start a business. Families spend less time sick or caring for family members who are unwell. Most important, not having to collect water means girls can go to school and get jobs. The need to fetch water for the family, or to take care of younger siblings while their mother goes, usually prevents them ever having this experience.</p>
+
+<p><strong class="text-brand-600 mr-2">D</strong>But the challenges of bringing water to remote villages like those in Konso are overwhelming. <span id="exp-q10" class="explanation-target">Locating water underground and then reaching it by means of deep wells requires geological expertise and expensive, heavy machines.</span> Abandoned wells and water projects litter the villages of Konso. In similar villages around the developing world, <span id="exp-q4" class="explanation-target">the biggest problem with water schemes is that about half of them break down soon after the groups that built them move on.</span> Sometimes technology is used that can’t be repaired locally, or spare parts are available only in the capital.</p>
+
+<p><strong class="text-brand-600 mr-2">E</strong>Today, a UK-based international non-profit organisation called WaterAid is tackling the job of bringing water to the most remote villages of Konso. Their approach combines technologies proven to last – such as <span id="exp-q11" class="explanation-target">building a sand dam to capture and filter rainwater</span> that would otherwise drain away. <span id="exp-q5" class="explanation-target">But the real innovation is that WaterAid believes technology is only part of the solution.</span> Just as important is involving the local community in designing, building and maintaining new water projects. Before beginning any project, WaterAid asks the community to create a WASH (water, sanitation, hygiene) committee of seven people. The committee works with WaterAid to plan projects and involve the village in construction. Then it maintains and runs the project.</p>
+
+<p><strong class="text-brand-600 mr-2">F</strong>The people of Konso, who grow their crops on terraces they have dug into the sides of mountains, are famous for hard work. In the village of Orbesho, <span id="exp-q12" class="explanation-target">residents even constructed a road themselves so that drilling machinery could come in.</span> Last summer, their pump, installed by the river, was being motorised to push its water to a newly built reservoir on top of a nearby mountain. From there, gravity will carry it down in pipes to villages on the other side of the mountain. Residents of those villages have each given some money to help fund the project. <span id="exp-q13" class="explanation-target">They have made concrete and collected stones for the structures.</span> Now they are digging trenches to lay pipes. <span id="exp-q6" class="explanation-target">If all goes well, Aylito Binayo will have a tap with safe water just a three-minute walk from her front door.</span></p>
+
+<p class="text-sm text-gray-500 font-sans text-right italic">adapted from National Geographic magazine</p>
+</div></div></div>
+<div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth"><div class="max-w-2xl mx-auto pb-24">
+<!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 13</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 1-6</h3><p class="text-sm text-gray-800">The reading passage has six paragraphs, <strong>A-F</strong>.</p><p class="text-sm text-gray-800 mt-1">Choose the correct heading for each paragraph from the list of headings below.</p></div><div class="space-y-4"><div class="bg-brand-50 border border-brand-200 rounded-xl p-4 mb-4 text-sm text-gray-800"><p class="font-bold text-center mb-2">List of headings</p><div class="space-y-1"><p><strong class="text-brand-700 inline-block w-10">i</strong>Why some plans have failed</p><p><strong class="text-brand-700 inline-block w-10">ii</strong>A rural and urban problem</p><p><strong class="text-brand-700 inline-block w-10">iii</strong>A possible success</p><p><strong class="text-brand-700 inline-block w-10">iv</strong>Explaining a new management style</p><p><strong class="text-brand-700 inline-block w-10">v</strong>Some relevant statistics</p><p><strong class="text-brand-700 inline-block w-10">vi</strong>A regular trip for some people</p><p><strong class="text-brand-700 inline-block w-10">vii</strong>Treating people for disease</p><p><strong class="text-brand-700 inline-block w-10">viii</strong>How water can change people’s lives</p></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="1"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">1</span><p class="text-sm text-gray-800 font-medium">Paragraph A</p><select id="sel-q1" class="match-select" onchange="updateSelect(1, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q1"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="2"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">2</span><p class="text-sm text-gray-800 font-medium">Paragraph B</p><select id="sel-q2" class="match-select" onchange="updateSelect(2, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q2", "exp-q8"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="3"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">3</span><p class="text-sm text-gray-800 font-medium">Paragraph C</p><select id="sel-q3" class="match-select" onchange="updateSelect(3, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q3"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="4"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">4</span><p class="text-sm text-gray-800 font-medium">Paragraph D</p><select id="sel-q4" class="match-select" onchange="updateSelect(4, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q4"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="5"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">5</span><p class="text-sm text-gray-800 font-medium">Paragraph E</p><select id="sel-q5" class="match-select" onchange="updateSelect(5, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q5"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="6"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">6</span><p class="text-sm text-gray-800 font-medium">Paragraph F</p><select id="sel-q6" class="match-select" onchange="updateSelect(6, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q6"])'>View Explanation</button></div></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 7-11</h3><p class="text-sm text-gray-800">Complete the sentences below.</p><p class="text-sm text-gray-800 font-bold mt-1">Choose NO MORE THAN ONE WORD AND/OR A NUMBER from the passage for each answer.</p></div><div class="space-y-4"><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="7"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">7</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">The water levels in the Toiro River are falling because of <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off" class="w-36 mx-1"> .</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q7"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="8"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">8</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">Globally, the number of people who die each year as a result of using dirty water is <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off" class="w-36 mx-1"> .</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q8"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="9"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">9</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">When families have clean water, they can spend more time growing <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off" class="w-36 mx-1"> .</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q9"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="10"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">10</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">Specialist knowledge and equipment are needed to dig <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off" class="w-36 mx-1"> .</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q10"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="11"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">11</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">WaterAid uses a dam made of <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off" class="w-36 mx-1"> to capture rainwater.</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q11"])'>View Explanation</button></div></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 12-13</h3><p class="text-sm text-gray-800">Choose <strong>TWO</strong> letters, <strong>A-E</strong>.</p><p class="text-sm text-gray-800 mt-1">Which <strong>TWO</strong> of these activities were performed by the villagers of Orbesho?</p></div><div class="space-y-4"><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="12"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">12</span><p class="text-sm text-gray-800 font-medium">Select two answers <span class="text-gray-400">(Q12–13, in either order)</span></p></div><div class="flex flex-col gap-1 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="A" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>A</strong>&nbsp; building a transport route</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="B" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>B</strong>&nbsp; digging a reservoir</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="C" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>C</strong>&nbsp; gathering building materials</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="D" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>D</strong>&nbsp; making pipes</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="E" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>E</strong>&nbsp; fitting taps</span></label></div><span class="q-block" data-q="13"></span><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q12","exp-q13"])'>View Explanation</button></div></div></div></div></div></div></main>
+<footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+<!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+const tfngQuestions = [{"q": 4, "text": "Sally Bailey intends to find locations for White Stuff in shopping centres.", "exp": ["exp-q4"]}, {"q": 5, "text": "Sally Bailey started White Stuff.", "exp": ["exp-q5"]}, {"q": 6, "text": "The buyer at Tesco initially rejected Oven Pride.", "exp": ["exp-q6"]}, {"q": 7, "text": "The buyer’s mother often gives him advice on products.", "exp": "not-given"}, {"q": 8, "text": "Matt Stockdale discovered important information about Tesco after contacting the company.", "exp": ["exp-q8"]}];
+document.getElementById('tf-container').innerHTML = tfngQuestions.map(item => {
+  const call = item.exp === 'not-given' ? 'showNotGivenToast()' : `showExplanation(${JSON.stringify(item.exp)})`;
+  const radio = v => `<label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q${item.q}" value="${v}" onchange="updateRadioMap(${item.q})"> ${v}</label>`;
+  return `<div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+   <div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span><p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p></div>
+   <div class="flex flex-wrap gap-3 pl-9">${radio('TRUE')}${radio('FALSE')}${radio('NOT GIVEN')}</div>
+   <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${call}'>View Explanation</button></div></div>`;
+}).join('');
+</script>
+
+
+<script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {1:"vi",2:"v",3:"viii",4:"i",5:"iv",6:"iii"};
+        const TEXT_KEYS = {7:["drought"],8:["3.3 million","3.3"],9:["crops"],10:["wells"],11:["sand"]};
+        const MULTI_KEYS = ["A","C"];
+        const multiSel = [];
+        const norm = s => (s||'').toLowerCase().replace(/\s+/g,' ').trim();
+        const TEXT_QS = [1,2,3,9,10,11,12,13];
+        const TF_QS = [4,5,6,7,8];
+
+        const TOTAL_QS = 13;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 20 * 60; // 20 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        function updateSelect(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, !!val);
+        }
+
+        function updateCheck(cb) {
+            if(isSubmitted) return;
+            if (cb.checked) {
+                if (multiSel.length >= 2) { cb.checked = false; flashToast('Choose only TWO letters.'); return; }
+                multiSel.push(cb.value);
+            } else {
+                const k = multiSel.indexOf(cb.value);
+                if (k > -1) multiSel.splice(k, 1);
+            }
+            updateMapStatus(12, multiSel.length >= 1);
+            updateMapStatus(13, multiSel.length >= 2);
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300 w-fit flex items-center gap-1 shadow-sm mt-1`;
+            el.innerHTML = `<svg class="w-3 h-3 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Ans: ${text}`;
+            return el;
+        }
+        
+        function createRadioCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function markRadio(qRow, correct, uAns) {
+            const right = qRow.querySelector(`input[value="${correct}"]`).parentElement;
+            right.classList.add('res-correct');
+            right.insertAdjacentHTML('beforeend', '<span class="ml-auto pl-2">✓</span>');
+            if (uAns && uAns !== correct) qRow.querySelector(`input[value="${uAns}"]`).parentElement.classList.add('res-wrong');
+        }
+        function ansBadge(text) {
+            return `<span class="ans-badge">✓ ${text}</span>`;
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('select').forEach(el => el.disabled = true);
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            const paint = (i, status) => {
+                styleMapBox(i, status);
+            };
+            const paintRow = (qRow, status) => {
+                const map = {correct:['border-green-400','bg-green-50'], incorrect:['border-red-400','bg-red-50'], blank:['border-yellow-400','bg-yellow-50']};
+                qRow.classList.replace('border-gray-200', map[status][0]);
+                qRow.classList.replace('bg-gray-50', map[status][1]);
+            };
+            const showFb = qRow => { const fc = qRow.querySelector('.feedback-container'); fc.classList.remove('hidden'); fc.classList.add('flex'); };
+
+            // Q1-6 headings
+            for (let i = 1; i <= 6; i++) {
+                const u = norm(userAnswers[i]);
+                const ok = u === ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const status = u === '' ? 'blank' : ok ? 'correct' : 'incorrect';
+                if (ok) score++;
+                paint(i, status); paintRow(qRow, status); showFb(qRow);
+                const s = document.getElementById(`sel-q${i}`);
+                if (u !== '') s.classList.add(ok ? 'correct' : 'incorrect');
+                s.insertAdjacentHTML('afterend', ' ' + ansBadge('Correct answer: ' + ANSWER_KEYS[i]));
+            }
+
+            // Q7-12 completion
+            for (let i = 7; i <= 11; i++) {
+                const u = norm(userAnswers[i]);
+                const ok = TEXT_KEYS[i].map(norm).includes(u);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const inputEl = document.getElementById(`input-q${i}`);
+                const status = u === '' ? 'blank' : ok ? 'correct' : 'incorrect';
+                if (ok) score++;
+                paint(i, status); paintRow(qRow, status); showFb(qRow);
+                if (u !== '') inputEl.classList.add(ok ? 'correct' : 'incorrect');
+                if (!ok) inputEl.insertAdjacentHTML('afterend', ' ' + ansBadge(TEXT_KEYS[i][0]));
+            }
+
+            // Q13-14 choose two
+            {
+                const qRow = document.querySelector('.q-row[data-q="12"]');
+                const n = multiSel.length;
+                const good = multiSel.filter(l => MULTI_KEYS.includes(l)).length;
+                const s13 = n === 0 ? 'blank' : good >= 1 ? 'correct' : 'incorrect';
+                const s14 = n < 2 ? 'blank' : good === 2 ? 'correct' : 'incorrect';
+                if (s13 === 'correct') score++;
+                if (s14 === 'correct') score++;
+                paint(12, s13); paint(13, s14);
+                paintRow(qRow, n === 0 ? 'blank' : good === 2 ? 'correct' : 'incorrect');
+                showFb(qRow);
+                qRow.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    const lab = cb.parentElement;
+                    if (MULTI_KEYS.includes(cb.value)) {
+                        lab.classList.add('res-correct');
+                        lab.insertAdjacentHTML('beforeend', '<span class="ml-auto pl-2">✓</span>');
+                    } else if (cb.checked) {
+                        lab.classList.add('res-wrong');
+                    }
+                });
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function flashToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function showNotGivenToast() { flashToast('There is no information in the text to prove or disprove this statement.'); }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

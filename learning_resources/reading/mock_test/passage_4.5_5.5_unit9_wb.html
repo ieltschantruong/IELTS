@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Unit 09 WB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    
+        select.match-select{border:2px solid #e5e7eb;border-radius:6px;padding:4px 8px;font-weight:700;color:#d75872;background:#fff;outline:none;cursor:pointer}
+        select.match-select:focus{border-color:#d75872;box-shadow:0 0 0 3px #fce8eb}
+        select.match-select.correct{border-color:#22c55e;background:#f0fdf4;color:#166534}
+        select.match-select.incorrect{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+    
+        .radio-wrapper.res-correct{background:#dcfce7!important;border-color:#4ade80!important;color:#166534!important;font-weight:700}
+        .radio-wrapper.res-wrong{background:#fee2e2!important;border-color:#f87171!important;color:#991b1b!important;font-weight:700;text-decoration:line-through}
+        .ans-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:2px 8px;white-space:nowrap}
+    
+        input[type="checkbox"]{accent-color:#d75872;width:1.1rem;height:1.1rem;cursor:pointer}
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+<header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">20:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+<div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+<div id="highlight-tooltip">Highlight</div><div class="max-w-2xl mx-auto pb-12"><div class="mb-8 border-b-2 border-brand-100 pb-5"><span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Reading Passage</span>
+<h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">The rain makers</h2>
+<p class="text-gray-500 mt-2 font-medium italic">Science and technology work with nature to bring rain when and where it is needed</p></div>
+<div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+<p><strong class="text-brand-600 mr-2">A</strong>Wheat farmer Gang Liu is a worried man. <span id="exp-q1" class="explanation-target">The annual rains have not arrived, and there is a danger that unless there is substantial rainfall soon, his annual wheat crop will fail.</span> As he looks anxiously at the clouds which promise rain but are failing to deliver it, there is a sudden loud roar, and from fields for miles around, hundreds of small rockets are fired into the clouds. Within twenty minutes, the farms around the eastern Chinese city of Luohe are experiencing their first rain for many weeks. Gang Liu’s valuable wheat has been saved, thanks to a technique known as ‘cloud seeding’, in which the chemical silver iodide (AgI) is introduced into clouds. This causes the tiny drops of moisture in the clouds to turn to ice. These tiny ice particles join until they become heavy enough to fall from the sky, turning into rain as they melt.</p>
+
+<p><strong class="text-brand-600 mr-2">B</strong>But did cloud seeding really cause the rain in Luohe to fall, or was it just a coincidence? <span id="exp-q7" class="explanation-target">Experts often question whether cloud seeding actually works. It is hard to tell how effective cloud seeding actually is, they say,</span> as it might have rained anyway, without human intervention. <span id="exp-q2" class="explanation-target">But this has not stopped many governments and organisations from trying.</span> <span id="exp-q8" class="explanation-target">There are currently 150 weather-modifying projects taking place in more than 40 countries.</span> Not all of them are aimed at creating rain. The Eastlund Scientific Enterprises Corporation in the USA, for example, is experimenting with firing microwaves into clouds to prevent the tornadoes which cause enormous damage to the country every year. In Russia, experiments have been carried out to make sure the sun shines during important national events.</p>
+
+<p><strong class="text-brand-600 mr-2">C</strong>However, it is rainmaking that dominates the research programmes. In many of these, researchers are using trials in which some clouds are ‘seeded’ while others are not, and both groups are monitored. Arlen Huggins of the Desert Research Institute is leading a research project in Australia. <span id="exp-q9" class="explanation-target">Weather-monitoring technology is so good nowadays, he says, that we can measure clouds much more effectively, even from the inside.</span> As a result, we now know much more about the effect humans can have on the weather. <span id="exp-q3" class="explanation-target">What Huggins’ team has discovered so far is promising. They believe that cloud seeding does work,</span> although <span id="exp-q10" class="explanation-target">there are still two years of the six-year project left to go.</span></p>
+
+<p><strong class="text-brand-600 mr-2">D</strong><span id="exp-q4" class="explanation-target">In China, where the majority of cloud-seeding operations take place, weather-modification authorities use army rockets to fire silver-iodide particles into the clouds.</span> <span id="exp-q11" class="explanation-target">39,000 staff working for the China Meteorological Administration (CMA) are equipped with 7,113 army cannons which, in 2006, were used to fire a million silver-iodide rockets into the atmosphere.</span> This costs over $100 million a year, although the CMA claims the results are worth the expense. <span id="exp-q12" class="explanation-target">Between 1999 and 2006, they say, cloud seeding produced 250 billion metric tonnes of rain and prevented thousands of farmers from losing their crops.</span></p>
+
+<p><strong class="text-brand-600 mr-2">E</strong><span id="exp-q5" class="explanation-target">“We want to understand what makes clouds rain,” says Philip Brown of the UK Meteorological office, explaining why so much time, effort and money are being invested. “But there is a more powerful economic reason.</span> A lot of countries around the world are at risk from drought, and governments will try anything to make sure that doesn’t happen, even if the scientific evidence is weak. The potential economic value is greater than the scientific value. Making it rain might allow you to keep agriculture going where, without human intervention, it might fail.”</p>
+
+<p><strong class="text-brand-600 mr-2">F</strong>Some people are concerned, however, that altering the weather can have negative consequences. Leonard Barrie, director of the research department at the World Meteorological Organisation in Geneva, explains why. <span id="exp-q6" class="explanation-target">“All areas of weather modification are still very controversial. Some people think that diverting water for irrigation benefits some people, but is a disadvantage to others. Someone in one area will get more water, but as a result, someone somewhere else could get less.”</span> His fears may be justified. Recently, the town of Zhoukou in China’s Henan province accused neighbouring town Pingdingshang of ‘stealing’ rain from clouds that were due to pass over its own farms, prompting what may be the world’s very first documented incident of ‘rain rage’.</p>
+</div></div></div>
+<div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth"><div class="max-w-2xl mx-auto pb-24">
+<!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 1-6</h3><p class="text-sm text-gray-800">The reading passage has six paragraphs, <strong>A-F</strong>.</p><p class="text-sm text-gray-800 mt-1">Choose the correct heading for each paragraph from the list of headings below.</p></div><div class="space-y-4"><div class="bg-brand-50 border border-brand-200 rounded-xl p-4 mb-4 text-sm text-gray-800"><p class="font-bold text-center mb-2">List of headings</p><div class="space-y-1"><p><strong class="text-brand-700 inline-block w-10">i</strong>Making peaceful use of a military weapon</p><p><strong class="text-brand-700 inline-block w-10">ii</strong>How modifying the weather has changed the world</p><p><strong class="text-brand-700 inline-block w-10">iii</strong>What is prompting this research?</p><p><strong class="text-brand-700 inline-block w-10">iv</strong>A period of drought comes to an end</p><p><strong class="text-brand-700 inline-block w-10">v</strong>An old solution to a new problem</p><p><strong class="text-brand-700 inline-block w-10">vi</strong>Winners and losers</p><p><strong class="text-brand-700 inline-block w-10">vii</strong>Tests provide encouraging results</p><p><strong class="text-brand-700 inline-block w-10">viii</strong>A waste of money</p><p><strong class="text-brand-700 inline-block w-10">ix</strong>Global attempts to change the weather</p></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="1"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">1</span><p class="text-sm text-gray-800 font-medium">Paragraph A</p><select id="sel-q1" class="match-select" onchange="updateSelect(1, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q1"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="2"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">2</span><p class="text-sm text-gray-800 font-medium">Paragraph B</p><select id="sel-q2" class="match-select" onchange="updateSelect(2, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q2", "exp-q8"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="3"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">3</span><p class="text-sm text-gray-800 font-medium">Paragraph C</p><select id="sel-q3" class="match-select" onchange="updateSelect(3, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q3"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="4"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">4</span><p class="text-sm text-gray-800 font-medium">Paragraph D</p><select id="sel-q4" class="match-select" onchange="updateSelect(4, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q4"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="5"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">5</span><p class="text-sm text-gray-800 font-medium">Paragraph E</p><select id="sel-q5" class="match-select" onchange="updateSelect(5, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q5"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="6"><div class="flex gap-3 items-center flex-wrap"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">6</span><p class="text-sm text-gray-800 font-medium">Paragraph F</p><select id="sel-q6" class="match-select" onchange="updateSelect(6, this.value)"><option value="">Select…</option><option value="i">i</option><option value="ii">ii</option><option value="iii">iii</option><option value="iv">iv</option><option value="v">v</option><option value="vi">vi</option><option value="vii">vii</option><option value="viii">viii</option><option value="ix">ix</option></select></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q6"])'>View Explanation</button></div></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 7-12</h3><p class="text-sm text-gray-800">Complete the sentences below.</p><p class="text-sm text-gray-800 font-bold mt-1">Choose NO MORE THAN ONE WORD AND/OR A NUMBER from the passage for each answer.</p></div><div class="space-y-4"><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="7"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">7</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">Experts are unsure if cloud seeding is <input type="text" id="input-q7" onkeyup="updateTextInput(7, this.value)" autocomplete="off" class="w-36 mx-1"> or not.</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q7"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="8"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">8</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">At the moment, there are over <input type="text" id="input-q8" onkeyup="updateTextInput(8, this.value)" autocomplete="off" class="w-36 mx-1"> where projects are being carried out to modify the weather.</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q8"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="9"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">9</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">Thanks to modern <input type="text" id="input-q9" onkeyup="updateTextInput(9, this.value)" autocomplete="off" class="w-36 mx-1"> , it is now possible to get better results when clouds are monitored.</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q9"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="10"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">10</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">The Desert Research Institute project will finish in a couple of <input type="text" id="input-q10" onkeyup="updateTextInput(10, this.value)" autocomplete="off" class="w-36 mx-1"> .</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q10"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="11"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">11</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">The CMA gets the equipment they need from the <input type="text" id="input-q11" onkeyup="updateTextInput(11, this.value)" autocomplete="off" class="w-36 mx-1"> .</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q11"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="12"><div class="flex gap-3 items-center"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">12</span><div class="text-sm text-gray-800 flex flex-wrap items-center gap-1">A large number of <input type="text" id="input-q12" onkeyup="updateTextInput(12, this.value)" autocomplete="off" class="w-36 mx-1"> benefited from cloud seeding carried out by the CMA.</div></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q12"])'>View Explanation</button></div></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 13-14</h3><p class="text-sm text-gray-800">Choose <strong>TWO</strong> letters, <strong>A-E</strong>.</p><p class="text-sm text-gray-800 mt-1">Which <strong>TWO</strong> of these sentences are true about cloud seeding, according to the passage?</p></div><div class="space-y-4"><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="13"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">13</span><p class="text-sm text-gray-800 font-medium">Select two answers <span class="text-gray-400">(Q13–14, in either order)</span></p></div><div class="flex flex-col gap-1 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="A" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>A</strong>&nbsp; China carries out more cloud seeding than anywhere else.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="B" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>B</strong>&nbsp; Cloud seeding is too expensive for most countries.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="C" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>C</strong>&nbsp; Cloud seeding is mostly done for scientific rather than economic reasons.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="D" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>D</strong>&nbsp; Cloud seeding helps turn dry areas of land into agricultural areas.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="checkbox" value="E" onchange="updateCheck(this)" class="mt-0.5 shrink-0"> <span><strong>E</strong>&nbsp; Cloud seeding may affect the distribution of rainfall.</span></label></div><span class="q-block" data-q="14"></span><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q4","exp-q6"])'>View Explanation</button></div></div></div></div></div></div></main>
+<footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+<!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+const tfngQuestions = [{"q": 4, "text": "Sally Bailey intends to find locations for White Stuff in shopping centres.", "exp": ["exp-q4"]}, {"q": 5, "text": "Sally Bailey started White Stuff.", "exp": ["exp-q5"]}, {"q": 6, "text": "The buyer at Tesco initially rejected Oven Pride.", "exp": ["exp-q6"]}, {"q": 7, "text": "The buyer’s mother often gives him advice on products.", "exp": "not-given"}, {"q": 8, "text": "Matt Stockdale discovered important information about Tesco after contacting the company.", "exp": ["exp-q8"]}];
+document.getElementById('tf-container').innerHTML = tfngQuestions.map(item => {
+  const call = item.exp === 'not-given' ? 'showNotGivenToast()' : `showExplanation(${JSON.stringify(item.exp)})`;
+  const radio = v => `<label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q${item.q}" value="${v}" onchange="updateRadioMap(${item.q})"> ${v}</label>`;
+  return `<div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+   <div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span><p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p></div>
+   <div class="flex flex-wrap gap-3 pl-9">${radio('TRUE')}${radio('FALSE')}${radio('NOT GIVEN')}</div>
+   <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${call}'>View Explanation</button></div></div>`;
+}).join('');
+</script>
+
+
+<script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {1:"iv",2:"ix",3:"vii",4:"i",5:"iii",6:"vi"};
+        const TEXT_KEYS = {7:["effective"],8:["40 countries","40"],9:["technology"],10:["years"],11:["army"],12:["farmers"]};
+        const MULTI_KEYS = ["A","E"];
+        const multiSel = [];
+        const norm = s => (s||'').toLowerCase().replace(/\s+/g,' ').trim();
+        const TEXT_QS = [1,2,3,9,10,11,12,13];
+        const TF_QS = [4,5,6,7,8];
+
+        const TOTAL_QS = 14;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 20 * 60; // 20 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        function updateSelect(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, !!val);
+        }
+
+        function updateCheck(cb) {
+            if(isSubmitted) return;
+            if (cb.checked) {
+                if (multiSel.length >= 2) { cb.checked = false; flashToast('Choose only TWO letters.'); return; }
+                multiSel.push(cb.value);
+            } else {
+                const k = multiSel.indexOf(cb.value);
+                if (k > -1) multiSel.splice(k, 1);
+            }
+            updateMapStatus(13, multiSel.length >= 1);
+            updateMapStatus(14, multiSel.length >= 2);
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300 w-fit flex items-center gap-1 shadow-sm mt-1`;
+            el.innerHTML = `<svg class="w-3 h-3 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Ans: ${text}`;
+            return el;
+        }
+        
+        function createRadioCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function markRadio(qRow, correct, uAns) {
+            const right = qRow.querySelector(`input[value="${correct}"]`).parentElement;
+            right.classList.add('res-correct');
+            right.insertAdjacentHTML('beforeend', '<span class="ml-auto pl-2">✓</span>');
+            if (uAns && uAns !== correct) qRow.querySelector(`input[value="${uAns}"]`).parentElement.classList.add('res-wrong');
+        }
+        function ansBadge(text) {
+            return `<span class="ans-badge">✓ ${text}</span>`;
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('select').forEach(el => el.disabled = true);
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            const paint = (i, status) => {
+                styleMapBox(i, status);
+            };
+            const paintRow = (qRow, status) => {
+                const map = {correct:['border-green-400','bg-green-50'], incorrect:['border-red-400','bg-red-50'], blank:['border-yellow-400','bg-yellow-50']};
+                qRow.classList.replace('border-gray-200', map[status][0]);
+                qRow.classList.replace('bg-gray-50', map[status][1]);
+            };
+            const showFb = qRow => { const fc = qRow.querySelector('.feedback-container'); fc.classList.remove('hidden'); fc.classList.add('flex'); };
+
+            // Q1-6 headings
+            for (let i = 1; i <= 6; i++) {
+                const u = norm(userAnswers[i]);
+                const ok = u === ANSWER_KEYS[i];
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const status = u === '' ? 'blank' : ok ? 'correct' : 'incorrect';
+                if (ok) score++;
+                paint(i, status); paintRow(qRow, status); showFb(qRow);
+                const s = document.getElementById(`sel-q${i}`);
+                if (u !== '') s.classList.add(ok ? 'correct' : 'incorrect');
+                s.insertAdjacentHTML('afterend', ' ' + ansBadge('Correct answer: ' + ANSWER_KEYS[i]));
+            }
+
+            // Q7-12 completion
+            for (let i = 7; i <= 12; i++) {
+                const u = norm(userAnswers[i]);
+                const ok = TEXT_KEYS[i].map(norm).includes(u);
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                const inputEl = document.getElementById(`input-q${i}`);
+                const status = u === '' ? 'blank' : ok ? 'correct' : 'incorrect';
+                if (ok) score++;
+                paint(i, status); paintRow(qRow, status); showFb(qRow);
+                if (u !== '') inputEl.classList.add(ok ? 'correct' : 'incorrect');
+                if (!ok) inputEl.insertAdjacentHTML('afterend', ' ' + ansBadge(TEXT_KEYS[i][0]));
+            }
+
+            // Q13-14 choose two
+            {
+                const qRow = document.querySelector('.q-row[data-q="13"]');
+                const n = multiSel.length;
+                const good = multiSel.filter(l => MULTI_KEYS.includes(l)).length;
+                const s13 = n === 0 ? 'blank' : good >= 1 ? 'correct' : 'incorrect';
+                const s14 = n < 2 ? 'blank' : good === 2 ? 'correct' : 'incorrect';
+                if (s13 === 'correct') score++;
+                if (s14 === 'correct') score++;
+                paint(13, s13); paint(14, s14);
+                paintRow(qRow, n === 0 ? 'blank' : good === 2 ? 'correct' : 'incorrect');
+                showFb(qRow);
+                qRow.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    const lab = cb.parentElement;
+                    if (MULTI_KEYS.includes(cb.value)) {
+                        lab.classList.add('res-correct');
+                        lab.insertAdjacentHTML('beforeend', '<span class="ml-auto pl-2">✓</span>');
+                    } else if (cb.checked) {
+                        lab.classList.add('res-wrong');
+                    }
+                });
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function flashToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function showNotGivenToast() { flashToast('There is no information in the text to prove or disprove this statement.'); }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
