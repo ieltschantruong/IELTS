@@ -141,6 +141,10 @@
             background-color: #fef2f2 !important;
             color: #991b1b !important;
         }
+    
+        .radio-wrapper.res-correct{background:#dcfce7!important;border-color:#4ade80!important;color:#166534!important;font-weight:700}
+        .radio-wrapper.res-wrong{background:#fee2e2!important;border-color:#f87171!important;color:#991b1b!important;font-weight:700;text-decoration:line-through}
+        .ans-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:2px 8px;white-space:nowrap}
     </style>
 </head>
 <body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
@@ -415,6 +419,16 @@ document.getElementById('tf-container').innerHTML = tfngQuestions.map(item => {
             }
         }
 
+        function markRadio(qRow, correct, uAns) {
+            const right = qRow.querySelector(`input[value="${correct}"]`).parentElement;
+            right.classList.add('res-correct');
+            right.insertAdjacentHTML('beforeend', '<span class="ml-auto pl-2">✓</span>');
+            if (uAns && uAns !== correct) qRow.querySelector(`input[value="${uAns}"]`).parentElement.classList.add('res-wrong');
+        }
+        function ansBadge(text) {
+            return `<span class="ans-badge">✓ ${text}</span>`;
+        }
+
         function submitTest() {
             if(isSubmitted) return;
             isSubmitted = true;
@@ -436,7 +450,7 @@ document.getElementById('tf-container').innerHTML = tfngQuestions.map(item => {
                 if (uAns === '') styleMapBox(i, 'blank');
                 else if (isCorrect) { score++; styleMapBox(i, 'correct'); inputEl.classList.add('correct'); }
                 else { styleMapBox(i, 'incorrect'); inputEl.classList.add('incorrect'); }
-                if (!isCorrect) fc.insertBefore(createCorrectMarker(ANSWER_KEYS[i][0]), fc.firstChild);
+                if (!isCorrect) inputEl.insertAdjacentHTML('afterend', ' ' + ansBadge(ANSWER_KEYS[i][0]));
                 fc.classList.remove('hidden'); fc.classList.add('flex');
             };
             TEXT_QS.forEach(gradeText);
@@ -450,11 +464,8 @@ document.getElementById('tf-container').innerHTML = tfngQuestions.map(item => {
                 else if (isCorrect) { score++; styleMapBox(i, 'correct'); qRow.classList.replace('border-gray-200', 'border-green-400'); qRow.classList.replace('bg-gray-50', 'bg-green-50'); }
                 else { styleMapBox(i, 'incorrect'); qRow.classList.replace('border-gray-200', 'border-red-400'); qRow.classList.replace('bg-gray-50', 'bg-red-50'); }
                 const fc = qRow.querySelector('.feedback-container');
-                if (!isCorrect) fc.insertBefore(createRadioCorrectMarker(acceptableKeys[0]), fc.firstChild);
                 fc.classList.remove('hidden'); fc.classList.add('flex');
-                if (!isCorrect && uAns !== '') {
-                    qRow.querySelector(`input[value="${uAns}"]`).parentElement.classList.add('bg-red-100', 'border-red-300', 'text-red-900', 'font-bold');
-                }
+                markRadio(qRow, acceptableKeys[0] === 'FALSE' ? 'FALSE' : acceptableKeys[0], uAns);
             }
 
             // Finish UI
