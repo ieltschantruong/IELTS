@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Computer-Based Mock Test - Unit 10 WB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbfb',   
+                            100: '#fce8eb',  
+                            200: '#f7cdd5',  
+                            300: '#f0a8b6',  
+                            400: '#e67c91',  
+                            500: '#d75872',  
+                            600: '#bf3f58',  
+                            700: '#a03046',  
+                            800: '#852b3d',
+                            900: '#702736',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .passage-text { font-family: 'Merriweather', serif; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #fce8eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f0a8b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e67c91; }
+
+        /* Highlight feature styles */
+        ::selection { background: #f7cdd5; color: #702736; }
+        
+        /* Explanation highlight transition */
+        .explanation-target { transition: all 0.5s ease; border-radius: 4px; display: inline; }
+        .active-explanation { background-color: #f7cdd5; box-shadow: 0 0 0 4px #f7cdd5; color: #702736; font-weight: 600; }
+
+        /* Floating Highlight Button */
+        #highlight-tooltip {
+            position: absolute;
+            display: none;
+            background: #bf3f58;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        #highlight-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #bf3f58 transparent transparent transparent;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #702736;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Radio Styling */
+        input[type="radio"] {
+            accent-color: #d75872;
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .radio-wrapper:has(input:checked) {
+            background-color: #fce8eb;
+            border-color: #d75872;
+            color: #852b3d;
+            font-weight: 600;
+        }
+
+        /* Text Input Styling */
+        input[type="text"] {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            color: #d75872;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            border-color: #d75872;
+            box-shadow: 0 0 0 3px #fce8eb;
+        }
+        input[type="text"].correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        input[type="text"].incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+        }
+    
+        select.match-select{border:2px solid #e5e7eb;border-radius:6px;padding:4px 8px;font-weight:700;color:#d75872;background:#fff;outline:none;cursor:pointer}
+        select.match-select:focus{border-color:#d75872;box-shadow:0 0 0 3px #fce8eb}
+        select.match-select.correct{border-color:#22c55e;background:#f0fdf4;color:#166534}
+        select.match-select.incorrect{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+    
+        .radio-wrapper.res-correct{background:#dcfce7!important;border-color:#4ade80!important;color:#166534!important;font-weight:700}
+        .radio-wrapper.res-wrong{background:#fee2e2!important;border-color:#f87171!important;color:#991b1b!important;font-weight:700;text-decoration:line-through}
+        .ans-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:2px 8px;white-space:nowrap}
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col overflow-hidden selection:bg-brand-200 text-gray-800">
+<header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 border-b border-brand-100">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-xl pb-1 shadow-md">I</div>
+            <h1 class="font-bold text-gray-900 text-lg tracking-tight">IELTS Chan Truong <span class="text-brand-500 font-medium text-sm ml-2 hidden sm:inline">| Academic Reading</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-brand-50 text-brand-700 px-4 py-2 rounded-full font-mono font-bold border border-brand-200 transition-colors shadow-sm" id="timer-container">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer">20:00</span>
+            </div>
+            <button id="submit-btn" onclick="submitTest()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-brand-200 transform active:scale-95">Submit Test</button>
+        </div>
+    </header>
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+<div id="left-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-gray-200 p-6 sm:p-10 relative scroll-smooth shadow-[inset_-4px_0_15px_-10px_rgba(0,0,0,0.1)]">
+<div id="highlight-tooltip">Highlight</div><div class="max-w-2xl mx-auto pb-12"><div class="mb-8 border-b-2 border-brand-100 pb-5"><span class="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2 block">Reading Passage</span>
+<h2 class="text-3xl font-serif font-black text-gray-900 leading-snug">The man who tried to destroy Paris</h2>
+<p class="text-gray-500 mt-2 font-medium italic">Le Corbusier was one of the most influential architects of the 20th century. But many may wish he had never built anything</p></div>
+<div id="passage-content" class="passage-text text-gray-800 leading-relaxed text-[16px] text-justify space-y-6">
+<p>Born Charles-Edouard Jeanneret in Switzerland in 1887, the architect Le Corbusier used his grandfather’s name when he went to Paris at the age of 29. As Jeanneret, he had been a fairly successful small-town architect; as Le Corbusier, he had bigger ideas. He disliked the architectural styles that were popular at the time, and considered them to be out of date in an industrial age. <span id="exp-q1" class="explanation-target">He believed that the 20th century deserved a <strong>brand-new</strong> style of architecture. “We must start again from zero,” he said.</span></p>
+
+<p>The new style of architecture was called the International Style, <span id="exp-q2" class="explanation-target">and it attracted many <strong>followers</strong> in the architectural world.</span> <span id="exp-q9" class="explanation-target">However, nobody was as <strong>enthusiastic</strong> about it as Le Corbusier at the beginning.</span> He worked hard to promote his ideas at exhibitions, at talks, in books and in his own magazine. He loved machines, and believed that, like a machine, a building should have a function. He is famous for saying: “A house is a machine for living in.”</p>
+
+<p>The machines he admired the most were ships, and his early buildings tried to capture the spirit of the sea with their white walls, <strong>exposed</strong> rooms, shining glass and flat roofs. He called this style of architecture ‘purism’. The first building to embrace this style was the Villa Savoye in France. <span id="exp-q5" class="explanation-target">Le Corbusier believed that it was one of the best, most functional houses ever built. Unfortunately, this turned out to be an <strong>exaggeration</strong>.</span> The flat roof was a particular problem, as water poured in every time it rained, and it needed constant repairs. <span id="exp-q3" class="explanation-target">Nevertheless, its design was <strong>revolutionary</strong>,</span> <span id="exp-q10" class="explanation-target">and it should be considered a <strong>significant</strong> piece of early 20th-century architecture.</span></p>
+
+<p>In 1935, Le Corbusier visited New York City. He loved the city, and especially its tall buildings. He had only one reservation, which he explained to a journalist for the <em>Herald Tribune</em> newspaper. American skyscrapers were the biggest, tallest buildings in the world at that time, but Le Corbusier was a man who always thought big, and as far as he was concerned, they were “just too small”. Le Corbusier had always admired tall buildings. <span id="exp-q4" class="explanation-target">Now, inspired by his visit, he <strong>abandoned</strong> purism.</span> <span id="exp-q11" class="explanation-target">It is doubtful that he could have created anything as grand as the skyscrapers he had seen in the city,</span> but from now on Le Corbusier started designing buildings that sent out a more powerful message.</p>
+
+<p>He first started using bright colours, and then experimented with concrete. <span id="exp-q6" class="explanation-target">Le Corbusier loved the look and flexibility of concrete, and found it hard to hide it behind brick or paint, preferring to leave it on full view.</span> At a time when concrete was seen as modern and exciting, his designs made him world famous, and he was asked to design several important buildings around the world. Altogether, he designed about 60 major buildings worldwide, in a style that became known as ‘modernism’.</p>
+
+<p><span id="exp-q8" class="explanation-target">However, while many admired and copied his new style of architecture,</span> <span id="exp-q7" class="explanation-target">many more hated it. They turned against him, and tried to block his plans.</span> Buildings should inspire people and make them feel good, they said, and Le Corbusier’s ugly, depressing buildings often had the opposite effect. In this respect, the people of Paris had a lucky escape. Early in his career, Le Corbusier had wanted to knock down the centre of Paris and replace the old buildings with huge towers. Fortunately, his plan was rejected. <span id="exp-q13" class="explanation-target">Justifiably, in view of his plans to transform one of the world’s most beautiful cities into a <strong>hideous</strong> concrete jungle,</span> Le Corbusier is still known as ‘the man who tried to destroy Paris’.</p>
+
+<p>Despite the criticism, he had an enormous effect on the world of architecture, and attracted a large number of followers. As a result, many places were <strong>subjected to</strong> his style. In the Paris suburbs of Bobigny, for example, huge towers were built to house some of the city’s poorer inhabitants. Other European cities such as London, Berlin and Dublin also felt his influence.</p>
+
+<p>Apart from the buildings that were directly influenced by Le Corbusier, something else happened that the architect never planned: there was a return to older styles of architecture. <span id="exp-q14" class="explanation-target">Today, many people live in modern houses that look like they are much older. This look may represent a return to traditional tastes and values. More likely, however, it represents a reaction against modernist architecture.</span></p>
+</div></div></div><div id="right-pane" class="w-full md:w-1/2 h-1/2 md:h-full overflow-y-auto bg-gray-50 p-6 sm:p-10 scroll-smooth"><div class="max-w-2xl mx-auto pb-24">
+<!-- Results Banner (Non-Sticky) -->
+                <div id="results-banner" class="hidden mb-8 bg-white border border-brand-200 rounded-2xl p-6 shadow-lg text-center transform transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-2 mt-2">Test Completed</h2>
+                    <div class="flex justify-center items-end gap-2 mb-4">
+                        <span class="text-5xl font-black text-brand-600 leading-none" id="final-score">0</span>
+                        <span class="text-xl font-bold text-gray-400 mb-1">/ 14</span>
+                    </div>
+                    <p class="text-sm text-gray-700 bg-brand-50 p-3 rounded-xl border border-brand-100 font-medium">Review your answers below. The correct answers are displayed in green badges. Click <strong class="text-brand-600">View Explanation</strong> to see the exact evidence in the text.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 1-4</h3><p class="text-sm text-gray-800">Choose the correct letter, <strong>A, B, C</strong> or <strong>D</strong>.</p></div><div class="space-y-4"><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="1"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">1</span><p class="text-sm text-gray-800 font-medium leading-relaxed">What does the writer say about Le Corbusier in the first paragraph?</p></div><div class="flex flex-col gap-1 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q1" value="A" onchange="updateRadioMap(1)" class="mt-0.5 shrink-0"> <span><strong>A</strong>&nbsp; He had a relative who was also an architect.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q1" value="B" onchange="updateRadioMap(1)" class="mt-0.5 shrink-0"> <span><strong>B</strong>&nbsp; He became successful when he went to Paris.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q1" value="C" onchange="updateRadioMap(1)" class="mt-0.5 shrink-0"> <span><strong>C</strong>&nbsp; He thought that there were too many industrial buildings.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q1" value="D" onchange="updateRadioMap(1)" class="mt-0.5 shrink-0"> <span><strong>D</strong>&nbsp; He wanted to do something different from everyone else.</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q1"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="2"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">2</span><p class="text-sm text-gray-800 font-medium leading-relaxed">What does the writer say about the International Style in the second paragraph?</p></div><div class="flex flex-col gap-1 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q2" value="A" onchange="updateRadioMap(2)" class="mt-0.5 shrink-0"> <span><strong>A</strong>&nbsp; A lot of other architects liked it.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q2" value="B" onchange="updateRadioMap(2)" class="mt-0.5 shrink-0"> <span><strong>B</strong>&nbsp; At first, people did not like it very much.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q2" value="C" onchange="updateRadioMap(2)" class="mt-0.5 shrink-0"> <span><strong>C</strong>&nbsp; It took a lot of hard work to get people to accept it.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q2" value="D" onchange="updateRadioMap(2)" class="mt-0.5 shrink-0"> <span><strong>D</strong>&nbsp; The buildings looked like machines.</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q2"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="3"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">3</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Why does the writer describe the Villa Savoye as ‘revolutionary’ in the third paragraph?</p></div><div class="flex flex-col gap-1 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q3" value="A" onchange="updateRadioMap(3)" class="mt-0.5 shrink-0"> <span><strong>A</strong>&nbsp; It looked more like a ship than a building.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q3" value="B" onchange="updateRadioMap(3)" class="mt-0.5 shrink-0"> <span><strong>B</strong>&nbsp; Nobody had built anything like it before.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q3" value="C" onchange="updateRadioMap(3)" class="mt-0.5 shrink-0"> <span><strong>C</strong>&nbsp; It looked nice, but had too many faults.</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q3" value="D" onchange="updateRadioMap(3)" class="mt-0.5 shrink-0"> <span><strong>D</strong>&nbsp; It was more functional than any other building of the time.</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q3"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="4"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">4</span><p class="text-sm text-gray-800 font-medium leading-relaxed">What is the writer’s main purpose in the fourth paragraph?</p></div><div class="flex flex-col gap-1 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q4" value="A" onchange="updateRadioMap(4)" class="mt-0.5 shrink-0"> <span><strong>A</strong>&nbsp; to explain why Le Corbusier visited New York</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q4" value="B" onchange="updateRadioMap(4)" class="mt-0.5 shrink-0"> <span><strong>B</strong>&nbsp; to show that Le Corbusier was not impressed by New York’s skyscrapers</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q4" value="C" onchange="updateRadioMap(4)" class="mt-0.5 shrink-0"> <span><strong>C</strong>&nbsp; to describe Le Corbusier’s reaction to New York</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q4" value="D" onchange="updateRadioMap(4)" class="mt-0.5 shrink-0"> <span><strong>D</strong>&nbsp; to explain why Le Corbusier changed his style of architecture</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q4"])'>View Explanation</button></div></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 5-8</h3><p class="text-sm text-gray-800">Complete each sentence with the correct ending, <strong>A-F</strong>, below.</p></div><div class="space-y-4"><div class="bg-brand-50 border border-brand-200 rounded-xl p-4 mb-4 text-sm text-gray-800 space-y-1"><p><strong class="text-brand-700">A</strong>&nbsp; copied the style that he had invented.</p><p><strong class="text-brand-700">B</strong>&nbsp; is a classic example of modernist architecture.</p><p><strong class="text-brand-700">C</strong>&nbsp; made him friends and enemies.</p><p><strong class="text-brand-700">D</strong>&nbsp; was not as good as he claimed.</p><p><strong class="text-brand-700">E</strong>&nbsp; was covered in bright colours.</p><p><strong class="text-brand-700">F</strong>&nbsp; was left exposed so that people could see it.</p></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="5"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">5</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Le Corbusier’s Villa Savoye</p></div><select id="sel-q5" class="match-select ml-9" onchange="updateSelect(5, this.value)"><option value="">Select…</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q5"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="6"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">6</span><p class="text-sm text-gray-800 font-medium leading-relaxed">The concrete in Le Corbusier’s later buildings</p></div><select id="sel-q6" class="match-select ml-9" onchange="updateSelect(6, this.value)"><option value="">Select…</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q6"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="7"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">7</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Le Corbusier’s style of architecture</p></div><select id="sel-q7" class="match-select ml-9" onchange="updateSelect(7, this.value)"><option value="">Select…</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q7"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="8"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">8</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Le Corbusier had a large following which</p></div><select id="sel-q8" class="match-select ml-9" onchange="updateSelect(8, this.value)"><option value="">Select…</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q8"])'>View Explanation</button></div></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"><div class="bg-brand-50 p-4 rounded-xl mb-6 border-l-4 border-brand-500 shadow-inner"><h3 class="font-bold text-gray-900 mb-2">Questions 9-14</h3><p class="text-sm text-gray-800">Do the following statements agree with the views of the writer in the reading passage?</p><ul class="text-sm text-gray-700 mt-2 space-y-1"><li><strong class="text-brand-700">YES</strong> if the statement agrees with the views of the writer</li><li><strong class="text-brand-700">NO</strong> if the statement contradicts the views of the writer</li><li><strong class="text-brand-700">NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</li></ul></div><div class="space-y-4"><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="9"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">9</span><p class="text-sm text-gray-800 font-medium leading-relaxed">At first, people were not as enthusiastic about the International Style as Le Corbusier was.</p></div><div class="flex flex-wrap gap-3 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q9" value="YES" onchange="updateRadioMap(9)" class="mt-0.5 shrink-0"> <span>YES</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q9" value="NO" onchange="updateRadioMap(9)" class="mt-0.5 shrink-0"> <span>NO</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q9" value="NOT GIVEN" onchange="updateRadioMap(9)" class="mt-0.5 shrink-0"> <span>NOT GIVEN</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q9"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="10"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">10</span><p class="text-sm text-gray-800 font-medium leading-relaxed">The Villa Savoye is an important building.</p></div><div class="flex flex-wrap gap-3 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q10" value="YES" onchange="updateRadioMap(10)" class="mt-0.5 shrink-0"> <span>YES</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q10" value="NO" onchange="updateRadioMap(10)" class="mt-0.5 shrink-0"> <span>NO</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q10" value="NOT GIVEN" onchange="updateRadioMap(10)" class="mt-0.5 shrink-0"> <span>NOT GIVEN</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q10"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="11"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">11</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Le Corbusier could have designed buildings that were as big and as impressive as those in New York.</p></div><div class="flex flex-wrap gap-3 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q11" value="YES" onchange="updateRadioMap(11)" class="mt-0.5 shrink-0"> <span>YES</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q11" value="NO" onchange="updateRadioMap(11)" class="mt-0.5 shrink-0"> <span>NO</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q11" value="NOT GIVEN" onchange="updateRadioMap(11)" class="mt-0.5 shrink-0"> <span>NOT GIVEN</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q11"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="12"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">12</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Le Corbusier found concrete a difficult material to work with.</p></div><div class="flex flex-wrap gap-3 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q12" value="YES" onchange="updateRadioMap(12)" class="mt-0.5 shrink-0"> <span>YES</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q12" value="NO" onchange="updateRadioMap(12)" class="mt-0.5 shrink-0"> <span>NO</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q12" value="NOT GIVEN" onchange="updateRadioMap(12)" class="mt-0.5 shrink-0"> <span>NOT GIVEN</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showNotGivenToast()'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="13"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">13</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Le Corbusier’s plans for Paris would have ruined the city.</p></div><div class="flex flex-wrap gap-3 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q13" value="YES" onchange="updateRadioMap(13)" class="mt-0.5 shrink-0"> <span>YES</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q13" value="NO" onchange="updateRadioMap(13)" class="mt-0.5 shrink-0"> <span>NO</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q13" value="NOT GIVEN" onchange="updateRadioMap(13)" class="mt-0.5 shrink-0"> <span>NOT GIVEN</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q13"])'>View Explanation</button></div></div><div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="14"><div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">14</span><p class="text-sm text-gray-800 font-medium leading-relaxed">Many people show they reject Le Corbusier’s style of architecture by living in old houses.</p></div><div class="flex flex-wrap gap-3 pl-9"><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q14" value="YES" onchange="updateRadioMap(14)" class="mt-0.5 shrink-0"> <span>YES</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q14" value="NO" onchange="updateRadioMap(14)" class="mt-0.5 shrink-0"> <span>NO</span></label><label class="radio-wrapper flex items-start gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q14" value="NOT GIVEN" onchange="updateRadioMap(14)" class="mt-0.5 shrink-0"> <span>NOT GIVEN</span></label></div><div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='showExplanation(["exp-q14"])'>View Explanation</button></div></div></div></div></div></div></main>
+<footer class="h-16 bg-white border-t border-brand-200 flex items-center justify-between px-6 z-10 shrink-0 shadow-[0_-4px_15px_rgba(0,0,0,0.02)] relative">
+        <div class="text-sm text-gray-500 font-medium flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            <span>Navigation:</span>
+            <div id="q-map" class="flex gap-1.5 flex-nowrap">
+                <!-- Javascript maps here -->
+            </div>
+            
+            <div id="result-legend" class="hidden ml-6 flex gap-4 text-xs font-bold uppercase tracking-widest bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-1.5 text-green-700"><div class="w-3 h-3 rounded-full bg-green-500 shadow-sm border border-green-600"></div> Correct</div>
+                <div class="flex items-center gap-1.5 text-red-700"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-red-600"></div> Incorrect</div>
+                <div class="flex items-center gap-1.5 text-yellow-600"><div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm border border-yellow-500"></div> Blank</div>
+            </div>
+        </div>
+        <div class="text-sm text-brand-700 font-semibold cursor-help bg-brand-50 px-4 py-1.5 rounded-lg border border-brand-200 shadow-sm flex items-center gap-2 shrink-0 hidden sm:flex" id="highlight-hint">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Select text in passage to highlight
+        </div>
+    </footer>
+<!-- Not Given Toast Notification -->
+    <div id="toast-notification">
+        There is no information in the text to prove or disprove this statement.
+    </div>
+
+    <script>
+const tfngQuestions = [{"q": 4, "text": "Sally Bailey intends to find locations for White Stuff in shopping centres.", "exp": ["exp-q4"]}, {"q": 5, "text": "Sally Bailey started White Stuff.", "exp": ["exp-q5"]}, {"q": 6, "text": "The buyer at Tesco initially rejected Oven Pride.", "exp": ["exp-q6"]}, {"q": 7, "text": "The buyer’s mother often gives him advice on products.", "exp": "not-given"}, {"q": 8, "text": "Matt Stockdale discovered important information about Tesco after contacting the company.", "exp": ["exp-q8"]}];
+document.getElementById('tf-container').innerHTML = tfngQuestions.map(item => {
+  const call = item.exp === 'not-given' ? 'showNotGivenToast()' : `showExplanation(${JSON.stringify(item.exp)})`;
+  const radio = v => `<label class="radio-wrapper flex items-center gap-2 p-2 border border-transparent rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 cursor-pointer"><input type="radio" name="q${item.q}" value="${v}" onchange="updateRadioMap(${item.q})"> ${v}</label>`;
+  return `<div class="q-row p-4 rounded-xl border border-gray-200 bg-gray-50 transition-colors" data-q="${item.q}">
+   <div class="flex gap-3 mb-3"><span class="w-6 h-6 shrink-0 bg-white border border-brand-200 text-brand-700 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">${item.q}</span><p class="text-sm text-gray-800 font-medium leading-relaxed">${item.text}</p></div>
+   <div class="flex flex-wrap gap-3 pl-9">${radio('TRUE')}${radio('FALSE')}${radio('NOT GIVEN')}</div>
+   <div class="feedback-container hidden flex-col pl-9 mt-3 border-t border-gray-200 pt-3"><button class="exp-btn text-[10px] text-brand-600 font-bold bg-white px-3 py-1.5 rounded-lg border border-brand-200 hover:bg-brand-50 w-fit shadow-sm uppercase tracking-wider" onclick='${call}'>View Explanation</button></div></div>`;
+}).join('');
+</script>
+
+<script>
+        // Answer Keys Configuration
+        const ANSWER_KEYS = {1:"D",2:"A",3:"B",4:"D",5:"D",6:"F",7:"C",8:"A",9:"YES",10:"YES",11:"NO",12:"NOT GIVEN",13:"YES",14:"NO"};
+        const SELECT_QS = [5,6,7,8];
+        const TEXT_QS = [1,2,3,9,10,11,12,13];
+        const TF_QS = [4,5,6,7,8];
+        const norm = s => s.toLowerCase().replace(/\s+/g,' ').trim();
+
+        const TOTAL_QS = 14;
+        let userAnswers = {};
+        for(let i=1; i<=TOTAL_QS; i++) userAnswers[i] = "";
+        
+        let timerInterval;
+        let timeRemaining = 20 * 60; // 20 minutes
+        let isSubmitted = false;
+
+        function initQuestionMap() {
+            const mapContainer = document.getElementById('q-map');
+            mapContainer.innerHTML = '';
+            for(let i=1; i<=TOTAL_QS; i++) {
+                const box = document.createElement('div');
+                box.className = `w-7 h-7 rounded border-2 border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 cursor-pointer transition-all bg-white hover:border-brand-400 hover:text-brand-600 shadow-sm shrink-0`;
+                box.innerText = i;
+                box.id = `map-q${i}`;
+                box.onclick = () => {
+                    let el = document.querySelector(`.q-row[data-q="${i}"]`);
+                    if(!el) el = document.querySelector(`.q-block[data-q="${i}"]`);
+                    if(el) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                };
+                mapContainer.appendChild(box);
+            }
+        }
+
+        function updateMapStatus(qNum, hasAnswer) {
+            const mapBox = document.getElementById(`map-q${qNum}`);
+            if(!mapBox) return;
+            if(hasAnswer) {
+                mapBox.classList.add('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.remove('bg-white', 'border-gray-200', 'text-gray-500');
+            } else {
+                mapBox.classList.remove('bg-brand-50', 'border-brand-500', 'text-brand-700');
+                mapBox.classList.add('bg-white', 'border-gray-200', 'text-gray-500');
+            }
+        }
+
+        function updateRadioMap(qNum) {
+            if(isSubmitted) return;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            userAnswers[qNum] = selected ? selected.value : "";
+            updateMapStatus(qNum, !!selected);
+        }
+
+        function updateSelect(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val;
+            updateMapStatus(qNum, !!val);
+        }
+
+        function updateTextInput(qNum, val) {
+            if(isSubmitted) return;
+            userAnswers[qNum] = val.trim();
+            updateMapStatus(qNum, val.trim().length > 0);
+        }
+
+        function initStudentHighlighting() {
+            const passagePane = document.getElementById('left-pane');
+            const tooltip = document.getElementById('highlight-tooltip');
+            
+            passagePane.addEventListener('mouseup', (e) => {
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    if(document.getElementById('passage-content').contains(range.commonAncestorContainer)) {
+                        const rect = range.getBoundingClientRect();
+                        const paneRect = passagePane.getBoundingClientRect();
+                        tooltip.style.left = `${rect.left - paneRect.left + (rect.width / 2)}px`;
+                        tooltip.style.top = `${rect.top - paneRect.top + passagePane.scrollTop - 5}px`;
+                        tooltip.style.display = 'block';
+                    }
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            tooltip.addEventListener('mousedown', (e) => e.preventDefault());
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'highlight-tooltip') tooltip.style.display = 'none';
+            });
+
+            tooltip.addEventListener('click', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) return;
+                
+                document.designMode = "on";
+                if (!document.execCommand("hiliteColor", false, "#fef08a")) {
+                    document.execCommand("backColor", false, "#fef08a");
+                }
+                document.designMode = "off";
+                
+                window.getSelection().removeAllRanges();
+                tooltip.style.display = 'none';
+                
+                const hint = document.getElementById('highlight-hint');
+                if(hint) hint.style.display = 'none';
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer');
+            const container = document.getElementById('timer-container');
+            
+            timerInterval = setInterval(() => {
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                    return;
+                }
+                timeRemaining--;
+                let m = Math.floor(timeRemaining / 60);
+                let s = timeRemaining % 60;
+                display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                if(timeRemaining < 300) {
+                    container.classList.replace('text-brand-700', 'text-red-600');
+                    container.classList.replace('bg-brand-50', 'bg-red-50');
+                    container.classList.replace('border-brand-200', 'border-red-200');
+                    container.classList.add('animate-pulse');
+                }
+            }, 1000);
+        }
+
+        function createCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-[10px] text-green-700 font-bold bg-green-100 px-2 py-1 rounded border border-green-300 w-fit flex items-center gap-1 shadow-sm mt-1`;
+            el.innerHTML = `<svg class="w-3 h-3 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Ans: ${text}`;
+            return el;
+        }
+        
+        function createRadioCorrectMarker(text) {
+            const el = document.createElement('div');
+            el.className = `text-sm text-green-800 font-bold bg-green-100 py-1.5 px-3 rounded-lg border border-green-300 shadow-sm flex items-center gap-2 mt-2 w-fit`;
+            el.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Correct: ${text}`;
+            return el;
+        }
+
+        function styleMapBox(i, status) {
+            const mapBox = document.getElementById(`map-q${i}`);
+            mapBox.className = `w-7 h-7 shrink-0 rounded border-2 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm`;
+            if (status === 'correct') {
+                mapBox.classList.add('bg-green-500', 'border-green-600');
+            } else if (status === 'incorrect') {
+                mapBox.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                mapBox.classList.add('bg-yellow-400', 'border-yellow-500');
+            }
+        }
+
+        function markRadio(qRow, correct, uAns) {
+            const right = qRow.querySelector(`input[value="${correct}"]`).parentElement;
+            right.classList.add('res-correct');
+            right.insertAdjacentHTML('beforeend', '<span class="ml-auto pl-2">✓</span>');
+            if (uAns && uAns !== correct) qRow.querySelector(`input[value="${uAns}"]`).parentElement.classList.add('res-wrong');
+        }
+        function ansBadge(text) {
+            return `<span class="ans-badge">✓ ${text}</span>`;
+        }
+
+        function submitTest() {
+            if(isSubmitted) return;
+            isSubmitted = true;
+            clearInterval(timerInterval);
+            let score = 0;
+            
+            // Disable inputs
+            document.querySelectorAll('select').forEach(el => el.disabled = true);
+            document.querySelectorAll('input').forEach(el => {
+                el.disabled = true;
+                if(el.type === 'radio') el.parentElement.classList.remove('hover:bg-gray-100', 'cursor-pointer');
+            });
+
+            for (let i = 1; i <= TOTAL_QS; i++) {
+                const uAns = (userAnswers[i] || '').toUpperCase();
+                const correct = ANSWER_KEYS[i];
+                const isCorrect = uAns === correct;
+                const qRow = document.querySelector(`.q-row[data-q="${i}"]`);
+                if (uAns === '') { styleMapBox(i, 'blank'); qRow.classList.replace('border-gray-200', 'border-yellow-400'); qRow.classList.replace('bg-gray-50', 'bg-yellow-50'); }
+                else if (isCorrect) { score++; styleMapBox(i, 'correct'); qRow.classList.replace('border-gray-200', 'border-green-400'); qRow.classList.replace('bg-gray-50', 'bg-green-50'); }
+                else { styleMapBox(i, 'incorrect'); qRow.classList.replace('border-gray-200', 'border-red-400'); qRow.classList.replace('bg-gray-50', 'bg-red-50'); }
+                const fc = qRow.querySelector('.feedback-container');
+                fc.classList.remove('hidden'); fc.classList.add('flex');
+                if (SELECT_QS.includes(i)) {
+                    const s = document.getElementById(`sel-q${i}`);
+                    if (uAns !== '') s.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    s.insertAdjacentHTML('afterend', ' ' + ansBadge('Correct answer: ' + correct));
+                } else {
+                    markRadio(qRow, correct, uAns);
+                }
+            }
+
+            // Finish UI
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('results-banner').classList.remove('hidden');
+            document.getElementById('result-legend').classList.remove('hidden');
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('highlight-hint').classList.add('hidden');
+            
+            document.getElementById('right-pane').scrollTop = 0;
+        }
+
+        function showExplanation(targetIds) {
+            document.querySelectorAll('.active-explanation').forEach(el => {
+                el.classList.remove('active-explanation');
+            });
+
+            if (targetIds && targetIds.length > 0) {
+                const firstTarget = document.getElementById(targetIds[0]);
+                if(firstTarget) {
+                    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                targetIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('active-explanation');
+                });
+            }
+        }
+
+        function showNotGivenToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        window.onload = function() {
+            initQuestionMap();
+            initStudentHighlighting();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
